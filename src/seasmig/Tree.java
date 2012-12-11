@@ -1,9 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 
@@ -42,7 +39,6 @@ public class Tree {
 	}
 	
 	public Tree(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String, Integer> traitMap, int num_states_) {
-		// TODO:
 		num_states=num_states_;
 		Integer trait = traitMap.get(tree.getTaxon(tree.getRootNode()));
         if (trait==null) 
@@ -55,7 +51,6 @@ public class Tree {
 			HashMap<String, Integer> traitMap, Node outputSubTree,
 			jebl.evolution.graphs.Node inputSubTree) {
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {	
-			//System.err.println(inputTree.getTaxon(node));
 			Taxon taxon = inputTree.getTaxon(node);
 			Integer trait = MigrationModel.UNKNOWN_STATE;
 			if (taxon!=null) {

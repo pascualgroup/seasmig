@@ -1,3 +1,6 @@
+package seasmig;
+//TODO: This code has major flaws... :)
+
 import java.util.HashMap;
 import java.util.Vector;
 
