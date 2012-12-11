@@ -38,7 +38,7 @@ public class Config
 	public Seasonality seasonality = Seasonality.NONE;
 	public String dataFilename;
 	
-	public int stateCount = 3;
+	public int stateCount = 3; 
 	public String traitFilename = "traits.txt"; // null if traits are loaded from tree
 	public String treeFilename = "beastInput.trees";
 	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail 

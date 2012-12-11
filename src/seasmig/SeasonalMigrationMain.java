@@ -26,8 +26,11 @@ public class SeasonalMigrationMain
 	{
 		try
 		{
+			// Load config
 			Gson gson = new Gson();
-			Config config = gson.fromJson(new FileReader("config.json"), Config.class);			
+			Config config = gson.fromJson(new FileReader("config.json"), Config.class);
+			
+			// Load data files
 			Data data = new Data(config);
 			
 			MCMC mcmc = new MCMC();

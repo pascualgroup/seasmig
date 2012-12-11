@@ -65,7 +65,36 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	{
 		double logLikelihood = 0.0;
 		
-		
+		switch (config.seasonality) {
+		case NONE:
+			double[][] rates = new double[config.stateCount][config.stateCount];
+			for (int i=0;i<config.stateCount;i++) {
+				for (int j=0;j<config.stateCount;j++) {
+					rates[i][j]=model.getRateParams(i, j).getRate();
+				}
+			}
+			
+			MigrationModel 
+			
+			break;
+			
+		case TWO_MATRICES:		
+			rates = new double[config.stateCount][config.stateCount];
+			double[][] rates2 = new double[config.stateCount][config.stateCount];
+			for (int i=0;i<config.stateCount;i++) {
+				for (int j=0;j<config.stateCount;j++) {
+					rates[i][j]=model.getRateParams(i, j).getRate();
+					rates2[i][j]=model.getRateParams(i, j).getRate2();
+				}
+			}
+			double twoMatrixPhase = model.getTwoMatrixPhase();
+			double twoMatrixLength = 0.5; // TODO: Add parameter for first season length
+			
+			break;
+			
+		//TODO: case SINUSIODIAL:
+			
+		}
 
 		// TODO: calculate log-likelihood here.
 

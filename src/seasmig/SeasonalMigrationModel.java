@@ -65,8 +65,8 @@ public class SeasonalMigrationModel extends GraphicalModel
 			for(int j = 0; j < config.stateCount; j++)
 			{
 				if(i == j) continue; // rateParams[i,i] remains null
-
 				rateParams[i][j] = new RateParams(i, j);
+				// TODO: Ask Ed about prior for TWO_MATRICES...
 			}
 		}
 	}
@@ -78,48 +78,46 @@ public class SeasonalMigrationModel extends GraphicalModel
 
 		obj.put("ratePriorRate", ratePriorRate.getValue());
 
-		switch (config.seasonality) {
+		switch (config.seasonality) {	
+		case TWO_MATRICES:
+			obj.put("twoMatrixPhase", twoMatrixPhase.getValue());
+			break;
 		// TODO: ADD SINUSOIDIAL SEASONALITY
 		//		case SINUSOIDAL :
 		//			obj.put("amplitudePriorAlpha", amplitudePriorAlpha.getValue());
 		//			obj.put("amplitudePriorBeta", amplitudePriorBeta.getValue());
 		//		break;
-		case TWO_MATRICES:
-			obj.put("twoMatrixPhase", twoMatrixPhase.getValue());
-			break;
 		}
-
-		double[][] rates = new double[config.stateCount][config.stateCount];
-		for(int i = 0; i < config.stateCount; i++)
-		{
-			for(int j = 0; j < config.stateCount; j++)
-			{
-				if(i == j) continue;
-				rates[i][j] = rateParams[i][j].getRate();
-			}
-		}
-		obj.put("rates", rates);
-
 
 		switch (config.seasonality) {
-		// TODO: ADD SINUSOIDIAL SEASONALITY
-		//		case SINUSOIDAL :
-		//			double[][] amplitudes = new double[config.stateCount][config.stateCount];
-		//			double[][] phases = new double[config.stateCount][config.stateCount];
-		//			
-		//			for(int i = 0; i < config.stateCount; i++)
-		//			{
-		//				for(int j = 0; j < config.stateCount; j++)
-		//				{
-		//					if(i == j) continue;
-		//					
-		//					amplitudes[i][j] = rateParams[i][j].getAmplitude();
-		//					phases[i][j] = rateParams[i][j].getPhase();
-		//				}
-		//			}
-		//			obj.put("amplitudes", amplitudes);
-		//			obj.put("phases", phases);
+		case  NONE: 
+			double[][] rates = new double[config.stateCount][config.stateCount];
+
+
+			for(int i = 0; i < config.stateCount; i++)
+			{
+				for(int j = 0; j < config.stateCount; j++)
+				{
+					if(i == j) continue;
+					rates[i][j] = rateParams[i][j].getRate();
+				}
+			}
+			obj.put("rates", rates);
+			break;
 		case TWO_MATRICES :
+			rates = new double[config.stateCount][config.stateCount];
+
+
+			for(int i = 0; i < config.stateCount; i++)
+			{
+				for(int j = 0; j < config.stateCount; j++)
+				{
+					if(i == j) continue;
+					rates[i][j] = rateParams[i][j].getRate();
+				}
+			}
+			obj.put("rates", rates);
+
 			double[][] rates2 = new double[config.stateCount][config.stateCount];
 			for(int i = 0; i < config.stateCount; i++)
 			{
@@ -131,6 +129,23 @@ public class SeasonalMigrationModel extends GraphicalModel
 			}
 			obj.put("rates2", rates2);
 			break;
+			// TODO: ADD SINUSOIDIAL SEASONALITY
+			//		case SINUSOIDAL :
+			//			double[][] amplitudes = new double[config.stateCount][config.stateCount];
+			//			double[][] phases = new double[config.stateCount][config.stateCount];
+			//			
+			//			for(int i = 0; i < config.stateCount; i++)
+			//			{
+			//				for(int j = 0; j < config.stateCount; j++)
+			//				{
+			//					if(i == j) continue;
+			//					
+			//					amplitudes[i][j] = rateParams[i][j].getAmplitude();
+			//					phases[i][j] = rateParams[i][j].getPhase();
+			//				}
+			//			}
+			//			obj.put("amplitudes", amplitudes);
+			//			obj.put("phases", phases);
 		}
 
 		return obj;
@@ -184,16 +199,16 @@ public class SeasonalMigrationModel extends GraphicalModel
 			return rate2.getValue();
 		}
 
-// TODO: ADD SINUSOIDIAL SEASONALITY
-//		public double getAmplitude()
-//		{
-//			return amplitude.getValue();
-//		}
-//
-//		public double getPhase()
-//		{
-//			return phase.getValue();
-//		}
+		// TODO: ADD SINUSOIDIAL SEASONALITY
+		//		public double getAmplitude()
+		//		{
+		//			return amplitude.getValue();
+		//		}
+		//
+		//		public double getPhase()
+		//		{
+		//			return phase.getValue();
+		//		}
 	}
 
 	double getTwoMatrixPhase()
