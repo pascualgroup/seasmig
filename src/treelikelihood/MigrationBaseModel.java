@@ -1,4 +1,4 @@
-package seasmig;
+package treelikelihood;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 

@@ -35,8 +35,6 @@ public class Config
 	public LogLevel logLevel = LogLevel.INFO;
 	public String logFilename = "debug.log";
 	
-	public String dataFilename = "data.csv";
-	
 	public Seasonality seasonality = Seasonality.NONE;
 	
 }

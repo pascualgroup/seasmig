@@ -1,4 +1,4 @@
-package seasmig;
+package treelikelihood;
 
 import java.util.HashMap;
 import java.util.Vector;
