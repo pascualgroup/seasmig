@@ -15,12 +15,14 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 {
 	SeasonalMigrationModel model;
 	Config config;
+	Data data;
 	
 	public SeasonalMigrationLikelihood(SeasonalMigrationModel model) throws MC3KitException
 	{
 		super(model, "likelihood");
 		this.model = model;
 		this.config = model.config;
+		this.data = model.data;
 		
 		// This is the weird way dependencies are declared. It will become unweird someday.
 		
