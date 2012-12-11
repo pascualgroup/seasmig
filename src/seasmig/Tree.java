@@ -26,7 +26,7 @@ public class Tree {
 	Node root = null;		
 	int num_states = 0;
 	
-	public Tree(MigrationModel createTreeModel, int numNodes) {
+	public Tree(MigrationBaseModel createTreeModel, int numNodes) {
 		num_states=createTreeModel.getNumStates();
 		root = new Node(0,0,num_states);
 		makeRandomTree(createTreeModel, root, numNodes);		
@@ -52,7 +52,7 @@ public class Tree {
 			jebl.evolution.graphs.Node inputSubTree) {
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {	
 			Taxon taxon = inputTree.getTaxon(node);
-			Integer trait = MigrationModel.UNKNOWN_STATE;
+			Integer trait = MigrationBaseModel.UNKNOWN_STATE;
 			if (taxon!=null) {
 				trait = traitMap.get(inputTree.getTaxon(node).toString());
 				if (trait==null) 
@@ -73,7 +73,7 @@ public class Tree {
 		
 	}
 	
-	public void makeRandomTree(MigrationModel m, Node from, int nNodes) {		
+	public void makeRandomTree(MigrationBaseModel m, Node from, int nNodes) {		
 		if (nNodes>1) {
 			for (int child=0;child<2;child++) {
 				double d = cern.jet.random.Uniform.staticNextDouble();
@@ -99,7 +99,7 @@ public class Tree {
 
 	private void removeInternalStates(Node node) {
 		if (node.children.size()!=0) {
-			node.state=MigrationModel.UNKNOWN_STATE;
+			node.state=MigrationBaseModel.UNKNOWN_STATE;
 			for (Node child : node.children) {
 				removeInternalStates(child);				
 			}
@@ -132,10 +132,10 @@ public class Tree {
 	}
 
 
-	public double logLikelihood(MigrationModel likelihoodModel) {
+	public double logLikelihood(MigrationBaseModel likelihoodModel) {
 		double[] alphas=new double[num_states];
 		double min = Double.MIN_VALUE;
-		if (root.state==MigrationModel.UNKNOWN_STATE) {
+		if (root.state==MigrationBaseModel.UNKNOWN_STATE) {
 			for (int rootState=0;rootState<num_states;rootState++) {				
 				double alpha=conditionalLogLikelihood(likelihoodModel,root, rootState);
 				alphas[rootState]=alpha;
@@ -148,7 +148,7 @@ public class Tree {
 		}		
 	}
 
-	private double conditionalLogLikelihood(MigrationModel likelihoodModel, Node node, int nodeState) {
+	private double conditionalLogLikelihood(MigrationBaseModel likelihoodModel, Node node, int nodeState) {
 
 		if (node.cachedConditionalLogLikelihood[nodeState]!=null) {			
 			return node.cachedConditionalLogLikelihood[nodeState];
@@ -156,7 +156,7 @@ public class Tree {
 		else {
 			double loglikelihood=0;
 			for (Node child : node.children) {
-				if (child.state!=MigrationModel.UNKNOWN_STATE) {
+				if (child.state!=MigrationBaseModel.UNKNOWN_STATE) {
 					assert child.time>node.time;
 					loglikelihood=loglikelihood+conditionalLogLikelihood(likelihoodModel,child,child.state)+likelihoodModel.logprobability(nodeState, child.state, node.time, child.time);
 				}

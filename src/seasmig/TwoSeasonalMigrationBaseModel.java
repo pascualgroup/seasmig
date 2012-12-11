@@ -1,3 +1,4 @@
+package seasmig;
 
 import java.util.HashMap;
 import java.util.Vector;
@@ -7,14 +8,14 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 
 
-public class TwoSeasonalRateBasedMigrationModel implements MigrationModel {
+public class TwoSeasonalMigrationBaseModel implements MigrationBaseModel {
 
 	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
 
 	// Seasonal Migration Models
-	MigrationModel season1MigrationModel = null;
-	MigrationModel season2MigrationModel = null;
+	MigrationBaseModel season1MigrationModel = null;
+	MigrationBaseModel season2MigrationModel = null;
 
 	// Seasonal Range [...season2....|...season1......|...season2..]
 	//                0             S1S              S1E        1 year
@@ -32,12 +33,12 @@ public class TwoSeasonalRateBasedMigrationModel implements MigrationModel {
 	private int num_states = 0;
 
 	// Constructor	
-	public TwoSeasonalRateBasedMigrationModel(double[][] Q1_,double[][] Q2_, double season1Start_, double season1End_) {		
+	public TwoSeasonalMigrationBaseModel(double[][] Q1_,double[][] Q2_, double season1Start_, double season1End_) {		
 		season1Start=season1Start_;
 		season1Length=season1End_-season1Start_;
 		season2Length=1-season1Length;
-		season1MigrationModel=new ConstantRateBasedMigrationModel(Q1_);
-		season2MigrationModel=new ConstantRateBasedMigrationModel(Q2_);
+		season1MigrationModel=new ConstantMigrationBaseModel(Q1_);
+		season2MigrationModel=new ConstantMigrationBaseModel(Q2_);
 		num_states=Q1_.length;
 	}
 
