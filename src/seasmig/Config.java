@@ -38,5 +38,5 @@ public class Config
 	public String dataFilename = "data.csv";
 	
 	public Seasonality seasonality = Seasonality.NONE;
-	public int stateCount = 2;
+	
 }
