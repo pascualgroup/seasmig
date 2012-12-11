@@ -8,7 +8,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 
 
-public class TwoSeasonalMigrationBaseModel implements MigrationBaseModel {
+public class TwoMatrixMigrationBaseModel implements MigrationBaseModel {
 
 	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
@@ -33,7 +33,7 @@ public class TwoSeasonalMigrationBaseModel implements MigrationBaseModel {
 	private int num_states = 0;
 
 	// Constructor	
-	public TwoSeasonalMigrationBaseModel(double[][] Q1_,double[][] Q2_, double season1Start_, double season1End_) {		
+	public TwoMatrixMigrationBaseModel(double[][] Q1_,double[][] Q2_, double season1Start_, double season1End_) {		
 		season1Start=season1Start_;
 		season1Length=season1End_-season1Start_;
 		season2Length=1-season1Length;
