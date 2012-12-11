@@ -24,43 +24,42 @@ import jebl.evolution.trees.SimpleRootedTree;
 public class Data
 {
 
-	public int stateCount = 3;
+
 	public Vector<Tree> trees = new Vector<Tree>();
+	Config config = null;
 
-	public Data(String treeFilename,String traitFilename) throws IOException, ImportException 	{			
+	public Data(Config config_) throws IOException, ImportException 	{
 
-		File treeFile = new File("beastInput.trees");
+		config = config_;		
+
+		// Load trees
+		File treeFile = new File(config.treeFilename);
 		FileReader reader = new FileReader(treeFile);
-
 		NexusImporter nexusImporter = new NexusImporter(reader);		
 		List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
 
-		HashMap<String,Integer> traitMap = readTraits("traits.txt");
+		// Convert trees to internal tree representation
+		if (config.traitFilename!=null) {
+			HashMap<String,Integer> traitMap = readTraits("traits.txt");
 
-		int treeLoadStartIndex = Math.max(0,trees.size()-20); //TODO: add config param,
-		for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
-			trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),traitMap,stateCount));
+			int treeLoadStartIndex = Math.max(0,nexsusTrees.size()-config.numTreesFromTail); 
+			for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
+				trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),traitMap,config.stateCount));
+			}
 		}
+		else {
 
+			int treeLoadStartIndex = Math.max(0,nexsusTrees.size()-config.numTreesFromTail);
+			for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
+				trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),config.stateCount));
+			}		
+		}	
 	}
 
-	public Data(String treeFilename) throws IOException, ImportException 	{
-		File treeFile = new File(treeFilename);
-		FileReader reader = new FileReader(treeFile);
-
-		NexusImporter nexusImporter = new NexusImporter(reader);		
-		List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
-
-		int treeLoadStartIndex = Math.max(0,trees.size()-20); //TODO: add config param,
-		for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
-			trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),stateCount));
-		}		
-	}	
-
 	public Data() {
-		
+
 		// TODO:		
-		// generate data...		
+		// generate test data...		
 
 	}
 
@@ -75,8 +74,6 @@ public class Data
 		String strLine;
 		//Read File Line By Line
 		while ((strLine = traitReader.readLine()) != null)   {
-			// Print the content on the console
-			//System.out.println (strLine);
 			String taxa = strLine;
 			Integer state = Integer.parseInt(traitReader.readLine());
 			traitMap.put(taxa, state);

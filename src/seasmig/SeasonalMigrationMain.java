@@ -27,8 +27,8 @@ public class SeasonalMigrationMain
 		try
 		{
 			Gson gson = new Gson();
-			Config config = gson.fromJson(new FileReader("config.json"), Config.class);
-			Data data = new Data(config.dataFilename);
+			Config config = gson.fromJson(new FileReader("config.json"), Config.class);			
+			Data data = new Data(config);
 			
 			MCMC mcmc = new MCMC();
 			mcmc.setRandomSeed(config.randomSeed);
