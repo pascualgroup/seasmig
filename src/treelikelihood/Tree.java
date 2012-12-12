@@ -1,7 +1,11 @@
 package treelikelihood;
+import Tree;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import Tree.Node;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
@@ -215,14 +219,15 @@ public class Tree {
 		Tree newTree = new Tree();
 		newTree.num_states=num_states;
 		newTree.root=new Node(root.state,root.time,num_states);
-		treeCopyNoCache(newTree.root,root);		
+		treeCopyNoCache(root,newTree.root);		
 		return newTree;
 	}
 
 	private void treeCopyNoCache(Node from, Node to) {
 		for (Node child : from.children) {
 			Node newChild = new Node(child.state,child.time,num_states);
-			to.children.add(newChild);
+			newChild.parent=from;
+			to.children.add(newChild);			
 			treeCopyNoCache(child, newChild);
 		}		
 	}
