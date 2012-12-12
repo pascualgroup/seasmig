@@ -29,7 +29,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		// This is the weird way dependencies are declared. It will become unweird someday.
 		for(int i = 0; i < config.stateCount; i++)
 		{
-			for(int j = 0; j < config.stateCount-1; j++)
+			for(int j = 0; j < config.stateCount; j++)
 			{
 				switch (config.seasonality) {
 				case NONE:
@@ -73,7 +73,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				for (int j=0;j<config.stateCount;j++) {
 					if (i!=j) {
 						rates[i][j]=model.getIndexAdjustedRateParams(i, j).getRate();
-						rowsum+=rates[i][j];
+						rowsum-=rates[i][j];
 					}
 				}
 				rates[i][i]=rowsum;
@@ -95,9 +95,9 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				for (int j=0;j<config.stateCount;j++) {		
 					if (i!=j) {
 						rates[i][j]=model.getIndexAdjustedRateParams(i, j).getRate();
-						row1sum+=rates[i][j];
+						row1sum-=rates[i][j];
 						rates2[i][j]=model.getIndexAdjustedRateParams(i, j).getRate2();
-						row2sum+=rates2[i][j];
+						row2sum-=rates2[i][j];
 					}
 				}
 				rates[i][i]=row1sum;

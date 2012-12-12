@@ -1,4 +1,4 @@
 {
-	"seasonality" : "NONE",
+	"seasonality" : "TWO_MATRICES",
 	"stateCount" : 3
 }

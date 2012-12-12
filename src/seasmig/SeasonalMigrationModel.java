@@ -45,34 +45,51 @@ public class SeasonalMigrationModel extends GraphicalModel
 	protected void buildModel(RandomEngine rng) throws MC3KitException
 	{
 		// TODO: ask Ed if this is ok
-		this.rng = rng;
-		
-		ratePriorRate = new ExponentialVariable(this, "ratePriorRate", 1.0);
-		ratePrior = new ExponentialDistribution(this, "ratePrior", ratePriorRate);
+		this.rng = rng;	
 
 		switch (config.seasonality) {
 
+		case NONE :
+			ratePriorRate = new ExponentialVariable(this, "ratePriorRate", 1.0);
+			ratePrior = new ExponentialDistribution(this, "ratePrior", ratePriorRate);
+			rateParams = new RateParams[config.stateCount][config.stateCount];
+			for(int i = 0; i < config.stateCount; i++)
+			{
+				for(int j = 0; j < config.stateCount; j++)
+				{
+					if(i == j) continue; // rateParams[i,i] remains null
+					rateParams[i][j] = new RateParams(i, j);
+				}
+			}
+			break;
+		case TWO_MATRICES:
+			twoMatrixPhase = new UniformDoubleVariable(this, "twoMatrixPhase", 0.0, 1.0);
+			for(int i = 0; i < config.stateCount; i++)
+			{
+				for(int j = 0; j < config.stateCount; j++)
+				{
+					if(i == j) continue; // rateParams[i,i] remains null
+					rateParams[i][j] = new RateParams(i, j);
+				}
+			}
+			break;
 		case SINUSOIDAL :
 			amplitudePriorAlpha = new ExponentialVariable(this, "amplitudePriorAlpha", 1.0);
 			amplitudePriorBeta = new ExponentialVariable(this, "amplitudePriorBeta", 1.0);
 			amplitudePrior = new BetaDistribution(this, "amplitudePrior", amplitudePriorAlpha, amplitudePriorBeta);
 			phasePrior = new UniformDoubleDistribution(this, "phasePrior", 0.0, 1.0);
-			break;
-		case TWO_MATRICES:
-			twoMatrixPhase = new UniformDoubleVariable(this, "twoMatrixPhase", 0.0, 1.0);
+			for(int i = 0; i < config.stateCount; i++)
+			{
+				for(int j = 0; j < config.stateCount; j++)
+				{
+					if(i == j) continue; // rateParams[i,i] remains null
+					rateParams[i][j] = new RateParams(i, j);
+				}
+			}
 			break;
 		}
 
-		rateParams = new RateParams[config.stateCount][config.stateCount];
-		for(int i = 0; i < config.stateCount; i++)
-		{
-			for(int j = 0; j < config.stateCount; j++)
-			{
-				if(i == j) continue; // rateParams[i,i] remains null
-				rateParams[i][j] = new RateParams(i, j);
-				// TODO: Ask Ed about prior for TWO_MATRICES...
-			}
-		}
+		
 	}
 
 	@Override
@@ -105,7 +122,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 				{
 					if(i == j) continue;
 					rates[i][j] = rateParams[i][j].getRate();
-					rates[i][j] = rateParams[i][j].getRate2();
+					rates2[i][j] = rateParams[i][j].getRate2();
 				}
 			}
 			obj.put("ratePriorRate", ratePriorRate.getValue());
