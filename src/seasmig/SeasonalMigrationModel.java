@@ -63,10 +63,10 @@ public class SeasonalMigrationModel extends GraphicalModel
 			break;
 		}
 
-		rateParams = new RateParams[config.stateCount][config.stateCount-1];
+		rateParams = new RateParams[config.stateCount][config.stateCount];
 		for(int i = 0; i < config.stateCount; i++)
 		{
-			for(int j = 0; j < config.stateCount-1; j++)
+			for(int j = 0; j < config.stateCount; j++)
 			{
 				if(i == j) continue; // rateParams[i,i] remains null
 				rateParams[i][j] = new RateParams(i, j);
@@ -82,11 +82,11 @@ public class SeasonalMigrationModel extends GraphicalModel
 
 		switch (config.seasonality) {
 		case  NONE: 
-			double[][] rates = new double[config.stateCount][config.stateCount-1];
+			double[][] rates = new double[config.stateCount][config.stateCount];
 
 			for(int i = 0; i < config.stateCount; i++)
 			{
-				for(int j = 0; j < config.stateCount-1; j++)
+				for(int j = 0; j < config.stateCount; j++)
 				{
 					if(i == j) continue;
 					rates[i][j] = rateParams[i][j].getRate();
@@ -96,12 +96,12 @@ public class SeasonalMigrationModel extends GraphicalModel
 			obj.put("rates", rates);
 			break;
 		case TWO_MATRICES :
-			rates = new double[config.stateCount][config.stateCount-1];
-			double[][] rates2 = new double[config.stateCount][config.stateCount-1];
+			rates = new double[config.stateCount][config.stateCount];
+			double[][] rates2 = new double[config.stateCount][config.stateCount];
 
 			for(int i = 0; i < config.stateCount; i++)
 			{
-				for(int j = 0; j < config.stateCount-1; j++)
+				for(int j = 0; j < config.stateCount; j++)
 				{
 					if(i == j) continue;
 					rates[i][j] = rateParams[i][j].getRate();
@@ -115,13 +115,13 @@ public class SeasonalMigrationModel extends GraphicalModel
 			break;
 
 		case SINUSOIDAL :
-			rates = new double[config.stateCount][config.stateCount-1];
-			double[][] amplitudes = new double[config.stateCount][config.stateCount-1];
-			double[][] phases = new double[config.stateCount][config.stateCount-1];
+			rates = new double[config.stateCount][config.stateCount];
+			double[][] amplitudes = new double[config.stateCount][config.stateCount];
+			double[][] phases = new double[config.stateCount][config.stateCount];
 
 			for(int i = 0; i < config.stateCount; i++)
 			{
-				for(int j = 0; j < config.stateCount-1; j++)
+				for(int j = 0; j < config.stateCount; j++)
 				{
 					if(i == j) continue;
 					rates[i][j] = rateParams[i][j].getRate();
@@ -207,28 +207,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 
 	RateParams getIndexAdjustedRateParams(int i, int j)
 	{ 		
-		 // TODO: Clean this up
-		
-		// deal with extra dof for each row
-		// original matrix:
-		// 0.25 0.25
-		// 0.1  0.1  
-		// 0.3  0.2
-		// 
-		// index adjusted:
-		// -0.5 0.25 0.25
-		// 0.1  -0.2 0.1
-		// 0.3  0.2  -0.5
-		
-		// deal with one less dof
-		if (j<i)
-			return rateParams[i][j];
-		else if (i>j) 
-			return rateParams[i][j-1];
-		else {
-			System.err.println("trying to access index [i,i] of rate param...\n");
-			return null;
-		}
+		return rateParams[i][j];
 	}
 
 	public RandomEngine getRNG() {
