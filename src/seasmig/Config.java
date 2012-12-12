@@ -9,7 +9,7 @@ public class Config
 	{
 		NONE,
 		TWO_MATRICES,
-		//TODO: SINUSOIDAL
+		SINUSOIDAL //TODO: 
 	}
 	
 	public String sampleFilename = "samples.jsons";

@@ -2,14 +2,13 @@ package seasmig;
 
 import java.util.Set;
 
-import seasmig.Config.Seasonality;
-
 import mc3kit.MC3KitException;
-import mc3kit.graphical.GraphicalModel;
 import mc3kit.graphical.Jack;
 import mc3kit.graphical.NoDistribution;
 import mc3kit.graphical.RandomVariable;
 import mc3kit.graphical.types.DoubleValued;
+
+import treelikelihood.*;
 
 public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 {
@@ -25,12 +24,6 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		this.data = model.data;
 
 		// This is the weird way dependencies are declared. It will become unweird someday.
-
-		if(config.seasonality == Seasonality.TWO_MATRICES)
-		{
-			new Jack<DoubleValued>(model, this, model.twoMatrixPhase);
-		}
-
 		for(int i = 0; i < config.stateCount; i++)
 		{
 			for(int j = 0; j < config.stateCount; j++)
@@ -38,13 +31,15 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				switch (config.seasonality) {
 				case NONE:
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);										
+					break;									
+				case SINUSOIDAL:
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate2);
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].amplitude);
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].phase);
 					break;
-					// TODO: Add SINUSOIDIAL SEASONALITY
-					//				case SINUSOIDAL:
-					//					new Jack<DoubleValued>(model, this, model.rateParams[i][j].amplitude);
-					//					new Jack<DoubleValued>(model, this, model.rateParams[i][j].phase);
-					//					break;
 				case TWO_MATRICES:
+					new Jack<DoubleValued>(model, this, model.twoMatrixPhase);
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate2);
 					break;
@@ -64,7 +59,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	void recalculate() throws MC3KitException
 	{
 		double logLikelihood = 0.0;
-		
+
 		switch (config.seasonality) {
 		case NONE:
 			double[][] rates = new double[config.stateCount][config.stateCount];
@@ -73,11 +68,17 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 					rates[i][j]=model.getRateParams(i, j).getRate();
 				}
 			}
-			
-			MigrationModel 
-			
+
+			MigrationBaseModel likelihoodModel = new ConstantMigrationBaseModel(rates);
+
+			// TODO: Deal with tree copy for parallel implementation. 
+			// TODO: Ask Ed about using static non-parallel colt random ...
+			int randomTreeIndex = cern.jet.random.Uniform.staticNextIntFromTo(0,data.trees.size()-1);
+			data.trees.get(randomTreeIndex).clearCachedLikelihood();
+			logLikelihood = data.trees.get(randomTreeIndex).logLikelihood(likelihoodModel);
+
 			break;
-			
+
 		case TWO_MATRICES:		
 			rates = new double[config.stateCount][config.stateCount];
 			double[][] rates2 = new double[config.stateCount][config.stateCount];
@@ -88,22 +89,37 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				}
 			}
 			double twoMatrixPhase = model.getTwoMatrixPhase();
-			double twoMatrixLength = 0.5; // TODO: Add parameter for first season length
-			
+			// TODO: Add parameter for first season length
+
+			rates = new double[config.stateCount][config.stateCount];
+			for (int i=0;i<config.stateCount;i++) {
+				for (int j=0;j<config.stateCount;j++) {
+					rates[i][j]=model.getRateParams(i, j).getRate();
+				}
+			}
+
+			double season1Start=0;			
+			if (twoMatrixPhase>0.5) 
+				season1Start=(0.5+twoMatrixPhase)%1;
+			else 
+				season1Start=twoMatrixPhase;			
+			double season1End=0.5+season1Start;
+
+			likelihoodModel = new TwoMatrixMigrationBaseModel(rates,rates2,season1Start,season1End);
+
+			// TODO: Deal with tree copy for parallel implementation. 
+			// TODO: Ask Ed about using static non-parallel colt random ...
+			randomTreeIndex = cern.jet.random.Uniform.staticNextIntFromTo(0,data.trees.size()-1);
+			data.trees.get(randomTreeIndex).clearCachedLikelihood();
+			logLikelihood = data.trees.get(randomTreeIndex).logLikelihood(likelihoodModel);
+
 			break;
-			
-		//TODO: case SINUSIODIAL:
-			
+
+			//TODO: case SINUSIODIAL:
+			// model.getRateParams(i,j).getRate() // seasonal amplitude for sinusoidal model
+			// model.getRateParams(i,j).getAmplitude() // seasonal amplitude for sinusoidal model
+			// model.getRateParams(i,j).getPhase() // seasonal phase (between 0 and 1) for sinusoidal model
 		}
-
-		// TODO: calculate log-likelihood here.
-
-		// Get parameters this way (all return double):
-		// model.getRateParams(i,j).getRate() // rate #1
-		// model.getRateParams(i,j).getRate2() // rate #2 for two-matrix model
-		// model.getRateParams(i,j).getAmplitude() // seasonal amplitude for sinusoidal model
-		// model.getRateParams(i,j).getPhase() // seasonal phase (between 0 and 1) for sinusoidal model
-		// model.getTwoMatrixPhase() // change point in year for two matrices (between 0 and 1)
 
 		setLogP(logLikelihood);
 	}
