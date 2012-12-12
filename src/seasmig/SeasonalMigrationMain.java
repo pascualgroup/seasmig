@@ -32,7 +32,7 @@ public class SeasonalMigrationMain
 			
 			// Load data files
 			Data data = new Data(config);
-			
+				
 			MCMC mcmc = new MCMC();
 			mcmc.setRandomSeed(config.randomSeed);
 			mcmc.setChainCount(config.chainCount);

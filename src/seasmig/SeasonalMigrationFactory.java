@@ -1,5 +1,6 @@
 package seasmig;
 
+import cern.jet.random.engine.RandomEngine;
 import mc3kit.MC3KitException;
 import mc3kit.MCMC;
 import mc3kit.Model;

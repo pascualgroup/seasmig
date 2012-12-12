@@ -30,6 +30,8 @@ public class SeasonalMigrationModel extends GraphicalModel
 	SeasonalMigrationLikelihood likeVar;
 
 	RateParams[][] rateParams;
+	
+	RandomEngine rng = null;
 
 	public SeasonalMigrationModel(MCMC mcmc, Config config, Data data) throws MC3KitException
 	{
@@ -37,11 +39,15 @@ public class SeasonalMigrationModel extends GraphicalModel
 
 		this.config = config;
 		this.data = data;
+		
 	}
 
 	@Override
 	protected void buildModel(RandomEngine rng) throws MC3KitException
 	{
+		// TODO: ask Ed if this is ok
+		this.rng = rng;
+		
 		ratePriorRate = new ExponentialVariable(this, "ratePriorRate", 1.0);
 		ratePrior = new ExponentialDistribution(this, "ratePrior", ratePriorRate);
 
@@ -203,5 +209,10 @@ public class SeasonalMigrationModel extends GraphicalModel
 	RateParams getRateParams(int i, int j)
 	{
 		return rateParams[i][j];
+	}
+
+	public RandomEngine getRNG() {
+		// TODO: ask Ed if this is ok
+		return rng;
 	}
 }

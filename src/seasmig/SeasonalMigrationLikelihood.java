@@ -2,6 +2,8 @@ package seasmig;
 
 import java.util.Set;
 
+import cern.jet.random.engine.RandomEngine;
+
 import mc3kit.MC3KitException;
 import mc3kit.graphical.Jack;
 import mc3kit.graphical.NoDistribution;
@@ -60,6 +62,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	void recalculate() throws MC3KitException
 	{
 		double logLikelihood = 0.0;
+		
+		RandomEngine rng = model.getRNG();
 
 		switch (config.seasonality) {
 		case NONE:
@@ -72,9 +76,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			MigrationBaseModel likelihoodModel = new ConstantMigrationBaseModel(rates);
 
-			// TODO: Deal with tree copy for parallel implementation. 
-			// TODO: Use non-static rng ...
-			int randomTreeIndex = cern.jet.random.Uniform.staticNextIntFromTo(0,data.trees.size()-1);
+			// TODO: Replace with random int from..to
+			int randomTreeIndex = rng.nextInt()%data.trees.size();
 			data.trees.get(randomTreeIndex).clearCachedLikelihood();
 			logLikelihood = data.trees.get(randomTreeIndex).logLikelihood(likelihoodModel);
 
@@ -108,9 +111,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			likelihoodModel = new TwoMatrixMigrationBaseModel(rates,rates2,season1Start,season1End);
 
-			// TODO: Deal with avoiding tree copy for parallel implementation. 
-			// TODO: Use non-static rng ...
-			randomTreeIndex = cern.jet.random.Uniform.staticNextIntFromTo(0,data.trees.size()-1);
+			// TODO: Replace with random int from..to
+			randomTreeIndex = rng.nextInt()%data.trees.size();
 			data.trees.get(randomTreeIndex).clearCachedLikelihood();
 			logLikelihood = data.trees.get(randomTreeIndex).copyWithNoCache().logLikelihood(likelihoodModel);
 
