@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-import treelikelihood.Tree;
+import treelikelihood.*;
 
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
@@ -27,38 +27,45 @@ public class Data
 	public Data(Config config_) throws IOException, ImportException 	{
 
 		config = config_;		
+		
+		if (config.treeFilename!=null) {
+			
+			// Load trees
+			File treeFile = new File(config.treeFilename);
+			FileReader reader = new FileReader(treeFile);
+			NexusImporter nexusImporter = new NexusImporter(reader);		
+			List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
+			
+			// Convert trees to internal tree representation
+			if (config.traitFilename!=null) {
+				HashMap<String,Integer> traitMap = readTraits("traits.txt");
 
-		// Load trees
-		File treeFile = new File(config.treeFilename);
-		FileReader reader = new FileReader(treeFile);
-		NexusImporter nexusImporter = new NexusImporter(reader);		
-		List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
-
-		// Convert trees to internal tree representation
-		if (config.traitFilename!=null) {
-			HashMap<String,Integer> traitMap = readTraits("traits.txt");
-
-			int treeLoadStartIndex = Math.max(0,nexsusTrees.size()-config.numTreesFromTail); 
-			for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
-				trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),traitMap,config.stateCount));
+				int treeLoadStartIndex = Math.max(0,nexsusTrees.size()-config.numTreesFromTail); 
+				for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
+					trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),traitMap,config.stateCount));
+				}
 			}
+			else {
+
+				int treeLoadStartIndex = Math.max(0,nexsusTrees.size()-config.numTreesFromTail);
+				for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
+					trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),config.stateCount));
+				}		
+			}	
 		}
 		else {
-
-			int treeLoadStartIndex = Math.max(0,nexsusTrees.size()-config.numTreesFromTail);
-			for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
-				trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),config.stateCount));
-			}		
-		}	
+			// Generate test data and trees (random 20 trees with 4 states)
+			double[][] Q1 = {{-0.75,0.25,0.25,0.25},{0.25,-0.75,0.25,0.25},{0.25,0.25,-0.75,0.25},{0.25,0.25,0.25,-0.75}};
+			
+			MigrationBaseModel createModel = new ConstantMigrationBaseModel(Q1);
+			
+			for (int i=0;i<20;i++) {
+				Tree myTree = new Tree(createModel,1000);
+				myTree.removeInternalStates();
+			}	
+		}
 	}
-
-	public Data() {
-
-		// TODO:		
-		// generate test data...		
-
-	}
-
+	
 	static HashMap<String, Integer> readTraits(String fileName) throws NumberFormatException, IOException {
 
 		FileInputStream traitFIStream = new FileInputStream(fileName);

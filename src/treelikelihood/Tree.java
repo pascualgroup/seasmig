@@ -9,8 +9,7 @@ import jebl.evolution.trees.SimpleRootedTree;
 
 public class Tree {
 	
-	public class Node {
-		
+	public class Node {	
 		Node parent = null;
 		List<Node> children = new ArrayList<Node>();
 		int state = 0;	
@@ -22,7 +21,6 @@ public class Tree {
 			time=time_;
 			cachedConditionalLogLikelihood = new Double[num_states_];
 		}
-
 	}
 
 	Node root = null;		
@@ -32,6 +30,9 @@ public class Tree {
 		num_states=createTreeModel.getNumStates();
 		root = new Node(0,0,num_states);
 		makeRandomTree(createTreeModel, root, numNodes);		
+	}
+	
+	private Tree() {
 	}
 	
 	public Tree(jebl.evolution.trees.SimpleRootedTree tree, int num_states_) {
@@ -208,6 +209,22 @@ public class Tree {
 
 	public void clearCachedLikelihood() {
 		clearCachedLikelihood(root);	
+	}
+	
+	public Tree copyWithNoCache() {
+		Tree newTree = new Tree();
+		newTree.num_states=num_states;
+		newTree.root=new Node(root.state,root.time,num_states);
+		treeCopyNoCache(newTree.root,root);		
+		return newTree;
+	}
+
+	private void treeCopyNoCache(Node from, Node to) {
+		for (Node child : from.children) {
+			Node newChild = new Node(child.state,child.time,num_states);
+			to.children.add(newChild);
+			treeCopyNoCache(child, newChild);
+		}		
 	}
 }
 

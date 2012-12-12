@@ -15,6 +15,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	SeasonalMigrationModel model;
 	Config config;
 	Data data;
+	
 
 	public SeasonalMigrationLikelihood(SeasonalMigrationModel model) throws MC3KitException
 	{
@@ -107,11 +108,11 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			likelihoodModel = new TwoMatrixMigrationBaseModel(rates,rates2,season1Start,season1End);
 
-			// TODO: Deal with tree copy for parallel implementation. 
+			// TODO: Deal with avoiding tree copy for parallel implementation. 
 			// TODO: Ask Ed about using static non-parallel colt random ...
 			randomTreeIndex = cern.jet.random.Uniform.staticNextIntFromTo(0,data.trees.size()-1);
 			data.trees.get(randomTreeIndex).clearCachedLikelihood();
-			logLikelihood = data.trees.get(randomTreeIndex).logLikelihood(likelihoodModel);
+			logLikelihood = data.trees.get(randomTreeIndex).copyWithNoCache().logLikelihood(likelihoodModel);
 
 			break;
 
