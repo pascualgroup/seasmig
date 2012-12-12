@@ -73,7 +73,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			MigrationBaseModel likelihoodModel = new ConstantMigrationBaseModel(rates);
 
 			// TODO: Deal with tree copy for parallel implementation. 
-			// TODO: Ask Ed about using static non-parallel colt random ...
+			// TODO: Use non-static rng ...
 			int randomTreeIndex = cern.jet.random.Uniform.staticNextIntFromTo(0,data.trees.size()-1);
 			data.trees.get(randomTreeIndex).clearCachedLikelihood();
 			logLikelihood = data.trees.get(randomTreeIndex).logLikelihood(likelihoodModel);
@@ -109,7 +109,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			likelihoodModel = new TwoMatrixMigrationBaseModel(rates,rates2,season1Start,season1End);
 
 			// TODO: Deal with avoiding tree copy for parallel implementation. 
-			// TODO: Ask Ed about using static non-parallel colt random ...
+			// TODO: Use non-static rng ...
 			randomTreeIndex = cern.jet.random.Uniform.staticNextIntFromTo(0,data.trees.size()-1);
 			data.trees.get(randomTreeIndex).clearCachedLikelihood();
 			logLikelihood = data.trees.get(randomTreeIndex).copyWithNoCache().logLikelihood(likelihoodModel);

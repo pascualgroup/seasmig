@@ -1,11 +1,8 @@
 package treelikelihood;
-import Tree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import Tree.Node;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
