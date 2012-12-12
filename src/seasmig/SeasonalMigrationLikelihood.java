@@ -76,10 +76,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			MigrationBaseModel likelihoodModel = new ConstantMigrationBaseModel(rates);
 
-			// TODO: Replace with random int from..to
-			int randomTreeIndex = rng.nextInt()%data.trees.size();
-			data.trees.get(randomTreeIndex).clearCachedLikelihood();
-			logLikelihood = data.trees.get(randomTreeIndex).logLikelihood(likelihoodModel);
+			// TODO: Replace with random int from..to			
+			data.trees.get(rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
 
 			break;
 
@@ -111,10 +109,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			likelihoodModel = new TwoMatrixMigrationBaseModel(rates,rates2,season1Start,season1End);
 
-			// TODO: Replace with random int from..to
-			randomTreeIndex = rng.nextInt()%data.trees.size();
-			data.trees.get(randomTreeIndex).clearCachedLikelihood();
-			logLikelihood = data.trees.get(randomTreeIndex).copyWithNoCache().logLikelihood(likelihoodModel);
+			// TODO: Replace with random int from..to			
+			logLikelihood = data.trees.get(rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
 
 			break;
 
