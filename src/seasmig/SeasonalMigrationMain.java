@@ -56,7 +56,7 @@ public class SeasonalMigrationMain
 					System.out.print(".");
 					testLikelihood+=tree.copyWithNoCache().logLikelihood(data.testModel);
 				}
-				testLikelihood=createLikelihood/data.trees.size();
+				testLikelihood=testLikelihood/data.trees.size();
 				System.out.println(testLikelihood);
 				
 			}

@@ -46,7 +46,7 @@ public class Config
 	
 	// TEST RELATED PARAMETERS
 	public Seasonality treeCreateSeasonality = Seasonality.TWO_MATRICES;
-	public int numTestTrees = 100; // at most number of trees to read from tree file's tail
+	public int numTestTrees = 50; // at most number of trees to read from tree file's tail
 	public int numTestTips = 1000; 
 	
 }
