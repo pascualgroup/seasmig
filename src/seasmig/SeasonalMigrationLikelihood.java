@@ -24,7 +24,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		super(model, "likelihood");
 		this.model = model;
 		this.config = model.config;
-		this.data = model.data;
+		this.data = model.data;		
 
 		// This is the weird way dependencies are declared. It will become unweird someday.
 		for(int i = 0; i < config.stateCount; i++)
@@ -126,9 +126,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			// model.getRateParams(i,j).getPhase() // seasonal phase (between 0 and 1) for sinusoidal model
 		}
 		
-		if (rng.nextInt()%10000==0) {
-			System.out.println(".");
-		}
+		getLogger().log(null, "%s", ".");
 
 		setLogP(logLikelihood);
 	}

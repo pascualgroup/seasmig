@@ -27,20 +27,22 @@ public class SeasonalMigrationMain
 		try
 		{
 			// Load config
-			System.out.println("Loading config file...");
+			System.out.print("Loading config file...");
 			Gson gson = new Gson();
 			Config config = gson.fromJson(new FileReader("config.json"), Config.class);
+			System.out.println(" done");
 			
 			// Load data files			
 			Data data = new Data(config);
 				
-			System.out.println("Initializing MCMC STEP 1...");
+			System.out.print("Initializing MCMC STEP 1...");
 			MCMC mcmc = new MCMC();
 			mcmc.setRandomSeed(config.randomSeed);
 			mcmc.setChainCount(config.chainCount);
+			System.out.println(" done");
 			
 			// Initialize debugging logger
-			System.out.println("Initialinzing debug logger...");
+			System.out.print("Initialinzing debug logger...");
 			Logger logger = Logger.getRootLogger();
 			logger.setLevel(config.logLevel.getLog4jLevel());
 			Layout layout = new TTCCLayout("ISO8601");
@@ -59,7 +61,9 @@ public class SeasonalMigrationMain
 			
 			mcmc.setLogger(fmtLogger);
 			
-			System.out.println("Initializing MCMC STEP 2...");
+			System.out.println(" done");
+			
+			System.out.print("Initializing MCMC STEP 2...");
 			
 			// Set heating function for chains, interpolating from 1.0 to 0.0 
 			// with an accelerating heating schedule
@@ -122,9 +126,10 @@ public class SeasonalMigrationMain
 			mcmc.addStep(sampOutStep);
 			mcmc.addStep(plOutStep);
 			
-			System.out.println("Running MCMC...");
+			System.out.println(" done");
+			System.out.print("Running MCMC...");
 			mcmc.run();			
-			System.out.println("Done!");
+			System.out.println("done");
 		}
 		catch(Throwable e)
 		{
