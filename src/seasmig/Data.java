@@ -74,10 +74,10 @@ public class Data
 
 			System.out.print("Generating test trees... ");
 
-			switch (config.seasonality) {
+			switch (config.treeCreateSeasonality) {
 			case NONE:
 
-				// Generate test data and trees (random 20 trees with 4 states)
+				// Generate test data and trees 
 				double[][] Q1 = {{-0.9,0.4,0.3,0.2},
 								{0.3,-0.6,0.2,0.1},
 								{0.2,0.1,-0.3,0.0},
@@ -94,7 +94,7 @@ public class Data
 
 			case TWO_MATRICES:
 
-				// Generate test data and trees (random 20 trees with 4 states)
+				// Generate test data and trees 
 				double[][] QW = {{-0.9,0.4,0.3,0.2},
 								{0.3,-0.6,0.2,0.1},
 								{0.2,0.1,-0.3,0.0},
@@ -105,8 +105,9 @@ public class Data
 								{0.2,0.1,-0.3,0.0},
 								{0.1,0.0,0.0,-0.1}};
 
-
-				createModel = new TwoMatrixMigrationBaseModel(QW,QS,0.3,0.5);
+				double phase = 0.3;
+				double length = 0.5;
+				createModel = new TwoMatrixMigrationBaseModel(QW,QS,phase,length);
 
 				for (int i=0;i<config.numTestTrees;i++) {
 					Tree testTree = new Tree(createModel,config.numTestTips);
