@@ -2,6 +2,8 @@ package seasmig;
 
 import java.util.Set;
 
+import org.apache.log4j.Priority;
+
 import cern.jet.random.engine.RandomEngine;
 
 import mc3kit.MC3KitException;
@@ -126,8 +128,6 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			// model.getRateParams(i,j).getPhase() // seasonal phase (between 0 and 1) for sinusoidal model
 		}
 		
-		getLogger().log(null, "%s", ".");
-
 		setLogP(logLikelihood);
 	}
 
