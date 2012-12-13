@@ -31,8 +31,7 @@ public class SeasonalMigrationMain
 			Gson gson = new Gson();
 			Config config = gson.fromJson(new FileReader("config.json"), Config.class);
 			
-			// Load data files
-			System.out.println("Loading trees...");
+			// Load data files			
 			Data data = new Data(config);
 				
 			System.out.println("Initializing MCMC STEP 1...");

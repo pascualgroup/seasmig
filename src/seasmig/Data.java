@@ -7,13 +7,17 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
 import treelikelihood.*;
 
 import jebl.evolution.io.ImportException;
+import jebl.evolution.io.NexusExporter;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.trees.SimpleRootedTree;
 
@@ -31,29 +35,44 @@ public class Data
 		if (config.treeFilename!=null) {
 
 			// Load trees
+			
+			System.out.print("Loading trees... ");			
 			File treeFile = new File(config.treeFilename);
 			FileReader reader = new FileReader(treeFile);
-			NexusImporter nexusImporter = new NexusImporter(reader);		
+			NexusImporter nexusImporter = new NexusImporter(reader);
 			List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
+			System.out.println("loaded "+nexsusTrees.size()+" trees");
+			
+			System.out.print("Keeping tail... ");		
+			List<jebl.evolution.trees.Tree> nexsusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
+			for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
+				nexsusTreeTail.add(nexsusTrees.get(i));
+			}
+			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
 
 			// Convert trees to internal tree representation
 			if (config.traitFilename!=null) {
+				System.out.print("Loading traits... ");
 				HashMap<String,Integer> traitMap = readTraits("traits.txt");
-
-				int treeLoadStartIndex = Math.max(0,nexsusTrees.size()-config.numTreesFromTail); 
-				for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
-					trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),traitMap,config.stateCount));
+				System.out.println("loaded "+traitMap.size()+" unique traits");
+				
+				System.out.print("Reparsing trees... ");
+				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
+					trees.add(new Tree((SimpleRootedTree) tree,traitMap,config.stateCount));
 				}
+				System.out.println(" reparsed "+trees.size()+" trees");
 			}
 			else {
-
-				int treeLoadStartIndex = Math.max(0,nexsusTrees.size()-config.numTreesFromTail);
-				for (int i=treeLoadStartIndex;i<nexsusTrees.size();i++); {
-					trees.add(new Tree((SimpleRootedTree) nexsusTrees.get(nexsusTrees.size()-1),config.stateCount));
+				System.out.print("Reparsing trees... ");
+				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
+					trees.add(new Tree((SimpleRootedTree) tree,config.stateCount));
 				}		
+				System.out.println(" reparsed "+trees.size()+" trees");
 			}	
 		}
 		else {
+			
+			System.out.print("Generating trees... ");
 			// Generate test data and trees (random 20 trees with 4 states)
 			double[][] Q1 = {{-0.75,0.25,0.25,0.25},{0.25,-0.75,0.25,0.25},{0.25,0.25,-0.75,0.25},{0.25,0.25,0.25,-0.75}};
 
@@ -63,6 +82,7 @@ public class Data
 				Tree myTree = new Tree(createModel,1000);
 				myTree.removeInternalStates();
 			}	
+			System.out.println(" generated "+trees.size()+" trees");
 		}
 	}
 
