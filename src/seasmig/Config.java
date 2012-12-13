@@ -10,6 +10,8 @@ public class Config
 	
 	public Long randomSeed;
 	
+	public RunMode runMode = RunMode.TEST;
+	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
@@ -38,8 +40,8 @@ public class Config
 	public int stateCount = 4; 
 	
 	// MODEL DATA RELATED PARAMETERS
-	public String traitFilename = null;//"traits.txt"; // null if traits are loaded from tree
-	public String treeFilename = null;//"beastInput.trees"; // null for test generated data 
+	public String traitFilename ="traits.txt"; // null if traits are loaded from tree
+	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS

@@ -32,7 +32,7 @@ public class Data
 
 		config = config_;		
 
-		if (config.treeFilename!=null) {
+		if (config.) {
 
 			// Load trees
 
