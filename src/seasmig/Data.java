@@ -35,14 +35,14 @@ public class Data
 		if (config.treeFilename!=null) {
 
 			// Load trees
-			
+
 			System.out.print("Loading trees... ");			
 			File treeFile = new File(config.treeFilename);
 			FileReader reader = new FileReader(treeFile);
 			NexusImporter nexusImporter = new NexusImporter(reader);
 			List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
 			System.out.println("loaded "+nexsusTrees.size()+" trees");
-			
+
 			System.out.print("Keeping tail... ");		
 			List<jebl.evolution.trees.Tree> nexsusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
 			for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
@@ -55,7 +55,7 @@ public class Data
 				System.out.print("Loading traits... ");
 				HashMap<String,Integer> traitMap = readTraits("traits.txt");
 				System.out.println("loaded "+traitMap.size()+" unique traits");
-				
+
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
 					trees.add(new Tree((SimpleRootedTree) tree,traitMap,config.stateCount));
@@ -71,17 +71,56 @@ public class Data
 			}	
 		}
 		else {
-			
-			System.out.print("Generating trees... ");
-			// Generate test data and trees (random 20 trees with 4 states)
-			double[][] Q1 = {{-0.75,0.25,0.25,0.25},{0.25,-0.75,0.25,0.25},{0.25,0.25,-0.75,0.25},{0.25,0.25,0.25,-0.75}};
 
-			MigrationBaseModel createModel = new ConstantMigrationBaseModel(Q1);
+			System.out.print("Generating test trees... ");
 
-			for (int i=0;i<20;i++) {
-				Tree myTree = new Tree(createModel,1000);
-				myTree.removeInternalStates();
-			}	
+			switch (config.seasonality) {
+			case NONE:
+
+				// Generate test data and trees (random 20 trees with 4 states)
+				double[][] Q1 = {{-0.9,0.4,0.3,0.2},
+								{0.3,-0.6,0.2,0.1},
+								{0.2,0.1,-0.3,0.0},
+								{0.1,0.0,0.0,-0.1}};
+
+				MigrationBaseModel createModel = new ConstantMigrationBaseModel(Q1);
+
+				for (int i=0;i<config.numTestTrees;i++) {
+					Tree testTree = new Tree(createModel,config.numTestTips);
+					testTree.removeInternalStates();
+					trees.add(testTree);
+				}
+				break;
+
+			case TWO_MATRICES:
+
+				// Generate test data and trees (random 20 trees with 4 states)
+				double[][] QW = {{-0.9,0.4,0.3,0.2},
+								{0.3,-0.6,0.2,0.1},
+								{0.2,0.1,-0.3,0.0},
+								{0.1,0.0,0.0,-0.1}};
+
+				double[][] QS = {{-0.9,0.4,0.3,0.2},
+								{0.3,-0.6,0.2,0.1},
+								{0.2,0.1,-0.3,0.0},
+								{0.1,0.0,0.0,-0.1}};
+
+
+				createModel = new TwoMatrixMigrationBaseModel(QW,QS,0.3,0.5);
+
+				for (int i=0;i<config.numTestTrees;i++) {
+					Tree testTree = new Tree(createModel,config.numTestTips);
+					testTree.removeInternalStates();
+					trees.add(testTree);
+				}
+				break;
+				
+			case SINUSOIDAL:
+				// TODO:
+				System.err.println("TODO: SEASONAL MODEL\n");
+				break;
+
+			}
 			System.out.println(" generated "+trees.size()+" trees");
 		}
 	}
