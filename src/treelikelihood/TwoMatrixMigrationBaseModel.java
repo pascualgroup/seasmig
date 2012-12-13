@@ -87,7 +87,7 @@ public class TwoMatrixMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public String print() {		
-		return season1MigrationModel.print()+","+season2MigrationModel.print();
+		return "phase: "+season1Start+"length: "+season1Length+"\n"+season1MigrationModel.print()+"\n"+season2MigrationModel.print();
 	}
 
 	private boolean isInSeason1(double time) {
