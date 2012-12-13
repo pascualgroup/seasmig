@@ -32,7 +32,8 @@ public class Data
 
 		config = config_;		
 
-		if (config.) {
+		switch (config.runMode) {
+		case NORMAL:
 
 			// Load trees
 
@@ -69,8 +70,8 @@ public class Data
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}	
-		}
-		else {
+			break;
+		case TEST:
 
 			System.out.print("Generating test trees... ");
 
@@ -123,6 +124,7 @@ public class Data
 
 			}
 			System.out.println(" generated "+trees.size()+" trees");
+			break;
 		}
 	}
 
