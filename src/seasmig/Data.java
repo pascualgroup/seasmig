@@ -27,6 +27,10 @@ public class Data
 
 	public Vector<Tree> trees = new Vector<Tree>();
 	Config config = null;
+	
+	// TEST MODELS
+	MigrationBaseModel createModel = null;
+	MigrationBaseModel testModel = null;
 
 	public Data(Config config_) throws IOException, ImportException 	{
 
@@ -72,42 +76,48 @@ public class Data
 			}	
 			break;
 		case TEST:
-
+						
 			System.out.print("Generating test trees... ");
+			
+			// Generate test data and trees 
+			double[][] Q = {{-0.9,0.4,0.3,0.2},
+							{0.3,-0.6,0.2,0.1},
+							{0.2,0.1,-0.3,0.0},
+							{0.1,0.0,0.0,-0.1}};
+			
+			double[][] QW = {{-0.9,0.8,0.1,0.0},
+							{0.2,-0.5,0.2,0.1},
+							{0.2,0.0,-0.2,0.0},
+							{0.3,0.0,0.0,-0.3}};
+
+			double[][] QS = {{-0.9,0.4,0.3,0.2},
+							{0.3,-0.6,0.2,0.1},
+							{0.2,0.1,-0.3,0.0},
+							{0.1,0.0,0.0,-0.1}};
 
 			switch (config.treeCreateSeasonality) {
 			case NONE:
 
-				// Generate test data and trees 
-				double[][] Q1 = {{-0.9,0.4,0.3,0.2},
-								{0.3,-0.6,0.2,0.1},
-								{0.2,0.1,-0.3,0.0},
-								{0.1,0.0,0.0,-0.1}};
-
-				MigrationBaseModel createModel = new ConstantMigrationBaseModel(Q1);
+				createModel = new ConstantMigrationBaseModel(Q);
 
 				for (int i=0;i<config.numTestTrees;i++) {
 					Tree testTree = new Tree(createModel,config.numTestTips);
 					testTree.removeInternalStates();
 					trees.add(testTree);
 				}
+				
+				/////////////
+				
+				double phase = 0.3;
+				double length = 0.5;
+				testModel = new TwoMatrixMigrationBaseModel(QW,QS,phase,length);
+				
 				break;
 
 			case TWO_MATRICES:
 
-				// Generate test data and trees 
-				double[][] QW = {{-0.9,0.4,0.3,0.2},
-								{0.3,-0.6,0.2,0.1},
-								{0.2,0.1,-0.3,0.0},
-								{0.1,0.0,0.0,-0.1}};
-
-				double[][] QS = {{-0.9,0.4,0.3,0.2},
-								{0.3,-0.6,0.2,0.1},
-								{0.2,0.1,-0.3,0.0},
-								{0.1,0.0,0.0,-0.1}};
-
-				double phase = 0.3;
-				double length = 0.5;
+				phase = 0.3;
+				length = 0.5;
 				createModel = new TwoMatrixMigrationBaseModel(QW,QS,phase,length);
 
 				for (int i=0;i<config.numTestTrees;i++) {
@@ -115,6 +125,10 @@ public class Data
 					testTree.removeInternalStates();
 					trees.add(testTree);
 				}
+				
+				/////////////
+								
+				testModel = new ConstantMigrationBaseModel(Q);
 				break;
 				
 			case SINUSOIDAL:

@@ -17,6 +17,9 @@ import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.TTCCLayout;
 
+import seasmig.Config.RunMode;
+import treelikelihood.Tree;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -34,6 +37,27 @@ public class SeasonalMigrationMain
 			
 			// Load data files			
 			Data data = new Data(config);
+			
+			// Tests...
+			System.out.print("Running likelihood test...");
+			if (config.runMode==RunMode.TEST) {
+				System.out.print("Calculating tree Likelihood using create model seasonality: "+config.treeCreateSeasonality);
+				double createLikelihood = 0;
+				for (Tree tree : data.trees) {
+					createLikelihood+=tree.copyWithNoCache().logLikelihood(data.createModel);
+				}
+				createLikelihood=createLikelihood/data.trees.size();
+				System.out.println(createLikelihood);
+				
+				System.out.print("Calculating tree Likelihood using test model seasonality: "+config.seasonality);
+				double testLikelihood = 0;
+				for (Tree tree : data.trees) {
+					testLikelihood+=tree.copyWithNoCache().logLikelihood(data.testModel);
+				}
+				testLikelihood=createLikelihood/data.trees.size();
+				System.out.println(testLikelihood);
+				
+			}
 				
 			System.out.print("Initializing MCMC STEP 1...");
 			MCMC mcmc = new MCMC();
