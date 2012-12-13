@@ -125,6 +125,10 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			// model.getRateParams(i,j).getAmplitude() // seasonal amplitude for sinusoidal model
 			// model.getRateParams(i,j).getPhase() // seasonal phase (between 0 and 1) for sinusoidal model
 		}
+		
+		if (rng.nextInt()%10000==0) {
+			System.out.println(".");
+		}
 
 		setLogP(logLikelihood);
 	}
