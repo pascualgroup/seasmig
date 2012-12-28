@@ -3,12 +3,13 @@ package treelikelihood;
 import java.util.HashMap;
 import java.util.Vector;
 
+import org.javatuples.Pair;
+
 import cern.colt.matrix.tdouble.*;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 
 
-public class TwoMatrixMigrationBaseModel implements MigrationBaseModel {
+public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 
 	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
@@ -28,12 +29,12 @@ public class TwoMatrixMigrationBaseModel implements MigrationBaseModel {
 	// Caching
 	DoubleFactory2D F = DoubleFactory2D.dense;
 	Vector<DoubleMatrix2D> cachedMatrixPower = new Vector<DoubleMatrix2D>();	
-	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
+	HashMap<Pair<Double,Double>, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, DoubleMatrix2D>();
 
 	private int num_states = 0;
 
 	// Constructor	
-	public TwoMatrixMigrationBaseModel(double[][] Q1_,double[][] Q2_, double season1Start_, double season1End_) {		
+	public TwoSeasonMigrationBaseModel(double[][] Q1_,double[][] Q2_, double season1Start_, double season1End_) {		
 		season1Start=season1Start_;
 		season1Length=season1End_-season1Start_;
 		season2Length=1-season1Length;
@@ -50,27 +51,29 @@ public class TwoMatrixMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {
-
-		DoubleMatrix2D cached = cachedTransitionMatrices.get(to_time-from_time);
+		double from_time_reminder = from_time % 1.0;
+		double from_time_div = from_time - from_time_reminder;
+		double to_time_reminder = to_time - from_time_div;
+		DoubleMatrix2D cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder,to_time_reminder));
 		if (cached!=null) {
 			return cached;
 		}
 		else {
-			double start_time = from_time;
-			double end_time = start_time;
+			double step_start_time = from_time;
+			double step_end_time = step_start_time;
 			DoubleMatrix2D result = F.identity(num_states);
 
 			int n=0;
-			while (end_time<to_time) {
+			while (step_end_time<to_time) {
 				n=n+1;
-				if (isInSeason1(start_time)) {
-					end_time = Math.min(to_time,start_time+season1Length);
-					result = result.zMult(season1MigrationModel.transitionMatrix(start_time, end_time),null);	
-					start_time=end_time;				
+				if (isInSeason1(step_start_time)) {
+					step_end_time = Math.min(to_time,step_start_time+season1Length);
+					result = result.zMult(season1MigrationModel.transitionMatrix(step_start_time, step_end_time),null);	
+					step_start_time=step_end_time;				
 				} else {
-					end_time = Math.min(to_time,start_time+season2Length);
-					result = result.zMult(season2MigrationModel.transitionMatrix(start_time, end_time),null);	
-					start_time=end_time;			
+					step_end_time = Math.min(to_time,step_start_time+season2Length);
+					result = result.zMult(season2MigrationModel.transitionMatrix(step_start_time, step_end_time),null);	
+					step_start_time=step_end_time;			
 				}
 
 			}
@@ -79,7 +82,7 @@ public class TwoMatrixMigrationBaseModel implements MigrationBaseModel {
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
 			}			
-			cachedTransitionMatrices.put(to_time-from_time, result);
+			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),result);
 
 			return result;
 		}

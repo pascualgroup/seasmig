@@ -40,7 +40,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 		this.data = data;
 		
 	}
-
+	
 	@Override
 	protected void buildModel(RandomEngine rng) throws MC3KitException
 	{
@@ -62,7 +62,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 				}
 			}
 			break;
-		case TWO_MATRICES:
+		case TWO_CONSTANT_SEASONS:
 			twoMatrixPhase = new UniformDoubleVariable(this, "twoMatrixPhase", 0.0, 1.0);
 			for(int i = 0; i < config.stateCount; i++)
 			{
@@ -112,7 +112,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 			obj.put("ratePriorRate", ratePriorRate.getValue());
 			obj.put("rates", rates);
 			break;
-		case TWO_MATRICES :
+		case TWO_CONSTANT_SEASONS :
 			rates = new double[config.stateCount][config.stateCount];
 			double[][] rates2 = new double[config.stateCount][config.stateCount];
 
@@ -172,7 +172,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 						SeasonalMigrationModel.this, "rate_" + i + "_" + j, ratePrior
 						);
 				break;
-			case TWO_MATRICES:
+			case TWO_CONSTANT_SEASONS:
 				rate = new DoubleVariable(
 						SeasonalMigrationModel.this, "rate_" + i + "_" + j, ratePrior
 						);
@@ -231,4 +231,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 		// TODO: ask Ed if this is ok
 		return rng;
 	}
+	
+	
+	
 }

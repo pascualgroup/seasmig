@@ -73,6 +73,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		}
 		else {
 			// Compute Taylor expansion to calculate P(t)=Exp(Qt) 
+			// TODO: Replace with closed form expression for Exp(Qt) at least for specific n's 
 			int n = 0;
 			DoubleMatrix2D result = matrixPowerQ(n).copy(); 
 			double t = (to_time - from_time);

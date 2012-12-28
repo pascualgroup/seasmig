@@ -14,10 +14,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import cern.colt.function.DoubleFunction;
+
 import treelikelihood.*;
 
 import jebl.evolution.io.ImportException;
-import jebl.evolution.io.NexusExporter;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.trees.SimpleRootedTree;
 
@@ -27,7 +28,7 @@ public class Data
 
 	public Vector<Tree> trees = new Vector<Tree>();
 	Config config = null;
-	
+
 	// TEST MODELS
 	MigrationBaseModel createModel = null;
 	MigrationBaseModel testModel = null;
@@ -76,26 +77,43 @@ public class Data
 			}	
 			break;
 		case TEST:
-						
+
 			System.out.print("Generating test trees... ");
-			
-			// Generate test data and trees 
+
+			// Generate test data and trees
+
+			// For constant model...
 			double[][] Q = {{-0.9,0.4,0.3,0.2},
-							{0.3,-0.6,0.2,0.1},
-							{0.2,0.1,-0.3,0.0},
-							{0.1,0.0,0.0,-0.1}};
-			
+					{0.3,-0.6,0.2,0.1},
+					{0.2,0.1,-0.3,0.0},
+					{0.1,0.0,0.0,-0.1}};
+
+			// For two seasonal model...
 			double[][] QW = {{-0.9,0.8,0.1,0.0},
-							{0.2,-0.5,0.2,0.1},
-							{0.2,0.0,-0.2,0.0},
-							{0.3,0.0,0.0,-0.3}};
+					{0.2,-0.5,0.2,0.1},
+					{0.2,0.0,-0.2,0.0},
+					{0.3,0.0,0.0,-0.3}};
 
 			double[][] QS = {{-0.9,0.4,0.3,0.2},
-							{0.3,-0.6,0.2,0.1},
-							{0.2,0.1,-0.3,0.0},
-							{0.1,0.0,0.0,-0.1}};
+					{0.3,-0.6,0.2,0.1},
+					{0.2,0.1,-0.3,0.0},
+					{0.1,0.0,0.0,-0.1}};
 
-			switch (config.treeCreateSeasonality) {
+			// For sinusoidal model...
+			double[][] rates = {{0,0.4,0.3,0.2},
+					{0.3,0,0.2,0.1},
+					{0.2,0.1,0,0.0},
+					{0.1,0.0,0.0,0}};
+			double[][] amps = {{0,0.8,0.1,0.0},
+					{0.2,0,0.2,0.1},
+					{0.2,0.0,0,0.0},
+					{0.3,0.0,1.9,0}};
+			double[][] phases = {{0,1.0,1.0,0.0},
+					{0.5,0,0.5,0.1},
+					{0.25,0.0,0,1.0},
+					{0.25,0.5,1.0,0}};
+
+			switch (config.testTreesCreateSeasonality) {
 			case NONE:
 
 				createModel = new ConstantMigrationBaseModel(Q);
@@ -105,35 +123,44 @@ public class Data
 					testTree.removeInternalStates();
 					trees.add(testTree);
 				}
-				
+
 				/////////////
-				
+
 				double phase = 0.3;
 				double length = 0.5;
-				testModel = new TwoMatrixMigrationBaseModel(QW,QS,phase,length);
-				
+				testModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,length);
+
 				break;
 
-			case TWO_MATRICES:
+			case TWO_CONSTANT_SEASONS:
 
 				phase = 0.3;
 				length = 0.5;
-				createModel = new TwoMatrixMigrationBaseModel(QW,QS,phase,length);
+				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
 
 				for (int i=0;i<config.numTestTrees;i++) {
 					Tree testTree = new Tree(createModel,config.numTestTips);
 					testTree.removeInternalStates();
 					trees.add(testTree);
 				}
-				
+
 				/////////////
-								
+
 				testModel = new ConstantMigrationBaseModel(Q);
 				break;
-				
+
 			case SINUSOIDAL:
-				// TODO:
-				System.err.println("TODO: SEASONAL MODEL\n");
+				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
+
+				for (int i=0;i<config.numTestTrees;i++) {
+					Tree testTree = new Tree(createModel,config.numTestTips);
+					testTree.removeInternalStates();
+					trees.add(testTree);
+				}
+
+				/////////////
+
+				testModel = new ConstantMigrationBaseModel(Q);
 				break;
 
 			}

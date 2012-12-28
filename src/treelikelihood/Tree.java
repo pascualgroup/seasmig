@@ -15,12 +15,12 @@ public class Tree {
 		List<Node> children = new ArrayList<Node>();
 		int state = 0;	
 		double time = 0;
-		Double[] cachedConditionalLogLikelihood = null;
+		double[] cachedConditionalLogLikelihood = null;
 		
 		public Node(int trait_, double time_, int num_states_) {
 			state=trait_;
 			time=time_;
-			cachedConditionalLogLikelihood = new Double[num_states_];
+			cachedConditionalLogLikelihood = new double[num_states_];
 		}
 	}
 
@@ -111,7 +111,7 @@ public class Tree {
 	}
 	
 	private void clearCachedLikelihood(Node node) {	
-		node.cachedConditionalLogLikelihood=new Double[num_states];
+		node.cachedConditionalLogLikelihood=new double[num_states];
 		if (node.children.size()!=0) {			
 			for (Node child : node.children) {
 				clearCachedLikelihood(child);				
@@ -154,7 +154,7 @@ public class Tree {
 
 	private double conditionalLogLikelihood(MigrationBaseModel likelihoodModel, Node node, int nodeState) {
 
-		if (node.cachedConditionalLogLikelihood[nodeState]!=null) {			
+		if (node.cachedConditionalLogLikelihood[nodeState]!=0) {			
 			return node.cachedConditionalLogLikelihood[nodeState];
 		}
 		else {
