@@ -42,7 +42,7 @@ public class Config
 	// MODEL DATA RELATED PARAMETERS
 	public String traitFilename ="traits.txt"; // null if traits are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
-	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
+	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
 	public Seasonality testTreesCreateSeasonality = Seasonality.SINUSOIDAL;
