@@ -1,10 +1,5 @@
 package treelikelihood;
 
-import java.util.HashMap;
-import java.util.Vector;
-
-import org.javatuples.Pair;
-
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.tdouble.*;
 
@@ -68,7 +63,6 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 
 	@Override
 	public String print() {
-		// TODO:
 		return baseModel.print();	
 	}
 

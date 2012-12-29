@@ -44,8 +44,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 	@Override
 	protected void buildModel(RandomEngine rng) throws MC3KitException
 	{
-		// TODO: ask Ed if this is ok
-		this.rng = rng;	
+		// TODO: ask Ed if need add this.rng = rng;	
 
 		switch (config.seasonality) {
 
@@ -226,12 +225,5 @@ public class SeasonalMigrationModel extends GraphicalModel
 	{ 		
 		return rateParams[i][j];
 	}
-
-	public RandomEngine getRNG() {
-		// TODO: ask Ed if this is ok
-		return rng;
-	}
-	
-	
 	
 }

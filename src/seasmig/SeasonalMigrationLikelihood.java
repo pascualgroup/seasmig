@@ -66,7 +66,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	{
 		double logLikelihood = 0.0;
 
-		RandomEngine rng = model.getRNG();
+		//RandomEngine rng = model.getRNG();
 
 		switch (config.seasonality) {
 		case NONE:
@@ -84,7 +84,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			MigrationBaseModel likelihoodModel = new ConstantMigrationBaseModel(rates);
 
-			data.trees.get(rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
+			data.trees.get(model.rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
 
 			break;
 
@@ -117,7 +117,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			likelihoodModel = new TwoSeasonMigrationBaseModel(rates,rates2,season1Start,season1End);
 
-			logLikelihood = data.trees.get(rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
+			logLikelihood = data.trees.get(model.rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
 
 			break;
 
@@ -131,8 +131,6 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			double[][] amp = new double[config.stateCount][config.stateCount];
 			double[][] phase = new double[config.stateCount][config.stateCount];
 			for (int i=0;i<config.stateCount;i++) {
-				double row1sum=0;
-				double row2sum=0;
 				for (int j=0;j<config.stateCount;j++) {		
 					if (i!=j) {
 						rates[i][j]=model.getIndexAdjustedRateParams(i, j).getRate();
@@ -144,7 +142,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		
 			likelihoodModel = new SinusoidialSeasonalMigrationBaseModel(rates, amp, phase);
 
-			logLikelihood = data.trees.get(rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
+			logLikelihood = data.trees.get(model.rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
 		}
 
 		//TODO: Figure out zero log likelihood in files

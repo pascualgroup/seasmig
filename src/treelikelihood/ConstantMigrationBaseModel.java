@@ -9,7 +9,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Precision Parameters...
 	static final double precisionGoal = 1E-15; // Individual probability calculation precision goal
-	static final int maxN = 10000; // Maximum number of taylor series values
+	static final int maxN = 10000; // Maximum number of Taylor series values
 
 	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
