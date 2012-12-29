@@ -221,7 +221,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 		return twoMatrixPhase.getValue();
 	}
 
-	RateParams getIndexAdjustedRateParams(int i, int j)
+	RateParams getRateParams(int i, int j)
 	{ 		
 		return rateParams[i][j];
 	}

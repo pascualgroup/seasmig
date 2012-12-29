@@ -75,7 +75,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				double rowsum=0;
 				for (int j=0;j<config.stateCount;j++) {
 					if (i!=j) {
-						rates[i][j]=model.getIndexAdjustedRateParams(i, j).getRate();
+						rates[i][j]=model.getRateParams(i, j).getRate();
 						rowsum-=rates[i][j];
 					}
 				}
@@ -96,9 +96,9 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				double row2sum=0;
 				for (int j=0;j<config.stateCount;j++) {		
 					if (i!=j) {
-						rates[i][j]=model.getIndexAdjustedRateParams(i, j).getRate();
+						rates[i][j]=model.getRateParams(i, j).getRate();
 						row1sum-=rates[i][j];
-						rates2[i][j]=model.getIndexAdjustedRateParams(i, j).getRate2();
+						rates2[i][j]=model.getRateParams(i, j).getRate2();
 						row2sum-=rates2[i][j];
 					}
 				}
@@ -133,9 +133,9 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			for (int i=0;i<config.stateCount;i++) {
 				for (int j=0;j<config.stateCount;j++) {		
 					if (i!=j) {
-						rates[i][j]=model.getIndexAdjustedRateParams(i, j).getRate();
-						amp[i][j]=model.getIndexAdjustedRateParams(i, j).getAmplitude();
-						amp[i][j]=model.getIndexAdjustedRateParams(i, j).getPhase();
+						rates[i][j]=model.getRateParams(i, j).getRate();
+						amp[i][j]=model.getRateParams(i, j).getAmplitude();
+						amp[i][j]=model.getRateParams(i, j).getPhase();
 					}
 				}
 			}
