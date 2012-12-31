@@ -1,5 +1,7 @@
 package seasmig;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import jebl.math.Random;
@@ -8,6 +10,7 @@ import org.apache.log4j.Priority;
 
 import cern.jet.random.engine.RandomEngine;
 
+import mc3kit.FormattingLogger;
 import mc3kit.MC3KitException;
 import mc3kit.graphical.Jack;
 import mc3kit.graphical.NoDistribution;
@@ -29,11 +32,11 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		this.model = model;
 		this.config = model.config;
 		this.data = model.data;		
-
+		
 		// This is the weird way dependencies are declared. It will become unweird someday.
-		for(int i = 0; i < config.stateCount; i++)
+		for(int i = 0; i < config.locationCount; i++)
 		{
-			for(int j = 0; j < config.stateCount; j++)
+			for(int j = 0; j < config.locationCount; j++)
 			{
 				switch (config.seasonality) {
 				case NONE:
@@ -70,10 +73,10 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 		switch (config.seasonality) {
 		case NONE:
-			double[][] rates = new double[config.stateCount][config.stateCount];
-			for (int i=0;i<config.stateCount;i++) {
+			double[][] rates = new double[config.locationCount][config.locationCount];
+			for (int i=0;i<config.locationCount;i++) {
 				double rowsum=0;
-				for (int j=0;j<config.stateCount;j++) {
+				for (int j=0;j<config.locationCount;j++) {
 					if (i!=j) {
 						rates[i][j]=model.getRateParams(i, j).getRate();
 						rowsum-=rates[i][j];
@@ -89,12 +92,12 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			break;
 
 		case TWO_CONSTANT_SEASONS:		
-			rates = new double[config.stateCount][config.stateCount];
-			double[][] rates2 = new double[config.stateCount][config.stateCount];
-			for (int i=0;i<config.stateCount;i++) {
+			rates = new double[config.locationCount][config.locationCount];
+			double[][] rates2 = new double[config.locationCount][config.locationCount];
+			for (int i=0;i<config.locationCount;i++) {
 				double row1sum=0;
 				double row2sum=0;
-				for (int j=0;j<config.stateCount;j++) {		
+				for (int j=0;j<config.locationCount;j++) {		
 					if (i!=j) {
 						rates[i][j]=model.getRateParams(i, j).getRate();
 						row1sum-=rates[i][j];
@@ -127,11 +130,11 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			// model.getRateParams(i,j).getPhase() // seasonal phase (between 0 and 1) for sinusoidal model
 			// ??? rate*(1+amp*sin(2*pi*t+2*pi*phase)) ???
 
-			rates = new double[config.stateCount][config.stateCount];
-			double[][] amp = new double[config.stateCount][config.stateCount];
-			double[][] phase = new double[config.stateCount][config.stateCount];
-			for (int i=0;i<config.stateCount;i++) {
-				for (int j=0;j<config.stateCount;j++) {		
+			rates = new double[config.locationCount][config.locationCount];
+			double[][] amp = new double[config.locationCount][config.locationCount];
+			double[][] phase = new double[config.locationCount][config.locationCount];
+			for (int i=0;i<config.locationCount;i++) {
+				for (int j=0;j<config.locationCount;j++) {		
 					if (i!=j) {
 						rates[i][j]=model.getRateParams(i, j).getRate();
 						amp[i][j]=model.getRateParams(i, j).getAmplitude();
@@ -144,14 +147,24 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			logLikelihood = data.trees.get(model.rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
 		}
-
+		
+		
 		//TODO: Figure out zero log likelihood in files
 		setLogP(logLikelihood);
+		
 	}
 
 	@Override
-	public Object makeOutputObject()
-	{
+	public Object makeOutputObject() {
+//		// TODO: Ask Ed if this makes sense (probably doesn't :)
+//		
+//		Map<String, Object> obj = new LinkedHashMap<String, Object>();
+//
+//		obj.put("model", model);
+//		
+//		return obj;
 		return null;
 	}
+
+
 }

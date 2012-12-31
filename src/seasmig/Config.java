@@ -5,7 +5,8 @@ import mc3kit.LogLevel;
 
 public class Config
 {
-	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,	SINUSOIDAL }; //TODO: DEBUG SINUSODIAL	
+	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,	SINUSOIDAL }; //TODO: DEBUG SINUSODIAL
+																  //TODO: ADD CONTINUOUS SEASONAL MODEL
 	enum RunMode {	NORMAL,	TEST };
 	
 	public Long randomSeed;
@@ -37,7 +38,7 @@ public class Config
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality seasonality = Seasonality.NONE;
-	public int stateCount = 4; 
+	public int locationCount = 4;  // TODO: add support of one location....
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String traitFilename ="traits.txt"; // null if traits are loaded from tree
@@ -46,7 +47,7 @@ public class Config
 	
 	// TEST RELATED PARAMETERS
 	public Seasonality testTreesCreateSeasonality = Seasonality.SINUSOIDAL;
-	public int numTestTrees = 50;
+	public int numTestTrees = 10;
 	public int numTestTips = 400; 
 	
 }

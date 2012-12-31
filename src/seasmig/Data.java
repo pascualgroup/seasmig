@@ -64,14 +64,14 @@ public class Data
 
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new Tree((SimpleRootedTree) tree,traitMap,config.stateCount));
+					trees.add(new Tree((SimpleRootedTree) tree,traitMap,config.locationCount));
 				}
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}
 			else {
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new Tree((SimpleRootedTree) tree,config.stateCount));
+					trees.add(new Tree((SimpleRootedTree) tree,config.locationCount));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}	

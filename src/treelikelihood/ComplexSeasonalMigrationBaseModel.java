@@ -22,6 +22,7 @@ public class ComplexSeasonalMigrationBaseModel implements MigrationBaseModel {
 
 	// Rate Matrix  
 	DenseDComplexMatrix2D Q;
+	private int num_locations = 0;	
 
 
 	// Caching 
@@ -29,12 +30,11 @@ public class ComplexSeasonalMigrationBaseModel implements MigrationBaseModel {
 	Vector<DComplexMatrix2D> cachedMatrixPower = new Vector<DComplexMatrix2D>();	
 	HashMap<Pair<Double,Double>, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, DoubleMatrix2D>();
 	double[] logFactorial = new double[maxN+1];
-	private int num_states = 0;
 
 	// Constructor	
 	public ComplexSeasonalMigrationBaseModel(double[][]c1) {	
 		Q = new DenseDComplexMatrix2D(c1);		
-		num_states =Q.rows();
+		num_locations =Q.rows();
 		cachedMatrixPower.add(0, DComplexFactory2D.dense.identity(Q.rows())); // Q^0 = I
 		cachedMatrixPower.add(1,Q);  // Q^1 = Q
 		for (int i=0;i<logFactorial.length;i++) {
@@ -45,9 +45,9 @@ public class ComplexSeasonalMigrationBaseModel implements MigrationBaseModel {
 
 	// Methods
 	@Override
-	public double logprobability(int from_state, int to_state, double from_time, double to_time) {
+	public double logprobability(int from_location, int to_location, double from_time, double to_time) {
 
-		if (to_state==MigrationBaseModel.UNKNOWN_STATE) 
+		if (to_location==MigrationBaseModel.UNKNOWN_LOCATION) 
 			return 0;
 
 		double result=0;
@@ -55,9 +55,9 @@ public class ComplexSeasonalMigrationBaseModel implements MigrationBaseModel {
 		DoubleMatrix2D cached = cachedTransitionMatrices.get(to_time-from_time);
 		
 		if (cached!=null)  
-			result=cached.get(from_state, to_state);		
+			result=cached.get(from_location, to_location);		
 		else 		
-			result=transitionMatrix(from_time, to_time).get(from_state, to_state);		
+			result=transitionMatrix(from_time, to_time).get(from_location, to_location);		
 
 		if (result<0) // TODO: deal with negative probability....
 			result=precisionGoal;
@@ -99,6 +99,7 @@ public class ComplexSeasonalMigrationBaseModel implements MigrationBaseModel {
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
 			}			
+			// TODO: for yearly cycles, change cache 
 			cachedTransitionMatrices.put(new Pair<Double,Double>(to_time,from_time), result.getRealPart());
 			return result.getRealPart();
 		}
@@ -110,8 +111,8 @@ public class ComplexSeasonalMigrationBaseModel implements MigrationBaseModel {
 	}
 	
 	@Override
-	public int getNumStates() {
-		return num_states;
+	public int getNumLocations() {
+		return num_locations;
 	}
 	
 	private DComplexMatrix2D matrixPowerQ(int n) {

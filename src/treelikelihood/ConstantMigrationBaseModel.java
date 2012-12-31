@@ -16,19 +16,18 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Rate Matrix  
 	DoubleMatrix2D Q;
-	private int num_states = 0;	
+	private int num_locations = 0;		
 	
 	// Caching 
 	DoubleFactory2D F = DoubleFactory2D.dense;	
 	Vector<DoubleMatrix2D> cachedMatrixPower = new Vector<DoubleMatrix2D>();	
 	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
 	double[] logFactorial = new double[maxN+1];
-	
 
 	// Constructor	
 	public ConstantMigrationBaseModel(double[][] Q_) {	
 		Q = F.make(Q_);	
-		num_states=Q.rows();
+		num_locations=Q.rows();
 		cachedMatrixPower.add(0,F.identity(Q.rows())); // Q^0 = I
 		cachedMatrixPower.add(1,Q.copy());  // Q^1 = Q
 		for (int i=0;i<logFactorial.length;i++) {
@@ -38,9 +37,9 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Methods
 	@Override
-	public double logprobability(int from_state, int to_state, double from_time, double to_time) {
+	public double logprobability(int from_location, int to_location, double from_time, double to_time) {
 
-		if (to_state==MigrationBaseModel.UNKNOWN_STATE) 
+		if (to_location==MigrationBaseModel.UNKNOWN_LOCATION) 
 			return 0;
 
 		double result=0;
@@ -48,9 +47,9 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		DoubleMatrix2D cached = cachedTransitionMatrices.get(to_time-from_time);
 		
 		if (cached!=null)  
-			result=cached.get(from_state, to_state);		
+			result=cached.get(from_location, to_location);		
 		else 		
-			result=transitionMatrix(from_time, to_time).get(from_state, to_state);		
+			result=transitionMatrix(from_time, to_time).get(from_location, to_location);		
 
 		if (result<0) 
 			result=precisionGoal;
@@ -102,8 +101,8 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	}
 	
 	@Override
-	public int getNumStates() {
-		return num_states ;
+	public int getNumLocations() {
+		return num_locations ;
 	}
 
 	private DoubleMatrix2D matrixPowerQ(int n) {

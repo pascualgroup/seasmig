@@ -68,7 +68,7 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 
 
 	@Override
-	public int getNumStates() {
+	public int getNumLocations() {
 		return num_states ;
 	}
 

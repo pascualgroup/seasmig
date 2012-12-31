@@ -98,7 +98,7 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	@Override
-	public int getNumStates() {
+	public int getNumLocations() {
 		return num_states ;
 	}
 

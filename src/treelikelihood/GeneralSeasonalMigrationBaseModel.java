@@ -32,22 +32,22 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	Vector<DoubleMatrix2D> cachedMatrixPower = new Vector<DoubleMatrix2D>();	
 	HashMap<Pair<Double,Double>, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, DoubleMatrix2D>();
 
-	private int num_states = 0;
+	private int num_locations = 0;
 	private double dt = 1.0/(double)nYearParts; 
 
 	// Constructor	
 	public GeneralSeasonalMigrationBaseModel(DoubleFunction[][] seasonalRates_) {	
 		// TODO: Check this...
 		// diagonal rates are calculated on row sums and are ignored...
-		num_states=seasonalRates_.length;	
+		num_locations=seasonalRates_.length;	
 		seasonalRates=seasonalRates_;
 		dt = 1.0/(double)nYearParts;
 		double t=dt/2.0;
 		for (int i=0;i<nYearParts;i++) {
-			double[][] migrationMatrix = new double[num_states][num_states];
-			for (int j=0; j<num_states; j++) {
+			double[][] migrationMatrix = new double[num_locations][num_locations];
+			for (int j=0; j<num_locations; j++) {
 				double row_sum = 0;
-				for (int k=0; k<num_states; k++) {
+				for (int k=0; k<num_locations; k++) {
 					if (j!=k) {
 						migrationMatrix[j][k]=seasonalRates[j][k].apply(t);
 						row_sum+=migrationMatrix[j][k];
@@ -62,8 +62,8 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 
 	// Methods
 	@Override
-	public double logprobability(int from_state, int to_state, double from_time, double to_time) {		
-		return Math.log(transitionMatrix(from_time, to_time).get(from_state, to_state));
+	public double logprobability(int from_location, int to_location, double from_time, double to_time) {		
+		return Math.log(transitionMatrix(from_time, to_time).get(from_location, to_location));
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 			// first step: 
 			double step_start_time = from_time_reminder;
 			double step_end_time = Math.min(to_time, Math.max(0,Math.ceil(step_start_time/dt)*dt));
-			DoubleMatrix2D result = F.identity(num_states);	 
+			DoubleMatrix2D result = F.identity(num_locations);	 
 			
 			while (step_end_time<to_time) {
 				int yearPartIndex = (int) Math.floor(step_start_time%1.0/dt);
@@ -122,8 +122,8 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 
 
 	@Override
-	public int getNumStates() {
-		return num_states ;
+	public int getNumLocations() {
+		return num_locations ;
 	}
 
 

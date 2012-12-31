@@ -51,10 +51,10 @@ public class SeasonalMigrationModel extends GraphicalModel
 		case NONE :
 			ratePriorRate = new ExponentialVariable(this, "ratePriorRate", 1.0);
 			ratePrior = new ExponentialDistribution(this, "ratePrior", ratePriorRate);
-			rateParams = new RateParams[config.stateCount][config.stateCount];
-			for(int i = 0; i < config.stateCount; i++)
+			rateParams = new RateParams[config.locationCount][config.locationCount];
+			for(int i = 0; i < config.locationCount; i++)
 			{
-				for(int j = 0; j < config.stateCount; j++)
+				for(int j = 0; j < config.locationCount; j++)
 				{
 					if(i == j) continue; // rateParams[i,i] remains null
 					rateParams[i][j] = new RateParams(i, j);
@@ -63,9 +63,9 @@ public class SeasonalMigrationModel extends GraphicalModel
 			break;
 		case TWO_CONSTANT_SEASONS:
 			twoMatrixPhase = new UniformDoubleVariable(this, "twoMatrixPhase", 0.0, 1.0);
-			for(int i = 0; i < config.stateCount; i++)
+			for(int i = 0; i < config.locationCount; i++)
 			{
-				for(int j = 0; j < config.stateCount; j++)
+				for(int j = 0; j < config.locationCount; j++)
 				{
 					if(i == j) continue; // rateParams[i,i] remains null
 					rateParams[i][j] = new RateParams(i, j);
@@ -77,9 +77,9 @@ public class SeasonalMigrationModel extends GraphicalModel
 			amplitudePriorBeta = new ExponentialVariable(this, "amplitudePriorBeta", 1.0);
 			amplitudePrior = new BetaDistribution(this, "amplitudePrior", amplitudePriorAlpha, amplitudePriorBeta);
 			phasePrior = new UniformDoubleDistribution(this, "phasePrior", 0.0, 1.0);
-			for(int i = 0; i < config.stateCount; i++)
+			for(int i = 0; i < config.locationCount; i++)
 			{
-				for(int j = 0; j < config.stateCount; j++)
+				for(int j = 0; j < config.locationCount; j++)
 				{
 					if(i == j) continue; // rateParams[i,i] remains null
 					rateParams[i][j] = new RateParams(i, j);
@@ -98,11 +98,11 @@ public class SeasonalMigrationModel extends GraphicalModel
 
 		switch (config.seasonality) {
 		case  NONE: 
-			double[][] rates = new double[config.stateCount][config.stateCount];
+			double[][] rates = new double[config.locationCount][config.locationCount];
 
-			for(int i = 0; i < config.stateCount; i++)
+			for(int i = 0; i < config.locationCount; i++)
 			{
-				for(int j = 0; j < config.stateCount; j++)
+				for(int j = 0; j < config.locationCount; j++)
 				{
 					if(i == j) continue;
 					rates[i][j] = rateParams[i][j].getRate();
@@ -112,12 +112,12 @@ public class SeasonalMigrationModel extends GraphicalModel
 			obj.put("rates", rates);
 			break;
 		case TWO_CONSTANT_SEASONS :
-			rates = new double[config.stateCount][config.stateCount];
-			double[][] rates2 = new double[config.stateCount][config.stateCount];
+			rates = new double[config.locationCount][config.locationCount];
+			double[][] rates2 = new double[config.locationCount][config.locationCount];
 
-			for(int i = 0; i < config.stateCount; i++)
+			for(int i = 0; i < config.locationCount; i++)
 			{
-				for(int j = 0; j < config.stateCount; j++)
+				for(int j = 0; j < config.locationCount; j++)
 				{
 					if(i == j) continue;
 					rates[i][j] = rateParams[i][j].getRate();
@@ -131,13 +131,13 @@ public class SeasonalMigrationModel extends GraphicalModel
 			break;
 
 		case SINUSOIDAL :
-			rates = new double[config.stateCount][config.stateCount];
-			double[][] amplitudes = new double[config.stateCount][config.stateCount];
-			double[][] phases = new double[config.stateCount][config.stateCount];
+			rates = new double[config.locationCount][config.locationCount];
+			double[][] amplitudes = new double[config.locationCount][config.locationCount];
+			double[][] phases = new double[config.locationCount][config.locationCount];
 
-			for(int i = 0; i < config.stateCount; i++)
+			for(int i = 0; i < config.locationCount; i++)
 			{
-				for(int j = 0; j < config.stateCount; j++)
+				for(int j = 0; j < config.locationCount; j++)
 				{
 					if(i == j) continue;
 					rates[i][j] = rateParams[i][j].getRate();
