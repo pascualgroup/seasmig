@@ -2,7 +2,7 @@ package treelikelihood;
 
 public class MigrationPlusBrowninanBaseModel implements MigrationPlusContinousStateBaseModel {
 	// TODO: go over this...
-	// P_location(from_location,to_location)*P_state(from_location,to_location,from_state,to_state)
+	// P_location(from_location,to_location)*P_state(from_location,to_location)(from_state,to_state)
 	
 	
 	BrownianMotionPlusSeasonalityFunction logSeasonalStatesTransitionProbabilities[][] = null;
