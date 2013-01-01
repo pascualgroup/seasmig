@@ -41,7 +41,8 @@ public class Config
 	public int locationCount = 4;  // TODO: add support of one location....
 	
 	// MODEL DATA RELATED PARAMETERS
-	public String traitFilename ="traits.txt"; // null if traits are loaded from tree
+	//public String traitFilename ="states.txt"; // null if states are loaded from tree
+	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	

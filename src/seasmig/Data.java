@@ -57,14 +57,14 @@ public class Data
 			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
 
 			// Convert trees to internal tree representation
-			if (config.traitFilename!=null) {
+			if (config.locationFilename!=null) {
 				System.out.print("Loading traits... ");
-				HashMap<String,Integer> traitMap = readTraits("traits.txt");
-				System.out.println("loaded "+traitMap.size()+" unique traits");
+				HashMap<String,Integer> locationMap = readLocations(config.locationFilename);
+				System.out.println("loaded "+locationMap.size()+" taxon locations");
 
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new Tree((SimpleRootedTree) tree,traitMap,config.locationCount));
+					trees.add(new Tree((SimpleRootedTree) tree,locationMap,config.locationCount));
 				}
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}
@@ -120,7 +120,7 @@ public class Data
 
 				for (int i=0;i<config.numTestTrees;i++) {
 					Tree testTree = new Tree(createModel,config.numTestTips);
-					testTree.removeInternalStates();
+					testTree.removeInternalLocations();
 					trees.add(testTree);
 				}
 
@@ -140,7 +140,7 @@ public class Data
 
 				for (int i=0;i<config.numTestTrees;i++) {
 					Tree testTree = new Tree(createModel,config.numTestTips);
-					testTree.removeInternalStates();
+					testTree.removeInternalLocations();
 					trees.add(testTree);
 				}
 
@@ -154,7 +154,7 @@ public class Data
 
 				for (int i=0;i<config.numTestTrees;i++) {
 					Tree testTree = new Tree(createModel,config.numTestTips);
-					testTree.removeInternalStates();
+					testTree.removeInternalLocations();
 					trees.add(testTree);
 				}
 
@@ -169,23 +169,42 @@ public class Data
 		}
 	}
 
-	HashMap<String, Integer> readTraits(String fileName) throws NumberFormatException, IOException {
+	HashMap<String, Integer> readLocations(String fileName) throws NumberFormatException, IOException {
 
-		FileInputStream traitFIStream = new FileInputStream(fileName);
-		DataInputStream traitDIStream = new DataInputStream(traitFIStream);
-		BufferedReader traitReader = new BufferedReader(new InputStreamReader(traitDIStream));
+		FileInputStream locationFIStream = new FileInputStream(fileName);
+		DataInputStream locationDIStream = new DataInputStream(locationFIStream);
+		BufferedReader locationReader = new BufferedReader(new InputStreamReader(locationDIStream));
 
-		HashMap<String,Integer> traitMap = new HashMap<String,Integer>();
+		HashMap<String,Integer> locationMap = new HashMap<String,Integer>();
 
 		String strLine;
 		//Read File Line By Line
-		while ((strLine = traitReader.readLine()) != null)   {
+		while ((strLine = locationReader.readLine()) != null)   {
 			String taxa = strLine;
-			Integer state = Integer.parseInt(traitReader.readLine());
-			traitMap.put(taxa, state);
+			Integer state = Integer.parseInt(locationReader.readLine());
+			locationMap.put(taxa, state);
 		}
 
-		return traitMap;
+		return locationMap;
+	}
+	
+	HashMap<String, Double> readStates(String fileName) throws NumberFormatException, IOException {
+
+		FileInputStream stateFIStream = new FileInputStream(fileName);
+		DataInputStream stateDIStream = new DataInputStream(stateFIStream);
+		BufferedReader stateReader = new BufferedReader(new InputStreamReader(stateDIStream));
+
+		HashMap<String,Double> stateMap = new HashMap<String,Double>();
+
+		String strLine;
+		//Read File Line By Line
+		while ((strLine = stateReader.readLine()) != null)   {
+			String taxa = strLine;
+			Double state = Double.parseDouble(stateReader.readLine());
+			stateMap.put(taxa, state);
+		}
+
+		return stateMap;
 	}
 
 
