@@ -17,12 +17,12 @@ public class MigrationPlusBrowninanBaseModel implements MigrationPlusContinousSt
 		private double phase_to;
 		
 
-		public BrownianMotionPlusSeasonalityFunction(double alpha_, double amp_from_, double phase_from_, double amp_to_, double phase_to) {
+		public BrownianMotionPlusSeasonalityFunction(double alpha_, double amp_from_, double phase_from_, double amp_to_, double phase_to_) {
 			alpha=alpha_;
 			phase_from=phase_from_;
 			amp_from=amp_from_;
 			amp_to=amp_to_;
-			amp_from=amp_from_;
+			phase_to=phase_to_;
 		}
 
 		@Override
