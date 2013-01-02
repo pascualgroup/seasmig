@@ -11,14 +11,16 @@ public class MigrationPlusBrowninanBaseModel implements MigrationPlusContinousSt
 	public class BrownianMotionPlusSeasonalityFunction {
 
 		private double alpha;
+		private double diff;
 		private double amp_from;
 		private double phase_from;
 		private double amp_to;
 		private double phase_to;
 		
 
-		public BrownianMotionPlusSeasonalityFunction(double alpha_, double amp_from_, double phase_from_, double amp_to_, double phase_to_) {
+		public BrownianMotionPlusSeasonalityFunction(double alpha_, double diff_, double amp_from_, double phase_from_, double amp_to_, double phase_to_) {
 			alpha=alpha_;
+			diff=diff_;
 			phase_from=phase_from_;
 			amp_from=amp_from_;
 			amp_to=amp_to_;
@@ -27,7 +29,7 @@ public class MigrationPlusBrowninanBaseModel implements MigrationPlusContinousSt
 
 		@Override
 		public String toString() {
-			return "Seasonality: "+amp_from+"*sin(2Pi*t+2Pi*"+phase_from+"),"+amp_to+"*sin(2Pi*t+2Pi*"+phase_to+"), Wiener: N(0,"+alpha+"*t)";			
+			return "Seasonality: "+amp_from+"*sin(2Pi*t+2Pi*"+phase_from+"),"+amp_to+"*sin(2Pi*t+2Pi*"+phase_to+") C="+diff+", Wiener: N(0,"+alpha+"*t)";			
 		}
 		
 		public double apply(double from_time, double to_time, double from_state, double to_state) {		
@@ -37,19 +39,19 @@ public class MigrationPlusBrowninanBaseModel implements MigrationPlusContinousSt
 			double xs = from_state - amp_from*Math.sin(2*Math.PI*from_time+2*Math.PI*phase_from);
 			double xt = to_state - amp_to*Math.sin(2*Math.PI*to_time+2*Math.PI*phase_to);
 			double var = Math.abs(to_time-from_time)*alpha;			
-			return -Math.log(2*Math.PI*var)/2.0+(xt-xs)*(xt-xs)/(2*var); 
+			return -Math.log(2*Math.PI*var)/2.0+(xt-xs-diff)*(xt-xs-diff)/(2*var); 
 		}
 
 	}
 
 	// Constructor	
-	public MigrationPlusBrowninanBaseModel(MigrationBaseModel migrationBaseModel_, double[][] alphas, double[] amp, double[] phase) {
+	public MigrationPlusBrowninanBaseModel(MigrationBaseModel migrationBaseModel_, double[][] alphas, double[][] diffs, double[] amp, double[] phase) {
 		// TODO: Lookup i and j from to....
 		migrationBaseModel=migrationBaseModel_;
 		logSeasonalStatesTransitionProbabilities = new BrownianMotionPlusSeasonalityFunction[alphas.length][alphas.length];		
 		for (int i=0;i<alphas.length;i++) {
 			for (int j=0;j<alphas.length;j++) {
-				logSeasonalStatesTransitionProbabilities[i][j]=new BrownianMotionPlusSeasonalityFunction(alphas[i][j],amp[i],phase[i],amp[j],phase[j]);
+				logSeasonalStatesTransitionProbabilities[i][j]=new BrownianMotionPlusSeasonalityFunction(alphas[i][j],diffs[i][j],amp[i],phase[i],amp[j],phase[j]);
 			}
 		}
 	}

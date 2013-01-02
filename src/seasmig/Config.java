@@ -11,7 +11,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.NORMAL;
+	public RunMode runMode = RunMode.TEST;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
