@@ -11,7 +11,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.TEST;
+	public RunMode runMode = RunMode.NORMAL;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -39,9 +39,11 @@ public class Config
 	// MODEL RELATED PARAMETERS
 	public Seasonality seasonality = Seasonality.NONE;
 	public int locationCount = 4;  // TODO: add support of one location....
+								   // TODO: add as an attribute loaded with attribute loader...
 	
 	// MODEL DATA RELATED PARAMETERS
-	//public String traitFilename ="states.txt"; // null if states are loaded from tree
+	// TODO: add states & combine files 
+	public String stateFilename =null; // null if states are loaded from tree or non-existent 
 	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail

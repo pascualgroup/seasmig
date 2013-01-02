@@ -1,20 +1,12 @@
 package seasmig;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-
-import cern.colt.function.DoubleFunction;
 
 import treelikelihood.*;
 
@@ -56,11 +48,14 @@ public class Data
 			}
 			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
 
+			// TODO: add states....
 			// Convert trees to internal tree representation
 			if (config.locationFilename!=null) {
 				System.out.print("Loading traits... ");
-				HashMap<String,Integer> locationMap = readLocations(config.locationFilename);
-				System.out.println("loaded "+locationMap.size()+" taxon locations");
+				AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilename, config.stateFilename);
+				// TODO: think about this...
+				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributeLoader.getAttributes().get("locations");
+				System.out.println("loaded "+locationMap.size()+" taxon traits");
 
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
@@ -77,7 +72,7 @@ public class Data
 			}	
 			break;
 		case TEST:
-
+			// TODO: add test files instead of hardcoding matrices ....
 			System.out.print("Generating test trees... ");
 
 			// Generate test data and trees
@@ -169,43 +164,7 @@ public class Data
 		}
 	}
 
-	HashMap<String, Integer> readLocations(String fileName) throws NumberFormatException, IOException {
-
-		FileInputStream locationFIStream = new FileInputStream(fileName);
-		DataInputStream locationDIStream = new DataInputStream(locationFIStream);
-		BufferedReader locationReader = new BufferedReader(new InputStreamReader(locationDIStream));
-
-		HashMap<String,Integer> locationMap = new HashMap<String,Integer>();
-
-		String strLine;
-		//Read File Line By Line
-		while ((strLine = locationReader.readLine()) != null)   {
-			String taxa = strLine;
-			Integer state = Integer.parseInt(locationReader.readLine());
-			locationMap.put(taxa, state);
-		}
-
-		return locationMap;
-	}
 	
-	HashMap<String, Double> readStates(String fileName) throws NumberFormatException, IOException {
-
-		FileInputStream stateFIStream = new FileInputStream(fileName);
-		DataInputStream stateDIStream = new DataInputStream(stateFIStream);
-		BufferedReader stateReader = new BufferedReader(new InputStreamReader(stateDIStream));
-
-		HashMap<String,Double> stateMap = new HashMap<String,Double>();
-
-		String strLine;
-		//Read File Line By Line
-		while ((strLine = stateReader.readLine()) != null)   {
-			String taxa = strLine;
-			Double state = Double.parseDouble(stateReader.readLine());
-			stateMap.put(taxa, state);
-		}
-
-		return stateMap;
-	}
 
 
 }
