@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.TTCCLayout;
 
 import seasmig.Config.RunMode;
+import treelikelihood.LikelihoodTree;
 import treelikelihood.TreeWithLocations;
 
 import com.google.gson.Gson;
@@ -35,7 +36,7 @@ public class SeasonalMigrationMain
 			Config config = gson.fromJson(new FileReader("config.json"), Config.class);
 			System.out.println(" done");
 			
-			// Load data files			
+			// Load data files and prepare data....			
 			Data data = new Data(config);
 			
 			// Tests...			
@@ -46,7 +47,10 @@ public class SeasonalMigrationMain
 				double createLikelihood = 0;
 				for (LikelihoodTree tree : data.trees) {
 					System.out.print(".");
-					createLikelihood+=tree.copyWithNoCache().logLikelihood(data.createModel);
+					// TODO: get likelihood not to require copy...
+					LikelihoodTree workingCopy = tree.workingCopy();
+					workingCopy.setLikelihoodModel(data.createModel);
+					createLikelihood+=workingCopy.logLikelihood();
 				}
 				createLikelihood=createLikelihood/data.trees.size();
 				System.out.println(createLikelihood);
@@ -54,9 +58,11 @@ public class SeasonalMigrationMain
 				System.out.println("Calculating tree Likelihood using test model seasonality: "+config.seasonality);
 				System.out.println(data.testModel.print());
 				double testLikelihood = 0;
-				for (TreeWithLocations tree : data.trees) {
+				for (LikelihoodTree tree : data.trees) {
 					System.out.print(".");
-					testLikelihood+=tree.copyWithNoCache().logLikelihood(data.testModel);
+					LikelihoodTree workingCopy = tree.workingCopy();
+					workingCopy.setLikelihoodModel(data.testModel);
+					testLikelihood+=workingCopy.logLikelihood();
 				}
 				testLikelihood=testLikelihood/data.trees.size();
 				System.out.println(testLikelihood);
@@ -70,8 +76,8 @@ public class SeasonalMigrationMain
 			mcmc.setChainCount(config.chainCount);
 			System.out.println(" done");
 			
-			// Initialize debugging logger
-			System.out.print("Initialinzing debug logger...");
+			// Initialize logger
+			System.out.print("Initializing logger...");
 			Logger logger = Logger.getRootLogger();
 			logger.setLevel(config.logLevel.getLog4jLevel());
 			Layout layout = new TTCCLayout("ISO8601");

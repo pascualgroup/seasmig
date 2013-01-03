@@ -1,16 +1,7 @@
 package seasmig;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
-import jebl.math.Random;
-
-import org.apache.log4j.Priority;
-
-import cern.jet.random.engine.RandomEngine;
-
-import mc3kit.FormattingLogger;
 import mc3kit.MC3KitException;
 import mc3kit.graphical.Jack;
 import mc3kit.graphical.NoDistribution;
@@ -25,7 +16,6 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	Config config;
 	Data data;
 
-
 	public SeasonalMigrationLikelihood(SeasonalMigrationModel model) throws MC3KitException
 	{
 		super(model, "likelihood");
@@ -34,10 +24,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		this.data = model.data;		
 		
 		// This is the weird way dependencies are declared. It will become unweird someday.
-		for(int i = 0; i < config.locationCount; i++)
-		{
-			for(int j = 0; j < config.locationCount; j++)
-			{
+		for(int i = 0; i < config.locationCount; i++) {
+			for(int j = 0; j < config.locationCount; j++) {
 				switch (config.seasonality) {
 				case NONE:
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);										
@@ -69,7 +57,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	{
 		double logLikelihood = 0.0;
 
-		//RandomEngine rng = model.getRNG();
+		MigrationBaseModel migrationBaseModel = null;
 
 		switch (config.seasonality) {
 		case NONE:
@@ -85,10 +73,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				rates[i][i]=rowsum;
 			}
 
-			MigrationBaseModel likelihoodModel = new ConstantMigrationBaseModel(rates);
-
-			data.trees.get(model.rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
-
+			migrationBaseModel = new ConstantMigrationBaseModel(rates);
 			break;
 
 		case TWO_CONSTANT_SEASONS:		
@@ -118,14 +103,11 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				season1Start=twoMatrixPhase;			
 			double season1End=0.5+season1Start;
 
-			likelihoodModel = new TwoSeasonMigrationBaseModel(rates,rates2,season1Start,season1End);
-
-			logLikelihood = data.trees.get(model.rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
-
+			migrationBaseModel = new TwoSeasonMigrationBaseModel(rates,rates2,season1Start,season1End);	
 			break;
 
 		case SINUSOIDAL: 
-			// model.getRateParams(i,j).getRate() // seasonal amplitude for sinusoidal model
+			// model.getRateParams(i,j).getRate() // overall rate for sinusoidal model
 			// model.getRateParams(i,j).getAmplitude() // seasonal amplitude for sinusoidal model
 			// model.getRateParams(i,j).getPhase() // seasonal phase (between 0 and 1) for sinusoidal model
 			// ??? rate*(1+amp*sin(2*pi*t+2*pi*phase)) ???
@@ -143,28 +125,21 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				}
 			}
 		
-			likelihoodModel = new SinusoidialSeasonalMigrationBaseModel(rates, amp, phase);
-
-			logLikelihood = data.trees.get(model.rng.nextInt()%data.trees.size()).copyWithNoCache().logLikelihood(likelihoodModel);
+			migrationBaseModel = new SinusoidialSeasonalMigrationBaseModel(rates, amp, phase);
 		}
 		
+		// TODO: maybe get likelihood to work without copy...
+		LikelihoodTree workingCopy = data.trees.get(model.rng.nextInt()%data.trees.size()).workingCopy(); 
+		workingCopy.setLikelihoodModel(migrationBaseModel);
+		logLikelihood=workingCopy.logLikelihood();
 		
 		//TODO: Figure out zero log likelihood in files
 		setLogP(logLikelihood);
-		
 	}
 
 	@Override
 	public Object makeOutputObject() {
-//		// TODO: Ask Ed if this makes sense (probably doesn't :)
-//		
-//		Map<String, Object> obj = new LinkedHashMap<String, Object>();
-//
-//		obj.put("model", model);
-//		
-//		return obj;
+		// TODO: Ask Ed what goes here :)
 		return null;
 	}
-
-
 }

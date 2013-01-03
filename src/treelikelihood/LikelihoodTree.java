@@ -1,7 +1,9 @@
 package treelikelihood;
 
 public interface LikelihoodTree {
+	// TODO: think about likelihood model typing enforcement
 	public void setLikelihoodModel(Object likelihoodModel);
 	public double logLikelihood();
-	String print(); 
+	String print();
+	public LikelihoodTree workingCopy(); 
 }
