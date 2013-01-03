@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.TTCCLayout;
 
 import seasmig.Config.RunMode;
-import treelikelihood.Tree;
+import treelikelihood.TreeWithLocations;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,7 +44,7 @@ public class SeasonalMigrationMain
 				System.out.println("Calculating tree Likelihood using create model seasonality: "+config.testTreesCreateSeasonality);
 				System.out.println(data.createModel.print());
 				double createLikelihood = 0;
-				for (Tree tree : data.trees) {
+				for (LikelihoodTree tree : data.trees) {
 					System.out.print(".");
 					createLikelihood+=tree.copyWithNoCache().logLikelihood(data.createModel);
 				}
@@ -54,7 +54,7 @@ public class SeasonalMigrationMain
 				System.out.println("Calculating tree Likelihood using test model seasonality: "+config.seasonality);
 				System.out.println(data.testModel.print());
 				double testLikelihood = 0;
-				for (Tree tree : data.trees) {
+				for (TreeWithLocations tree : data.trees) {
 					System.out.print(".");
 					testLikelihood+=tree.copyWithNoCache().logLikelihood(data.testModel);
 				}

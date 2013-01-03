@@ -16,9 +16,7 @@ import jebl.evolution.trees.SimpleRootedTree;
 
 public class Data
 {
-
-
-	public Vector<Tree> trees = new Vector<Tree>();
+	public Vector<LikelihoodTree> trees = new Vector<LikelihoodTree>();
 	Config config = null;
 
 	// TEST MODELS
@@ -33,7 +31,6 @@ public class Data
 		case NORMAL:
 
 			// Load trees
-
 			System.out.print("Loading trees... ");			
 			File treeFile = new File(config.treeFilename);
 			FileReader reader = new FileReader(treeFile);
@@ -59,14 +56,14 @@ public class Data
 
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new Tree((SimpleRootedTree) tree,locationMap,config.locationCount));
+					trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,config.locationCount));
 				}
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}
 			else {
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new Tree((SimpleRootedTree) tree,config.locationCount));
+					trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, config.locationCount));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}	
@@ -114,7 +111,7 @@ public class Data
 				createModel = new ConstantMigrationBaseModel(Q);
 
 				for (int i=0;i<config.numTestTrees;i++) {
-					Tree testTree = new Tree(createModel,config.numTestTips);
+					TreeWithLocations testTree = new TreeWithLocations(createModel,config.numTestTips);
 					testTree.removeInternalLocations();
 					trees.add(testTree);
 				}
@@ -134,7 +131,7 @@ public class Data
 				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
 
 				for (int i=0;i<config.numTestTrees;i++) {
-					Tree testTree = new Tree(createModel,config.numTestTips);
+					TreeWithLocations testTree = new TreeWithLocations(createModel,config.numTestTips);
 					testTree.removeInternalLocations();
 					trees.add(testTree);
 				}
@@ -148,7 +145,7 @@ public class Data
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 
 				for (int i=0;i<config.numTestTrees;i++) {
-					Tree testTree = new Tree(createModel,config.numTestTips);
+					TreeWithLocations testTree = new TreeWithLocations(createModel,config.numTestTips);
 					testTree.removeInternalLocations();
 					trees.add(testTree);
 				}

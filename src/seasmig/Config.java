@@ -11,7 +11,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.TEST;
+	public RunMode runMode = RunMode.NORMAL;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -46,11 +46,14 @@ public class Config
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
 	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
+	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
 	public Seasonality testTreesCreateSeasonality = Seasonality.SINUSOIDAL;
 	public int numTestTrees = 10;
-	public int numTestTips = 400; 
+	public int numTestTips = 400;
+
+	 
 	
 }
