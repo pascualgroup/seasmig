@@ -30,7 +30,7 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 		
 		@Override
 		public String toString() {
-			return rate+"(1+"+amp+"*sin(2Pi*t+2Pi*"+phase+"))";			
+			return String.format("%.4f",rate)+"(1+"+String.format("%.4f",amp)+"*sin(2Pi*t+2Pi*"+String.format("%.4f",phase)+"))";			
 		}
 
 	}

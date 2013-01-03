@@ -22,17 +22,13 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	DoubleFactory2D F = DoubleFactory2D.dense;	
 	Vector<DoubleMatrix2D> cachedMatrixPower = new Vector<DoubleMatrix2D>();	
 	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
-	double[] logFactorial = new double[maxN+1];
 
 	// Constructor	
 	public ConstantMigrationBaseModel(double[][] Q_) {	
 		Q = F.make(Q_);	
 		num_locations=Q.rows();
 		cachedMatrixPower.add(0,F.identity(Q.rows())); // Q^0 = I
-		cachedMatrixPower.add(1,Q.copy());  // Q^1 = Q
-		for (int i=0;i<logFactorial.length;i++) {
-			logFactorial[i]=cern.jet.math.tdouble.DoubleArithmetic.logFactorial(i);
-		}		
+		cachedMatrixPower.add(1,Q.copy());  // Q^1 = Q	
 	}
 
 	// Methods
@@ -82,8 +78,8 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			do {
 				n=n+1;		
 				DoubleMatrix2D Qn = matrixPowerQ(n);
-				precision=Math.max(Math.abs(Qn.getMinLocation()[0]),Math.abs(Qn.getMaxLocation()[0]))*Math.exp(n*logt-logFactorial[n]); 				
-				result.assign(Qn,DoublePlusMultSecond.plusMult(Math.exp(n*logt-logFactorial[n])));
+				precision=Math.max(Math.abs(Qn.getMinLocation()[0]),Math.abs(Qn.getMaxLocation()[0]))*Math.exp(n*logt-cern.jet.math.tdouble.DoubleArithmetic.logFactorial(n)); 				
+				result.assign(Qn,DoublePlusMultSecond.plusMult(Math.exp(n*logt-cern.jet.math.tdouble.DoubleArithmetic.logFactorial(n))));
 			} while (precision>precisionGoal && (n<maxN));	
 
 			// cache result

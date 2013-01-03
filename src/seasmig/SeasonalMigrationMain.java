@@ -42,8 +42,8 @@ public class SeasonalMigrationMain
 			// Tests...			
 			if (config.runMode==RunMode.TEST) {
 				System.out.print("Running likelihood test...\n");
-				System.out.println("Calculating tree Likelihood using create model seasonality: "+config.testCreateSeasonality);
-				System.out.println(data.createModel.print());
+				System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.seasonality);
+				System.out.print(data.createModel.print());
 				double createLikelihood = 0;
 				for (LikelihoodTree tree : data.trees) {
 					System.out.print(".");
@@ -55,12 +55,12 @@ public class SeasonalMigrationMain
 				createLikelihood=createLikelihood/data.trees.size();
 				System.out.println(createLikelihood);
 				
-				System.out.println("Calculating tree Likelihood using test models seasonality");
+				System.out.println("\nCalculating tree likelihood using test models with increasing noise:");
 				for (int i=0;i<data.testModels.size();i++) {
-					if (i%config.numTestModels==0) {
-						System.out.println("--------------");
+					if (i%config.numTestRepeats==0) {						
+						System.out.println("SEASONALITY "+Config.Seasonality.values()[i/config.numTestRepeats]);						
 					}
-				//System.out.println(data.testModels.get(i).print());
+				
 					double testLikelihood = 0;
 					for (LikelihoodTree tree : data.trees) {
 						System.out.print(".");

@@ -108,10 +108,10 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 			returnValue+="[";
 			for (int j=0;j<seasonalRates[i].length;j++) {
 				if (i!=j) 
-					returnValue=returnValue+String.format("%30s",seasonalRates[i][j].toString());
+					returnValue=returnValue+String.format("%40s",seasonalRates[i][j].toString());
 				else 
-					returnValue+=String.format("%30s", "NA");
-				if (j!=seasonalRates[i].length-1) returnValue+=",\t";
+					returnValue+=String.format("%40s", "NA");
+				if (j!=seasonalRates[i].length-1) returnValue+=",";
 			}
 			returnValue+="]";
 			if (i!=seasonalRates.length-1) returnValue+="\n";

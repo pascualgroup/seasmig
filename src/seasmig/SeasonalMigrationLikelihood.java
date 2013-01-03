@@ -15,32 +15,33 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	SeasonalMigrationModel model;
 	Config config;
 	Data data;
-
+	
 	public SeasonalMigrationLikelihood(SeasonalMigrationModel model) throws MC3KitException
 	{
 		super(model, "likelihood");
 		this.model = model;
 		this.config = model.config;
-		this.data = model.data;		
 		
 		// This is the weird way dependencies are declared. It will become unweird someday.
-		for(int i = 0; i < config.numLocations; i++) {
-			for(int j = 0; j < config.numLocations; j++) {
-				switch (config.seasonality) {
-				case NONE:
-					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);										
-					break;									
-				case SINUSOIDAL:
-					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
+		
+		if(config.seasonality == Config.Seasonality.TWO_CONSTANT_SEASONS)
+		{
+			new Jack<DoubleValued>(model, this, model.twoMatrixPhase);
+		}
+		
+		for(int i = 0; i < config.numLocations; i++)
+		{
+			for(int j = 0; j < config.numLocations; j++)
+			{
+				new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
+				if(config.seasonality == Config.Seasonality.SINUSOIDAL)
+				{
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].amplitude);
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].phase);
-					break;
-				case TWO_CONSTANT_SEASONS:
-					new Jack<DoubleValued>(model, this, model.twoMatrixPhase);
-					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
+				}
+				else if(config.seasonality ==Config.Seasonality.TWO_CONSTANT_SEASONS)
+				{
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate2);
-					break;
-				default:
 				}
 			}
 		}

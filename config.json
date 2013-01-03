@@ -1,4 +1,3 @@
 {
-	"seasonality" : "NONE",
-	"stateCount" : 4
+	"numTestTrees" : 4
 }

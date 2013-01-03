@@ -13,6 +13,7 @@ import treelikelihood.*;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.trees.SimpleRootedTree;
+import jebl.math.Random;
 
 public class Data
 {
@@ -76,18 +77,18 @@ public class Data
 			// Generate test data and trees
 
 			// For constant model...
-			double[][] Q = makeRandomMigrationMatrix(config.numLocations,5); 
+			double[][] Q = makeRandomMigrationMatrix(config.numLocations,2); 
 
 			// For two seasonal model...
-			double[][] QW = Q.clone();
+			double[][] QW = myMatrixCopy(Q);
 			double[][] QS = makeRandomMigrationMatrix(config.numLocations,3); 
 
 			// For sinusoidal model...
-			double[][] rates = Q.clone();
+			double[][] rates = myMatrixCopy(Q);
 			double[][] amps = makeRandomMigrationMatrix(config.numLocations,1);
 			double[][] phases = makeRandomMigrationMatrix(config.numLocations,1);
 
-			switch (config.testCreateSeasonality) {
+			switch (config.seasonality) {
 			case NONE:	
 				createModel = new ConstantMigrationBaseModel(Q); 
 				break;
@@ -110,21 +111,28 @@ public class Data
 			System.out.print("Generating test models... ");
 
 			testModels = new ArrayList<MigrationBaseModel>();
-
-			double disturbanceStep = 0.1;
-			for (int i=0; i<config.numTestModels; i++) {
-				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, disturbanceStep*i,99999)));
+			
+			for (int i=0; i<config.numTestRepeats; i++) {
+				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, config.disturbanceScale*i,99999)));
 			}
-			for (int i=0; i<config.numTestModels; i++) {
-				double disturbedphase = 0.3; double length = 0.5; // TODO: disturb phase
-				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,disturbanceStep*i,99999),disturbMigrationMatrix(QS,disturbanceStep*i,99999),disturbedphase,disturbedphase+length));
+			for (int i=0; i<config.numTestRepeats; i++) {
+				double phase = Math.max(0,Math.min(1,0.3+i/3*(Random.nextDouble()-0.5))); double length = 0.5;
+				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,config.disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,config.disturbanceScale*i/3,99999),phase, phase+length));
 			}
-			for (int i=0; i<config.numTestModels; i++) {
-				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,disturbanceStep*i,999999),disturbMigrationMatrix(amps,disturbanceStep*i,1),disturbMigrationMatrix(phases,disturbanceStep*i,1)));
+			for (int i=0; i<config.numTestRepeats; i++) {
+				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,config.disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,config.disturbanceScale*i/3,1),disturbMigrationMatrix(phases,config.disturbanceScale*i/3,1)));
 			}
 			System.out.println(" generated "+testModels.size()+" test models");
 			break;
 		}
+	}
+
+	private double[][] myMatrixCopy(double[][] q) {
+		double [][] returnValue = new double[q.length][];
+		for(int i = 0; i < q.length; i++) {
+			returnValue[i] = q[i].clone();
+		}				
+		return returnValue;
 	}
 
 	private double[][] makeRandomMigrationMatrix(int size, double scale) {
@@ -145,7 +153,7 @@ public class Data
 
 	private double[][] disturbMigrationMatrix(double[][] migrationMatrix, double disturbanceMagnitude, double max) {
 		// For test purposes...
-		double[][] returnValue = migrationMatrix.clone();
+		double[][] returnValue = myMatrixCopy(migrationMatrix);
 		for (int i=0;i<migrationMatrix.length;i++) {
 			double rowSum=0;
 			for (int j=0;j<migrationMatrix.length;j++) {
