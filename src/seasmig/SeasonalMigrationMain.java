@@ -43,7 +43,7 @@ public class SeasonalMigrationMain
 			if (config.runMode==RunMode.TEST) {
 				System.out.print("Running likelihood test...\n");
 				System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.seasonality);
-				System.out.print(data.createModel.print());
+				System.out.println(data.createModel.print());
 				double createLikelihood = 0;
 				for (LikelihoodTree tree : data.trees) {
 					System.out.print(".");

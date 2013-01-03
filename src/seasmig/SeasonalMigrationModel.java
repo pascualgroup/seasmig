@@ -39,8 +39,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 		super(mcmc);
 
 		this.config = config;
-		this.data = data;
-		
+		this.data = data;	
 	} 
 	
 	@Override

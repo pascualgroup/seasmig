@@ -36,7 +36,7 @@ public class Config
 	public double heatPower = 3.0;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality seasonality = Seasonality.SINUSOIDAL;
+	public Seasonality seasonality = Seasonality.TWO_CONSTANT_SEASONS;
 	public int numLocations = 4;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...
 	
@@ -50,8 +50,8 @@ public class Config
 	
 	// TEST RELATED PARAMETERS
 	public int numTestTrees = 50;
-	public int numTestTips = 500;
-	public int numTestRepeats = 5; 
+	public int numTestTips = 400;
+	public int numTestRepeats = 6; 
 	public double disturbanceScale = 0.3;
 	
 }
