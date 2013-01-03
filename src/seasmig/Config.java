@@ -11,7 +11,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.TEST;
+	public RunMode runMode = RunMode.NORMAL;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -38,8 +38,8 @@ public class Config
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality seasonality = Seasonality.NONE;
-	public int locationCount = 4;  // TODO: add support of one location....
-								   // TODO: add as an attribute loaded with attribute loader...
+	public int numLocations = 4;  // TODO: add support of one location....
+							      // TODO: add as an attribute loaded with attribute loader...
 	
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add states & combine files 
@@ -50,10 +50,9 @@ public class Config
 	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
-	public Seasonality testTreesCreateSeasonality = Seasonality.SINUSOIDAL;
-	public int numTestTrees = 10;
-	public int numTestTips = 400;
-
-	 
+	public Seasonality testCreateSeasonality = Seasonality.SINUSOIDAL;
+	public int numTestTrees = 20;
+	public int numTestTips = 300;
+	public int numTestModels = 5; 
 	
 }

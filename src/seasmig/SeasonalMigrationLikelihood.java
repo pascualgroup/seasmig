@@ -24,8 +24,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		this.data = model.data;		
 		
 		// This is the weird way dependencies are declared. It will become unweird someday.
-		for(int i = 0; i < config.locationCount; i++) {
-			for(int j = 0; j < config.locationCount; j++) {
+		for(int i = 0; i < config.numLocations; i++) {
+			for(int j = 0; j < config.numLocations; j++) {
 				switch (config.seasonality) {
 				case NONE:
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);										
@@ -61,10 +61,10 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 		switch (config.seasonality) {
 		case NONE:
-			double[][] rates = new double[config.locationCount][config.locationCount];
-			for (int i=0;i<config.locationCount;i++) {
+			double[][] rates = new double[config.numLocations][config.numLocations];
+			for (int i=0;i<config.numLocations;i++) {
 				double rowsum=0;
-				for (int j=0;j<config.locationCount;j++) {
+				for (int j=0;j<config.numLocations;j++) {
 					if (i!=j) {
 						rates[i][j]=model.getRateParams(i, j).getRate();
 						rowsum-=rates[i][j];
@@ -77,12 +77,12 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			break;
 
 		case TWO_CONSTANT_SEASONS:		
-			rates = new double[config.locationCount][config.locationCount];
-			double[][] rates2 = new double[config.locationCount][config.locationCount];
-			for (int i=0;i<config.locationCount;i++) {
+			rates = new double[config.numLocations][config.numLocations];
+			double[][] rates2 = new double[config.numLocations][config.numLocations];
+			for (int i=0;i<config.numLocations;i++) {
 				double row1sum=0;
 				double row2sum=0;
-				for (int j=0;j<config.locationCount;j++) {		
+				for (int j=0;j<config.numLocations;j++) {		
 					if (i!=j) {
 						rates[i][j]=model.getRateParams(i, j).getRate();
 						row1sum-=rates[i][j];
@@ -112,11 +112,11 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			// model.getRateParams(i,j).getPhase() // seasonal phase (between 0 and 1) for sinusoidal model
 			// ??? rate*(1+amp*sin(2*pi*t+2*pi*phase)) ???
 
-			rates = new double[config.locationCount][config.locationCount];
-			double[][] amp = new double[config.locationCount][config.locationCount];
-			double[][] phase = new double[config.locationCount][config.locationCount];
-			for (int i=0;i<config.locationCount;i++) {
-				for (int j=0;j<config.locationCount;j++) {		
+			rates = new double[config.numLocations][config.numLocations];
+			double[][] amp = new double[config.numLocations][config.numLocations];
+			double[][] phase = new double[config.numLocations][config.numLocations];
+			for (int i=0;i<config.numLocations;i++) {
+				for (int j=0;j<config.numLocations;j++) {		
 					if (i!=j) {
 						rates[i][j]=model.getRateParams(i, j).getRate();
 						amp[i][j]=model.getRateParams(i, j).getAmplitude();

@@ -21,7 +21,7 @@ public class Data
 
 	// TEST MODELS
 	MigrationBaseModel createModel = null;
-	MigrationBaseModel testModel = null;
+	List<MigrationBaseModel> testModels = null;
 
 	public Data(Config config_) throws IOException, ImportException 	{
 
@@ -56,18 +56,19 @@ public class Data
 
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,config.locationCount));
+					trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,config.numLocations));
 				}
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}
 			else {
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, config.locationCount));
+					trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, config.numLocations));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}	
 			break;
+
 		case TEST:
 			// TODO: add test files instead of hardcoding matrices ....
 			System.out.print("Generating test trees... ");
@@ -75,93 +76,92 @@ public class Data
 			// Generate test data and trees
 
 			// For constant model...
-			double[][] Q = {{-0.9,0.4,0.3,0.2},
-					{0.3,-0.6,0.2,0.1},
-					{0.2,0.1,-0.3,0.0},
-					{0.1,0.0,0.0,-0.1}};
+			double[][] Q = makeRandomMigrationMatrix(config.numLocations,5); 
 
 			// For two seasonal model...
-			double[][] QW = {{-0.9,0.8,0.1,0.0},
-					{0.2,-0.5,0.2,0.1},
-					{0.2,0.0,-0.2,0.0},
-					{0.3,0.0,0.0,-0.3}};
-
-			double[][] QS = {{-0.9,0.4,0.3,0.2},
-					{0.3,-0.6,0.2,0.1},
-					{0.2,0.1,-0.3,0.0},
-					{0.1,0.0,0.0,-0.1}};
+			double[][] QW = Q.clone();
+			double[][] QS = makeRandomMigrationMatrix(config.numLocations,3); 
 
 			// For sinusoidal model...
-			double[][] rates = {{0,0.4,0.3,0.2},
-					{0.3,0,0.2,0.1},
-					{0.2,0.1,0,0.0},
-					{0.1,0.0,0.0,0}};
-			double[][] amps = {{0,0.8,0.1,0.0},
-					{0.2,0,0.2,0.1},
-					{0.2,0.0,0,0.0},
-					{0.3,0.0,1.9,0}};
-			double[][] phases = {{0,1.0,1.0,0.0},
-					{0.5,0,0.5,0.1},
-					{0.25,0.0,0,1.0},
-					{0.25,0.5,1.0,0}};
+			double[][] rates = Q.clone();
+			double[][] amps = makeRandomMigrationMatrix(config.numLocations,1);
+			double[][] phases = makeRandomMigrationMatrix(config.numLocations,1);
 
-			switch (config.testTreesCreateSeasonality) {
-			case NONE:
-
-				createModel = new ConstantMigrationBaseModel(Q);
-
-				for (int i=0;i<config.numTestTrees;i++) {
-					TreeWithLocations testTree = new TreeWithLocations(createModel,config.numTestTips);
-					testTree.removeInternalLocations();
-					trees.add(testTree);
-				}
-
-				/////////////
-
-				double phase = 0.3;
-				double length = 0.5;
-				testModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,length);
-
+			switch (config.testCreateSeasonality) {
+			case NONE:	
+				createModel = new ConstantMigrationBaseModel(Q); 
 				break;
-
-			case TWO_CONSTANT_SEASONS:
-
-				phase = 0.3;
-				length = 0.5;
+			case TWO_CONSTANT_SEASONS: 
+				double phase = 0.3; double length = 0.5;
 				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
-
-				for (int i=0;i<config.numTestTrees;i++) {
-					TreeWithLocations testTree = new TreeWithLocations(createModel,config.numTestTips);
-					testTree.removeInternalLocations();
-					trees.add(testTree);
-				}
-
-				/////////////
-
-				testModel = new ConstantMigrationBaseModel(Q);
 				break;
-
 			case SINUSOIDAL:
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
-
-				for (int i=0;i<config.numTestTrees;i++) {
-					TreeWithLocations testTree = new TreeWithLocations(createModel,config.numTestTips);
-					testTree.removeInternalLocations();
-					trees.add(testTree);
-				}
-
-				/////////////
-
-				testModel = new ConstantMigrationBaseModel(Q);
 				break;
-
 			}
+			
+			for (int i=0;i<config.numTestTrees;i++) {
+				TreeWithLocations testTree = new TreeWithLocations(createModel,config.numTestTips);
+				testTree.removeInternalLocations();
+				trees.add(testTree);
+			}
+
 			System.out.println(" generated "+trees.size()+" trees");
+			System.out.print("Generating test models... ");
+
+			testModels = new ArrayList<MigrationBaseModel>();
+
+			double disturbanceStep = 0.1;
+			for (int i=0; i<config.numTestModels; i++) {
+				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, disturbanceStep*i,99999)));
+			}
+			for (int i=0; i<config.numTestModels; i++) {
+				double disturbedphase = 0.3; double length = 0.5; // TODO: disturb phase
+				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,disturbanceStep*i,99999),disturbMigrationMatrix(QS,disturbanceStep*i,99999),disturbedphase,disturbedphase+length));
+			}
+			for (int i=0; i<config.numTestModels; i++) {
+				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,disturbanceStep*i,999999),disturbMigrationMatrix(amps,disturbanceStep*i,1),disturbMigrationMatrix(phases,disturbanceStep*i,1)));
+			}
+			System.out.println(" generated "+testModels.size()+" test models");
 			break;
 		}
 	}
 
-	
+	private double[][] makeRandomMigrationMatrix(int size, double scale) {
+		// For test purposes...
+		double[][] returnValue = new double[size][size];
+		for (int i=0;i<size;i++) {
+			double rowSum=0;
+			for (int j=0;j<size;j++) {
+				if (i!=j) {
+					returnValue[i][j]=Math.random()*scale;
+					rowSum+=returnValue[i][j];
+				}
+			}
+			returnValue[i][i]=-rowSum;
+		}
+		return returnValue;
+	}
+
+	private double[][] disturbMigrationMatrix(double[][] migrationMatrix, double disturbanceMagnitude, double max) {
+		// For test purposes...
+		double[][] returnValue = migrationMatrix.clone();
+		for (int i=0;i<migrationMatrix.length;i++) {
+			double rowSum=0;
+			for (int j=0;j<migrationMatrix.length;j++) {
+				if (i!=j) {
+					do {
+						returnValue[i][j]+=(Math.random()-0.5)*disturbanceMagnitude;
+					} while ((returnValue[i][j]<0) || (returnValue[i][j]>max));
+					rowSum+=returnValue[i][j];
+				}
+			}
+			returnValue[i][i]=-rowSum;
+		}
+		return returnValue;
+	}
+
+
 
 
 }

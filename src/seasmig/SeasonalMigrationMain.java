@@ -42,12 +42,12 @@ public class SeasonalMigrationMain
 			// Tests...			
 			if (config.runMode==RunMode.TEST) {
 				System.out.print("Running likelihood test...\n");
-				System.out.println("Calculating tree Likelihood using create model seasonality: "+config.testTreesCreateSeasonality);
+				System.out.println("Calculating tree Likelihood using create model seasonality: "+config.testCreateSeasonality);
 				System.out.println(data.createModel.print());
 				double createLikelihood = 0;
 				for (LikelihoodTree tree : data.trees) {
 					System.out.print(".");
-					// TODO: get likelihood not to require copy...
+					// TODO: maybe get likelihood to not require copy...
 					LikelihoodTree workingCopy = tree.workingCopy();
 					workingCopy.setLikelihoodModel(data.createModel);
 					createLikelihood+=workingCopy.logLikelihood();
@@ -55,17 +55,22 @@ public class SeasonalMigrationMain
 				createLikelihood=createLikelihood/data.trees.size();
 				System.out.println(createLikelihood);
 				
-				System.out.println("Calculating tree Likelihood using test model seasonality: "+config.seasonality);
-				System.out.println(data.testModel.print());
-				double testLikelihood = 0;
-				for (LikelihoodTree tree : data.trees) {
-					System.out.print(".");
-					LikelihoodTree workingCopy = tree.workingCopy();
-					workingCopy.setLikelihoodModel(data.testModel);
-					testLikelihood+=workingCopy.logLikelihood();
+				System.out.println("Calculating tree Likelihood using test models seasonality");
+				for (int i=0;i<data.testModels.size();i++) {
+					if (i%config.numTestModels==0) {
+						System.out.println("--------------");
+					}
+				//System.out.println(data.testModels.get(i).print());
+					double testLikelihood = 0;
+					for (LikelihoodTree tree : data.trees) {
+						System.out.print(".");
+						LikelihoodTree workingCopy = tree.workingCopy();
+						workingCopy.setLikelihoodModel(data.testModels.get(i));
+						testLikelihood+=workingCopy.logLikelihood();
+					}
+					testLikelihood=testLikelihood/data.trees.size();
+					System.out.println(testLikelihood);
 				}
-				testLikelihood=testLikelihood/data.trees.size();
-				System.out.println(testLikelihood);
 				System.out.print("Completed likelihood test!\n\n");
 				
 			}
