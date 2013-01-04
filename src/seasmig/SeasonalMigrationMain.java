@@ -86,12 +86,10 @@ public class SeasonalMigrationMain
 			Logger logger = Logger.getRootLogger();
 			logger.setLevel(config.logLevel.getLog4jLevel());
 			Layout layout = new TTCCLayout("ISO8601");
-			if(config.logFilename.equals("-"))
-			{
+			if(config.logFilename.equals("-")) 	{
 				logger.addAppender(new ConsoleAppender(layout));
 			}
-			else
-			{
+			else {
 				logger.addAppender(new FileAppender(layout, config.logFilename));
 			}
 			FormattingLogger fmtLogger = new FormattingLogger(logger);
@@ -158,10 +156,9 @@ public class SeasonalMigrationMain
 			// Set up execution order for the steps
 			mcmc.addStep(univarStep);
 			mcmc.addStep(deStep);
-			for(int i = 0; i < config.chainCount; i++)
-			{
+			for(int i = 0; i < config.chainCount; i++)	{
 				mcmc.addStep(evenSwapStep);
-				mcmc.addStep(oddSwapStep);
+				mcmc.addStep(oddSwapStep);				
 			}
 			mcmc.addStep(sampOutStep);
 			mcmc.addStep(plOutStep);
