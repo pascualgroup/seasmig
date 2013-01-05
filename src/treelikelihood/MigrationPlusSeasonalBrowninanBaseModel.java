@@ -1,6 +1,6 @@
 package treelikelihood;
 
-public class MigrationPlusBrowninanBaseModel implements MigrationPlusContinousStateBaseModel {
+public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusContinousStateBaseModel {
 	// TODO: go over this...
 	// P_location(from_location,to_location)*P_state(from_location,to_location)(from_state,to_state)
 	
@@ -45,7 +45,7 @@ public class MigrationPlusBrowninanBaseModel implements MigrationPlusContinousSt
 	}
 
 	// Constructor	
-	public MigrationPlusBrowninanBaseModel(MigrationBaseModel migrationBaseModel_, double[][] alphas, double[][] diffs, double[] amp, double[] phase) {
+	public MigrationPlusSeasonalBrowninanBaseModel(MigrationBaseModel migrationBaseModel_, double[][] alphas, double[][] diffs, double[] amp, double[] phase) {
 		// TODO: Lookup i and j from to....
 		migrationBaseModel=migrationBaseModel_;
 		logSeasonalStatesTransitionProbabilities = new BrownianMotionPlusSeasonalityFunction[alphas.length][alphas.length];		
