@@ -2,12 +2,16 @@ package seasmig;
 
 import java.util.Set;
 
+import cern.jet.random.Uniform;
+import cern.jet.random.engine.RandomEngine;
+
 import mc3kit.MC3KitException;
 import mc3kit.graphical.Jack;
 import mc3kit.graphical.NoDistribution;
 import mc3kit.graphical.RandomVariable;
 import mc3kit.graphical.types.DoubleValued;
 
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 import treelikelihood.*;
 
 public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
@@ -16,11 +20,15 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	Config config;
 	Data data;
 	
-	public SeasonalMigrationLikelihood(SeasonalMigrationModel model) throws MC3KitException
+	public SeasonalMigrationLikelihood(SeasonalMigrationModel model, RandomEngine rng) throws MC3KitException
 	{
 		super(model, "likelihood");
+		
+		setObserved(true);
+		
 		this.model = model;
 		this.config = model.config;		
+		this.data = model.data;
 		
 		// This is the weird way dependencies are declared. It will become unweird someday.
 		
@@ -33,6 +41,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		{
 			for(int j = 0; j < config.numLocations; j++)
 			{
+				if(i == j) continue;
+				
 				new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
 				if(config.migrationSeasonality == Config.Seasonality.SINUSOIDAL)
 				{
@@ -130,11 +140,17 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		}
 		
 		// TODO: maybe get likelihood to work without copy...
-		LikelihoodTree workingCopy = data.trees.get(model.rng.nextInt()%data.trees.size()).workingCopy(); 
+		
+		Uniform uniform = new Uniform(model.rng);
+		LikelihoodTree workingCopy = data.trees.get(uniform.nextIntFromTo(0,data.trees.size()-1)).workingCopy(); 
 		workingCopy.setLikelihoodModel(migrationBaseModel);
 		logLikelihood=workingCopy.logLikelihood();
 		
 		//TODO: Figure out zero log likelihood in files
+		// TODO: fix NaN likelihood
+		if (logLikelihood==Double.NaN) {
+			logLikelihood=Double.MIN_VALUE*100;
+		}
 		setLogP(logLikelihood);
 	}
 

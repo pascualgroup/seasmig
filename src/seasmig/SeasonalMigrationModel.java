@@ -1,5 +1,6 @@
 package seasmig;
 
+import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
 
 import java.util.*;
@@ -45,8 +46,9 @@ public class SeasonalMigrationModel extends GraphicalModel
 	@Override
 	protected void buildModel(RandomEngine rng) throws MC3KitException
 	{
-		// TODO: Ask Ed if this is ok...
-		this.rng=rng;
+		// TODO: when Ed changes things, eliminate rng member variable
+		// and exclusively use RNG passed into constructor and update methods.
+		this.rng=new MersenneTwister(rng.nextInt()); //TOOD: might be weirdly correlated
 		
 		ratePriorRate = new ExponentialVariable(this, "ratePriorRate", 1.0);
 		ratePrior = new ExponentialDistribution(this, "ratePrior", ratePriorRate);
@@ -72,6 +74,8 @@ public class SeasonalMigrationModel extends GraphicalModel
 				rateParams[i][j] = new RateParams(i, j);
 			}
 		}
+		
+		likeVar = new SeasonalMigrationLikelihood(this, rng);
 	}
 
 	@Override

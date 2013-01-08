@@ -13,7 +13,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.NORMAL;
+	public RunMode runMode = RunMode.TEST;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -53,9 +53,9 @@ public class Config
 	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
-	public int numTestTrees = 30;
-	public int numTestTips = 300;
-	public int numTestRepeats = 6; 
+	public int numTestTrees = 3;
+	public int numTestTips = 100;
+	public int numTestRepeats = 2; 
 	public double disturbanceScale = 0.3;
 	
 }
