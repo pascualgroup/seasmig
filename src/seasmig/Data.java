@@ -53,15 +53,22 @@ public class Data
 				AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilename, config.stateFilename);
 				// TODO: think about this...
 				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributeLoader.getAttributes().get("locations");
+				HashMap<String,Double> stateMap = (HashMap<String,Double>) attributeLoader.getAttributes().get("states");
 				System.out.println("loaded "+locationMap.size()+" taxon traits");
 
 				System.out.print("Reparsing trees... ");
-				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,config.numLocations));
+				if (stateMap==null) {
+					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
+						trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,config.numLocations));
+					}
+				}
+				else {
+					// TODO: this...
 				}
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}
 			else {
+				// TODO: add load states from trees...
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
 					trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, config.numLocations));
@@ -71,7 +78,8 @@ public class Data
 			break;
 
 		case TEST:
-			// TODO: add test files instead of hardcoding matrices ....
+			// TODO: add more tests + test files ....
+			// TODO: add tests for states...
 			System.out.print("Generating test trees... ");
 
 			// Generate test data and trees
@@ -88,7 +96,7 @@ public class Data
 			double[][] amps = makeRandomMigrationMatrix(config.numLocations,1);
 			double[][] phases = makeRandomMigrationMatrix(config.numLocations,1);
 
-			switch (config.seasonality) {
+			switch (config.migrationSeasonality) {
 			case NONE:	
 				createModel = new ConstantMigrationBaseModel(Q); 
 				break;

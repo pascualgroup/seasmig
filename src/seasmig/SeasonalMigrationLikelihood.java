@@ -24,7 +24,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		
 		// This is the weird way dependencies are declared. It will become unweird someday.
 		
-		if(config.seasonality == Config.Seasonality.TWO_CONSTANT_SEASONS)
+		if(config.migrationSeasonality == Config.Seasonality.TWO_CONSTANT_SEASONS)
 		{
 			new Jack<DoubleValued>(model, this, model.twoMatrixPhase);
 		}
@@ -34,12 +34,12 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			for(int j = 0; j < config.numLocations; j++)
 			{
 				new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
-				if(config.seasonality == Config.Seasonality.SINUSOIDAL)
+				if(config.migrationSeasonality == Config.Seasonality.SINUSOIDAL)
 				{
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].amplitude);
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].phase);
 				}
-				else if(config.seasonality ==Config.Seasonality.TWO_CONSTANT_SEASONS)
+				else if(config.migrationSeasonality ==Config.Seasonality.TWO_CONSTANT_SEASONS)
 				{
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate2);
 				}
@@ -60,7 +60,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 		MigrationBaseModel migrationBaseModel = null;
 
-		switch (config.seasonality) {
+		switch (config.migrationSeasonality) {
 		case NONE:
 			double[][] rates = new double[config.numLocations][config.numLocations];
 			for (int i=0;i<config.numLocations;i++) {

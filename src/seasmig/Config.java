@@ -7,11 +7,13 @@ public class Config
 {
 	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,	SINUSOIDAL }; //TODO: DEBUG SINUSODIAL
 																  //TODO: ADD CONTINUOUS SEASONAL MODEL
+	enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
+	
 	enum RunMode {	NORMAL,	TEST };
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.TEST;
+	public RunMode runMode = RunMode.NORMAL;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -36,7 +38,8 @@ public class Config
 	public double heatPower = 3.0;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality seasonality = Seasonality.TWO_CONSTANT_SEASONS;
+	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
+	public StateModel stateModel = StateModel.NONE; // TODO: this...
 	public int numLocations = 4;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...
 	
@@ -46,6 +49,7 @@ public class Config
 	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
+	public String stateAttributeNameInTree = null; // location attribute in jebl tree
 	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
