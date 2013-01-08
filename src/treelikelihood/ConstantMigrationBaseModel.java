@@ -47,6 +47,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		else 		
 			result=transitionMatrix(from_time, to_time).get(from_location, to_location);		
 
+		// TODO: don't return 0 values
 		if (result<0) 
 			result=precisionGoal;
 		if (result>1) 

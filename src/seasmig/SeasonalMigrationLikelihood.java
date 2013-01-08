@@ -64,6 +64,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		return true;
 	}
 
+	
+	
 	void recalculate() throws MC3KitException
 	{
 		double logLikelihood = 0.0;
@@ -148,10 +150,16 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		
 		//TODO: Figure out zero log likelihood in files
 		// TODO: fix NaN likelihood
-		if (logLikelihood==Double.NaN) {
-			logLikelihood=Double.MIN_VALUE*100;
-		}
 		setLogP(logLikelihood);
+	}
+	
+	
+
+	@Override
+	public boolean updateAfterRejection(Set<Jack<?>> changedParents)
+			throws MC3KitException {
+		// TODO Just revert to last log-likelihood value
+		return super.updateAfterRejection(changedParents);
 	}
 
 	@Override

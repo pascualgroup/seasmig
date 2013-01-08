@@ -38,9 +38,9 @@ public class Config
 	public double heatPower = 3.0;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
+	public Seasonality migrationSeasonality = Seasonality.NONE;
 	public StateModel stateModel = StateModel.NONE; // TODO: this...
-	public int numLocations = 4;  // TODO: add support of one location....
+	public int numLocations = 3;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...
 	
 	// MODEL DATA RELATED PARAMETERS
@@ -54,7 +54,7 @@ public class Config
 	
 	// TEST RELATED PARAMETERS
 	public int numTestTrees = 3;
-	public int numTestTips = 100;
+	public int numTestTips = 1000;
 	public int numTestRepeats = 2; 
 	public double disturbanceScale = 0.3;
 	
