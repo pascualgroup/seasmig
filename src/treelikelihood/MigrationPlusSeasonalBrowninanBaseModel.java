@@ -5,61 +5,61 @@ public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusCon
 	// P_location(from_location,to_location)*P_state(from_location,to_location)(from_state,to_state)
 	
 	
-	BrownianMotionPlusSeasonalityFunction logSeasonalStatesTransitionProbabilities[][] = null;
+	BrownianMotionPlusSeasonalityFunction logSeasonalStatesTransitionProbabilities[] = null;
 	private MigrationBaseModel migrationBaseModel;	
 	
 	public class BrownianMotionPlusSeasonalityFunction {
 
-		private double alpha;
-		private double diff;
-		private double amp_from;
-		private double phase_from;
-		private double amp_to;
-		private double phase_to;
+		private double alpha; 				
+		private double ampAnnual;
+		private double phaseAnnual;
+		private double ampBiannual;
+		private double phaseBiannual;
 		
 
-		public BrownianMotionPlusSeasonalityFunction(double alpha_, double diff_, double amp_from_, double phase_from_, double amp_to_, double phase_to_) {
+		public BrownianMotionPlusSeasonalityFunction(double alpha_, double ampAnnual_, double phaseAnnual_, double ampBiannual_, double phaseBiannual_) {
 			alpha=alpha_;
-			diff=diff_;
-			phase_from=phase_from_;
-			amp_from=amp_from_;
-			amp_to=amp_to_;
-			phase_to=phase_to_;
+			ampAnnual=phaseAnnual_;
+			phaseAnnual=phaseAnnual_;
+			ampBiannual=ampBiannual_;
+			phaseBiannual=phaseBiannual_;
 		}
 
 		@Override
 		public String toString() {
-			return "Seasonality: "+amp_from+"*sin(2Pi*t+2Pi*"+phase_from+"),"+amp_to+"*sin(2Pi*t+2Pi*"+phase_to+") C="+diff+", Wiener: N(0,"+alpha+"*t)";			
+			return "Seasonality: "+ampAnnual+"*sin(2Pi*t+2Pi*"+phaseAnnual+")+"+ampBiannual+"*sin(4Pi*t+2Pi*"+phaseBiannual+"), Wiener: N(0,"+alpha+"*t)";			
 		}
 		
 		public double apply(double from_time, double to_time, double from_state, double to_state) {		
 			// TODO: go over this...
 			// When removing the seasonality the adjusted state is assumed to be a Wiener process (Brownian Motion)
 			// Wt-Ws ~ N(0, alpha*(t-s)) (for 0<s<t)
-			double xs = from_state - amp_from*Math.sin(2*Math.PI*from_time+2*Math.PI*phase_from);
-			double xt = to_state - amp_to*Math.sin(2*Math.PI*to_time+2*Math.PI*phase_to);
-			double var = Math.abs(to_time-from_time)*alpha;			
-			return -Math.log(2*Math.PI*var)/2.0+(xt-xs-diff)*(xt-xs-diff)/(2*var); 
+			// When locations are different we assume that the baseline migration model estimates the probability regardless of the actual state values 			
+			double xs = from_state - ampAnnual*Math.sin(2*Math.PI*from_time+2*Math.PI*phaseAnnual)+ampBiannual*Math.sin(4*Math.PI*from_time+2*Math.PI*phaseBiannual);
+			double xt = to_state -ampAnnual*Math.sin(2*Math.PI*to_time+2*Math.PI*phaseAnnual)+ampBiannual*Math.sin(4*Math.PI*to_time+2*Math.PI*phaseBiannual);
+			double var = Math.abs(to_time-from_time+Double.MIN_VALUE)*alpha;			
+			return -Math.log(2*Math.PI*var)/2.0+(xt-xs)*(xt-xs)/(2*var); 
 		}
 
 	}
 
 	// Constructor	
-	public MigrationPlusSeasonalBrowninanBaseModel(MigrationBaseModel migrationBaseModel_, double[][] alphas, double[][] diffs, double[] amp, double[] phase) {
-		// TODO: Lookup i and j from to....
+	public MigrationPlusSeasonalBrowninanBaseModel(MigrationBaseModel migrationBaseModel_, double[] alphas, double[] ampAnnual, double[] phaseAnnual, double[] ampBiannual, double[] phaseBiannual) {
 		migrationBaseModel=migrationBaseModel_;
-		logSeasonalStatesTransitionProbabilities = new BrownianMotionPlusSeasonalityFunction[alphas.length][alphas.length];		
+		logSeasonalStatesTransitionProbabilities = new BrownianMotionPlusSeasonalityFunction[alphas.length];		
 		for (int i=0;i<alphas.length;i++) {
-			for (int j=0;j<alphas.length;j++) {
-				logSeasonalStatesTransitionProbabilities[i][j]=new BrownianMotionPlusSeasonalityFunction(alphas[i][j],diffs[i][j],amp[i],phase[i],amp[j],phase[j]);
-			}
+			logSeasonalStatesTransitionProbabilities[i]=new BrownianMotionPlusSeasonalityFunction(alphas[i],ampAnnual[i],phaseAnnual[i],ampBiannual[i],phaseBiannual[i]);
 		}
 	}
 
 	// Methods
 	@Override
 	public double logprobability(int from_location, int to_location, double from_time, double to_time, double from_state, double to_state) {
-		return migrationBaseModel.logprobability(from_location, to_location, from_time, to_time)+logSeasonalStatesTransitionProbabilities[from_location][to_location].apply(from_time, to_time, from_state, to_state);
+		double returnValue = migrationBaseModel.logprobability(from_location, to_location, from_time, to_time);
+		if (from_location==to_location) {
+			returnValue+=logSeasonalStatesTransitionProbabilities[from_location].apply(from_time, to_time, from_state, to_state); 
+		}
+		return returnValue; 
 	}
 
 	@Override
@@ -68,15 +68,9 @@ public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusCon
 		returnValue=returnValue+migrationBaseModel.print();
 		returnValue+="\n[";
 		for (int i=0;i<logSeasonalStatesTransitionProbabilities.length;i++) {
-			if (i!=0) returnValue+=" ";
-			returnValue+="[";
-			for (int j=0;j<logSeasonalStatesTransitionProbabilities[i].length;j++) {
-				returnValue=returnValue+String.format("%30s",logSeasonalStatesTransitionProbabilities[i][j].toString());				
-				if (j!=logSeasonalStatesTransitionProbabilities[i].length-1) returnValue+=",\t";
-			}
-			returnValue+="]";
-			if (i!=logSeasonalStatesTransitionProbabilities.length-1) returnValue+="\n";
-		}
+			returnValue=returnValue+String.format("%s\n",logSeasonalStatesTransitionProbabilities[i].toString());				
+			if (i!=logSeasonalStatesTransitionProbabilities.length-1) returnValue+=",\t";
+		}			
 		returnValue+="]\n";
 		return returnValue;	
 	}
