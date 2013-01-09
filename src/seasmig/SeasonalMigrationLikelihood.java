@@ -150,7 +150,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		
 		// TODO: fix NaN likelihood
 		if (logLikelihood==Double.NaN)
-			logLikelihood=Math.log(ConstantMigrationBaseModel.precisionGoal);
+			System.err.println("NaN Likelihood!!!");
 		setLogP(logLikelihood);
 	}
 	
