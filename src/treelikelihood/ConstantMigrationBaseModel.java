@@ -126,6 +126,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	private DoubleMatrix2D matrixPowerQ(int n) {
+		// TODO: fix and check this...
 		for (int i=cachedMatrixPower.size();i<=n;i++) {
 			DoubleMatrix2D result = cachedMatrixPower.get(i-1).zMult(Q,null);
 			if (result.getMaxLocation()[0]!=Double.NaN) {
