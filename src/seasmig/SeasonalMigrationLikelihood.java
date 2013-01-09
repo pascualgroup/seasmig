@@ -148,8 +148,9 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		workingCopy.setLikelihoodModel(migrationBaseModel);
 		logLikelihood=workingCopy.logLikelihood();
 		
-		//TODO: Figure out zero log likelihood in files
 		// TODO: fix NaN likelihood
+		if (logLikelihood==Double.NaN)
+			logLikelihood=Math.log(ConstantMigrationBaseModel.precisionGoal);
 		setLogP(logLikelihood);
 	}
 	

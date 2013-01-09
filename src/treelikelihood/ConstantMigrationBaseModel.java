@@ -3,15 +3,15 @@ import java.util.HashMap;
 import java.util.Vector;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.jet.math.PlusMult;
 import cern.jet.math.tdouble.DoublePlusMultSecond;
 
 public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Precision Parameters...
-	static final double precisionGoal = 1E-15; // Individual probability calculation precision goal
-	static final int maxN = 10000; // Maximum number of Taylor series values
-
-	// Cache Parameters
+	public static final double precisionGoal = 1E-15; // Individual probability calculation precision goal
+	static final int maxIter = 10000; // Maximum number of Taylor series values
+ 	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
 
 	// Rate Matrix  
@@ -22,6 +22,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	DoubleFactory2D F = DoubleFactory2D.dense;	
 	Vector<DoubleMatrix2D> cachedMatrixPower = new Vector<DoubleMatrix2D>();	
 	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
+
 
 	// Constructor	
 	public ConstantMigrationBaseModel(double[][] Q_) {	
@@ -47,15 +48,12 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		else 		
 			result=transitionMatrix(from_time, to_time).get(from_location, to_location);		
 
-		// TODO: don't return 0 values
-		if (result<0) 
-			result=precisionGoal;
-		if (result>1) 
-			result=1-precisionGoal;
 		if (result==0) 
-			return Double.MIN_VALUE;
+			return Math.log(precisionGoal);
+		if (result==Double.NaN)
+			return Math.log(precisionGoal);
 		if (result==1)
-			return Double.MAX_VALUE;
+			return Math.log(1-precisionGoal);
 
 		return Math.log(result);
 	}
@@ -75,14 +73,32 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			double t = (to_time - from_time);
 			double logt = Math.log(t);		
 			double precision=0;
-
+			boolean probabilityOK=false;
 			do {
 				n=n+1;		
 				DoubleMatrix2D Qn = matrixPowerQ(n);
-				precision=Math.max(Math.abs(Qn.getMinLocation()[0]),Math.abs(Qn.getMaxLocation()[0]))*Math.exp(n*logt-cern.jet.math.tdouble.DoubleArithmetic.logFactorial(n)); 				
-				result.assign(Qn,DoublePlusMultSecond.plusMult(Math.exp(n*logt-cern.jet.math.tdouble.DoubleArithmetic.logFactorial(n))));
-			} while (precision>precisionGoal && (n<maxN));	
+				// TODO: Fix precision to handle both 0 and 1 side... 
+				// TODO: this...
+				DoubleMatrix2D diff = F.dense.make(Q.rows(),Q.rows(),0);
+				double taylorCoeff = Math.exp(n*logt-cern.jet.math.tdouble.DoubleArithmetic.logFactorial(n));
+				diff.assign(Qn,DoublePlusMultSecond.plusMult(taylorCoeff));
+				result.assign(diff, cern.jet.math.tdouble.DoubleFunctions.plus);
+				precision=Math.max(Math.abs(diff.getMinLocation()[0]),Math.abs(diff.getMaxLocation()[0]));
+				probabilityOK = (result.getMaxLocation()[0]<=1.0) && (result.getMinLocation()[0]>=0); 
+			} while ((precision>precisionGoal || !probabilityOK) && n<maxIter);	
 
+			if (n==maxIter) {
+				for (int i=0; i<Q.rows();i++) {
+					for (int j=0; j<Q.rows();j++) {
+						if (result.get(i,j)<=0) {
+							result.set(i,j, precisionGoal);
+						}
+						if (result.get(i, j)>=1) {
+							result.set(i, j, 1-precisionGoal);
+						}
+					}
+				}
+			}
 			// cache result
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
