@@ -23,12 +23,14 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	DoubleFactory2D F = DoubleFactory2D.dense;	
 	Vector<DoubleMatrix2D> cachedMatrixPower = new Vector<DoubleMatrix2D>();	
 	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
+	private DoubleMatrix2D zeroMatrix;
 
 
 
 	// Constructor	
 	public ConstantMigrationBaseModel(double[][] Q_) {	
 		Q = F.make(Q_);	
+		zeroMatrix = F.make(Q.rows(), Q.rows(), 0);
 		num_locations=Q.rows();
 		cachedMatrixPower.add(0,F.identity(Q.rows())); // Q^0 = I
 		cachedMatrixPower.add(1,Q.copy());  // Q^1 = Q	
@@ -86,6 +88,9 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 				diff.assign(Qn,DoublePlusMultSecond.plusMult(taylorCoeff));
 				result.assign(diff, cern.jet.math.tdouble.DoubleFunctions.plus);
 				precision=Math.max(Math.abs(diff.getMinLocation()[0]),Math.abs(diff.getMaxLocation()[0]));
+				if (n==(maxIter-1)) {
+					System.err.println(precision);
+				}
 				probabilityOK = (result.getMaxLocation()[0]<=1.0) && (result.getMinLocation()[0]>=0); 
 			} while ((precision>precisionGoal || !probabilityOK || n<minIter) && n<maxIter);	
 
@@ -122,7 +127,14 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	private DoubleMatrix2D matrixPowerQ(int n) {
 		for (int i=cachedMatrixPower.size();i<=n;i++) {
-			cachedMatrixPower.add(i,cachedMatrixPower.get(i-1).zMult(Q,null));						
+			DoubleMatrix2D result = cachedMatrixPower.get(i-1).zMult(Q,null);
+			if (result.getMaxLocation()[0]!=Double.NaN) {
+				cachedMatrixPower.add(i,result);
+				return result;
+			}					
+			else {
+				cachedMatrixPower.add(i,zeroMatrix);
+			}
 		}		
 		return cachedMatrixPower.get(n);
 	}
