@@ -9,8 +9,9 @@ import cern.jet.math.tdouble.DoublePlusMultSecond;
 public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Precision Parameters...
-	public static final double precisionGoal = 1E-15; // Individual probability calculation precision goal
+	public static final double precisionGoal = 1E-25; // Individual probability calculation precision goal
 	static final int maxIter = 10000; // Maximum number of Taylor series values
+	static final int minIter = 30; // Minimum number of Taylor series values
  	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
 
@@ -22,6 +23,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	DoubleFactory2D F = DoubleFactory2D.dense;	
 	Vector<DoubleMatrix2D> cachedMatrixPower = new Vector<DoubleMatrix2D>();	
 	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
+
 
 
 	// Constructor	
@@ -48,12 +50,12 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		else 		
 			result=transitionMatrix(from_time, to_time).get(from_location, to_location);		
 
-		if (result==0) 
-			return Math.log(precisionGoal);
-		if (result==Double.NaN)
-			return Math.log(precisionGoal);
-		if (result==1)
-			return Math.log(1-precisionGoal);
+//		if (result==0) 
+//			return Math.log(precisionGoal);
+//		if (result==Double.NaN)
+//			return Math.log(precisionGoal);
+//		if (result==1)
+//			return Math.log(1-precisionGoal);
 
 		return Math.log(result);
 	}
@@ -85,7 +87,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 				result.assign(diff, cern.jet.math.tdouble.DoubleFunctions.plus);
 				precision=Math.max(Math.abs(diff.getMinLocation()[0]),Math.abs(diff.getMaxLocation()[0]));
 				probabilityOK = (result.getMaxLocation()[0]<=1.0) && (result.getMinLocation()[0]>=0); 
-			} while ((precision>precisionGoal || !probabilityOK) && n<maxIter);	
+			} while ((precision>precisionGoal || !probabilityOK || n<minIter) && n<maxIter);	
 
 			if (n==maxIter) {
 				for (int i=0; i<Q.rows();i++) {
