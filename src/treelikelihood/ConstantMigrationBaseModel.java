@@ -9,9 +9,9 @@ import cern.jet.math.tdouble.DoublePlusMultSecond;
 public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Precision Parameters...
-	public static final double precisionGoal = 1E-25; // Individual probability calculation precision goal
-	static final int maxIter = 10000; // Maximum number of Taylor series values
-	static final int minIter = 30; // Minimum number of Taylor series values
+	public static final double precisionGoal = 1E-15; // Individual probability calculation precision goal
+	static final int maxIter = 1000; // Maximum number of Taylor series values
+	static final int minIter = 10; // Minimum number of Taylor series values
  	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
 
