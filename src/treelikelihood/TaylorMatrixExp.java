@@ -64,23 +64,25 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	@Override
 	public DoubleMatrix2D expm(double t) {
 		
-		if (t>2.0) {
+		if (t>0.5) {
 			DoubleMatrix2D halfProb = expm(t/2.0);
 			return halfProb.zMult(halfProb, null);
 		}
 		
 		DoubleMatrix2D result = zeroMatrix.copy();
 
-		for (int i=nTaylor-1;i>=0;i--) {
-			double taylorCoeff =cachedScale.get(i)*Math.pow(t, i);
-			if (taylorCoeff<maxValue) {
-				DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(taylorCoeff));
-				result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
-			}
-			else {
-				System.err.println("overflow");
-			}
+		for (int i=nTaylor-1;i>=0;i=i-2) {
+			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(cachedScale.get(i)*Math.pow(t, i)));
+			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
 		}
+		for (int i=nTaylor-2;i>=0;i=i-2) {
+			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(cachedScale.get(i)*Math.pow(t, i)));
+			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
+		}
+		
+//		if (Math.random()<0.0001) {
+//			System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());	
+//		}
 		
 		// TODO: remove debug, at least partially
 		for (int i=0;i<result.rows();i++) {
