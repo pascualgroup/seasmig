@@ -13,8 +13,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	Node root = null;		
 	int num_locations = 0;
 	private MigrationBaseModel likelihoodModel = null;
-	static final private double branchAlpha = 2;
-	static final private double branchLambda = 2;
+	static final private double branchLengthMean = 1.0;
+	static final private double branchLengthVariance = 3.0;
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {
@@ -193,7 +193,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			for (int child=0;child<2;child++) {
 				double d = cern.jet.random.Uniform.staticNextDouble();
 				// Decide on branch length
-				double to_time = from.time+cern.jet.random.Gamma.staticNextDouble(branchAlpha,branchLambda);
+				double to_time = from.time+cern.jet.random.Gamma.staticNextDouble(branchLengthMean*branchLengthMean/branchLengthVariance,1.0/(branchLengthVariance/branchLengthMean));
 				double p=0;		
 
 				for (int location=0;location<num_locations;location++) {
