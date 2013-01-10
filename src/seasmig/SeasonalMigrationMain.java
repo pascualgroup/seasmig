@@ -19,7 +19,6 @@ import org.apache.log4j.TTCCLayout;
 
 import seasmig.Config.RunMode;
 import treelikelihood.LikelihoodTree;
-import treelikelihood.TreeWithLocations;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

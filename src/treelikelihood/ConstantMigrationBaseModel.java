@@ -1,10 +1,7 @@
 package treelikelihood;
 import java.util.HashMap;
-import java.util.Vector;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.jet.math.PlusMult;
-import cern.jet.math.tdouble.DoublePlusMultSecond;
 
 public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
@@ -12,7 +9,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	DoubleMatrix2D Q;
 	private int num_locations = 0;		
 
-	// Caching 
+	// cache
 	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
 	final static int maxCachedTransitionMatrices=6000;
 	
@@ -70,7 +67,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		return num_locations ;
 	}
 
-	
+
 
 
 

@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import org.javatuples.Pair;
-
-import corejava.Format;
-
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.tdouble.*;
 

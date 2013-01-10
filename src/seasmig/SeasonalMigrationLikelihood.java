@@ -10,8 +10,6 @@ import mc3kit.graphical.Jack;
 import mc3kit.graphical.NoDistribution;
 import mc3kit.graphical.RandomVariable;
 import mc3kit.graphical.types.DoubleValued;
-
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 import treelikelihood.*;
 
 public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
