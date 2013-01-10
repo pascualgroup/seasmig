@@ -54,7 +54,7 @@ public class Config
 	
 	// TEST RELATED PARAMETERS
 	public int numTestTrees = 50;
-	public int numTestTips = 800;
+	public int numTestTips = 500;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;
 	
