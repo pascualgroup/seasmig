@@ -9,13 +9,12 @@ import cern.jet.math.tdouble.DoublePlusMultSecond;
 public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Precision Parameters...
-	int nTaylor = 100;	
+	int nTaylor = 1000;	
 	static final double maxValue = Double.MAX_VALUE/1024;
 	static final double minValue = Double.MIN_VALUE*1024;
 
 	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
-
 
 	// Rate Matrix  
 	DoubleMatrix2D Q;
@@ -23,7 +22,8 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Caching 
 	DoubleFactory2D F = DoubleFactory2D.dense;	
-	Vector<DoubleMatrix2D> cachedQnDivFactorialN = new Vector<DoubleMatrix2D>();	
+	Vector<DoubleMatrix2D> cachedQnDivFactorialN = new Vector<DoubleMatrix2D>();
+	Vector<Double> cachedMatrixScale = new Vector<Double>();
 	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
 
 	// Constructor	
@@ -31,12 +31,12 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		num_locations=Q_.length;
 
 		Q = F.make(Q_);
-		cachedQnDivFactorialN.add(0,F.identity(Q.rows())); // Q^0/0! = I
-		cachedQnDivFactorialN.add(1,Q.copy());  // Q^1/1! = Q
-		DoubleMatrix2D next = Q.copy();
-		for (int i=1;i<nTaylor;i++) { // Q^N/N! = Q^(N-1)/(N-1)!*Q/N
-			next = next.zMult(Q,null,1.0/(i+1.0),0,false,false);						
-			cachedQnDivFactorialN.add(i+1,next);
+// TODO:scale cache
+		addToCache(0,F.identity(Q.rows()));	// Q^0/0! = I
+		DoubleMatrix2D next = getFromCache(0);
+		for (int i=1;i<nTaylor;i++) { // Q^N/N! = Q^(N-1)/(N-1)!*scale*Q/N
+			next = getFromCache(i-1).zMult(Q,null,getScale(i-1)/(i+1.0),0,false,false);						
+			cachedQnDivFactorialN.add(i,next);
 			// TODO: check for overflow or underflow	
 			for (int j=0;j<next.rows();j++) {
 				for (int k=0;k<next.rows();k++) {
@@ -50,6 +50,21 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			}
 		}
 
+	}
+
+	private DoubleMatrix2D getFromCache(int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private double getScale(int i) {
+		// TODO Auto-generated method stub
+		return cachedMatrixScale.get(i);
+	}
+
+	private void addToCache(int i, DoubleMatrix2D identity) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	// Methods
@@ -124,7 +139,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	private DoubleMatrix2D taylorSeriesQ(int n, double t) {
 		// TODO: fix and check this...
 		if (n<nTaylor) {
-			return cachedQnDivFactorialN.get(n).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(Math.pow(t, n)));
+			return cachedQnDivFactorialN.get(n).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(Math.pow(t, n)*getScale(n)));
 		}
 		else {
 			// TODO: deal with this...
