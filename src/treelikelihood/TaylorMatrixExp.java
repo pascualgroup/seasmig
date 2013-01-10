@@ -14,11 +14,13 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	// Precision Parameters...
 	int nTaylor = 1000;	
 	double minValue = 1E-90;
+	double maxValue = 1E90;
 	
 	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
 	
 	DoubleFactory2D F = DoubleFactory2D.dense; // TODO: is parallelizable? 	
+	
 
 	public TaylorMatrixExp(DoubleMatrix2D Q_) {
 		Q = Q_;
@@ -70,8 +72,14 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 		DoubleMatrix2D result = zeroMatrix.copy();
 
 		for (int i=nTaylor-1;i>=0;i--) {
-			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(cachedScale.get(i)*Math.pow(t, i)));
-			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);				
+			double taylorCoeff =cachedScale.get(i)*Math.pow(t, i);
+			if (taylorCoeff<maxValue) {
+				DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(taylorCoeff));
+				result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
+			}
+			else {
+				System.err.println("overflow");
+			}
 		}
 		
 		// TODO: remove debug, at least partially
