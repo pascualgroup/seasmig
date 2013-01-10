@@ -40,7 +40,7 @@ public class Config
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.NONE;
 	public StateModel stateModel = StateModel.NONE; // TODO: this...
-	public int numLocations = 3;  // TODO: add support of one location....
+	public int numLocations = 2;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...
 	
 	// MODEL DATA RELATED PARAMETERS
@@ -54,7 +54,7 @@ public class Config
 	
 	// TEST RELATED PARAMETERS
 	public int numTestTrees = 50;
-	public int numTestTips = 1000;
+	public int numTestTips = 400;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;
 	

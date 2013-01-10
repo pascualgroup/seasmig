@@ -10,6 +10,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	Vector<DoubleMatrix2D> cachedQnDivFactorialN = new Vector<DoubleMatrix2D>();
 	Vector<Double> cachedScale = new Vector<Double>();
 	DoubleMatrix2D Q;
+	DoubleMatrix2D zeroMatrix;
 	// Precision Parameters...
 	int nTaylor = 1000;	
 	double minValue = 1E-90;
@@ -21,6 +22,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 
 	public TaylorMatrixExp(DoubleMatrix2D Q_) {
 		Q = Q_;
+		zeroMatrix = F.make(Q.rows(),Q.rows(),0);
 		DoubleMatrix2D next = F.identity(Q.rows()); // Q^0/0! = I
 		double scale = getScale(next);		
 			
@@ -59,28 +61,47 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 
 	@Override
 	public DoubleMatrix2D expm(double t) {
-		DoubleMatrix2D result = cachedQnDivFactorialN.get(0).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(cachedScale.get(0)*Math.pow(t, 0)));
+		
+		if (t>2.0) {
+			DoubleMatrix2D halfProb = expm(t/2.0);
+			return halfProb.zMult(halfProb, null);
+		}
+		
+		DoubleMatrix2D result = zeroMatrix.copy();
 
-		for (int i=1;i<nTaylor;i++) {
+		for (int i=nTaylor-1;i>=0;i--) {
 			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(cachedScale.get(i)*Math.pow(t, i)));
 			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);				
 		}
 		
+		// TODO: remove debug, at least partially
 		for (int i=0;i<result.rows();i++) {
 			for (int j=0;j<result.rows();j++) {
 				if (result.get(i, j)<0) {
-					result.set(i, j, 0);
+					result.set(i, j, minValue);
+					System.err.println("result.get(i, j)<0");
+					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
 				}
 				if (result.get(i,j)>1) {
-					result.set(i, j, 1);
+					result.set(i, j, 1-minValue);
+					System.err.println("result.get(i, j)>1");
+					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
 				}
 				if (result.get(i, j)==Double.NaN) {
 					System.err.println("result.get(i, j)==Double.NaN");
+					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
 				}
-				
+				if (result.get(i, j)==Double.MAX_VALUE) {
+					System.err.println("result.get(i, j)==Double.MAX_VALUE");
+					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
+				}
+				if (result.get(i, j)==Double.MIN_VALUE) {
+					System.err.println("result.get(i, j)==Double.MIN_VALUE");
+					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
+				}				
 			}
 		}
-		//System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
+		//
 		return result; 	
 		
 	}
