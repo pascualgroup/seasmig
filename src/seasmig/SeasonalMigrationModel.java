@@ -48,7 +48,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 	{
 		// TODO: when Ed changes things, eliminate rng member variable
 		// and exclusively use RNG passed into constructor and update methods.
-		this.rng=new MersenneTwister(rng.nextInt()); //TOOD: might be weirdly correlated
+		this.rng=new MersenneTwister(rng.nextInt()); //TOOD: might be weirdly correlated 
 		
 		ratePriorRate = new ExponentialVariable(this, "ratePriorRate", 1.0);
 		ratePrior = new ExponentialDistribution(this, "ratePrior", ratePriorRate);
