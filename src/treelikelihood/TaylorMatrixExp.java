@@ -12,7 +12,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	DoubleMatrix2D Q;
 	DoubleMatrix2D zeroMatrix;
 	// Precision Parameters...
-	int nTaylor = 1000;	
+	int nTaylor = 200;	
 	double minValue = 1E-250;
 	double maxValue = 1E250;
 	
