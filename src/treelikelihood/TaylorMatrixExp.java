@@ -13,9 +13,10 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	// Cache 
 	static final int maxCachedTransitionMatrices = 16000;		
 	Vector<DoubleMatrix2D> cachedQnDivFactorialN = new Vector<DoubleMatrix2D>();
+	Vector<Double> cachedScale = new Vector<Double>();
 	DoubleMatrix2D Q;
 	DoubleMatrix2D zeroMatrix;
-	private int nTaylor = 100;
+	private int nTaylor = Integer.MAX_VALUE;
 	
 	DoubleFactory2D F = DoubleFactory2D.dense; 
 	
@@ -23,11 +24,39 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 		Q = Q_;
 		zeroMatrix = F.make(Q.rows(),Q.rows(),0);
 		DoubleMatrix2D next = F.identity(Q.rows()); // Q^0/0! = I
-		int nTaylor = Integer.MAX_VALUE;		
+		double scale = getScale(next);		
+
 		for (int i=0;i<nTaylor;i++) { // Q^N/N! = Q^(N-1)/(N-1)!*Q/N
 			cachedQnDivFactorialN.add(i,next);
-			next = next.zMult(Q,null,1.0/(i+1.0),0,false,false);
+			cachedScale.add(i,scale);
+			next = next.zMult(Q,null,scale/(i+1.0),0,false,false);
+			scale = getScale(next);
+			next.assign(cern.jet.math.tdouble.DoubleFunctions.div(scale));	
+			if (scale<precision) {
+				nTaylor = i-1;
+			}
 		}
+	}
+
+	private double getScale(DoubleMatrix2D Q) {
+		// TODO: redo this...
+		double minScale=Double.MAX_VALUE;;
+		double maxScale=0;
+		for (int i=0; i<Q.rows(); i++) {
+			for (int j=0; j<Q.rows(); j++) {
+				if (Math.abs(Q.get(i, j))<minScale) {
+					minScale = Math.abs(Q.get(i, j));
+				}
+				if (Math.abs(Q.get(i, j))>maxScale) {
+					maxScale = Math.abs(Q.get(i, j));
+				}
+			}
+		}
+		double scale = Math.sqrt(minScale*maxScale);
+		if (scale!=0) 
+			return scale;
+		else
+			return 1.0;
 	}
 
 	@Override
@@ -42,11 +71,11 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 		DoubleMatrix2D result = zeroMatrix.copy();
 
 		for (int i=nTaylor-1;i>=0;i=i-2) {
-			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(/*cachedScale.get(i)**/Math.pow(t, i)));
+			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(cachedScale.get(i)*Math.pow(t, i)));
 			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
 		}
 		for (int i=nTaylor-2;i>=0;i=i-2) {
-			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(/*cachedScale.get(i)**/Math.pow(t, i)));
+			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(cachedScale.get(i)*Math.pow(t, i)));
 			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
 		}
 		
