@@ -32,25 +32,20 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		
 		// This is the weird way dependencies are declared. It will become unweird someday.
 		
-		if(config.migrationSeasonality == Config.Seasonality.TWO_CONSTANT_SEASONS)
-		{
+		if(config.migrationSeasonality == Config.Seasonality.TWO_CONSTANT_SEASONS) 		{
 			new Jack<DoubleValued>(model, this, model.twoMatrixPhase);
 		}
 		
-		for(int i = 0; i < config.numLocations; i++)
-		{
-			for(int j = 0; j < config.numLocations; j++)
-			{
+		for(int i = 0; i < config.numLocations; i++) 		{
+			for(int j = 0; j < config.numLocations; j++) 			{
 				if(i == j) continue;
 				
 				new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
-				if(config.migrationSeasonality == Config.Seasonality.SINUSOIDAL)
-				{
+				if(config.migrationSeasonality == Config.Seasonality.SINUSOIDAL) 				{
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].amplitude);
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].phase);
 				}
-				else if(config.migrationSeasonality ==Config.Seasonality.TWO_CONSTANT_SEASONS)
-				{
+				else if(config.migrationSeasonality ==Config.Seasonality.TWO_CONSTANT_SEASONS) 				{
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate2);
 				}
 			}
@@ -58,14 +53,12 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	}
 
 	@Override
-	public boolean update(Set<Jack<?>> changedJacks) throws MC3KitException
-	{
+	public boolean update(Set<Jack<?>> changedJacks) throws MC3KitException 	{
 		recalculate();
 		return true;
 	}
 	
-	void recalculate() throws MC3KitException
-	{
+	void recalculate() throws MC3KitException 	{
 		oldLogLikelihood = getLogP();
 		double logLikelihood = 0.0;
 
@@ -147,9 +140,6 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		workingCopy.setLikelihoodModel(migrationBaseModel);
 		logLikelihood=workingCopy.logLikelihood();
 		
-		// TODO: fix NaN likelihood
-		if (Double.isNaN(logLikelihood))
-			System.err.println("NaN Likelihood!!!");
 		setLogP(logLikelihood);
 	}
 	

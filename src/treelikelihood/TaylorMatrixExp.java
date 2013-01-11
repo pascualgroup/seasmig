@@ -7,27 +7,25 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 public class TaylorMatrixExp implements MatrixExponentiator {
 
+	// Precision Parameters...	
+	static final double minValue = Double.MIN_VALUE*1024.0;
+	
+	// Cache 
+	static final int maxCachedTransitionMatrices = 16000;		
 	Vector<DoubleMatrix2D> cachedQnDivFactorialN = new Vector<DoubleMatrix2D>();
 	Vector<Double> cachedScale = new Vector<Double>();
 	DoubleMatrix2D Q;
 	DoubleMatrix2D zeroMatrix;
-	// Precision Parameters...
-	int nTaylor = 500;	
-	double minValue = 1E-150;
-	double maxValue = 1E150;
+	private int nTaylor = Integer.MAX_VALUE;
 	
-	// Cache Parameters
-	static final int maxCachedTransitionMatrices = 16000;
+	DoubleFactory2D F = DoubleFactory2D.dense; 
 	
-	DoubleFactory2D F = DoubleFactory2D.dense; // TODO: is parallelizable? 	
-	
-
 	public TaylorMatrixExp(DoubleMatrix2D Q_) {
 		Q = Q_;
 		zeroMatrix = F.make(Q.rows(),Q.rows(),0);
 		DoubleMatrix2D next = F.identity(Q.rows()); // Q^0/0! = I
 		double scale = getScale(next);		
-			
+		int nTaylor = Integer.MAX_VALUE;		
 		for (int i=0;i<nTaylor;i++) { // Q^N/N! = Q^(N-1)/(N-1)!*Q/N
 			cachedQnDivFactorialN.add(i,next);
 			cachedScale.add(i,scale);
@@ -64,6 +62,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	@Override
 	public DoubleMatrix2D expm(double t) {
 		
+		// TODO: deal with different scales of t
 		if (t>0.025) {
 			DoubleMatrix2D halfProb = expm(t/2.0);
 			return halfProb.zMult(halfProb, null);
@@ -80,11 +79,11 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
 		}
 		
+		// TODO: remove debug, at least partially
 //		if (Math.random()<0.0001) {
 //			System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());	
 //		}
-		
-		// TODO: remove debug, at least partially
+				
 		for (int i=0;i<result.rows();i++) {
 			for (int j=0;j<result.rows();j++) {
 				if (result.get(i, j)<0) {
@@ -97,21 +96,13 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 					System.err.println("result.get(i, j)>1");
 					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
 				}
-				if (result.get(i, j)==Double.NaN) {
+				if (Double.isNaN(result.get(i, j))) {
 					System.err.println("result.get(i, j)==Double.NaN");
 					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
 				}
-				if (result.get(i, j)==Double.MAX_VALUE) {
-					System.err.println("result.get(i, j)==Double.MAX_VALUE");
-					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
-				}
-				if (result.get(i, j)==Double.MIN_VALUE) {
-					System.err.println("result.get(i, j)==Double.MIN_VALUE");
-					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
-				}				
 			}
 		}
-		//
+		
 		return result; 	
 		
 	}

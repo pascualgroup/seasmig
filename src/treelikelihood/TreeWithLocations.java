@@ -10,13 +10,16 @@ import jebl.evolution.trees.SimpleRootedTree;
 
 public class TreeWithLocations implements LikelihoodTree {
 
+	
+	// Tree generate parameters for test purpose
+	static final private double branchLengthMean = 1.0;
+	static final private double branchLengthVariance = 3.0;
+	
+	// Tree & Model
 	Node root = null;		
 	int num_locations = 0;
 	private MigrationBaseModel likelihoodModel = null;
-	private double minValue = 1E-150;
-	static final private double branchLengthMean = 1.0;
-	static final private double branchLengthVariance = 3.0;
-
+	
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {
 		num_locations=createTreeModel.getNumLocations();
@@ -47,6 +50,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public void setLikelihoodModel(Object likelihoodModel_) {
 		likelihoodModel = (MigrationBaseModel) likelihoodModel_;
 	}
+	
 	@Override
 	public double logLikelihood() {
 		double[] alphas=new double[num_locations];
@@ -57,14 +61,10 @@ public class TreeWithLocations implements LikelihoodTree {
 				alphas[rootLocation]=alpha;
 				if (alpha<min) min=alpha;				
 			}
-			double returnValue=logSumExp(alphas,min);
-			System.err.println("logSumExp: "+returnValue);
-			return returnValue;
+			return logSumExp(alphas,min);
 		}
 		else {
-			double returnValue=conditionalLogLikelihood(root,root.location);
-			System.err.println("conditional log likelihood: "+returnValue);
-			return returnValue;			
+			return conditionalLogLikelihood(root,root.location);					
 		}		
 	}
 	
@@ -91,7 +91,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				}
 				else {
 					double[] alphas=new double[num_locations];
-					double min = Double.MIN_VALUE;
+					double min = Double.NEGATIVE_INFINITY;
 					for (int childLocation=0;childLocation<num_locations;childLocation++) {
 						double alpha = likelihoodModel.logprobability(nodeLocation, childLocation, node.time, child.time)+conditionalLogLikelihood(child, childLocation);						
 						alphas[childLocation]=alpha;
@@ -105,7 +105,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 	}
 
-	double logSumExp(double[] alphas, double min) {
+	static double logSumExp(double[] alphas, double min) {
 		double returnValue;
 		if (min>Double.NEGATIVE_INFINITY ) {
 			double sumExp = 0;
@@ -121,11 +121,13 @@ public class TreeWithLocations implements LikelihoodTree {
 			}
 			returnValue=Math.log(sumExp);
 		}
-		if (returnValue!=Double.NaN) {
+		if (!Double.isNaN(returnValue)) {
 			return returnValue;
 		}
-		else
-			return minValue;
+		else {
+			System.err.println("logSumExp==NaN: alphas: "+alphas+"\nmin="+min);			
+			return Double.MIN_VALUE;
+		}
 			
 	}
 
