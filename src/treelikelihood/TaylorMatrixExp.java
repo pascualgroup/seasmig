@@ -13,8 +13,8 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	DoubleMatrix2D zeroMatrix;
 	// Precision Parameters...
 	int nTaylor = 500;	
-	double minValue = 1E-250;
-	double maxValue = 1E250;
+	double minValue = 1E-150;
+	double maxValue = 1E150;
 	
 	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;

@@ -13,6 +13,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	Node root = null;		
 	int num_locations = 0;
 	private MigrationBaseModel likelihoodModel = null;
+	private double minValue = 1E-150;
 	static final private double branchLengthMean = 1.0;
 	static final private double branchLengthVariance = 3.0;
 
@@ -101,21 +102,27 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	double logSumExp(double[] alphas, double min) {
-
-		if (min>Double.NEGATIVE_INFINITY) {
+		double returnValue;
+		if (min>Double.NEGATIVE_INFINITY ) {
 			double sumExp = 0;
 			for (int i=0;i<alphas.length;i++) {			
 				sumExp=sumExp+Math.exp(alphas[i]-min);
 			}
-			return min+Math.log(sumExp);
+			returnValue=min+Math.log(sumExp);
 		}
 		else {
 			double sumExp = 0;
 			for (int i=0;i<alphas.length;i++) {			
 				sumExp=sumExp+Math.exp(alphas[i]);
 			}
-			return Math.log(sumExp);
+			returnValue=Math.log(sumExp);
 		}
+		if (returnValue!=Double.NaN) {
+			return returnValue;
+		}
+		else
+			return minValue;
+			
 	}
 
 	@Override
