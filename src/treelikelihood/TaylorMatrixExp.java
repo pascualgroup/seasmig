@@ -12,7 +12,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	DoubleMatrix2D Q;
 	DoubleMatrix2D zeroMatrix;
 	// Precision Parameters...
-	int nTaylor = 200;	
+	int nTaylor = 500;	
 	double minValue = 1E-250;
 	double maxValue = 1E250;
 	
@@ -64,7 +64,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	@Override
 	public DoubleMatrix2D expm(double t) {
 		
-		if (t>0.05) {
+		if (t>0.025) {
 			DoubleMatrix2D halfProb = expm(t/2.0);
 			return halfProb.zMult(halfProb, null);
 		}
