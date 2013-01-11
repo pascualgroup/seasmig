@@ -57,10 +57,14 @@ public class TreeWithLocations implements LikelihoodTree {
 				alphas[rootLocation]=alpha;
 				if (alpha<min) min=alpha;				
 			}
-			return logSumExp(alphas,min);
+			double returnValue=logSumExp(alphas,min);
+			System.err.println("logSumExp: "+returnValue);
+			return returnValue;
 		}
 		else {
-			return conditionalLogLikelihood(root,root.location);
+			double returnValue=conditionalLogLikelihood(root,root.location);
+			System.err.println("conditional log likelihood: "+returnValue);
+			return returnValue;			
 		}		
 	}
 	

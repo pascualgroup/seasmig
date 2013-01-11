@@ -18,6 +18,8 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	Config config;
 	Data data;
 	
+	double oldLogLikelihood;
+	
 	public SeasonalMigrationLikelihood(SeasonalMigrationModel model, RandomEngine rng) throws MC3KitException
 	{
 		super(model, "likelihood");
@@ -61,11 +63,10 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		recalculate();
 		return true;
 	}
-
-	
 	
 	void recalculate() throws MC3KitException
 	{
+		oldLogLikelihood = getLogP();
 		double logLikelihood = 0.0;
 
 		MigrationBaseModel migrationBaseModel = null;
@@ -147,7 +148,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		logLikelihood=workingCopy.logLikelihood();
 		
 		// TODO: fix NaN likelihood
-		if (logLikelihood==Double.NaN)
+		if (Double.isNaN(logLikelihood))
 			System.err.println("NaN Likelihood!!!");
 		setLogP(logLikelihood);
 	}
@@ -156,9 +157,10 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 	@Override
 	public boolean updateAfterRejection(Set<Jack<?>> changedParents)
-			throws MC3KitException {
-		// TODO Just revert to last log-likelihood value
-		return super.updateAfterRejection(changedParents);
+			throws MC3KitException
+	{
+		setLogP(oldLogLikelihood);
+		return true;
 	}
 
 	@Override
