@@ -6,6 +6,7 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 public class TaylorMatrixExp implements MatrixExponentiator {
+	// TODO: this has many numerical issues...
 
 	// Precision Parameters...	
 	static final double precision = 1E-80;
