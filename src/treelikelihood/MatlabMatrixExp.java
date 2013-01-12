@@ -1,9 +1,5 @@
 package treelikelihood;
 
-import java.util.Vector;
-
-import org.javatuples.Pair;
-
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
@@ -15,7 +11,7 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 	DoubleMatrix2D Q;
 
 	DoubleFactory2D F = DoubleFactory2D.dense;
-	DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra(Double.MIN_VALUE);
+	DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra();
 
 	public MatlabMatrixExp(DoubleMatrix2D Q_) {
 		Q = Q_;		
@@ -154,7 +150,7 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 		DoubleMatrix2D X = A.copy(); // X = A
 		double c = 0.5;
 		DoubleMatrix2D E = A.copy().assign(eye(),cern.jet.math.tdouble.DoublePlusMultFirst.plusMult(c)); // I + c * A; 
-		DoubleMatrix2D D = A.copy().assign(eye(),cern.jet.math.tdouble.DoublePlusMultFirst.minusMult(c)); // I - c * A; // ok so far...
+		DoubleMatrix2D D = A.copy().assign(eye(),cern.jet.math.tdouble.DoublePlusMultFirst.minusMult(c)); // I - c * A; 
 		double q = 6.0;
 		boolean p = true;
 		for (int k = 2;k<=q;k++) {
