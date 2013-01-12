@@ -15,7 +15,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		1187353796428800L,  129060195264000L,   10559470521600L, 
 		670442572800L,      33522128640L,       1323241920L,
 		40840800L,          960960L,            16380L,  182L,  1L};
-	// Cache 
+	 
 	DoubleMatrix2D Q;
 
 	DoubleFactory2D F = DoubleFactory2D.dense;

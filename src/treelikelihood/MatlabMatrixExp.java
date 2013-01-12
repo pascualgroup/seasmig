@@ -7,26 +7,22 @@ import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 
 public class MatlabMatrixExp implements MatrixExponentiator {
 
-	// Cache 
 	DoubleMatrix2D Q;
-
 	DoubleFactory2D F = DoubleFactory2D.dense;
 	DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra();
+	DoubleMatrix2D eye; 
 
 	public MatlabMatrixExp(DoubleMatrix2D Q_) {
 		Q = Q_;		
+		eye = DoubleFactory2D.dense.identity(Q.rows());
 	}
 	
-	public DoubleMatrix2D eye() {
-		return F.dense.identity(Q.rows());
-	}
-	
-	public double norm_inf() {
+	public double norm_inf(DoubleMatrix2D A) {
 		double returnValue = Double.NEGATIVE_INFINITY;
-		for (int i=0; i<Q.rows();i++) {
+		for (int i=0; i<A.rows();i++) {
 			double rowSum=0;
-			for (int j=0; j<Q.rows();j++) {
-				rowSum=rowSum+Math.abs(Q.get(i, j));
+			for (int j=0; j<A.rows();j++) {
+				rowSum=rowSum+Math.abs(A.get(i, j));
 			}
 			if (rowSum>returnValue) {
 				returnValue=rowSum;
@@ -49,7 +45,6 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 	      result.f = value;
 	   }
 	   else  {
-
 	      boolean neg = (bits < 0);
 	      int exponent = (int)((bits >> 52) & 0x7ffL);
 	      long mantissa = bits & 0xfffffffffffffL;
@@ -142,15 +137,15 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 				  return
 				end
 		 */
-		DoubleMatrix2D A = Q.copy();
-		MatlabMatrixExp.FRexpResult fe = log2(norm_inf()); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
+		DoubleMatrix2D A = Q.copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(t));
+		MatlabMatrixExp.FRexpResult fe = log2(norm_inf(A)); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
 		long s = Math.max(0, fe.e+1); //  s = max ( 0, e + 1 );
 		A.assign(cern.jet.math.tdouble.DoubleFunctions.div(1L<<s)); // A = A / 2^s;
 		
 		DoubleMatrix2D X = A.copy(); // X = A
 		double c = 0.5;
-		DoubleMatrix2D E = A.copy().assign(eye(),cern.jet.math.tdouble.DoublePlusMultFirst.plusMult(c)); // I + c * A; 
-		DoubleMatrix2D D = A.copy().assign(eye(),cern.jet.math.tdouble.DoublePlusMultFirst.minusMult(c)); // I - c * A; 
+		DoubleMatrix2D E = A.copy().assign(eye,cern.jet.math.tdouble.DoublePlusMultFirst.plusMult(c)); // I + c * A; 
+		DoubleMatrix2D D = A.copy().assign(eye,cern.jet.math.tdouble.DoublePlusMultFirst.minusMult(c)); // I - c * A; 
 		double q = 6.0;
 		boolean p = true;
 		for (int k = 2;k<=q;k++) {
