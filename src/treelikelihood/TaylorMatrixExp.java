@@ -8,15 +8,14 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 public class TaylorMatrixExp implements MatrixExponentiator {
 
 	// Precision Parameters...	
-	static final double precision = 1E-15;
+	static final double precision = 1E-80;
 	
 	// Cache 
-	static final int maxCachedTransitionMatrices = 16000;		
 	Vector<DoubleMatrix2D> cachedQnDivFactorialN = new Vector<DoubleMatrix2D>();
 	Vector<Double> cachedScale = new Vector<Double>();
 	DoubleMatrix2D Q;
 	DoubleMatrix2D zeroMatrix;
-	private int nTaylor = Integer.MAX_VALUE;
+	private int nTaylor = 200;
 	
 	DoubleFactory2D F = DoubleFactory2D.dense; 
 	
