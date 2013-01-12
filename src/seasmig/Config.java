@@ -13,7 +13,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.TEST;
+	public RunMode runMode = RunMode.NORMAL;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -26,10 +26,10 @@ public class Config
 	public String logFilename = "debug.log";
 
 	// MCMC & LOG RELATED PARAMETERS
-	public long thin = 10;
+	public long thin = 50;
 
 	public long tuneEvery = 100;
-	public long tuneFor = 10000;
+	public long tuneFor = 1000;
 	
 	public long initialHistoryCount = 100;
 	public long recordHistoryAfter = 1000;
@@ -38,7 +38,7 @@ public class Config
 	public double heatPower = 3.0;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
+	public Seasonality migrationSeasonality = Seasonality.NONE;
 	public StateModel stateModel = StateModel.NONE; // TODO: this...
 	public int numLocations = 3;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...
@@ -53,7 +53,7 @@ public class Config
 	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
-	public int numTestTrees = 50;
+	public int numTestTrees = 99;
 	public int numTestTips = 500;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;

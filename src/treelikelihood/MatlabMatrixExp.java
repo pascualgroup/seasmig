@@ -15,7 +15,7 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 	DoubleMatrix2D Q;
 
 	DoubleFactory2D F = DoubleFactory2D.dense;
-	DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra();
+	DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra(Double.MIN_VALUE);
 
 	public MatlabMatrixExp(DoubleMatrix2D Q_) {
 		Q = Q_;		
