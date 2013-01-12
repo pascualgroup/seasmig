@@ -14,7 +14,8 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 	// Cache 
 	DoubleMatrix2D Q;
 
-	DoubleFactory2D F = DoubleFactory2D.dense; 
+	DoubleFactory2D F = DoubleFactory2D.dense;
+	DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra();
 
 	public MatlabMatrixExp(DoubleMatrix2D Q_) {
 		Q = Q_;		
@@ -150,35 +151,31 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 		long s = Math.max(0, fe.e+1); //  s = max ( 0, e + 1 );
 		A.assign(cern.jet.math.tdouble.DoubleFunctions.div(1L<<s)); // A = A / 2^s;
 		
-		DoubleMatrix2D X = A.copy();
+		DoubleMatrix2D X = A.copy(); // X = A
 		double c = 0.5;
-		DoubleMatrix2D E = A.copy().assign(eye(),cern.jet.math.tdouble.DoublePlusMultFirst.plusMult(c)); // I + c * A;
-		DoubleMatrix2D D = A.copy().assign(eye(),cern.jet.math.tdouble.DoublePlusMultFirst.minusMult(c)); // I - c * A;
+		DoubleMatrix2D E = A.copy().assign(eye(),cern.jet.math.tdouble.DoublePlusMultFirst.plusMult(c)); // I + c * A; 
+		DoubleMatrix2D D = A.copy().assign(eye(),cern.jet.math.tdouble.DoublePlusMultFirst.minusMult(c)); // I - c * A; // ok so far...
 		double q = 6.0;
 		boolean p = true;
 		for (int k = 2;k<=q;k++) {
 			    c = c*(q-k+1)/(k*(2*q-k+1));
-			    X.zMult(A, null); // X = A * X;
-			    DoubleMatrix2D cX=X.copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(c)); // cX = c * X; 
+			    X=X.zMult(A, null); // X = A * X;			    
 			    E.assign(X,cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(c)); //E = E + cX;
 			    if ( p ) {
 			      D.assign(X,cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(c)); // D = D + cX;
 			    }
 			    else {
 			      D.assign(X,cern.jet.math.tdouble.DoublePlusMultSecond.minusMult(c)); // D = D - cX;
-			    }
-			    
+			    }		    
 			    p = !p;
 		}
 		
-		// TODO: check if can use E.zMult(E,E);
-		DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra();
 		E=myAlgebra.inverse(D).zMult(E, null); // E = D \ E;
 
 		for (int k=1;k<=s;k++) {
 			E=E.zMult(E, null); // E = E*E 
 		} 
-		 		
+		
 		return E;
 	}
 
