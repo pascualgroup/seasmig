@@ -4,13 +4,10 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 
-
 public class MatlabMatrixExp implements MatrixExponentiator {
 
 	// Cache 
 	DoubleMatrix2D Q;
-
-	DoubleFactory2D F = DoubleFactory2D.dense;
 	DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra();
 
 	public MatlabMatrixExp(DoubleMatrix2D Q_) {
@@ -18,7 +15,7 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 	}
 	
 	public DoubleMatrix2D eye() {
-		return F.dense.identity(Q.rows());
+		return DoubleFactory2D.dense.identity(Q.rows()); // TODO: change to dynamic call...
 	}
 	
 	public double norm_inf() {
