@@ -33,7 +33,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 
 	DoubleMatrix2D Q;
-	DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra(Double.MIN_VALUE);
+	DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Double.MIN_VALUE);
 	private DoubleMatrix2D eye;
 
 	public Matlab7MatrixExp(DoubleMatrix2D Q_) {
@@ -161,9 +161,11 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	DoubleMatrix2D padeApproximantOfDegree(int m, DoubleMatrix2D A) {
 		// TODO: use Q powers to quickly calculate A powers when precision allows!
+		// m is not zero based...
 		int n = A.rows(); //	n = length(A);
 		//	c = getPadeCoefficients (in constructor)
 		DoubleMatrix2D[] Apowers; 
+		DoubleMatrix2D F;
 
 		// Evaluate Pade approximant.
 		switch (m) {
@@ -182,16 +184,20 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			DoubleMatrix2D V = DoubleFactory2D.dense.make(A.rows(),A.rows());
 			// for j = m+1:-2:2
 			for (int j=m;j>=1;j-=2) { // convert j to zero based arrays
-				U.assign(Apowers[j/2],cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(c[m][j]));
+				U.assign(Apowers[(j+1)/2-1],cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(c[m][j]));
 				//  U = U + c(j)*Apowers{j/2};
 			}
-			U=A.zMult(U, null);
+			U=A.zMult(U, null); // U = A*U;
+			// for j = m:-2:1
+			for (int j=(m-1);j>=0;j-=2) {
+//				V = V + c(j)*Apowers{(j+1)/2};
+				V.assign(Apowers[(j+2)/2],cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(c[m][j]));
+			}
+			// TODO: optimize this
+			DoubleMatrix2D VplusU = V.copy().assign(U,cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(1.0)); 
+			DoubleMatrix2D VminusU = V.copy().assign(U,cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(-1.0));
+			F = algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
 			
-			//	                U = A*U;
-			//	                for j = m:-2:1
-			//	                    V = V + c(j)*Apowers{(j+1)/2};
-			//	                end
-			//	                F = (-U+V)\(U+V);
 			//
 			//	            case 13
 			//
