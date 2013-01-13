@@ -10,19 +10,19 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	// Pade Coefficients
 	static final long[][] c = {null,null,null,
-											 {120L, 60L, 12L, 1L} /*c3*/,
-											 null,
-											 {30240L, 15120L, 3360L, 420L, 30L, 1L} /*c5*/,
-											 null,
-											 {17297280L, 8648640L, 1995840L, 277200L, 25200L, 1512L, 56L, 1L} /*c7*/,
-											 null,
-											 {17643225600L, 8821612800L, 2075673600L, 302702400L, 30270240L, 
-								                  2162160L, 110880L, 3960L, 90L, 1L} /*c9*/,
-								             null, null, null,
-								             {64764752532480000L, 32382376266240000L, 7771770303897600L, 
-								         		1187353796428800L,  129060195264000L,   10559470521600L, 
-								        		670442572800L,      33522128640L,       1323241920L,
-								        		40840800L,          960960L,            16380L,  182L,  1L} /*c13*/}; 
+		{120L, 60L, 12L, 1L} /*c3*/,
+		null,
+		{30240L, 15120L, 3360L, 420L, 30L, 1L} /*c5*/,
+		null,
+		{17297280L, 8648640L, 1995840L, 277200L, 25200L, 1512L, 56L, 1L} /*c7*/,
+		null,
+		{17643225600L, 8821612800L, 2075673600L, 302702400L, 30270240L, 
+			2162160L, 110880L, 3960L, 90L, 1L} /*c9*/,
+			null, null, null,
+			{64764752532480000L, 32382376266240000L, 7771770303897600L, 
+				1187353796428800L,  129060195264000L,   10559470521600L, 
+				670442572800L,      33522128640L,       1323241920L,
+				40840800L,          960960L,            16380L,  182L,  1L} /*c13*/}; 
 
 	// Assumes double precision
 	int[] m_vals = new int[]{3,5,7,9,13};
@@ -35,7 +35,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	DoubleMatrix2D Q;
 	DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Double.MIN_VALUE);
-	
+
 	private DoubleMatrix2D eye;
 
 	public Matlab7MatrixExp(DoubleMatrix2D Q_) {
@@ -192,34 +192,45 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			U=A.zMult(U, null); // U = A*U;
 			// for j = m:-2:1
 			for (int j=(m-1);j>=0;j-=2) {
-//				V = V + c(j)*Apowers{(j+1)/2};
+				//				V = V + c(j)*Apowers{(j+1)/2};
 				V.assign(Apowers[(j+2)/2],DoublePlusMultSecond.plusMult(c[m][j]));
 			}
-			// TODO: optimize this
-			DoubleMatrix2D VplusU = V.copy().assign(U,DoublePlusMultSecond.plusMult(1.0)); 
-			DoubleMatrix2D VminusU = V.copy().assign(U,DoublePlusMultSecond.plusMult(-1.0));
-			F = algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
+
 			break;
 		case 13: 
 			// % For optimal evaluation need different formula for m >= 12.
 			DoubleMatrix2D A2 = A.zMult(A, null); 	// A2 = A*A; 
 			DoubleMatrix2D A4 = A2.zMult(A2, null);
 			DoubleMatrix2D A6 = A4.zMult(A2, null);
-			//  U = A * (A6*(c(14)*A6 + c(12)*A4 + c(10)*A2) + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA) );
-			algebra.
-	    //  U = A   *  (A6   *  (....)
-			U = A.zMult(A6.zMult(A6.zMult(
-			//	                    
-			//	                V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
-			//	                F = (-U+V)\(U+V);
-			//	        end
-			//	    end
-		}
+			//  U = A * 
+			// (A6*
+			//  (c(14)*A6 + c(12)*A4 + c(10)*A2) %alpha
+			//  + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA) % beta 
+			// );
+			//  U = A   *  (A6   *  alpha + beta)
 
-		return null;
+			DoubleMatrix2D alpha = A6.zMult(zSum(new DoubleMatrix2D[] {A6,A4,A2},new double[] {c[m][13],c[m][11],c[m][9]}),null);
+			DoubleMatrix2D beta = zSum(new DoubleMatrix2D[] {A6,A4,A2,eye},new double[] {c[m][7],c[m][5],c[m][3],c[m][1]});
+			U = A.zMult(alpha.assign(beta,DoubleFunctions.plusMultSecond(1.0)),null);
+
+			alpha = 
+					//	                    
+					//	                V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
+					//	                F = (-U+V)\(U+V);
+					//	        end
+					//	    end
+		}
+		// TODO: optimize this
+		DoubleMatrix2D VplusU = V.copy().assign(U,DoublePlusMultSecond.plusMult(1.0)); 
+		DoubleMatrix2D VminusU = V.copy().assign(U,DoublePlusMultSecond.plusMult(-1.0));
+		F = algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
+		return F;
 	}
 
-	DoubleMatr	
+	DoubleMatrix2D zSum(DoubleMatrix2D[] A, double[] c) {
+		// return Sum[c[i]*A[i]]
+		return null;
+	}
 
 	/*
     function [m_vals, theta, classA] = expmchk
@@ -392,18 +403,18 @@ end
 		public double f = 0.;
 	}
 
-//	public double norm_1(DoubleMatrix2D A) {
-//		double returnValue = Double.NEGATIVE_INFINITY;
-//		for (int i=0; i<A.rows();i++) {
-//			double columnSum=0;
-//			for (int j=0; j<A.rows();j++) {
-//				columnSum=columnSum+Math.abs(A.get(j, i));
-//			}
-//			if (columnSum>returnValue) {
-//				returnValue=columnSum;
-//			}
-//		}
-//		return returnValue;
-//	}
+	//	public double norm_1(DoubleMatrix2D A) {
+	//		double returnValue = Double.NEGATIVE_INFINITY;
+	//		for (int i=0; i<A.rows();i++) {
+	//			double columnSum=0;
+	//			for (int j=0; j<A.rows();j++) {
+	//				columnSum=columnSum+Math.abs(A.get(j, i));
+	//			}
+	//			if (columnSum>returnValue) {
+	//				returnValue=columnSum;
+	//			}
+	//		}
+	//		return returnValue;
+	//	}
 
 }
