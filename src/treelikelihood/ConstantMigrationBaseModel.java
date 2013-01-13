@@ -18,12 +18,11 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	final static int maxCachedTransitionMatrices=6000;
 
 	// Matrix Exponentiation
-	MatrixExponentiator matrixExponentiator;
-	DoubleFactory2D F = DoubleFactory2D.dense;	
+	MatrixExponentiator matrixExponentiator;	
 
 	// Constructor	
 	public ConstantMigrationBaseModel(double[][] Q_) {	
-		Q = F.make(Q_);
+		Q = DoubleFactory2D.dense.make(Q_);
 		num_locations=Q_.length;
 		matrixExponentiator=new Matlab7MatrixExp(Q);
 	}

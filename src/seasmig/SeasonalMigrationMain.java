@@ -215,6 +215,7 @@ public class SeasonalMigrationMain
 				String res1=test1.expm(t).toString();
 				String res2=test2.expm(t).toString();
 				String res3=test3.expm(t).toString();
+	
 				if (res1.equalsIgnoreCase(res2) && res2.equalsIgnoreCase(res3)) {
 					System.out.print(".");
 				}

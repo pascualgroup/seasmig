@@ -63,7 +63,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	public DoubleMatrix2D expm(double t) {
 		
 		// TODO: deal with different scales of t
-		if (t>0.01) {
+		if (t>0.5) {
 			DoubleMatrix2D halfProb = expm(t/2.0);
 			return halfProb.zMult(halfProb, null);
 		}

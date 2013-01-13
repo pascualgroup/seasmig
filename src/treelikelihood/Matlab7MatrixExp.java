@@ -96,22 +96,19 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 				40840800L,          960960L,            16380L,  182L,  1L} /*c13*/}; 
 
 	// Assumes double precision
-	int[] m_vals = new int[]{3,5,7,9,13};
-	double[] theta = new double[]{1.495585217958292e-002,  // m_vals = 3
+	static final int[] m_vals = new int[]{3,5,7,9,13};
+	static final double[] theta = new double[]{1.495585217958292e-002,  // m_vals = 3
 			2.539398330063230e-001,  // m_vals = 5
 			9.504178996162932e-001,  // m_vals = 7
 			2.097847961257068e+000,  // m_vals = 9
 			5.371920351148152e+000}; // m_vals = 13
 
+	static final DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Double.MIN_VALUE);
 
 	DoubleMatrix2D Q;
-	DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Double.MIN_VALUE);
-
-	private DoubleMatrix2D eye;
 
 	public Matlab7MatrixExp(DoubleMatrix2D Q_) {
 		Q = Q_;		
-		eye = DoubleFactory2D.dense.identity(Q.rows());
 	}
 
 	/*
@@ -159,13 +156,14 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 	        end
 	    end
 	 */
-	DoubleMatrix2D padeApproximantOfDegree(int m, DoubleMatrix2D A) {
+	static DoubleMatrix2D padeApproximantOfDegree(int m, DoubleMatrix2D A) {
 		// TODO: use Q powers to quickly calculate A powers when precision allows!	
 
 		//	c = getPadeCoefficients (in constructor)
 		DoubleMatrix2D[] Apowers; 
 		DoubleMatrix2D U = DoubleFactory2D.dense.make(A.rows(),A.rows());
 		DoubleMatrix2D V = DoubleFactory2D.dense.make(A.rows(),A.rows());
+		DoubleMatrix2D eye = DoubleFactory2D.dense.identity(A.rows());
 		DoubleMatrix2D F;
 
 		// Evaluate Pade approximant.
@@ -175,7 +173,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			//Apowers = cell(ceil((m+1)/2),1);
 			Apowers = new DoubleMatrix2D[(m+1)/2]; 
 			// Apowers{1} = eye(n,classA);
-			Apowers[0]=eye;
+			Apowers[0]= eye;
 			// Apowers{2} = A*A;
 			Apowers[1]=A.zMult(A,null);
 			for (int j=2;j<(m+1)/2;j++)  // for j = 3:ceil((m+1)/2)
@@ -215,14 +213,14 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		return F;
 	}
 
-	DoubleMatrix2D zSum3(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,double alpha,double beta, double gamma) {
+	static DoubleMatrix2D zSum3(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,double alpha,double beta, double gamma) {
 		DoubleMatrix2D returnValue = A.copy().assign(DoubleFunctions.mult(alpha));
 		returnValue.assign(B,DoublePlusMultSecond.plusMult(beta));
 		returnValue.assign(C,DoublePlusMultSecond.plusMult(gamma));
 		return returnValue;
 	}
 
-	DoubleMatrix2D zSum4(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,DoubleMatrix2D D, double alpha,double beta, double gamma, double delta) {
+	static DoubleMatrix2D zSum4(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,DoubleMatrix2D D, double alpha,double beta, double gamma, double delta) {
 		DoubleMatrix2D returnValue = A.copy().assign(DoubleFunctions.mult(alpha));
 		returnValue.assign(B,DoublePlusMultSecond.plusMult(beta));
 		returnValue.assign(C,DoublePlusMultSecond.plusMult(gamma));
@@ -254,9 +252,8 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			if (t==0.5) s = s - 1; // s = s - (t == 0.5); % adjust s if normA/theta(end) is a power of 2.
 			A.assign(DoubleFunctions.div(1L<<s)); // A = A/2^s;    % Scaling
 			F = padeApproximantOfDegree(m_vals[m_vals.length-1],A);
-			for (int i=0;i<s;i++) {
+			for (int i=0;i<s;i++) 
 				F=F.zMult(F, null); // F = F*F;  % Squaring
-			}
 		}
 		return F;
 	}
