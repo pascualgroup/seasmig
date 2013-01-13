@@ -152,15 +152,15 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		stateCount+=1;
 		if (stateCount==100) {
 			time = System.currentTimeMillis();
-			System.out.printf("\n%.2e states per per hour",(double)60L*60L*1000L*100L/(time-oldTime)*((long)config.chainCount));
+			System.out.printf("\n%.2e states per hour",(double)60L*60L*1000L*100L/(time-oldTime)*((long)config.chainCount));
 		}
 		if (stateCount==1000) {
 			time = System.currentTimeMillis();
-			System.out.printf("\n%.2e states per per hour",(double)60L*60L*1000L*1000L/(time-oldTime)*((long)config.chainCount));
+			System.out.printf("\n%.2e states per hour",(double)60L*60L*1000L*1000L/(time-oldTime)*((long)config.chainCount));
 		}
 		if (stateCount%10000==0) {
 			time = System.currentTimeMillis();
-			System.out.printf("\n%.2e states per per hour",(double)60L*60L*1000L*10000L/(time-oldTime)*((long)config.chainCount));
+			System.out.printf("\n%.2e states per hour",(double)60L*60L*1000L*10000L/(time-oldTime)*((long)config.chainCount));
 			oldTime=time;
 		}
 		//
