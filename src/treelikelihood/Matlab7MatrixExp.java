@@ -167,6 +167,8 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		int n = A.rows(); //	n = length(A);
 		//	c = getPadeCoefficients (in constructor)
 		DoubleMatrix2D[] Apowers; 
+		DoubleMatrix2D U = DoubleFactory2D.dense.make(A.rows(),A.rows());
+		DoubleMatrix2D V = DoubleFactory2D.dense.make(A.rows(),A.rows());
 		DoubleMatrix2D F;
 
 		// Evaluate Pade approximant.
@@ -182,8 +184,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			for (int j=2;j<Math.ceil((m+1)/2.0);j++) { // for j = 3:ceil((m+1)/2)
 				Apowers[j]=Apowers[j-1].zMult(A, null); // Apowers{j} = Apowers{j-1}*Apowers{2};
 			}
-			DoubleMatrix2D U = DoubleFactory2D.dense.make(A.rows(),A.rows());
-			DoubleMatrix2D V = DoubleFactory2D.dense.make(A.rows(),A.rows());
+			
 			// for j = m+1:-2:2
 			for (int j=m;j>=1;j-=2) { // convert j to zero based arrays
 				U.assign(Apowers[(j+1)/2-1],DoublePlusMultSecond.plusMult(c[m][j]));
@@ -213,12 +214,9 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			DoubleMatrix2D beta = zSum(new DoubleMatrix2D[] {A6,A4,A2,eye},new double[] {c[m][7],c[m][5],c[m][3],c[m][1]});
 			U = A.zMult(alpha.assign(beta,DoubleFunctions.plusMultSecond(1.0)),null);
 
-			alpha = 
-					//	                    
-					//	                V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
-					//	                F = (-U+V)\(U+V);
-					//	        end
-					//	    end
+			alpha = A6.zMult(zSum(new DoubleMatrix2D[] {A6,A4,A2}, new double[] {c[m][12],c[m][10],c[m][8]}),null);
+			beta = zSum(new DoubleMatrix2D[] {A6,A4,A2,eye}, new double[] {c[m][6],c[m][4],c[m][2],c[m][0]});
+			V = alpha.assign(beta,DoubleFunctions.plusMultSecond(1.0));	                    
 		}
 		// TODO: optimize this
 		DoubleMatrix2D VplusU = V.copy().assign(U,DoublePlusMultSecond.plusMult(1.0)); 
