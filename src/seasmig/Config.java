@@ -13,7 +13,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.TEST;
+	public RunMode runMode = RunMode.NORMAL;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -46,8 +46,8 @@ public class Config
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add statese & combine files 
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
-	public String locationFilename =null;//"locations.txt"; // null if locations are loaded from tree
-	public String treeFilename = "h3n2.trees";//"beastInput.trees"; // null for test generated data 
+	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
+	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // location attribute in jebl tree
 	public int numTreesFromTail = 99; // at most number of trees to read from tree file's tail

@@ -92,6 +92,7 @@ public class SeasonalMigrationMain
 					}
 					testLikelihood=testLikelihood/data.trees.size();
 					System.out.println(testLikelihood);
+					testStream.println("test likelihood: "+testLikelihood);
 				}
 				testStream.print((new GregorianCalendar()).getTime());
 				testStream.close();
