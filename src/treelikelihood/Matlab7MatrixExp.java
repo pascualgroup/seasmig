@@ -219,14 +219,6 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		F = algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
 		return F;
 	}
-
-//	DoubleMatrix2D zSum(DoubleMatrix2D[] A, double[] c) {
-//		DoubleMatrix2D returnValue = A[0].copy().assign(DoubleFunctions.mult(c[0]));
-//		for (int i=1;i<A.length;i++) {
-//			returnValue.assign(A[i],DoublePlusMultSecond.plusMult(c[i]));
-//		}
-//		return returnValue;
-//	}
 	
 	DoubleMatrix2D zSum3(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,double alpha,double beta, double gamma) {
 		DoubleMatrix2D returnValue = A.copy().assign(DoubleFunctions.mult(alpha));
@@ -245,7 +237,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	@Override
 	public DoubleMatrix2D expm(double tt) {
-		
+	
 		//	Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
 		DoubleMatrix2D A = Q.copy().assign(DoubleFunctions.mult(tt));
 		double normA = algebra.norm1(A);

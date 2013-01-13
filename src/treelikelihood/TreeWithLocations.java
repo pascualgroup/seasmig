@@ -14,7 +14,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	//static final private double jitter=0.001;
 	
 	// Tree generate parameters for test purpose
-	static final private double branchLengthMean = 0.01;
+	static final private double branchLengthMean = 0.1;
 	static final private double branchLengthVariance = 3.0;
 	
 	// Tree & Model

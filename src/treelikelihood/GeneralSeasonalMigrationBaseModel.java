@@ -16,7 +16,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	static final int maxCachedTransitionMatrices = 16000;
 
 	// Precision Parameters
-	static final int nYearParts = 12;
+	static final int nYearParts = 36;
 	
 	// Origin Model
 	DoubleFunction[][] seasonalRates;
