@@ -1,9 +1,10 @@
 package treelikelihood;
 
-import treelikelihood.MatlabMatrixExp.FRexpResult;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
+import cern.jet.math.tdouble.DoublePlusMultSecond;
+import cern.jet.math.tdouble.DoubleFunctions;
 
 public class Matlab7MatrixExp implements MatrixExponentiator {
 
@@ -34,6 +35,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	DoubleMatrix2D Q;
 	DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Double.MIN_VALUE);
+	
 	private DoubleMatrix2D eye;
 
 	public Matlab7MatrixExp(DoubleMatrix2D Q_) {
@@ -184,26 +186,28 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			DoubleMatrix2D V = DoubleFactory2D.dense.make(A.rows(),A.rows());
 			// for j = m+1:-2:2
 			for (int j=m;j>=1;j-=2) { // convert j to zero based arrays
-				U.assign(Apowers[(j+1)/2-1],cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(c[m][j]));
+				U.assign(Apowers[(j+1)/2-1],DoublePlusMultSecond.plusMult(c[m][j]));
 				//  U = U + c(j)*Apowers{j/2};
 			}
 			U=A.zMult(U, null); // U = A*U;
 			// for j = m:-2:1
 			for (int j=(m-1);j>=0;j-=2) {
 //				V = V + c(j)*Apowers{(j+1)/2};
-				V.assign(Apowers[(j+2)/2],cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(c[m][j]));
+				V.assign(Apowers[(j+2)/2],DoublePlusMultSecond.plusMult(c[m][j]));
 			}
 			// TODO: optimize this
-			DoubleMatrix2D VplusU = V.copy().assign(U,cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(1.0)); 
-			DoubleMatrix2D VminusU = V.copy().assign(U,cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(-1.0));
+			DoubleMatrix2D VplusU = V.copy().assign(U,DoublePlusMultSecond.plusMult(1.0)); 
+			DoubleMatrix2D VminusU = V.copy().assign(U,DoublePlusMultSecond.plusMult(-1.0));
 			F = algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
-			
-			//
-			//	            case 13
-			//
-			//	                % For optimal evaluation need different formula for m >= 12.
-			//	                A2 = A*A; A4 = A2*A2; A6 = A2*A4;
+			break;
+		case 13: 
+			// % For optimal evaluation need different formula for m >= 12.
+			DoubleMatrix2D A2 = A.zMult(A, null); 	// A2 = A*A; 
+			DoubleMatrix2D A4 = A2.zMult(A2, null);
+			DoubleMatrix2D A6 = A4.zMult(A2, null);
 			//	                U = A * (A6*(c(14)*A6 + c(12)*A4 + c(10)*A2) ...
+			U = A.zMult(A6.zMult(A6,null,c[m][7],0,false,false).assign(A4,DoublePlusMultSecond.plusMult(c[m][11])).assign(A2,DoublePlusMultSecond.plusMult(c[m][9])),null);
+			
 			//	                    + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA) );
 			//	                V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) ...
 			//	                    + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
@@ -306,7 +310,7 @@ end
 	@Override
 	public DoubleMatrix2D expm(double tt) {
 		//	Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
-		DoubleMatrix2D A = Q.copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(tt));
+		DoubleMatrix2D A = Q.copy().assign(DoubleFunctions.mult(tt));
 		double normA = norm_1(A);
 		DoubleMatrix2D F=null;
 
@@ -324,7 +328,7 @@ end
 			int s = ts.e;
 			double t = ts.f;
 			if (t==0.5) s = s - 1; // s = s - (t == 0.5); % adjust s if normA/theta(end) is a power of 2.
-			A.assign(cern.jet.math.tdouble.DoubleFunctions.div(1L<<s)); // A = A/2^s;    % Scaling
+			A.assign(DoubleFunctions.div(1L<<s)); // A = A/2^s;    % Scaling
 			F = padeApproximantOfDegree(m_vals[m_vals.length-1],A);
 			for (int i=1;i<=s;i++) {
 				F=F.zMult(F, null); // F = F*F;  % Squaring
