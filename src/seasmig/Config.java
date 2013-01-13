@@ -49,7 +49,7 @@ public class Config
 	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
-	public String stateAttributeNameInTree = null; // location attribute in jebl tree
+	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 99; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
