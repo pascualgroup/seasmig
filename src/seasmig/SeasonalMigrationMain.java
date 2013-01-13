@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.PrintStream;
 import java.util.GregorianCalendar;
 
+import jebl.evolution.substmodel.MatrixExponential;
+
 import mc3kit.FormattingLogger;
 import mc3kit.MCMC;
 import mc3kit.PowerHeatFunction;
@@ -22,6 +24,12 @@ import org.apache.log4j.TTCCLayout;
 
 import seasmig.Config.RunMode;
 import treelikelihood.LikelihoodTree;
+import treelikelihood.Matlab7MatrixExp;
+import treelikelihood.MatlabMatrixExp;
+import treelikelihood.MatrixExponentiator;
+import treelikelihood.TaylorMatrixExp;
+
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -37,14 +45,18 @@ public class SeasonalMigrationMain
 			Gson gson = new Gson();
 			Config config = gson.fromJson(new FileReader("config.json"), Config.class);
 			System.out.println(" done");
-			
+
+			if (config.runMode==RunMode.TEST) {
+				testMatrixExponentiation(config.numLocations);
+			}
+
 			// Load data files and prepare data....			
 			Data data = new Data(config);
-			
+
 			// Tests...			
 			if (config.runMode==RunMode.TEST) {
 				System.out.print("Running likelihood test...\n");
-				
+
 				// Creating test file 
 				File testFile = new File("out.test");
 				testFile.delete();
@@ -64,13 +76,13 @@ public class SeasonalMigrationMain
 				}
 				createLikelihood=createLikelihood/data.trees.size();
 				System.out.println(createLikelihood);
-				
+
 				System.out.println("\nCalculating tree likelihood using test models with increasing noise:");
 				for (int i=0;i<data.testModels.size();i++) {
 					if (i%config.numTestRepeats==0) {						
 						System.out.println("SEASONALITY "+Config.Seasonality.values()[i/config.numTestRepeats]);						
 					}
-				
+
 					double testLikelihood = 0;
 					for (LikelihoodTree tree : data.trees) {
 						System.out.print(".");
@@ -83,18 +95,18 @@ public class SeasonalMigrationMain
 				}
 				testStream.print((new GregorianCalendar()).getTime());
 				testStream.close();
-		
+
 
 				System.out.print("Completed likelihood test!\n\n");
-				
+
 			}
-				
+
 			System.out.print("Initializing MCMC STEP 1...");
 			MCMC mcmc = new MCMC();
 			mcmc.setRandomSeed(config.randomSeed);
 			mcmc.setChainCount(config.chainCount);
 			System.out.println(" done");
-			
+
 			// Initialize logger
 			System.out.print("Initializing logger...");
 			Logger logger = Logger.getRootLogger();
@@ -107,27 +119,27 @@ public class SeasonalMigrationMain
 				logger.addAppender(new FileAppender(layout, config.logFilename));
 			}
 			FormattingLogger fmtLogger = new FormattingLogger(logger);
-			
+
 			String configJson = new GsonBuilder().setPrettyPrinting().create().toJson(config, Config.class);
 			fmtLogger.info("Parsed config: %s", configJson);
-			
+
 			mcmc.setLogger(fmtLogger);
-			
+
 			System.out.println(" done");
-			
+
 			System.out.print("Initializing MCMC STEP 2...");
-			
+
 			// Set heating function for chains, interpolating from 1.0 to 0.0 
 			// with an accelerating heating schedule
 			PowerHeatFunction heatFunc = new PowerHeatFunction();
 			heatFunc.setHeatPower(config.heatPower);
 			heatFunc.setMinHeatExponent(0.0);
 			mcmc.setHeatFunction(heatFunc);
-			
+
 			// Set model factory, which generates model instances to run on multiple chains
 			SeasonalMigrationFactory modelFactory = new SeasonalMigrationFactory(config, data);
 			mcmc.setModelFactory(modelFactory);
-			
+
 			// Step representing each chain going through each variable one at a time in random order
 			UnivariateStep univarStep = new UnivariateStep();
 			univarStep.setTuneFor(config.tuneFor);
@@ -135,7 +147,7 @@ public class SeasonalMigrationMain
 			univarStep.setStatsFilename(config.varStatsFilename);
 			univarStep.setRecordHeatedStats(config.recordHeatedStats);
 			univarStep.setRecordStatsAfterTuning(true);
-			
+
 			// Differential evolution step
 			BlockDifferentialEvolutionStep deStep = new BlockDifferentialEvolutionStep();
 			deStep.setStatsFilename(config.demcStatsFilename);
@@ -146,7 +158,7 @@ public class SeasonalMigrationMain
 			deStep.setInitialHistoryCount(config.initialHistoryCount);
 			deStep.setRecordHeatedStats(false);
 			deStep.setRecordStatsAfterTuning(true);
-			
+
 			// Swap steps: even (0,1), (2,3), etc. Odd (1,2), (3,4), etc.
 			// Set up to allow parallelization of all swaps.
 			SwapStep evenSwapStep = new SwapStep(SwapStep.SwapParity.EVEN);
@@ -155,18 +167,18 @@ public class SeasonalMigrationMain
 			SwapStep oddSwapStep = new SwapStep(SwapStep.SwapParity.ODD);
 			oddSwapStep.setStatsFilename(config.swapStatsFilename);
 			oddSwapStep.setStatsEvery(config.tuneEvery * config.chainCount);
-			
+
 			// Sample output step: all model parameters just for cold chain
 			SampleOutputStep sampOutStep = new SampleOutputStep();
 			sampOutStep.setChainId(0);
 			sampOutStep.setFilename(config.sampleFilename);
 			sampOutStep.setThin(config.thin);
-			
+
 			// Prior-likelihood output step: log-prior/log-likelihood for all chains
 			PriorLikelihoodOutputStep plOutStep = new PriorLikelihoodOutputStep();
 			plOutStep.setFilename(config.priorLikelihoodFilename);
 			plOutStep.setThin(config.thin);
-			
+
 			// Set up execution order for the steps
 			mcmc.addStep(univarStep);
 			mcmc.addStep(deStep);
@@ -176,7 +188,7 @@ public class SeasonalMigrationMain
 			}
 			mcmc.addStep(sampOutStep);
 			mcmc.addStep(plOutStep);
-			
+
 			System.out.println(" done");
 			System.out.print("Running MCMC...");
 			mcmc.run();			
@@ -187,5 +199,35 @@ public class SeasonalMigrationMain
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+
+	private static void testMatrixExponentiation(int n) {
+		System.out.println("Testing matrix exponentiation:");
+
+		for (int i=1;i<100;i++) {
+			DoubleMatrix2D testMatrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(Data.makeRandomMigrationMatrix(n,(double) i/100.0));
+			MatrixExponentiator test1 = new MatlabMatrixExp(testMatrix);
+			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);
+			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);
+
+			for (double t=0;t<500;t=(t+0.000001)*2) {
+				String res1=test1.expm(t).toString();
+				String res2=test2.expm(t).toString();
+				String res3=test3.expm(t).toString();
+				if (res1.equalsIgnoreCase(res2) && res2.equalsIgnoreCase(res3)) {
+					System.out.print(".");
+				}
+				else {
+					System.out.println("----------------------------");
+					System.out.println("MatlabMatrixExp:\n "+test1.expm(t).toString());
+					System.out.println("Matlab7MatrixExp:\n "+test2.expm(t).toString());
+					System.out.println("TaylorMatrixExp:\n "+test3.expm(t).toString());
+				}
+			}
+			if (i%10==0) System.out.println();
+		}
+		
+		System.out.println("\nCompleted matrix exponentiation test");
+
 	}
 }

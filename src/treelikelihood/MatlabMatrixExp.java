@@ -16,22 +16,6 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 		eye = DoubleFactory2D.dense.identity(Q.rows());
 	}
 	
-//	public double norm_inf(DoubleMatrix2D A) {
-//		double returnValue = Double.NEGATIVE_INFINITY;
-//		for (int i=0; i<A.rows();i++) {
-//			double rowSum=0;
-//			for (int j=0; j<A.rows();j++) {
-//				rowSum=rowSum+Math.abs(A.get(i, j));
-//			}
-//			if (rowSum>returnValue) {
-//				returnValue=rowSum;
-//			}
-//		}
-//		return returnValue;
-//	}
-	
-	
-	
 	public static FRexpResult log2(double value)
 	{
 	   final FRexpResult result = new FRexpResult();

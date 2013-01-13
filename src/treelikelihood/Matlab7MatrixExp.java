@@ -204,33 +204,42 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			DoubleMatrix2D A4 = A2.zMult(A2, null);
 			DoubleMatrix2D A6 = A4.zMult(A2, null);
 			//  U = A * 
-			// (A6*(c(14)*A6 + c(12)*A4 + c(10)*A2) %alpha
-			//  + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA) % beta 
+			// (A6*(c(14)*A6 + c(12)*A4 + c(10)*A2) 
+			//  + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA)  
 			// );
-			//  U = A   *  (alpha + beta)
+			U = A.zMult(A6.zMult(zSum3(A6,A4,A2,c[m][13],c[m][11],c[m][9]),null).assign(zSum4(A6,A4,A2,eye,c[m][7],c[m][5],c[m][3],c[m][1]),DoubleFunctions.plus),null);
 
-			DoubleMatrix2D alpha = A6.zMult(zSum(new DoubleMatrix2D[] {A6,A4,A2},new double[] {c[m][13],c[m][11],c[m][9]}),null);
-			DoubleMatrix2D beta = zSum(new DoubleMatrix2D[] {A6,A4,A2,eye},new double[] {c[m][7],c[m][5],c[m][3],c[m][1]});
-			U = A.zMult(alpha.assign(beta,DoubleFunctions.plus),null);
-
-//			V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) % alpha
-//              + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA); % beta
-			alpha = A6.zMult(zSum(new DoubleMatrix2D[] {A6,A4,A2}, new double[] {c[m][12],c[m][10],c[m][8]}),null);
-			beta = zSum(new DoubleMatrix2D[] {A6,A4,A2,eye}, new double[] {c[m][6],c[m][4],c[m][2],c[m][0]});
-			V = alpha.assign(beta,DoubleFunctions.plus);	                    
+			//	V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) 
+			//  + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
+			V = A6.zMult(zSum3(A6,A4,A2,c[m][12],c[m][10],c[m][8]),null).assign(zSum4(A6,A4,A2,eye,c[m][6],c[m][4],c[m][2],c[m][0]),DoubleFunctions.plus);	                    
 		}
 		// TODO: optimize this
 		DoubleMatrix2D VplusU = V.copy().assign(U,DoubleFunctions.plus); 
-		DoubleMatrix2D VminusU = V.copy().assign(U,DoubleFunctions.plus);
+		DoubleMatrix2D VminusU = V.assign(U,DoubleFunctions.minus);
 		F = algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
 		return F;
 	}
 
-	DoubleMatrix2D zSum(DoubleMatrix2D[] A, double[] c) {
-		DoubleMatrix2D returnValue = A[0].copy().assign(DoubleFunctions.mult(c[0]));
-		for (int i=1;i<A.length;i++) {
-			returnValue.assign(A[i],DoublePlusMultSecond.plusMult(c[i]));
-		}
+//	DoubleMatrix2D zSum(DoubleMatrix2D[] A, double[] c) {
+//		DoubleMatrix2D returnValue = A[0].copy().assign(DoubleFunctions.mult(c[0]));
+//		for (int i=1;i<A.length;i++) {
+//			returnValue.assign(A[i],DoublePlusMultSecond.plusMult(c[i]));
+//		}
+//		return returnValue;
+//	}
+	
+	DoubleMatrix2D zSum3(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,double alpha,double beta, double gamma) {
+		DoubleMatrix2D returnValue = A.copy().assign(DoubleFunctions.mult(alpha));
+		returnValue.assign(B,DoublePlusMultSecond.plusMult(beta));
+		returnValue.assign(C,DoublePlusMultSecond.plusMult(gamma));
+		return returnValue;
+	}
+	
+	DoubleMatrix2D zSum4(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,DoubleMatrix2D D, double alpha,double beta, double gamma, double delta) {
+		DoubleMatrix2D returnValue = A.copy().assign(DoubleFunctions.mult(alpha));
+		returnValue.assign(B,DoublePlusMultSecond.plusMult(beta));
+		returnValue.assign(C,DoublePlusMultSecond.plusMult(gamma));
+		returnValue.assign(D,DoublePlusMultSecond.plusMult(delta));
 		return returnValue;
 	}
 
