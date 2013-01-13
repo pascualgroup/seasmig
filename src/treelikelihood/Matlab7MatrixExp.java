@@ -205,12 +205,12 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			DoubleMatrix2D A2 = A.zMult(A, null); 	// A2 = A*A; 
 			DoubleMatrix2D A4 = A2.zMult(A2, null);
 			DoubleMatrix2D A6 = A4.zMult(A2, null);
-			//	                U = A * (A6*(c(14)*A6 + c(12)*A4 + c(10)*A2) ...
-			U = A.zMult(A6.zMult(A6,null,c[m][7],0,false,false).assign(A4,DoublePlusMultSecond.plusMult(c[m][11])).assign(A2,DoublePlusMultSecond.plusMult(c[m][9])),null);
-			
-			//	                    + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA) );
-			//	                V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) ...
-			//	                    + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
+			//  U = A * (A6*(c(14)*A6 + c(12)*A4 + c(10)*A2) + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA) );
+			algebra.
+	    //  U = A   *  (A6   *  (....)
+			U = A.zMult(A6.zMult(A6.zMult(
+			//	                    
+			//	                V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
 			//	                F = (-U+V)\(U+V);
 			//	        end
 			//	    end
@@ -219,6 +219,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		return null;
 	}
 
+	DoubleMatr	
 
 	/*
     function [m_vals, theta, classA] = expmchk
@@ -311,7 +312,7 @@ end
 	public DoubleMatrix2D expm(double tt) {
 		//	Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
 		DoubleMatrix2D A = Q.copy().assign(DoubleFunctions.mult(tt));
-		double normA = norm_1(A);
+		double normA = algebra.norm1(A);
 		DoubleMatrix2D F=null;
 
 		if (normA <= theta[theta.length-1]) { //		if normA <= theta(end)
@@ -391,18 +392,18 @@ end
 		public double f = 0.;
 	}
 
-	public double norm_1(DoubleMatrix2D A) {
-		double returnValue = Double.NEGATIVE_INFINITY;
-		for (int i=0; i<A.rows();i++) {
-			double columnSum=0;
-			for (int j=0; j<A.rows();j++) {
-				columnSum=columnSum+Math.abs(A.get(j, i));
-			}
-			if (columnSum>returnValue) {
-				returnValue=columnSum;
-			}
-		}
-		return returnValue;
-	}
+//	public double norm_1(DoubleMatrix2D A) {
+//		double returnValue = Double.NEGATIVE_INFINITY;
+//		for (int i=0; i<A.rows();i++) {
+//			double columnSum=0;
+//			for (int j=0; j<A.rows();j++) {
+//				columnSum=columnSum+Math.abs(A.get(j, i));
+//			}
+//			if (columnSum>returnValue) {
+//				returnValue=columnSum;
+//			}
+//		}
+//		return returnValue;
+//	}
 
 }

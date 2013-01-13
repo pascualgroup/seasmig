@@ -16,19 +16,19 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 		eye = DoubleFactory2D.dense.identity(Q.rows());
 	}
 	
-	public double norm_inf(DoubleMatrix2D A) {
-		double returnValue = Double.NEGATIVE_INFINITY;
-		for (int i=0; i<A.rows();i++) {
-			double rowSum=0;
-			for (int j=0; j<A.rows();j++) {
-				rowSum=rowSum+Math.abs(A.get(i, j));
-			}
-			if (rowSum>returnValue) {
-				returnValue=rowSum;
-			}
-		}
-		return returnValue;
-	}
+//	public double norm_inf(DoubleMatrix2D A) {
+//		double returnValue = Double.NEGATIVE_INFINITY;
+//		for (int i=0; i<A.rows();i++) {
+//			double rowSum=0;
+//			for (int j=0; j<A.rows();j++) {
+//				rowSum=rowSum+Math.abs(A.get(i, j));
+//			}
+//			if (rowSum>returnValue) {
+//				returnValue=rowSum;
+//			}
+//		}
+//		return returnValue;
+//	}
 	
 	
 	
@@ -137,7 +137,7 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 				end
 		 */
 		DoubleMatrix2D A = Q.copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(t));
-		MatlabMatrixExp.FRexpResult fe = log2(norm_inf(A)); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
+		MatlabMatrixExp.FRexpResult fe = log2(algebra.normInfinity(A)); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
 		long s = Math.max(0, fe.e+1); //  s = max ( 0, e + 1 );
 		A.assign(cern.jet.math.tdouble.DoubleFunctions.div(1L<<s)); // A = A / 2^s;
 		
