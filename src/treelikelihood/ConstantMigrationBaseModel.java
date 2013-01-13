@@ -15,7 +15,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	
 	// Matrix Exponentiation
 	MatrixExponentiator matrixExponentiator;
-	DoubleFactory2D F = DoubleFactory2D.dense; // TODO: is parallelizable? 	
+	DoubleFactory2D F = DoubleFactory2D.dense;	
 	
 	// Constructor	
 	public ConstantMigrationBaseModel(double[][] Q_) {	
@@ -32,7 +32,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			return 0;
 
 		DoubleMatrix2D cached = cachedTransitionMatrices.get(to_time-from_time);
-
+		
 		if (cached!=null)  
 			return Math.log(cached.get(from_location, to_location));		
 		else 		

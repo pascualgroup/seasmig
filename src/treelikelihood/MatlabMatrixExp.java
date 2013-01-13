@@ -8,7 +8,6 @@ import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 public class MatlabMatrixExp implements MatrixExponentiator {
 
 	DoubleMatrix2D Q;
-	DoubleFactory2D F = DoubleFactory2D.dense;
 	DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra();
 	DoubleMatrix2D eye; 
 
@@ -162,11 +161,9 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 		}
 		
 		E=myAlgebra.inverse(D).zMult(E, null); // E = D \ E;
-
 		for (int k=1;k<=s;k++) {
 			E=E.zMult(E, null); // E = E*E 
 		} 
-		
 		return E;
 	}
 

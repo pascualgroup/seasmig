@@ -136,7 +136,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		// TODO: maybe get likelihood to work without copy...
 		
 		Uniform uniform = new Uniform(model.rng);
-		LikelihoodTree workingCopy = data.trees.get(uniform.nextIntFromTo(0,data.trees.size()-1)).workingCopy(); 
+		LikelihoodTree workingCopy = data.trees.get(uniform.nextIntFromTo(0,data.trees.size()-1)).copy(); 
 		workingCopy.setLikelihoodModel(migrationBaseModel);
 		logLikelihood=workingCopy.logLikelihood();
 		

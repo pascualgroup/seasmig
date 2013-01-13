@@ -58,7 +58,7 @@ public class SeasonalMigrationMain
 				for (LikelihoodTree tree : data.trees) {
 					System.out.print(".");
 					// TODO: maybe get likelihood to not require copy...
-					LikelihoodTree workingCopy = tree.workingCopy();
+					LikelihoodTree workingCopy = tree.copy();
 					workingCopy.setLikelihoodModel(data.createModel);
 					createLikelihood+=workingCopy.logLikelihood();
 				}
@@ -74,7 +74,7 @@ public class SeasonalMigrationMain
 					double testLikelihood = 0;
 					for (LikelihoodTree tree : data.trees) {
 						System.out.print(".");
-						LikelihoodTree workingCopy = tree.workingCopy();
+						LikelihoodTree workingCopy = tree.copy();
 						workingCopy.setLikelihoodModel(data.testModels.get(i));
 						testLikelihood+=workingCopy.logLikelihood();
 					}

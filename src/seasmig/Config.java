@@ -28,17 +28,17 @@ public class Config
 	// MCMC & LOG RELATED PARAMETERS
 	public long thin = 50;
 
-	public long tuneEvery = 10;
-	public long tuneFor = 100;
+	public long tuneEvery = 100;
+	public long tuneFor = 1000;
 	
-	public long initialHistoryCount = 100;
-	public long recordHistoryAfter = 1000;
+	public long initialHistoryCount = 1000;
+	public long recordHistoryAfter = 10000;
 	
 	public int chainCount = 4;
 	public double heatPower = 3.0;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.NONE;
+	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
 	public StateModel stateModel = StateModel.NONE; // TODO: this...
 	public int numLocations = 3;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...

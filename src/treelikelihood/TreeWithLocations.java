@@ -10,15 +10,18 @@ import jebl.evolution.trees.SimpleRootedTree;
 
 public class TreeWithLocations implements LikelihoodTree {
 
+	// Tree read parameters
+	//static final private double jitter=0.001;
 	
 	// Tree generate parameters for test purpose
-	static final private double branchLengthMean = 0.05;
+	static final private double branchLengthMean = 0.01;
 	static final private double branchLengthVariance = 3.0;
 	
 	// Tree & Model
 	Node root = null;		
 	int num_locations = 0;
 	private MigrationBaseModel likelihoodModel = null;
+
 	
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {
@@ -69,7 +72,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 	
 	@Override
-	public LikelihoodTree workingCopy() {
+	public LikelihoodTree copy() {
 		TreeWithLocations newTree = new TreeWithLocations();
 		newTree.num_locations=num_locations;
 		newTree.root=new Node(root.location,root.time,num_locations);
@@ -186,7 +189,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				if (location==null) 
 					location=-1;
 			}			
-			outputSubTree.children.add(new Node(location,outputSubTree.time+inputTree.getLength(node),num_locations));
+			outputSubTree.children.add(new Node(location,outputSubTree.time+inputTree.getLength(node)/*+jitter*(cern.jet.random.Uniform.staticNextDouble()-0.5)*/,num_locations));
 			makeSubTree(inputTree,locationMap, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
 		}
 
