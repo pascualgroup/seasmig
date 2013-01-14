@@ -16,7 +16,8 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 	static final double q = 6.0;
 	
 	public MatlabMatrixExp(DoubleMatrix2D Q_) {
-		Q = Q_;		
+		Q = Q_;	
+		eye = DoubleFactory2D.dense.identity(Q.rows());
 	}
 	
 	public DoubleMatrix2D eye() {

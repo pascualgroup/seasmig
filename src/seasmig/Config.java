@@ -13,7 +13,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.NORMAL;
+	public RunMode runMode = RunMode.TEST;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -57,7 +57,7 @@ public class Config
 	
 	// TEST RELATED PARAMETERS
 	public int numTestTrees = 50;
-	public int numTestTips = 500;
+	public int numTestTips = 800;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;
 
