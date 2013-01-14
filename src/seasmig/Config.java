@@ -32,7 +32,7 @@ public class Config
 	public long tuneFor = 1000;
 	
 	public long initialHistoryCount = 100;
-	public long recordHistoryAfter = 1000;
+	public long recordHistoryAfter = 10000;
 	
 	public int chainCount = 4;
 	public double heatPower = 3.0;
@@ -41,7 +41,7 @@ public class Config
 	public int printEveryNStates = 20000;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.NONE;
+	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
 	public StateModel stateModel = StateModel.NONE; // TODO: this...
 	public int numLocations = 3;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...
@@ -57,7 +57,7 @@ public class Config
 	
 	// TEST RELATED PARAMETERS
 	public int numTestTrees = 50;
-	public int numTestTips = 800;
+	public int numTestTips = 1200;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;
 
