@@ -192,7 +192,7 @@ public class SeasonalMigrationMain
 
 			System.out.println(" done");
 			System.out.println("Running MCMC...");
-			System.out.println("state\tlikelihood\tstates per hour");
+			System.out.println("state\tlikelihood\thours/million states");
 			mcmc.run();			
 			System.out.println("done");
 		}
