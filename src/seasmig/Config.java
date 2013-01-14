@@ -13,7 +13,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.TEST;
+	public RunMode runMode = RunMode.NORMAL;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -38,7 +38,7 @@ public class Config
 	public double heatPower = 3.0;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.SINUSOIDAL;
+	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
 	public StateModel stateModel = StateModel.NONE; // TODO: this...
 	public int numLocations = 3;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...
