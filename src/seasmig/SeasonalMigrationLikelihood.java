@@ -148,19 +148,20 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		
 		setLogP(logLikelihood);
 		
+		// TODO: organize this...
 		// Display state per hour....
 		stateCount+=1;
-		if (stateCount==100) {
+		if (stateCount==25) {
 			time = System.currentTimeMillis();
-			System.out.printf("\n%.2e states per hour",(double)60L*60L*1000L*100L/(time-oldTime)*((long)config.chainCount));
+			System.out.printf("%d\t%.2f\t%.2f hours/million states\n",stateCount*config.chainCount,logLikelihood,(time-oldTime)/((double)config.chainCount)/100L*1000000L/(60L*60L*1000L));
 		}
-		if (stateCount==1000) {
+		if (stateCount==250) {
 			time = System.currentTimeMillis();
-			System.out.printf("\n%.2e states per hour",(double)60L*60L*1000L*1000L/(time-oldTime)*((long)config.chainCount));
+			System.out.printf("%d\t%.2f\t%.2f hours/million states\n",stateCount*config.chainCount,logLikelihood,(time-oldTime)/((double)config.chainCount)/1000L*1000000L/(60L*60L*1000L));
 		}
-		if (stateCount%10000==0) {
+		if (stateCount%(config.printEveryNStates/config.chainCount)==0) {
 			time = System.currentTimeMillis();
-			System.out.printf("\n%.2e states per hour",(double)60L*60L*1000L*10000L/(time-oldTime)*((long)config.chainCount));
+			System.out.printf("%d\t%.2f\t%.2f hours/million states\n",stateCount*config.chainCount,logLikelihood,(time-oldTime)/((double)config.chainCount)/10000L*1000000L/(60L*60L*1000L));
 			oldTime=time;
 		}
 		//

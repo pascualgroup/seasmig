@@ -191,7 +191,8 @@ public class SeasonalMigrationMain
 			mcmc.addStep(plOutStep);
 
 			System.out.println(" done");
-			System.out.print("Running MCMC...");
+			System.out.println("Running MCMC...");
+			System.out.println("state\tlikelihood\tstates per hour");
 			mcmc.run();			
 			System.out.println("done");
 		}

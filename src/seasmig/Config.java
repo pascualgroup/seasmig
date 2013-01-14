@@ -36,6 +36,9 @@ public class Config
 	
 	public int chainCount = 4;
 	public double heatPower = 3.0;
+	
+	// DISPLAY RELATED PARAMTERS
+	public int printEveryNStates = 20000;
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
@@ -57,5 +60,7 @@ public class Config
 	public int numTestTips = 500;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;
+
+	
 	
 }
