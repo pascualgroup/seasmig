@@ -138,6 +138,10 @@ public class SeasonalMigrationModel extends GraphicalModel
 			obj.put("rates2", rates2);
 		}
 		
+		obj.put("likelihood", this.getLogLikelihood());
+		obj.put("prior", this.getLogPrior());
+		obj.put("posterior",this.getLogPrior()+this.getLogLikelihood());
+		
 		return obj;
 	}
 	
