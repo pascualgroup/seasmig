@@ -6,17 +6,21 @@ import java.util.Vector;
 import org.javatuples.Pair;
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.tdouble.*;
+import cern.jet.math.tdouble.DoubleFunctions;
 
 
 
 public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check this...
 	
+	// Precision Parameter
+	static final double timePrecision = 1.0/365.0;
+	
 	// Cache Parameters 
 	static final int maxCachedTransitionMatrices = 16000;
 
 	// Precision Parameters
-	static final int nYearParts = 12;
+	static final int nYearParts = 36;
 	
 	// Origin Model
 	DoubleFunction[][] seasonalRates;
@@ -65,32 +69,35 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {
+		// TODO: organize this...
 		double from_time_reminder = from_time % 1.0;
 		double from_time_div = from_time - from_time_reminder;
 		double to_time_reminder = to_time - from_time_div;
-		DoubleMatrix2D cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder,to_time_reminder));
+		double from_time_reminder_round = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(from_time_reminder));
+		double to_time_reminder_round = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time_reminder));
+		DoubleMatrix2D cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder_round,to_time_reminder_round));
 		if (cached!=null) {
 			return cached;
 		}
-		else {
-			
+		else {			
 			// first step: 
-			double step_start_time = from_time_reminder;
-			double step_end_time = Math.min(to_time, Math.max(0,Math.ceil(step_start_time/dt)*dt));
+			double step_start_time = from_time_reminder_round;
+			double to_time_round = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time));
+			double step_end_time = Math.min(to_time_round, Math.max(0,Math.ceil(step_start_time/dt)*dt));
 			DoubleMatrix2D result = F.identity(num_locations);	 
 			
-			while (step_end_time<to_time) {
+			while (step_end_time<to_time_round) {
 				int yearPartIndex = (int) Math.floor(step_start_time%1.0/dt);
 				result = result.zMult(constantModels[yearPartIndex].transitionMatrix(step_start_time, step_end_time),null);	
 				step_start_time = step_end_time;
-				step_end_time = Math.min(to_time, step_start_time+dt);
+				step_end_time = Math.min(to_time_round, step_start_time+dt);
 			}
 
 			// cache result
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
 			}			
-			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),result);
+			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder_round, to_time_reminder_round),result);
 
 			return result;
 		}

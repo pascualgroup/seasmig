@@ -143,7 +143,7 @@ public class Data
 		return returnValue;
 	}
 
-	private double[][] makeRandomMigrationMatrix(int size, double scale) {
+	static double[][] makeRandomMigrationMatrix(int size, double scale) {
 		// For test purposes...
 		double[][] returnValue = new double[size][size];
 		for (int i=0;i<size;i++) {

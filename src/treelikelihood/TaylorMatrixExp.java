@@ -63,7 +63,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	public DoubleMatrix2D expm(double t) {
 		
 		// TODO: deal with different scales of t
-		if (t>0.025) {
+		if (t>0.5) {
 			DoubleMatrix2D halfProb = expm(t/2.0);
 			return halfProb.zMult(halfProb, null);
 		}
@@ -84,24 +84,24 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 //			System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());	
 //		}
 				
-		for (int i=0;i<result.rows();i++) {
-			for (int j=0;j<result.rows();j++) {
-				if (result.get(i, j)<0) {
-					result.set(i, j, precision);
-					System.err.println("result.get(i, j)<0");
-					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
-				}
-				if (result.get(i,j)>1) {
-					result.set(i, j, 1-precision);
-					System.err.println("result.get(i, j)>1");
-					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
-				}
-				if (Double.isNaN(result.get(i, j))) {
-					System.err.println("result.get(i, j)==Double.NaN");
-					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
-				}
-			}
-		}
+//		for (int i=0;i<result.rows();i++) {
+//			for (int j=0;j<result.rows();j++) {
+//				if (result.get(i, j)<0) {
+//					result.set(i, j, precision);
+//					System.err.println("result.get(i, j)<0");
+//					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
+//				}
+//				if (result.get(i,j)>1) {
+//					result.set(i, j, 1-precision);
+//					System.err.println("result.get(i, j)>1");
+//					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
+//				}
+//				if (Double.isNaN(result.get(i, j))) {
+//					System.err.println("result.get(i, j)==Double.NaN");
+//					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
+//				}
+//			}
+//		}
 		
 		return result; 	
 		

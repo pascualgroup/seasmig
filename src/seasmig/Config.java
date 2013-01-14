@@ -28,11 +28,11 @@ public class Config
 	// MCMC & LOG RELATED PARAMETERS
 	public long thin = 50;
 
-	public long tuneEvery = 10;
-	public long tuneFor = 100;
+	public long tuneEvery = 100;
+	public long tuneFor = 1000;
 	
-	public long initialHistoryCount = 100;
-	public long recordHistoryAfter = 1000;
+	public long initialHistoryCount = 1000;
+	public long recordHistoryAfter = 10000;
 	
 	public int chainCount = 4;
 	public double heatPower = 3.0;
@@ -49,7 +49,7 @@ public class Config
 	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
-	public String stateAttributeNameInTree = null; // location attribute in jebl tree
+	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 99; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
