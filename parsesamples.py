@@ -6,6 +6,6 @@ file = open('samples.jsons')
 jsonsFile = JsonsFile(file)
 
 for obj in jsonsFile:
-    print obj['rates']
+    print str(obj['rates']).replace("[","{").replace("]","}")
      
 file.close()
