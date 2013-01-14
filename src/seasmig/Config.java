@@ -28,11 +28,11 @@ public class Config
 	// MCMC & LOG RELATED PARAMETERS
 	public long thin = 100;
 
-	public long tuneEvery = 1000;
-	public long tuneFor = 10000;
+	public long tuneEvery = 100;
+	public long tuneFor = 1000;
 	
-	public long initialHistoryCount = 1000;
-	public long recordHistoryAfter = 10000;
+	public long initialHistoryCount = 100;
+	public long recordHistoryAfter = 1000;
 	
 	public int chainCount = 4;
 	public double heatPower = 3.0;
