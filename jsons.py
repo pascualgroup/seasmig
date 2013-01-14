@@ -45,4 +45,3 @@ class JsonsFile:
 				lines.append(line)
 		
 		return json.loads('\n'.join(lines), object_pairs_hook=self.object_pairs_hook)
-	

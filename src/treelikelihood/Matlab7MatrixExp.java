@@ -161,8 +161,8 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 		//	c = getPadeCoefficients (in constructor)
 		DoubleMatrix2D[] Apowers; 
-		DoubleMatrix2D U = DoubleFactory2D.dense.make(A.rows(),A.rows());
-		DoubleMatrix2D V = DoubleFactory2D.dense.make(A.rows(),A.rows());
+		DoubleMatrix2D U = null;
+		DoubleMatrix2D V = null;
 		DoubleMatrix2D eye = DoubleFactory2D.dense.identity(A.rows());
 		DoubleMatrix2D F;
 
@@ -179,6 +179,9 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			for (int j=2;j<(m+1)/2;j++)  // for j = 3:ceil((m+1)/2)
 				Apowers[j]=Apowers[j-1].zMult(Apowers[1], null); // Apowers{j} = Apowers{j-1}*Apowers{2};
 			
+			U = DoubleFactory2D.dense.make(A.rows(),A.rows());
+			V = DoubleFactory2D.dense.make(A.rows(),A.rows());
+						
 			// for j = m+1:-2:2
 			for (int j=m;j>=1;j-=2)  // convert j to zero based index
 				U.assign(Apowers[(j-1)/2],DoublePlusMultSecond.plusMult(c[m][j])); //  U = U + c(j)*Apowers{j/2};
