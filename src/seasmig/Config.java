@@ -26,10 +26,10 @@ public class Config
 	public String logFilename = "debug.log";
 
 	// MCMC & LOG RELATED PARAMETERS
-	public long thin = 50;
+	public long thin = 100;
 
-	public long tuneEvery = 100;
-	public long tuneFor = 1000;
+	public long tuneEvery = 1000;
+	public long tuneFor = 10000;
 	
 	public long initialHistoryCount = 1000;
 	public long recordHistoryAfter = 10000;
