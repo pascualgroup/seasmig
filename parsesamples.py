@@ -1,8 +1,9 @@
 #!/cygdrive/f/python27/python.exe
 import json
+import sys
 from jsons import *
 
-file = open('samples.jsons')
+file = open(sys.argv[1])
 jsonsFile = JsonsFile(file)
 
 first = jsonsFile.next()
