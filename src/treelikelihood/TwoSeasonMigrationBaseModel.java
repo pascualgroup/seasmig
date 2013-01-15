@@ -95,6 +95,14 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 		returnValue+="{"+season1Start+","+season1Length+",\n"+season1MigrationModel.print()+","+season2MigrationModel.print()+"}";
 		return returnValue;
 	}
+	
+	@Override
+	public String parse() {	
+		String returnValue="";
+		returnValue+="{phase,length,rates1,rates2},";
+		returnValue+="{"+season1Start+","+season1Length+",\n"+season1MigrationModel.parse()+","+season2MigrationModel.parse()+"}";
+		return returnValue;
+	}
 
 	private boolean isInSeason1(double time) {
 		return (time%1.0>=season1Start) && ((time-season1Start)%1.0<season1Length);			

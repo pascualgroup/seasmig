@@ -8,4 +8,5 @@ public interface MigrationBaseModel  {
 	public DoubleMatrix2D transitionMatrix(double from_time, double to_time);
 	public int getNumLocations();
 	public String print();
+	public String parse();
 }

@@ -72,6 +72,12 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 		return num_states ;
 	}
 
+	@Override
+	public String parse() {
+		// TODO Auto-generated method stub
+		return print();
+	}
+
 
 
 }

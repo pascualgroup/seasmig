@@ -130,6 +130,12 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 		return num_locations ;
 	}
 
+	@Override
+	public String parse() {
+		// TODO Auto-generated method stub
+		return print();
+	}
+
 
 
 }
