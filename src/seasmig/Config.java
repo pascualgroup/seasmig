@@ -27,15 +27,15 @@ public class Config
 
 	// MCMC & LOG RELATED PARAMETERS
 	// in iterations
-	public long thin = 100;
+	public long thin = 50;
 
-	public long tuneEvery = 300; 
-	public long tuneFor = 3000; 
+	public long tuneEvery = 10000; 
+	public long tuneFor = 10000; 
 	
-	public long initialHistoryCount = 300;
-	public long recordHistoryAfter = 300;
+	public long initialHistoryCount = 10000;
+	public long recordHistoryAfter = 10000;
 	
-	public int chainCount = 4;
+	public int chainCount = 32;
 	public double heatPower = 3.0;
 	
 	// DISPLAY RELATED PARAMTERS
@@ -58,7 +58,7 @@ public class Config
 	
 	// TEST RELATED PARAMETERS
 	public int numTestTrees = 50;
-	public int numTestTips = 200;
+	public int numTestTips = 1000;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;
 
