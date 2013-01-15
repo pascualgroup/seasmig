@@ -91,8 +91,8 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	@Override
 	public String print() {	
 		String returnValue="";
-		returnValue+="{phase,length,rates1,rates2}\n";
-		returnValue+="{"+season1Start+","+season1Length+",\n"+season1MigrationModel.print()+","+season2MigrationModel.print();
+		returnValue+="{phase,length,rates1,rates2},\n";
+		returnValue+="{"+season1Start+","+season1Length+",\n"+season1MigrationModel.print()+","+season2MigrationModel.print()+"}";
 		return returnValue;
 	}
 

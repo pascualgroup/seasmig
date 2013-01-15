@@ -170,9 +170,9 @@ public class SeasonalMigrationMain
 		testFile.delete();
 		testFile.createNewFile();
 		PrintStream testStream = new PrintStream(testFile);
-		testStream.println("{Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality+",");				
-		System.out.println("{"+config.migrationSeasonality+",");
-		testStream.println(data.createModel.print());
+		System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality+",");				
+		testStream.println("{"+config.migrationSeasonality+",");
+		testStream.print(data.createModel.print());
 		System.out.println(data.createModel.print());
 		double createLikelihood = 0;
 		for (LikelihoodTree tree : data.trees) {
