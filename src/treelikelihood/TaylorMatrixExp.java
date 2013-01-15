@@ -79,30 +79,6 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
 		}
 		
-		// TODO: remove debug, at least partially
-//		if (Math.random()<0.0001) {
-//			System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());	
-//		}
-				
-//		for (int i=0;i<result.rows();i++) {
-//			for (int j=0;j<result.rows();j++) {
-//				if (result.get(i, j)<0) {
-//					result.set(i, j, precision);
-//					System.err.println("result.get(i, j)<0");
-//					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
-//				}
-//				if (result.get(i,j)>1) {
-//					result.set(i, j, 1-precision);
-//					System.err.println("result.get(i, j)>1");
-//					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
-//				}
-//				if (Double.isNaN(result.get(i, j))) {
-//					System.err.println("result.get(i, j)==Double.NaN");
-//					System.err.println("\nQ:"+Q.toString()+"\nt: "+t+"\nexpm:"+result.toString());
-//				}
-//			}
-//		}
-		
 		return result; 	
 		
 	}

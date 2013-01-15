@@ -111,15 +111,15 @@ public class SeasonalMigrationMain
 			univarStep.setRecordStatsAfterTuning(true);
 
 			// Differential evolution step
-			BlockDifferentialEvolutionStep deStep = new BlockDifferentialEvolutionStep();
-			deStep.setStatsFilename(config.demcStatsFilename);
-			deStep.setRecordHistoryEvery(config.thin);
-			deStep.setRecordHistoryAfter(config.recordHistoryAfter);
-			deStep.setTuneEvery(config.tuneEvery);
-			deStep.setTuneFor(config.tuneFor);
-			deStep.setInitialHistoryCount(config.initialHistoryCount);
-			deStep.setRecordHeatedStats(false);
-			deStep.setRecordStatsAfterTuning(true);
+//			BlockDifferentialEvolutionStep deStep = new BlockDifferentialEvolutionStep();
+//			deStep.setStatsFilename(config.demcStatsFilename);
+//			deStep.setRecordHistoryEvery(config.thin);
+//			deStep.setRecordHistoryAfter(config.recordHistoryAfter);
+//			deStep.setTuneEvery(config.tuneEvery);
+//			deStep.setTuneFor(config.tuneFor);
+//			deStep.setInitialHistoryCount(config.initialHistoryCount);
+//			deStep.setRecordHeatedStats(false);
+//			deStep.setRecordStatsAfterTuning(true);
 
 			// Swap steps: even (0,1), (2,3), etc. Odd (1,2), (3,4), etc.
 			// Set up to allow parallelization of all swaps.
@@ -143,7 +143,7 @@ public class SeasonalMigrationMain
 
 			// Set up execution order for the steps
 			mcmc.addStep(univarStep);
-			mcmc.addStep(deStep);
+//			mcmc.addStep(deStep);
 			for(int i = 0; i < config.chainCount; i++)	{
 				mcmc.addStep(evenSwapStep);
 				mcmc.addStep(oddSwapStep);				
@@ -170,8 +170,8 @@ public class SeasonalMigrationMain
 		testFile.delete();
 		testFile.createNewFile();
 		PrintStream testStream = new PrintStream(testFile);
-		testStream.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality);				
-		System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality);
+		testStream.println("{Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality+",");				
+		System.out.println("{"+config.migrationSeasonality+",");
 		testStream.println(data.createModel.print());
 		System.out.println(data.createModel.print());
 		double createLikelihood = 0;
@@ -201,7 +201,7 @@ public class SeasonalMigrationMain
 			testLikelihood=testLikelihood/data.trees.size();
 			System.out.println(testLikelihood);
 		}
-		testStream.print((new GregorianCalendar()).getTime());
+		testStream.print(","+(new GregorianCalendar()).getTime()+"}");
 		testStream.close();
 		
 	}

@@ -26,19 +26,20 @@ public class Config
 	public String logFilename = "debug.log";
 
 	// MCMC & LOG RELATED PARAMETERS
+	// in iterations
 	public long thin = 100;
 
-	public long tuneEvery = 100;
-	public long tuneFor = 1000;
+	public long tuneEvery = 300; 
+	public long tuneFor = 3000; 
 	
-	public long initialHistoryCount = 100;
-	public long recordHistoryAfter = 10000;
+	public long initialHistoryCount = 300;
+	public long recordHistoryAfter = 300;
 	
 	public int chainCount = 4;
 	public double heatPower = 3.0;
 	
 	// DISPLAY RELATED PARAMTERS
-	public int printEveryNStates = 20000;
+	public int printEveryNStates = 50000;
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
