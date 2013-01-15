@@ -64,7 +64,24 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public String print() {		
-		return Q.toString();
+		String returnValue = "{";
+		for (int i=0; i<Q.rows();i++) {
+			if (i!=0) 
+				returnValue+=" ";
+			returnValue+="{";
+			for (int j=0; j<Q.columns();j++) {
+				returnValue+=String.format("%6.3f",Q.get(i, j));
+				if (j!=Q.columns()-1) {
+					returnValue+=",";
+				}
+			}			
+			returnValue+="}";
+			if (i!=Q.rows()-1) {
+				returnValue+=",\n";
+			}			
+		}
+		returnValue+="}\n";
+		return returnValue;
 	}
 
 	@Override

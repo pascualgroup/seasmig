@@ -2,6 +2,7 @@ package seasmig;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.GregorianCalendar;
 
@@ -47,6 +48,7 @@ public class SeasonalMigrationMain
 			System.out.println(" done");
 
 			if (config.runMode==RunMode.TEST) {
+				// Roughly comparing results of several different exponentiation algorithms 
 				testMatrixExponentiation(config.numLocations);
 			}
 
@@ -56,45 +58,7 @@ public class SeasonalMigrationMain
 			// Tests...			
 			if (config.runMode==RunMode.TEST) {
 				System.out.print("Running likelihood test...\n");
-
-				// Creating test file 
-				File testFile = new File("out.test");
-				testFile.delete();
-				testFile.createNewFile();
-				PrintStream testStream = new PrintStream(testFile);
-				testStream.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality);				
-				System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality);
-				testStream.println(data.createModel.print());
-				System.out.println(data.createModel.print());
-				double createLikelihood = 0;
-				for (LikelihoodTree tree : data.trees) {
-					System.out.print(".");
-					// TODO: maybe get likelihood to not require copy...
-					LikelihoodTree workingCopy = tree.copy();
-					workingCopy.setLikelihoodModel(data.createModel);
-					createLikelihood+=workingCopy.logLikelihood();
-				}
-				createLikelihood=createLikelihood/data.trees.size();
-				System.out.println(createLikelihood);
-
-				System.out.println("\nCalculating tree likelihood using test models with increasing noise:");
-				for (int i=0;i<data.testModels.size();i++) {
-					if (i%config.numTestRepeats==0) {						
-						System.out.println("SEASONALITY "+Config.Seasonality.values()[i/config.numTestRepeats]);						
-					}
-
-					double testLikelihood = 0;
-					for (LikelihoodTree tree : data.trees) {
-						System.out.print(".");
-						LikelihoodTree workingCopy = tree.copy();
-						workingCopy.setLikelihoodModel(data.testModels.get(i));
-						testLikelihood+=workingCopy.logLikelihood();
-					}
-					testLikelihood=testLikelihood/data.trees.size();
-					System.out.println(testLikelihood);
-				}
-				testStream.print((new GregorianCalendar()).getTime());
-				testStream.close();
+				testLikelihood(config, data);				
 				System.out.print("Completed likelihood test!\n\n");
 
 			}
@@ -198,6 +162,48 @@ public class SeasonalMigrationMain
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+
+	private static void testLikelihood(Config config, Data data) throws IOException {
+		// Creating test file 
+		File testFile = new File("out.test");
+		testFile.delete();
+		testFile.createNewFile();
+		PrintStream testStream = new PrintStream(testFile);
+		testStream.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality);				
+		System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality);
+		testStream.println(data.createModel.print());
+		System.out.println(data.createModel.print());
+		double createLikelihood = 0;
+		for (LikelihoodTree tree : data.trees) {
+			System.out.print(".");
+			// TODO: maybe get likelihood to not require copy...
+			LikelihoodTree workingCopy = tree.copy();
+			workingCopy.setLikelihoodModel(data.createModel);
+			createLikelihood+=workingCopy.logLikelihood();
+		}
+		createLikelihood=createLikelihood/data.trees.size();
+		System.out.println(createLikelihood);
+
+		System.out.println("\nCalculating tree likelihood using test models with increasing noise:");
+		for (int i=0;i<data.testModels.size();i++) {
+			if (i%config.numTestRepeats==0) {						
+				System.out.println("SEASONALITY "+Config.Seasonality.values()[i/config.numTestRepeats]);						
+			}
+
+			double testLikelihood = 0;
+			for (LikelihoodTree tree : data.trees) {
+				System.out.print(".");
+				LikelihoodTree workingCopy = tree.copy();
+				workingCopy.setLikelihoodModel(data.testModels.get(i));
+				testLikelihood+=workingCopy.logLikelihood();
+			}
+			testLikelihood=testLikelihood/data.trees.size();
+			System.out.println(testLikelihood);
+		}
+		testStream.print((new GregorianCalendar()).getTime());
+		testStream.close();
+		
 	}
 
 	private static void testMatrixExponentiation(int n) {
