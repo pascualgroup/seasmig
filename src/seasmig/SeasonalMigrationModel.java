@@ -61,7 +61,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 			phasePrior = new UniformDoubleDistribution(this, "phasePrior", 0.0, 1.0);
 		}
 		else if(config.migrationSeasonality == Seasonality.TWO_CONSTANT_SEASONS) {
-			twoMatrixPhase = new UniformDoubleVariable(this, "twoMatrixPhase", 0.0, 1.0);
+			twoMatrixPhase = new UniformDoubleVariable(this, "twoMatrixPhase", 0.0, 0.49999);
 		}
 		
 		rateParams = new RateParams[config.numLocations][config.numLocations];
