@@ -57,8 +57,8 @@ public class Config
 	public int numTreesFromTail = 99; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
-	public int numTestTrees = 50;
-	public int numTestTips = 1000;
+	public int numTestTrees = 99;
+	public int numTestTips = 1200;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;
 
