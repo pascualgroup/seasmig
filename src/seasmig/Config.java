@@ -29,13 +29,13 @@ public class Config
 	// in iterations
 	public long thin = 50;
 
-	public long tuneEvery = 10000; 
-	public long tuneFor = 10000; 
+	public long tuneEvery = 500; 
+	public long tuneFor = 5000; 
 	
 	public long initialHistoryCount = 10000;
 	public long recordHistoryAfter = 10000;
 	
-	public int chainCount = 32;
+	public int chainCount = 16;
 	public double heatPower = 3.0;
 	
 	// DISPLAY RELATED PARAMTERS
