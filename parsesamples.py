@@ -14,8 +14,11 @@ for key in first.keys():
         result+=","
 result+="}\n"
 
+resultList=list();
 for obj in jsonsFile:
-    result+=str(obj.values()).replace("[","{").replace("]","}")+"\n"    
+    resultList.append(str(obj.values()).replace("[","{").replace("]","}")+"\n")
+
+result=resultList.join()    
 
 print result     
 file.close()
