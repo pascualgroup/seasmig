@@ -1,6 +1,12 @@
 package seasmig;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+
+import com.google.gson.Gson;
+
 import mc3kit.LogLevel;
 
 public class Config
@@ -61,6 +67,14 @@ public class Config
 	public int numTestTips = 1200;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;
+	public void outputToFile(String outfilename, Gson gson) throws IOException {
+		File configOutputFile = new File("out.config.json");
+		configOutputFile.delete();
+		configOutputFile.createNewFile();
+		PrintStream configOutputStream = new PrintStream(configOutputFile);
+		configOutputStream.print(gson.toJson(this).toString());
+		configOutputStream.close();
+	}
 
 	
 	

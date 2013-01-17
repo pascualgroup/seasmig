@@ -46,6 +46,9 @@ public class SeasonalMigrationMain
 			Gson gson = new Gson();
 			Config config = gson.fromJson(new FileReader("config.json"), Config.class);
 			System.out.println(" done");
+			System.out.print("Writing full config options to out.config...");
+			config.outputToFile("out.config",gson);
+			System.out.println(" done");
 
 			if (config.runMode==RunMode.TEST) {
 				// Roughly comparing results of several different exponentiation algorithms 
