@@ -29,8 +29,8 @@ public class Config
 	// in iterations
 	public long thin = 50;
 
-	public long tuneEvery = 500; 
-	public long tuneFor = 5000; 
+	public long tuneEvery = 50000; 
+	public long tuneFor = 50000; 
 	
 	public long initialHistoryCount = 10000;
 	public long recordHistoryAfter = 10000;
@@ -39,7 +39,7 @@ public class Config
 	public double heatPower = 3.0;
 	
 	// DISPLAY RELATED PARAMTERS
-	public int printEveryNStates = 50000;
+	public int printEveryNStates = 20000;
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
