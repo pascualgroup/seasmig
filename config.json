@@ -1,3 +1,7 @@
 {
-	"numTestTrees" : 20
+	"chainCount" : 64,
+	"migrationSeasonality" : "NONE",
+	"tuneEvery" : 500,
+	"tuneFor" : 50000,
+	"printEveryNStates" = 100000
 }

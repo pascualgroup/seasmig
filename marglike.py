@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/cygdrive/f/Python27/python.exe
 
 import sys
 import csv
@@ -123,5 +123,4 @@ def runMargLike(filename, heatPower):
   print 'curve-fit bootstrap 95% interval: ', quantiles
 
 if __name__ == '__main__':
-  if sys.argv[1] == 'marglike':
-    runMargLike(sys.argv[2], float(sys.argv[3]))
+    runMargLike(sys.argv[1], float(sys.argv[2]))
