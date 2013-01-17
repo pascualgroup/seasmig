@@ -39,7 +39,7 @@ public class Config
 	public double heatPower = 3.0;
 	
 	// DISPLAY RELATED PARAMTERS
-	public int printEveryNStates = 20000;
+	public int printEveryNStates = 10000;
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
