@@ -35,8 +35,8 @@ public class Config
 	// in iterations
 	public long thin = 50;
 
-	public long tuneEvery = 500; 
-	public long tuneFor = 50000; 
+	public long tuneEvery = 100; 
+	public long tuneFor = 100000; 
 	
 	public long initialHistoryCount = 10000;
 	public long recordHistoryAfter = 10000;
@@ -50,17 +50,17 @@ public class Config
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
 	public StateModel stateModel = StateModel.NONE; // TODO: this...
-	public int numLocations = 3;  // TODO: add support of one location....
+	public int numLocations = 7;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...
 	
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add statese & combine files 
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
-	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
+	public String locationFilename ="regions.txt"; // null if locations are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
-	public int numTreesFromTail = 99; // at most number of trees to read from tree file's tail
+	public int numTreesFromTail = 1000; // at most number of trees to read from tree file's tail
 	
 	// TEST RELATED PARAMETERS
 	public int numTestTrees = 99;
