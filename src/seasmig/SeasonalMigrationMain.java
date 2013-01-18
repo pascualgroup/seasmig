@@ -50,7 +50,7 @@ public class SeasonalMigrationMain
 			config.outputToFile("out.config",gson);
 			System.out.println(" done");
 
-			if (config.runMode==RunMode.TEST) {
+			if (config.runMode==RunMode.TEST1 || config.runMode==RunMode.TEST2) {
 				// Roughly comparing results of several different exponentiation algorithms 
 				testMatrixExponentiation(config.numLocations);
 			}
@@ -59,7 +59,7 @@ public class SeasonalMigrationMain
 			Data data = new Data(config);
 
 			// Tests...			
-			if (config.runMode==RunMode.TEST) {
+			if (config.runMode==RunMode.TEST1 || config.runMode==RunMode.TEST2) {
 				System.out.print("Running likelihood test...\n");
 				testLikelihood(config, data);				
 				System.out.print("Completed likelihood test!\n\n");

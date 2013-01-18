@@ -1,6 +1,33 @@
 package treelikelihood;
 
 public class Util {
+	
+	static double logSumExp(double[] alphas, double min) {
+		double returnValue;
+		if (min>Double.NEGATIVE_INFINITY ) {
+			double sumExp = 0;
+			for (int i=0;i<alphas.length;i++) {			
+				sumExp=sumExp+Math.exp(alphas[i]-min);
+			}
+			returnValue=min+Math.log(sumExp);
+		}
+		else {
+			double sumExp = 0;
+			for (int i=0;i<alphas.length;i++) {			
+				sumExp=sumExp+Math.exp(alphas[i]);
+			}
+			returnValue=Math.log(sumExp);
+		}
+		if (!Double.isNaN(returnValue)) {
+			return returnValue;
+		}
+		else {
+			System.err.println("logSumExp==NaN: alphas: "+alphas+"\nmin="+min);			
+			return Double.MIN_VALUE;
+		}
+			
+	}
+	
 	public static FRexpResult log2(double value)
 	{
 		final FRexpResult result = new FRexpResult();

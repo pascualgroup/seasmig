@@ -1,5 +1,5 @@
 {
-	"chainCount" : 64,
+	"chainCount" : 4,
 	"migrationSeasonality" : "NONE",
 	"tuneEvery" : 500,
 	"tuneFor" : 50000,

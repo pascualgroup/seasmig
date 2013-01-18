@@ -12,22 +12,47 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Tree read parameters
 	//static final private double jitter=0.001;
-	
+
 	// Tree generate parameters for test purpose
 	static final private double branchLengthMean = 0.1;
 	static final private double branchLengthVariance = 3.0;
-	
+
 	// Tree & Model
 	Node root = null;		
 	int num_locations = 0;
 	private MigrationBaseModel likelihoodModel = null;
 
-	
+
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {
 		num_locations=createTreeModel.getNumLocations();
 		root = new Node(0,0,num_locations);
 		makeRandomTree(createTreeModel, root, numNodes);		
+	}
+
+	// Generate random tree states based on input tree topology and model .... 
+	public TreeWithLocations(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree) {
+		num_locations=createTreeModel.getNumLocations();
+		root = new Node(0,0,num_locations);
+		makeSubTree(tree,(String)null, root,tree.getRootNode());
+		fillRandomTraits(createTreeModel,root);
+	}
+
+	private void fillRandomTraits(MigrationBaseModel m, Node parent) {
+		for (Node child : parent.children) {	
+			double d = cern.jet.random.Uniform.staticNextDouble();
+			double p=0;
+			for (int location=0;location<num_locations;location++) {
+				p=p+Math.exp(m.logprobability(root.location, location, parent.time, child.time));
+				if (d<=p) {
+					parent.children.add(new Node(location,child.time,num_locations));
+					break;
+				}
+			}			
+		}
+		for (Node child : parent.children) {
+			fillRandomTraits(m,child);
+		}
 	}
 
 	// Load a tree from a basic jebl tree
@@ -48,12 +73,12 @@ public class TreeWithLocations implements LikelihoodTree {
 		root = new Node(location,0,num_locations);
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 	}
-	
+
 	@Override 
 	public void setLikelihoodModel(Object likelihoodModel_) {
 		likelihoodModel = (MigrationBaseModel) likelihoodModel_;
 	}
-	
+
 	@Override
 	public double logLikelihood() {
 		double[] alphas=new double[num_locations];
@@ -64,13 +89,13 @@ public class TreeWithLocations implements LikelihoodTree {
 				alphas[rootLocation]=alpha;
 				if (alpha<min) min=alpha;				
 			}
-			return logSumExp(alphas,min);
+			return Util.logSumExp(alphas,min);
 		}
 		else {
 			return conditionalLogLikelihood(root,root.location);					
 		}		
 	}
-	
+
 	@Override
 	public LikelihoodTree copy() {
 		TreeWithLocations newTree = new TreeWithLocations();
@@ -100,7 +125,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						alphas[childLocation]=alpha;
 						if (alpha<min) min=alpha;
 					}
-					loglikelihood=loglikelihood+logSumExp(alphas,min);
+					loglikelihood=loglikelihood+ Util.logSumExp(alphas,min);
 				}			 
 			}
 			node.cachedConditionalLogLikelihood[nodeLocation]=loglikelihood;
@@ -108,31 +133,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 	}
 
-	static double logSumExp(double[] alphas, double min) {
-		double returnValue;
-		if (min>Double.NEGATIVE_INFINITY ) {
-			double sumExp = 0;
-			for (int i=0;i<alphas.length;i++) {			
-				sumExp=sumExp+Math.exp(alphas[i]-min);
-			}
-			returnValue=min+Math.log(sumExp);
-		}
-		else {
-			double sumExp = 0;
-			for (int i=0;i<alphas.length;i++) {			
-				sumExp=sumExp+Math.exp(alphas[i]);
-			}
-			returnValue=Math.log(sumExp);
-		}
-		if (!Double.isNaN(returnValue)) {
-			return returnValue;
-		}
-		else {
-			System.err.println("logSumExp==NaN: alphas: "+alphas+"\nmin="+min);			
-			return Double.MIN_VALUE;
-		}
-			
-	}
 
 	@Override
 	public String print() {
@@ -195,10 +195,14 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	}
 
-	public void makeSubTree(jebl.evolution.trees.SimpleRootedTree inputTree, String locationAttributeName, Node outputSubTree, jebl.evolution.graphs.Node inputSubTree) {
 
-		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {						
-			outputSubTree.children.add(new Node(Integer.parseInt((String)node.getAttribute(locationAttributeName))-1,outputSubTree.time+inputTree.getLength(node),num_locations));
+	public void makeSubTree(jebl.evolution.trees.SimpleRootedTree inputTree, String locationAttributeName, Node outputSubTree, jebl.evolution.graphs.Node inputSubTree) {
+		// Null attribute means 0 location tree
+		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {
+			if (locationAttributeName!=null)
+				outputSubTree.children.add(new Node(Integer.parseInt((String)node.getAttribute(locationAttributeName))-1,outputSubTree.time+inputTree.getLength(node),num_locations));
+			else 
+				outputSubTree.children.add(new Node(0,outputSubTree.time+inputTree.getLength(node),num_locations));
 			makeSubTree(inputTree, locationAttributeName, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
 		}
 
@@ -209,10 +213,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			for (int child=0;child<2;child++) {
 				double d = cern.jet.random.Uniform.staticNextDouble();
 				// Decide on branch length
-				double to_time;
-				do {
-					to_time = from.time+cern.jet.random.Gamma.staticNextDouble(branchLengthMean*branchLengthMean/branchLengthVariance,1.0/(branchLengthVariance/branchLengthMean));
-				} while ((to_time-from.time)<=1E-3);
+				double to_time = from.time+cern.jet.random.Gamma.staticNextDouble(branchLengthMean*branchLengthMean/branchLengthVariance,1.0/(branchLengthVariance/branchLengthMean));
 				double p=0;		
 
 				for (int location=0;location<num_locations;location++) {
@@ -249,7 +250,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			}
 		}				
 	}
-	
+
 	// Nodes in this tree...
 	public class Node {	
 		Node parent = null;
@@ -270,7 +271,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 	}
 
-	
+
 }
 
 

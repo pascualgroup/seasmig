@@ -15,7 +15,7 @@ public class Config
 																  //TODO: ADD CONTINUOUS SEASONAL MODEL
 	enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
-	enum RunMode {	NORMAL,	TEST };
+	enum RunMode {	NORMAL,	TEST1, TEST2};
 	
 	public Long randomSeed;
 	
@@ -41,8 +41,8 @@ public class Config
 	public long initialHistoryCount = 10000;
 	public long recordHistoryAfter = 10000;
 	
-	public int chainCount = 16;
-	public double heatPower = 3.0;
+	public int chainCount = 4;
+	public double heatPower = 1.0;
 	
 	// DISPLAY RELATED PARAMTERS
 	public int printEveryNStates = 100000;

@@ -30,7 +30,6 @@ public class Data
 
 		switch (config.runMode) {
 		case NORMAL:
-
 			// Load trees
 			System.out.print("Loading trees... ");			
 			File treeFile = new File(config.treeFilename);
@@ -77,7 +76,7 @@ public class Data
 			}	
 			break;
 
-		case TEST:
+		case TEST1:
 			// TODO: add more tests + test files ....
 			// TODO: add tests for states...
 			System.out.print("Generating test trees... ");
@@ -108,7 +107,7 @@ public class Data
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 				break;
 			}
-			
+
 			for (int i=0;i<config.numTestTrees;i++) {
 				TreeWithLocations testTree = new TreeWithLocations(createModel,config.numTestTips);
 				testTree.removeInternalLocations();
@@ -119,7 +118,70 @@ public class Data
 			System.out.print("Generating test models... ");
 
 			testModels = new ArrayList<MigrationBaseModel>();
+
+			for (int i=0; i<config.numTestRepeats; i++) {
+				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, config.disturbanceScale*i,99999)));
+			}
+			for (int i=0; i<config.numTestRepeats; i++) {
+				double phase = Math.max(0,Math.min(1,0.3+i/3*(Random.nextDouble()-0.5))); double length = 0.5;
+				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,config.disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,config.disturbanceScale*i/3,99999),phase, phase+length));
+			}
+			for (int i=0; i<config.numTestRepeats; i++) {
+				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,config.disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,config.disturbanceScale*i/3,1),disturbMigrationMatrix(phases,config.disturbanceScale*i/3,1)));
+			}
+			System.out.println(" generated "+testModels.size()+" test models");
+			break;
+
+		case TEST2:
+			// TODO: add more tests + test files ....
+			// TODO: add tests for states...
+			System.out.print("Generating test trees based on input tree topology ... ");
+
+			// Generate test data and trees
+
+			// For constant model...
+			Q = makeRandomMigrationMatrix(config.numLocations,2); 
+
+			// For two seasonal model...
+			QW = myMatrixCopy(Q);
+			QS = makeRandomMigrationMatrix(config.numLocations,3); 
+
+			// For sinusoidal model...
+			rates = myMatrixCopy(Q);
+			amps = makeRandomMigrationMatrix(config.numLocations,1);
+			phases = makeRandomMigrationMatrix(config.numLocations,1);
+
+			switch (config.migrationSeasonality) {
+			case NONE:	
+				createModel = new ConstantMigrationBaseModel(Q); 
+				break;
+			case TWO_CONSTANT_SEASONS: 
+				double phase = 0.3; double length = 0.5;
+				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
+				break;
+			case SINUSOIDAL:
+				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
+				break;
+			}
 			
+			System.out.print("Loading trees... ");			
+			treeFile = new File(config.treeFilename);
+			reader = new FileReader(treeFile);
+			nexusImporter = new NexusImporter(reader);
+			nexsusTrees = nexusImporter.importTrees();
+			System.out.println("loaded "+nexsusTrees.size()+" trees");
+			
+			for (int i=0;i<config.numTestTrees;i++) {
+				TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree)nexsusTrees.get(cern.jet.random.Uniform.staticNextIntFromTo(0, nexsusTrees.size()-1)));
+				testTree.removeInternalLocations();
+				trees.add(testTree);
+			}
+
+			System.out.println(" generated "+trees.size()+" random model tips with random input tree topology");
+			System.out.print("Generating test models... ");
+
+			testModels = new ArrayList<MigrationBaseModel>();
+
 			for (int i=0; i<config.numTestRepeats; i++) {
 				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, config.disturbanceScale*i,99999)));
 			}
