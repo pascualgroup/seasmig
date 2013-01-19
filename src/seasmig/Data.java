@@ -179,7 +179,7 @@ public class Data
 			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");
 			int i=0;
 			for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-				// TODO: pick random trees from tail
+				// TOOD: pick random trees from tail
 				if (i>config.numTestTrees) break;
 				i=i+1;
 				System.out.println(i);
