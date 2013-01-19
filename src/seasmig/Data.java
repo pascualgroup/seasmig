@@ -132,7 +132,7 @@ public class Data
 			System.out.println(" generated "+testModels.size()+" test models");
 			break;
 
-		case TEST2:
+		case TEST2:{
 			// TODO: add more tests + test files ....
 			// TODO: add tests for states...
 			System.out.print("Generating test trees based on input tree topology ... ");
@@ -163,18 +163,25 @@ public class Data
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 				break;
 			}
-			
+
 			System.out.print("Loading trees... ");			
 			treeFile = new File(config.treeFilename);
 			reader = new FileReader(treeFile);
 			nexusImporter = new NexusImporter(reader);
 			nexsusTrees = nexusImporter.importTrees();
 			System.out.println("loaded "+nexsusTrees.size()+" trees");
-			
-			for (int i=0;i<config.numTestTrees;i++) {
-				TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree)nexsusTrees.get(cern.jet.random.Uniform.staticNextIntFromTo(0, nexsusTrees.size()-1)));
+
+			System.out.print("Keeping tail... ");		
+			nexsusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
+			for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
+				nexsusTreeTail.add(nexsusTrees.get(i));
+			}
+			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");
+			for (int i=0;i<config.numTestTrees;i++) {				
+				TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree) nexsusTreeTail.get(cern.jet.random.Uniform.staticNextIntFromTo(0, nexsusTreeTail.size()-1)));
+				testTree.fillRandomTraits();
 				testTree.removeInternalLocations();
-				trees.add(testTree);
+				trees.add(testTree);				
 			}
 
 			System.out.println(" generated "+trees.size()+" random model tips with random input tree topology");
@@ -193,8 +200,12 @@ public class Data
 				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,config.disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,config.disturbanceScale*i/3,1),disturbMigrationMatrix(phases,config.disturbanceScale*i/3,1)));
 			}
 			System.out.println(" generated "+testModels.size()+" test models");
-			break;
+
 		}
+		break;
+
+		}
+
 	}
 
 	private double[][] myMatrixCopy(double[][] q) {

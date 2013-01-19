@@ -33,27 +33,34 @@ public class TreeWithLocations implements LikelihoodTree {
 	// Generate random tree states based on input tree topology and model .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree) {
 		num_locations=createTreeModel.getNumLocations();
+		likelihoodModel=createTreeModel;
 		root = new Node(0,0,num_locations);
 		makeSubTree(tree,(String)null, root,tree.getRootNode());
-		fillRandomTraits(createTreeModel,root);
 	}
 
-	private void fillRandomTraits(MigrationBaseModel m, Node parent) {
-		for (Node child : parent.children) {	
-			double d = cern.jet.random.Uniform.staticNextDouble();
-			double p=0;
-			for (int location=0;location<num_locations;location++) {
-				p=p+Math.exp(m.logprobability(root.location, location, parent.time, child.time));
-				if (d<=p) {
-					parent.children.add(new Node(location,child.time,num_locations));
-					break;
-				}
-			}			
-		}
-		for (Node child : parent.children) {
-			fillRandomTraits(m,child);
+	private void fillRandomTraits(Node parent) {
+		if (parent.children!=null) {
+			for (Node child : parent.children) {	
+				double d = cern.jet.random.Uniform.staticNextDouble();
+				double p=0;
+				for (int location=0;location<num_locations;location++) {
+					p=p+Math.exp(likelihoodModel.logprobability(parent.location, location, parent.time, child.time));
+					if (d<=p) {
+						parent.children.add(new Node(location,child.time,num_locations));
+						break;
+					}
+				}			
+			}
+			for (Node child : parent.children) {
+				fillRandomTraits(child);
+			}
 		}
 	}
+	
+	public void fillRandomTraits() {
+		fillRandomTraits(root);
+	}
+
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from nexsus tree trait location_attribute name
