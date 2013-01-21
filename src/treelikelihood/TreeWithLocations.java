@@ -46,7 +46,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int location=0;location<num_locations;location++) {
 					p=p+Math.exp(likelihoodModel.logprobability(parent.location, location, parent.time, child.time));
 					if (d<=p) {
-						parent.children.add(new Node(location,child.time,num_locations));
+						child.location=location;
 						break;
 					}
 				}			

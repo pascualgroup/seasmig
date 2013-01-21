@@ -176,32 +176,27 @@ public class Data
 			for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
 				nexsusTreeTail.add(nexsusTrees.get(i));
 			}
-			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");
-			int i=0;
-			for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-				// TOOD: pick random trees from tail
-				if (i>config.numTestTrees) break;
-				i=i+1;
-				System.out.println(i);
-				TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree) tree);
+			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
+			for (int i=0; i<config.numTestTrees;i++) {				
+				TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree) nexsusTreeTail.get(Random.nextInt(nexsusTreeTail.size())));
 				testTree.fillRandomTraits();
 				testTree.removeInternalLocations();
 				trees.add(testTree);				
 			}
 
-			System.out.println(" generated "+trees.size()+" random model tips with random input tree topology");
+			System.out.println(" generated "+trees.size()+" random model tips with input trees topology");
 			System.out.print("Generating test models... ");
 
 			testModels = new ArrayList<MigrationBaseModel>();
 
-			for (i=0; i<config.numTestRepeats; i++) {
+			for (int i=0; i<config.numTestRepeats; i++) {
 				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, config.disturbanceScale*i,99999)));
 			}
-			for (i=0; i<config.numTestRepeats; i++) {
+			for (int i=0; i<config.numTestRepeats; i++) {
 				double phase = Math.max(0,Math.min(1,0.3+i/3*(Random.nextDouble()-0.5))); double length = 0.5;
 				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,config.disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,config.disturbanceScale*i/3,99999),phase, phase+length));
 			}
-			for (i=0; i<config.numTestRepeats; i++) {
+			for (int i=0; i<config.numTestRepeats; i++) {
 				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,config.disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,config.disturbanceScale*i/3,1),disturbMigrationMatrix(phases,config.disturbanceScale*i/3,1)));
 			}
 			System.out.println(" generated "+testModels.size()+" test models");
