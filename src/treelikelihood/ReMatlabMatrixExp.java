@@ -26,6 +26,9 @@ function F = expm(A)
 		%   exponential revisited. SIAM J. Matrix Anal. Appl.,
 		%   26(4) (2005), pp. 1179-1193.
 		%
+		%   Nicholas J. Higham
+		%   Copyright 1984-2005 The MathWorks, Inc.
+		%   $Revision: 5.10.4.6 $  $Date: 2005/11/18 14:15:53 $
 
 		[m_vals, theta, classA] = expmchk; % Initialization
 		normA = norm(A,1);
@@ -51,7 +54,7 @@ function F = expm(A)
 		% End of expm
  */
 
-public class MyMatrixExp implements MatrixExponentiator {
+public class ReMatlabMatrixExp implements MatrixExponentiator {
 
 	// Pade Coefficients m based ("not zero based")
 	/*
@@ -101,24 +104,17 @@ public class MyMatrixExp implements MatrixExponentiator {
 			5.371920351148152e+000}; // m_vals = 13
 
 	static final DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Util.minValue);
-	
-	DoubleMatrix2D[] Q2ts;
-	DoubleMatrix2D[] Q4ts;
-	DoubleMatrix2D[] Q6ts;
-	DoubleMatrix2D[] Q8ts;
 
 	DoubleMatrix2D Q;
 
-	public MyMatrixExp(DoubleMatrix2D Q_) {
-		Q = Q_;
-		
-		Q2ts = new DoubleMatrix2D[13];
-		Q4ts = new DoubleMatrix2D[13];
-		Q6ts = new DoubleMatrix2D[13];
-		Q8ts = new DoubleMatrix2D[13];
-//		for (int i=-10;i<3;i++) {
-//			DoubleMatrix2D[][]
-//		}
+	private double norm1Q;
+
+	private DoubleMatrix2D eye;
+
+	public ReMatlabMatrixExp(double[][] Q_) {
+		Q = DoubleFactory2D.dense.make(Q_);	
+		norm1Q = algebra.norm1(Q);
+		eye=DoubleFactory2D.dense.identity(Q.rows());
 	}
 
 	/*
@@ -166,14 +162,13 @@ public class MyMatrixExp implements MatrixExponentiator {
 	        end
 	    end
 	 */
-	static DoubleMatrix2D padeApproximantOfDegree(int m, DoubleMatrix2D A) {
+	DoubleMatrix2D padeApproximantOfDegree(int m, DoubleMatrix2D A) {
 		// TODO: use Q powers to quickly calculate A powers when precision allows!	
 
 		//	c = getPadeCoefficients (in constructor)
 		DoubleMatrix2D[] Apowers; 
 		DoubleMatrix2D U = null;
 		DoubleMatrix2D V = null;
-		DoubleMatrix2D eye = DoubleFactory2D.dense.identity(A.rows());
 		DoubleMatrix2D F;
 
 		// Evaluate Pade approximant.
@@ -222,8 +217,7 @@ public class MyMatrixExp implements MatrixExponentiator {
 		// TODO: optimize this
 		DoubleMatrix2D VplusU = V.copy().assign(U,DoubleFunctions.plus); 
 		DoubleMatrix2D VminusU = V.assign(U,DoubleFunctions.minus);
-		F = algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
-		return F;
+		return algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
 	}
 
 	static DoubleMatrix2D zSum3(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,double alpha,double beta, double gamma) {
@@ -243,22 +237,22 @@ public class MyMatrixExp implements MatrixExponentiator {
 
 	@Override
 	public DoubleMatrix2D expm(double tt) {
-		System.err.println(tt);
+
 		//	Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
-		DoubleMatrix2D A = Q.copy().assign(DoubleFunctions.mult(tt));
-		double normA = algebra.norm1(A);
+		double normA = norm1Q*tt;
 		DoubleMatrix2D F=null;
 
 		if (normA <= theta[theta.length-1]) { //		if normA <= theta(end)
 			//	no scaling and squaring is required.
 			for (int i=0;i<m_vals.length;i++) {
 				if (normA <= theta[i]) {
-					F = padeApproximantOfDegree(m_vals[i],A);
+					F = padeApproximantOfDegree(m_vals[i],tt);
 					break;
 				}
 			}
 		}
 		else {
+			DoubleMatrix2D A = Q.copy().assign(DoubleFunctions.mult(tt));
 			FRexpResult ts = Util.log2(normA/theta[theta.length-1]); 	// [t s] = log2(normA/theta(end));
 			int s = ts.e;
 			double t = ts.f;
@@ -268,6 +262,65 @@ public class MyMatrixExp implements MatrixExponentiator {
 			for (int i=0;i<s;i++) 
 				F=F.zMult(F, null); // F = F*F;  % Squaring
 		}
+		return F;
+	}
+
+	private DoubleMatrix2D padeApproximantOfDegree(int m, double tt) {
+		// TODO: use Q powers to quickly calculate A powers when precision allows!	
+
+		//	c = getPadeCoefficients (in constructor)
+		DoubleMatrix2D[] Apowers; 
+		DoubleMatrix2D U = null;
+		DoubleMatrix2D V = null;
+		DoubleMatrix2D F;
+
+		// Evaluate Pade approximant.
+		switch (m) {
+
+		case 3: case 5: case 7: case 9:
+			//Apowers = cell(ceil((m+1)/2),1);
+			Apowers = new DoubleMatrix2D[(m+1)/2]; 
+			// Apowers{1} = eye(n,classA);
+			Apowers[0]= eye;
+			// Apowers{2} = A*A;
+			Apowers[1]=Q.zMult(Q,null,tt*tt,0,false,false);
+			for (int j=2;j<(m+1)/2;j++)  // for j = 3:ceil((m+1)/2)
+				Apowers[j]=Apowers[j-1].zMult(Apowers[1], null); // Apowers{j} = Apowers{j-1}*Apowers{2};
+			
+			U = DoubleFactory2D.dense.make(Q.rows(),Q.rows());
+			V = DoubleFactory2D.dense.make(Q.rows(),Q.rows());
+						
+			// for j = m+1:-2:2
+			for (int j=m;j>=1;j-=2)  // convert j to zero based index
+				U.assign(Apowers[(j-1)/2],DoublePlusMultSecond.plusMult(c[m][j])); //  U = U + c(j)*Apowers{j/2};
+			
+			U=Q.zMult(U, null,tt,0,false,false); // U = A*U;
+
+			// for j = m:-2:1
+			for (int j=(m-1);j>=0;j-=2) 
+				//				V = V + c(j)*Apowers{(j+1)/2};
+				V.assign(Apowers[j/2],DoublePlusMultSecond.plusMult(c[m][j]));
+
+			break;
+		case 13: 
+			// % For optimal evaluation need different formula for m >= 12.
+			DoubleMatrix2D A2 = Q.zMult(Q, null,tt*tt,0,false,false); 	// A2 = A*A; 
+			DoubleMatrix2D A4 = A2.zMult(A2, null);
+			DoubleMatrix2D A6 = A4.zMult(A2, null);
+			//  U = A * 
+			// (A6*(c(14)*A6 + c(12)*A4 + c(10)*A2) 
+			//  + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA)  
+			// );
+			U = Q.zMult(A6.zMult(zSum3(A6,A4,A2,c[m][13],c[m][11],c[m][9]),null).assign(zSum4(A6,A4,A2,eye,c[m][7],c[m][5],c[m][3],c[m][1]),DoubleFunctions.plus),null,tt,0,false,false);
+
+			//	V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) 
+			//  + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
+			V = A6.zMult(zSum3(A6,A4,A2,c[m][12],c[m][10],c[m][8]),null).assign(zSum4(A6,A4,A2,eye,c[m][6],c[m][4],c[m][2],c[m][0]),DoubleFunctions.plus);	                    
+		}
+		// TODO: optimize this
+		DoubleMatrix2D VplusU = V.copy().assign(U,DoubleFunctions.plus); 
+		DoubleMatrix2D VminusU = V.assign(U,DoubleFunctions.minus);
+		F = algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
 		return F;
 	}
 

@@ -184,7 +184,7 @@ public class Data
 				trees.add(testTree);				
 			}
 
-			System.out.println(" generated "+trees.size()+" random model tips with input trees topology");
+			System.out.println("Generated "+trees.size()+" model based random tip annotations with input tree topology");
 			System.out.print("Generating test models... ");
 
 			testModels = new ArrayList<MigrationBaseModel>();

@@ -10,26 +10,26 @@ import cern.jet.math.tdouble.DoublePlusMultSecond;
 
 public class MatlabMatrixExp implements MatrixExponentiator {
 
-	DoubleMatrix2D Q;
+	double[][] Q;
 	DenseDoubleAlgebra algebra = new DenseDoubleAlgebra();
 	DoubleMatrix2D eye; 
 	static final double q = 6.0;
 	
-	public MatlabMatrixExp(DoubleMatrix2D Q_) {
-		Q = Q_;	
-		eye = DoubleFactory2D.dense.identity(Q.rows());
+	public MatlabMatrixExp(double[][] testMatrix) {
+		Q = testMatrix;	
+		eye = DoubleFactory2D.dense.identity(Q.length);
 	}
 	
 	public DoubleMatrix2D eye() {
-		return DoubleFactory2D.dense.identity(Q.rows()); // TODO: change to dynamic call...
+		return DoubleFactory2D.dense.identity(Q.length); // TODO: change to dynamic call...
 	}
 	
 	public double norm_inf() {
 		double returnValue = Double.NEGATIVE_INFINITY;
-		for (int i=0; i<Q.rows();i++) {
+		for (int i=0; i<Q.length;i++) {
 			double rowSum=0;
-			for (int j=0; j<Q.rows();j++) {
-				rowSum=rowSum+Math.abs(Q.get(i, j));
+			for (int j=0; j<Q.length;j++) {
+				rowSum=rowSum+Math.abs(Q[i][j]);
 			}
 			if (rowSum>returnValue) {
 				returnValue=rowSum;
@@ -91,7 +91,7 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 	@Override
 	public DoubleMatrix2D expm(double t) {
 		
-		DoubleMatrix2D A = Q.copy().assign(DoubleFunctions.mult(t));
+		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(DoubleFunctions.mult(t));
 		FRexpResult fe = Util.log2(algebra.normInfinity(A)); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
 		long s = Math.max(0, fe.e+1); //  s = max ( 0, e + 1 );
 		A.assign(cern.jet.math.tdouble.DoubleFunctions.div(1L<<s)); // A = A / 2^s;

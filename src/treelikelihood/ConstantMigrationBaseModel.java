@@ -10,7 +10,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	static final double timePrecision = 1.0/365.0;
 
 	// Rate Matrix  
-	DoubleMatrix2D Q;
+	final double[][] Q;
 	private int num_locations = 0;		
 
 	// cache
@@ -22,7 +22,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Constructor	
 	public ConstantMigrationBaseModel(double[][] Q_) {	
-		Q = DoubleFactory2D.dense.make(Q_);
+		Q = Q_;
 		num_locations=Q_.length;
 		matrixExponentiator=new Matlab7MatrixExp(Q);
 		//matrixExponentiator=new TaylorMatrixExp(Q);
@@ -66,18 +66,18 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	@Override
 	public String print() {		
 		String returnValue = "{";
-		for (int i=0; i<Q.rows();i++) {
+		for (int i=0; i<Q.length;i++) {
 			if (i!=0) 
 				returnValue+=" ";
 			returnValue+="{";
-			for (int j=0; j<Q.columns();j++) {
-				returnValue+=String.format("%6.3f",Q.get(i, j));
-				if (j!=Q.columns()-1) {
+			for (int j=0; j<Q.length;j++) {
+				returnValue+=String.format("%6.3f",Q[i][j]);
+				if (j!=Q.length-1) {
 					returnValue+=",";
 				}
 			}			
 			returnValue+="}";
-			if (i!=Q.rows()-1) {
+			if (i!=Q.length-1) {
 				returnValue+=",\n";
 			}			
 		}
@@ -88,18 +88,18 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	@Override
 	public String parse() {		
 		String returnValue = "{";
-		for (int i=0; i<Q.rows();i++) {
+		for (int i=0; i<Q.length;i++) {
 			if (i!=0) 
 				returnValue+=" ";
 			returnValue+="{";
-			for (int j=0; j<Q.columns();j++) {
-				returnValue+=String.format("%6.3f",Q.get(i, j));
-				if (j!=Q.columns()-1) {
+			for (int j=0; j<Q.length;j++) {
+				returnValue+=String.format("%6.3f",Q[i][j]);
+				if (j!=Q.length-1) {
 					returnValue+=",";
 				}
 			}			
 			returnValue+="}";
-			if (i!=Q.rows()-1) {
+			if (i!=Q.length-1) {
 				returnValue+=",";
 			}			
 		}

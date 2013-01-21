@@ -105,9 +105,9 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	static final DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Util.minValue);
 
-	DoubleMatrix2D Q;
+	final double[][] Q;
 
-	public Matlab7MatrixExp(DoubleMatrix2D Q_) {
+	public Matlab7MatrixExp(double[][] Q_) {
 		Q = Q_;	
 	}
 
@@ -235,7 +235,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 	public DoubleMatrix2D expm(double tt) {
 
 		//	Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
-		DoubleMatrix2D A = Q.copy().assign(DoubleFunctions.mult(tt));
+		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(DoubleFunctions.mult(tt));
 		double normA = algebra.norm1(A);
 		DoubleMatrix2D F=null;
 

@@ -6,12 +6,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.GregorianCalendar;
 
-import jebl.evolution.substmodel.MatrixExponential;
-
 import mc3kit.FormattingLogger;
 import mc3kit.MCMC;
 import mc3kit.PowerHeatFunction;
-import mc3kit.graphical.step.BlockDifferentialEvolutionStep;
 import mc3kit.graphical.step.PriorLikelihoodOutputStep;
 import mc3kit.graphical.step.SampleOutputStep;
 import mc3kit.graphical.step.SwapStep;
@@ -28,6 +25,7 @@ import treelikelihood.LikelihoodTree;
 import treelikelihood.Matlab7MatrixExp;
 import treelikelihood.MatlabMatrixExp;
 import treelikelihood.MatrixExponentiator;
+import treelikelihood.ReMatlabMatrixExp;
 import treelikelihood.TaylorMatrixExp;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
@@ -213,17 +211,19 @@ public class SeasonalMigrationMain
 		System.out.println("Testing matrix exponentiation:");
 
 		for (int i=1;i<100;i++) {
-			DoubleMatrix2D testMatrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(Data.makeRandomMigrationMatrix(n,(double) i/100.0));
+			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
 			MatrixExponentiator test1 = new MatlabMatrixExp(testMatrix);
 			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);
 			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);
+			MatrixExponentiator test4 = new ReMatlabMatrixExp(testMatrix);
 
 			for (double t=0;t<500;t=(t+0.000001)*2) {
 				String res1=test1.expm(t).toString();
 				String res2=test2.expm(t).toString();
 				String res3=test3.expm(t).toString();
+				String res4=test4.expm(t).toString();
 	
-				if (res1.equalsIgnoreCase(res2) && res2.equalsIgnoreCase(res3)) {
+				if (res1.equalsIgnoreCase(res2) && res2.equalsIgnoreCase(res3) && res3.equalsIgnoreCase(res4)) {
 					System.out.print(".");
 				}
 				else {
@@ -231,38 +231,51 @@ public class SeasonalMigrationMain
 					System.out.println("MatlabMatrixExp:\n "+test1.expm(t).toString());
 					System.out.println("Matlab7MatrixExp:\n "+test2.expm(t).toString());
 					System.out.println("TaylorMatrixExp:\n "+test3.expm(t).toString());
+					System.out.println("ReMatlabMatrixExp:\n "+test4.expm(t).toString());
 				}
 			}
 			if (i%10==0) System.out.println();
 		}
+		
+		long startTime4= System.currentTimeMillis();		
+		for (int i=1;i<200;i++) {
+			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
+			MatrixExponentiator test4 = new ReMatlabMatrixExp(testMatrix);;
+			for (int j=0;j<1200;j++) {
+				DoubleMatrix2D res4=test4.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+				if (Math.random()<0.0000000000001) System.out.println(res4);
+			}
+		}
+		long time4= System.currentTimeMillis()-startTime4;
+		
 		long startTime1= System.currentTimeMillis();		
-		for (int i=1;i<1000;i++) {
-			DoubleMatrix2D testMatrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(Data.makeRandomMigrationMatrix(n,(double) i/100.0));
+		for (int i=1;i<200;i++) {
+			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
 			MatrixExponentiator test1 = new MatlabMatrixExp(testMatrix);
-			for (double t=0;t<500;t=(t+0.000001)*2) {
-				DoubleMatrix2D res1=test1.expm(t);
+			for (int j=0;j<1200;j++) {
+				DoubleMatrix2D res1=test1.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
 				if (Math.random()<0.0000000000001) System.out.println(res1);
 			}
 		}
 		long time1= System.currentTimeMillis()-startTime1;
 		
 		long startTime2= System.currentTimeMillis();		
-		for (int i=1;i<1000;i++) {
-			DoubleMatrix2D testMatrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(Data.makeRandomMigrationMatrix(n,(double) i/100.0));
-			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);;
-			for (double t=0;t<500;t=(t+0.000001)*2) {
-				DoubleMatrix2D res2=test2.expm(t);
+		for (int i=1;i<200;i++) {
+			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
+			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);
+			for (int j=0;j<1200;j++) {
+				DoubleMatrix2D res2=test2.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
 				if (Math.random()<0.0000000000001) System.out.println(res2);
 			}
 		}
 		long time2= System.currentTimeMillis()-startTime2;
 		
 		long startTime3= System.currentTimeMillis();		
-		for (int i=1;i<1000;i++) {
-			DoubleMatrix2D testMatrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(Data.makeRandomMigrationMatrix(n,(double) i/100.0));
+		for (int i=1;i<200;i++) {
+			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
 			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);;
-			for (double t=0;t<500;t=(t+0.000001)*2) {
-				DoubleMatrix2D res3=test3.expm(t);
+			for (int j=0;j<1200;j++) {
+				DoubleMatrix2D res3=test3.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
 				if (Math.random()<0.0000000000001) System.out.println(res3);
 			}
 		}
@@ -272,6 +285,7 @@ public class SeasonalMigrationMain
 		System.out.println("MatlabMatrixExp: "+time1+"ms");
 		System.out.println("Matlab7MatrixExp: "+time2+"ms");
 		System.out.println("TaylorMatrixExp: "+time3+"ms");
+		System.out.println("ReMatlabMatrixExp: "+time4+"ms");
 		
 		System.out.println("\nCompleted matrix exponentiation test");
 
