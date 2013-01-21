@@ -163,8 +163,8 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		DoubleMatrix2D[] Apowers; 
 		DoubleMatrix2D U = null;
 		DoubleMatrix2D V = null;
-		DoubleMatrix2D eye = DoubleFactory2D.dense.identity(A.rows());
-		DoubleMatrix2D F;
+		DoubleMatrix2D eye = DoubleFactory2D.dense.identity(A.rows());		
+		DoubleMatrix2D A2 = A.zMult(A, null); 	// A2 = A*A; 
 
 		// Evaluate Pade approximant.
 		switch (m) {
@@ -175,7 +175,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			// Apowers{1} = eye(n,classA);
 			Apowers[0]= eye;
 			// Apowers{2} = A*A;
-			Apowers[1]=A.zMult(A,null);
+			Apowers[1]=A2;
 			for (int j=2;j<(m+1)/2;j++)  // for j = 3:ceil((m+1)/2)
 				Apowers[j]=Apowers[j-1].zMult(Apowers[1], null); // Apowers{j} = Apowers{j-1}*Apowers{2};
 			
@@ -195,8 +195,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 			break;
 		case 13: 
-			// % For optimal evaluation need different formula for m >= 12.
-			DoubleMatrix2D A2 = A.zMult(A, null); 	// A2 = A*A; 
+			// % For optimal evaluation need different formula for m >= 12.		
 			DoubleMatrix2D A4 = A2.zMult(A2, null);
 			DoubleMatrix2D A6 = A4.zMult(A2, null);
 			//  U = A * 
@@ -212,8 +211,8 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		// TODO: optimize this
 		DoubleMatrix2D VplusU = V.copy().assign(U,DoubleFunctions.plus); 
 		DoubleMatrix2D VminusU = V.assign(U,DoubleFunctions.minus);
-		F = algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
-		return F;
+		return algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
+
 	}
 
 	static DoubleMatrix2D zSum3(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,double alpha,double beta, double gamma) {

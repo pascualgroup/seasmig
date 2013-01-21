@@ -105,16 +105,16 @@ public class ReMatlabMatrixExp implements MatrixExponentiator {
 
 	static final DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Util.minValue);
 
-	DoubleMatrix2D Q;
+	double[][] Q;
 
 	private double norm1Q;
 
 	private DoubleMatrix2D eye;
 
 	public ReMatlabMatrixExp(double[][] Q_) {
-		Q = DoubleFactory2D.dense.make(Q_);	
-		norm1Q = algebra.norm1(Q);
-		eye=DoubleFactory2D.dense.identity(Q.rows());
+		Q = Q_;	
+		norm1Q = algebra.norm1(DoubleFactory2D.dense.make(Q));
+		eye=DoubleFactory2D.dense.identity(Q.length);
 	}
 
 	/*
@@ -169,7 +169,6 @@ public class ReMatlabMatrixExp implements MatrixExponentiator {
 		DoubleMatrix2D[] Apowers; 
 		DoubleMatrix2D U = null;
 		DoubleMatrix2D V = null;
-		DoubleMatrix2D F;
 
 		// Evaluate Pade approximant.
 		switch (m) {
@@ -184,17 +183,18 @@ public class ReMatlabMatrixExp implements MatrixExponentiator {
 			for (int j=2;j<(m+1)/2;j++)  // for j = 3:ceil((m+1)/2)
 				Apowers[j]=Apowers[j-1].zMult(Apowers[1], null); // Apowers{j} = Apowers{j-1}*Apowers{2};
 			
-			U = DoubleFactory2D.dense.make(A.rows(),A.rows());
-			V = DoubleFactory2D.dense.make(A.rows(),A.rows());
+			U = Apowers[(m-1)/2].copy().assign(DoubleFunctions.mult(c[m][m]));
 						
 			// for j = m+1:-2:2
-			for (int j=m;j>=1;j-=2)  // convert j to zero based index
+			for (int j=m-2;j>=1;j-=2)  // convert j to zero based index
 				U.assign(Apowers[(j-1)/2],DoublePlusMultSecond.plusMult(c[m][j])); //  U = U + c(j)*Apowers{j/2};
 			
 			U=A.zMult(U, null); // U = A*U;
+			
+			V = Apowers[(m-1)/2].copy().assign(DoubleFunctions.mult(c[m][m-1]));
 
 			// for j = m:-2:1
-			for (int j=(m-1);j>=0;j-=2) 
+			for (int j=(m-3);j>=0;j-=2) 
 				//				V = V + c(j)*Apowers{(j+1)/2};
 				V.assign(Apowers[j/2],DoublePlusMultSecond.plusMult(c[m][j]));
 
@@ -252,7 +252,7 @@ public class ReMatlabMatrixExp implements MatrixExponentiator {
 			}
 		}
 		else {
-			DoubleMatrix2D A = Q.copy().assign(DoubleFunctions.mult(tt));
+			DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(DoubleFunctions.mult(tt));
 			FRexpResult ts = Util.log2(normA/theta[theta.length-1]); 	// [t s] = log2(normA/theta(end));
 			int s = ts.e;
 			double t = ts.f;
@@ -273,6 +273,8 @@ public class ReMatlabMatrixExp implements MatrixExponentiator {
 		DoubleMatrix2D U = null;
 		DoubleMatrix2D V = null;
 		DoubleMatrix2D F;
+		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(DoubleFunctions.mult(tt));
+		DoubleMatrix2D A2 = A.zMult(A,null);	
 
 		// Evaluate Pade approximant.
 		switch (m) {
@@ -282,19 +284,19 @@ public class ReMatlabMatrixExp implements MatrixExponentiator {
 			Apowers = new DoubleMatrix2D[(m+1)/2]; 
 			// Apowers{1} = eye(n,classA);
 			Apowers[0]= eye;
-			// Apowers{2} = A*A;
-			Apowers[1]=Q.zMult(Q,null,tt*tt,0,false,false);
+			// Apowers{2} = A*A;			
+			Apowers[1]=A2;
 			for (int j=2;j<(m+1)/2;j++)  // for j = 3:ceil((m+1)/2)
 				Apowers[j]=Apowers[j-1].zMult(Apowers[1], null); // Apowers{j} = Apowers{j-1}*Apowers{2};
 			
-			U = DoubleFactory2D.dense.make(Q.rows(),Q.rows());
-			V = DoubleFactory2D.dense.make(Q.rows(),Q.rows());
+			U = DoubleFactory2D.dense.make(Q.length,Q.length);
+			V = DoubleFactory2D.dense.make(Q.length,Q.length);
 						
 			// for j = m+1:-2:2
 			for (int j=m;j>=1;j-=2)  // convert j to zero based index
 				U.assign(Apowers[(j-1)/2],DoublePlusMultSecond.plusMult(c[m][j])); //  U = U + c(j)*Apowers{j/2};
 			
-			U=Q.zMult(U, null,tt,0,false,false); // U = A*U;
+			U=A.zMult(U, null); // U = A*U;
 
 			// for j = m:-2:1
 			for (int j=(m-1);j>=0;j-=2) 
@@ -304,14 +306,14 @@ public class ReMatlabMatrixExp implements MatrixExponentiator {
 			break;
 		case 13: 
 			// % For optimal evaluation need different formula for m >= 12.
-			DoubleMatrix2D A2 = Q.zMult(Q, null,tt*tt,0,false,false); 	// A2 = A*A; 
+
 			DoubleMatrix2D A4 = A2.zMult(A2, null);
 			DoubleMatrix2D A6 = A4.zMult(A2, null);
 			//  U = A * 
 			// (A6*(c(14)*A6 + c(12)*A4 + c(10)*A2) 
 			//  + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA)  
 			// );
-			U = Q.zMult(A6.zMult(zSum3(A6,A4,A2,c[m][13],c[m][11],c[m][9]),null).assign(zSum4(A6,A4,A2,eye,c[m][7],c[m][5],c[m][3],c[m][1]),DoubleFunctions.plus),null,tt,0,false,false);
+			U = A.zMult(A6.zMult(zSum3(A6,A4,A2,c[m][13],c[m][11],c[m][9]),null).assign(zSum4(A6,A4,A2,eye,c[m][7],c[m][5],c[m][3],c[m][1]),DoubleFunctions.plus),null);
 
 			//	V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) 
 			//  + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
