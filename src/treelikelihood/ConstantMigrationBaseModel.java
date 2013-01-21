@@ -25,6 +25,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		Q = DoubleFactory2D.dense.make(Q_);
 		num_locations=Q_.length;
 		matrixExponentiator=new Matlab7MatrixExp(Q);
+		//matrixExponentiator=new TaylorMatrixExp(Q);
 	}
 
 	// Methods

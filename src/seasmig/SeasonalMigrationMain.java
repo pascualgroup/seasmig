@@ -235,6 +235,43 @@ public class SeasonalMigrationMain
 			}
 			if (i%10==0) System.out.println();
 		}
+		long startTime1= System.currentTimeMillis();		
+		for (int i=1;i<1000;i++) {
+			DoubleMatrix2D testMatrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(Data.makeRandomMigrationMatrix(n,(double) i/100.0));
+			MatrixExponentiator test1 = new MatlabMatrixExp(testMatrix);
+			for (double t=0;t<500;t=(t+0.000001)*2) {
+				DoubleMatrix2D res1=test1.expm(t);
+				if (Math.random()<0.0000000000001) System.out.println(res1);
+			}
+		}
+		long time1= System.currentTimeMillis()-startTime1;
+		
+		long startTime2= System.currentTimeMillis();		
+		for (int i=1;i<1000;i++) {
+			DoubleMatrix2D testMatrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(Data.makeRandomMigrationMatrix(n,(double) i/100.0));
+			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);;
+			for (double t=0;t<500;t=(t+0.000001)*2) {
+				DoubleMatrix2D res2=test2.expm(t);
+				if (Math.random()<0.0000000000001) System.out.println(res2);
+			}
+		}
+		long time2= System.currentTimeMillis()-startTime2;
+		
+		long startTime3= System.currentTimeMillis();		
+		for (int i=1;i<1000;i++) {
+			DoubleMatrix2D testMatrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(Data.makeRandomMigrationMatrix(n,(double) i/100.0));
+			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);;
+			for (double t=0;t<500;t=(t+0.000001)*2) {
+				DoubleMatrix2D res3=test3.expm(t);
+				if (Math.random()<0.0000000000001) System.out.println(res3);
+			}
+		}
+		long time3= System.currentTimeMillis()-startTime3;
+		
+		System.out.println("----------------------------");
+		System.out.println("MatlabMatrixExp: "+time1+"ms");
+		System.out.println("Matlab7MatrixExp: "+time2+"ms");
+		System.out.println("TaylorMatrixExp: "+time3+"ms");
 		
 		System.out.println("\nCompleted matrix exponentiation test");
 

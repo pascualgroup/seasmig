@@ -26,9 +26,6 @@ function F = expm(A)
 		%   exponential revisited. SIAM J. Matrix Anal. Appl.,
 		%   26(4) (2005), pp. 1179-1193.
 		%
-		%   Nicholas J. Higham
-		%   Copyright 1984-2005 The MathWorks, Inc.
-		%   $Revision: 5.10.4.6 $  $Date: 2005/11/18 14:15:53 $
 
 		[m_vals, theta, classA] = expmchk; % Initialization
 		normA = norm(A,1);
@@ -54,7 +51,7 @@ function F = expm(A)
 		% End of expm
  */
 
-public class Matlab7MatrixExp implements MatrixExponentiator {
+public class MyMatrixExp implements MatrixExponentiator {
 
 	// Pade Coefficients m based ("not zero based")
 	/*
@@ -104,11 +101,24 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			5.371920351148152e+000}; // m_vals = 13
 
 	static final DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Util.minValue);
+	
+	DoubleMatrix2D[] Q2ts;
+	DoubleMatrix2D[] Q4ts;
+	DoubleMatrix2D[] Q6ts;
+	DoubleMatrix2D[] Q8ts;
 
 	DoubleMatrix2D Q;
 
-	public Matlab7MatrixExp(DoubleMatrix2D Q_) {
-		Q = Q_;	
+	public MyMatrixExp(DoubleMatrix2D Q_) {
+		Q = Q_;
+		
+		Q2ts = new DoubleMatrix2D[13];
+		Q4ts = new DoubleMatrix2D[13];
+		Q6ts = new DoubleMatrix2D[13];
+		Q8ts = new DoubleMatrix2D[13];
+//		for (int i=-10;i<3;i++) {
+//			DoubleMatrix2D[][]
+//		}
 	}
 
 	/*
@@ -233,7 +243,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	@Override
 	public DoubleMatrix2D expm(double tt) {
-
+		System.err.println(tt);
 		//	Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
 		DoubleMatrix2D A = Q.copy().assign(DoubleFunctions.mult(tt));
 		double normA = algebra.norm1(A);

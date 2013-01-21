@@ -37,7 +37,7 @@ public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusCon
 			// When locations are different we assume that the baseline migration model estimates the probability regardless of the actual state values 			
 			double xs = from_state - ampAnnual*Math.sin(2*Math.PI*from_time+2*Math.PI*phaseAnnual)+ampBiannual*Math.sin(4*Math.PI*from_time+2*Math.PI*phaseBiannual);
 			double xt = to_state -ampAnnual*Math.sin(2*Math.PI*to_time+2*Math.PI*phaseAnnual)+ampBiannual*Math.sin(4*Math.PI*to_time+2*Math.PI*phaseBiannual);
-			double var = Math.abs(to_time-from_time+Double.MIN_VALUE)*alpha;			
+			double var = Math.abs(to_time-from_time+Util.minValue)*alpha;			
 			return -Math.log(2*Math.PI*var)/2.0+(xt-xs)*(xt-xs)/(2*var); 
 		}
 

@@ -11,8 +11,7 @@ import mc3kit.LogLevel;
 
 public class Config
 {
-	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,	SINUSOIDAL }; //TODO: DEBUG SINUSODIAL
-																  //TODO: ADD CONTINUOUS SEASONAL MODEL
+	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,	SINUSOIDAL }; //TODO: DEBUG SINUSODIAL //TODO: ADD CONTINUOUS SEASONAL MODEL
 	enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
 	enum RunMode {	NORMAL,	TEST1, TEST2};
@@ -62,11 +61,16 @@ public class Config
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 1000; // at most number of trees to read from tree file's tail
 	
-	// TEST RELATED PARAMETERS
-	public int numTestTrees = 99;
+	// TEST RELATED PARAMETERS	
+	// TEST1+TEST2
+	public int numTestTrees = 2;
+
+	// TEST1
 	public int numTestTips = 1200;
 	public int numTestRepeats = 5; 
 	public double disturbanceScale = 0.3;
+		
+	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) throws IOException {
 		File configOutputFile = new File("out.config.json");
 		configOutputFile.delete();

@@ -10,12 +10,9 @@ import jebl.evolution.trees.SimpleRootedTree;
 
 public class TreeWithLocations implements LikelihoodTree {
 
-	// Tree read parameters
-	//static final private double jitter=0.001;
-
 	// Tree generate parameters for test purpose
-	static final private double branchLengthMean = 0.1;
-	static final private double branchLengthVariance = 3.0;
+	static final private double testBranchLengthMean = 0.1;
+	static final private double testBranchLengthVariance = 3.0;
 
 	// Tree & Model
 	Node root = null;		
@@ -89,7 +86,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public double logLikelihood() {
 		double[] alphas=new double[num_locations];
-		double min = Double.MIN_VALUE;
+		double min = Util.minValue;
 		if (root.location==MigrationBaseModel.UNKNOWN_LOCATION) {
 			for (int rootLocation=0;rootLocation<num_locations;rootLocation++) {				
 				double alpha=conditionalLogLikelihood(root, rootLocation);
@@ -220,7 +217,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			for (int child=0;child<2;child++) {
 				double d = cern.jet.random.Uniform.staticNextDouble();
 				// Decide on branch length
-				double to_time = from.time+cern.jet.random.Gamma.staticNextDouble(branchLengthMean*branchLengthMean/branchLengthVariance,1.0/(branchLengthVariance/branchLengthMean));
+				double to_time = from.time+cern.jet.random.Gamma.staticNextDouble(testBranchLengthMean*testBranchLengthMean/testBranchLengthVariance,1.0/(testBranchLengthVariance/testBranchLengthMean));
 				double p=0;		
 
 				for (int location=0;location<num_locations;location++) {

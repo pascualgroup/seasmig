@@ -2,31 +2,26 @@ package treelikelihood;
 
 public class Util {
 	
+	static final double minValue = 1E-300;
+	
 	static double logSumExp(double[] alphas, double min) {
 		double returnValue;
-		if (min>Double.NEGATIVE_INFINITY ) {
-			double sumExp = 0;
-			for (int i=0;i<alphas.length;i++) {			
-				sumExp=sumExp+Math.exp(alphas[i]-min);
-			}
-			returnValue=min+Math.log(sumExp);
+		double sumExp = 0;
+		for (int i=0;i<alphas.length;i++) {			
+			sumExp=sumExp+Math.exp(alphas[i]-min);
 		}
-		else {
-			double sumExp = 0;
-			for (int i=0;i<alphas.length;i++) {			
-				sumExp=sumExp+Math.exp(alphas[i]);
-			}
-			returnValue=Math.log(sumExp);
-		}
+		returnValue=min+Math.log(sumExp);
 		if (!Double.isNaN(returnValue)) {
 			return returnValue;
 		}
 		else {
+			System.err.println(sumExp);				
 			System.err.println("logSumExp==NaN: alphas: "+alphas+"\nmin="+min);			
-			return Double.MIN_VALUE;
-		}
-			
+			return Util.minValue;			
+		}				
+	
 	}
+	
 	
 	public static FRexpResult log2(double value)
 	{

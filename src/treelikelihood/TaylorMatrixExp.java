@@ -9,14 +9,15 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	// TODO: this has many numerical issues...
 
 	// Precision Parameters...	
-	static final double precision = 1E-80;
+	static final double precision = Util.minValue;
+	static int nTaylor = 500; // Maximum number of Taylor series terms
 	
 	// Cache 
 	Vector<DoubleMatrix2D> cachedQnDivFactorialN = new Vector<DoubleMatrix2D>();
 	Vector<Double> cachedScale = new Vector<Double>();
 	DoubleMatrix2D Q;
 	DoubleMatrix2D zeroMatrix;
-	private int nTaylor = 200;
+	
 	
 	DoubleFactory2D F = DoubleFactory2D.dense; 
 	
@@ -38,25 +39,17 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 		}
 	}
 
-	private double getScale(DoubleMatrix2D Q) {
-		// TODO: redo this...
-		double minScale=Double.MAX_VALUE;;
-		double maxScale=0;
-		for (int i=0; i<Q.rows(); i++) {
-			for (int j=0; j<Q.rows(); j++) {
-				if (Math.abs(Q.get(i, j))<minScale) {
-					minScale = Math.abs(Q.get(i, j));
-				}
-				if (Math.abs(Q.get(i, j))>maxScale) {
-					maxScale = Math.abs(Q.get(i, j));
-				}
+	private double getScale(DoubleMatrix2D Q) {	
+		double norm1=0;
+		for (int i=0; i<Q.columns(); i++) {
+			double absRowSum=0;
+			for (int j=0; j<Q.rows();j++) {
+				absRowSum+=Q.get(j,i);
 			}
+			if (absRowSum>norm1)
+				norm1=absRowSum;
 		}
-		double scale = Math.sqrt(minScale*maxScale);
-		if (scale!=0) 
-			return scale;
-		else
-			return 1.0;
+		return norm1;
 	}
 
 	@Override
