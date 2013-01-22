@@ -2,7 +2,7 @@ package treelikelihood;
 
 public class Util {
 	
-	static final double minValue = 1E-100;
+	static final double minValue = 1E-300;
 	
 	static double logSumExp(double[] alphas, double min) {
 		double returnValue;

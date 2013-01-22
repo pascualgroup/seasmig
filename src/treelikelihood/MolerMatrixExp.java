@@ -12,12 +12,14 @@ public class MolerMatrixExp implements MatrixExponentiator {
 
 	double[][] Q;
 	DenseDoubleAlgebra algebra = new DenseDoubleAlgebra();
-	DoubleMatrix2D eye; 
+	DoubleMatrix2D eye;
+	private double normInfQ; 
 	static final double q = 6.0;
 	
 	public MolerMatrixExp(double[][] testMatrix) {
 		Q = testMatrix;	
 		eye = DoubleFactory2D.dense.identity(Q.length);
+		normInfQ=norm_inf();
 	}
 	
 	public DoubleMatrix2D eye() {
@@ -92,7 +94,7 @@ public class MolerMatrixExp implements MatrixExponentiator {
 	public double[][] expm(double t) {
 		
 		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(DoubleFunctions.mult(t));
-		FRexpResult fe = Util.log2(algebra.normInfinity(A)); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
+		FRexpResult fe = Util.log2(normInfQ*t); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
 		long s = Math.max(0, fe.e+1); //  s = max ( 0, e + 1 );
 		A.assign(cern.jet.math.tdouble.DoubleFunctions.div(1L<<s)); // A = A / 2^s;
 
