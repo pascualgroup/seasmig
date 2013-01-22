@@ -18,7 +18,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.TEST2;
+	public RunMode runMode = RunMode.NORMAL;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -34,13 +34,13 @@ public class Config
 	// in iterations
 	public long thin = 50;
 
-	public long tuneEvery = 100; 
-	public long tuneFor = 100000; 
+	public long tuneEvery = 5; 
+	public long tuneFor = 50000; 
 	
 	public long initialHistoryCount = 10000;
 	public long recordHistoryAfter = 10000;
 	
-	public int chainCount = 4;
+	public int chainCount = 16;
 	public double heatPower = 1.0;
 	
 	// DISPLAY RELATED PARAMTERS
