@@ -32,7 +32,7 @@ public class Config
 
 	// MCMC & LOG RELATED PARAMETERS
 	// in iterations
-	public long thin = 50;
+	public long thin = 20;
 
 	public long tuneEvery = 5; 
 	public long tuneFor = 50000; 
