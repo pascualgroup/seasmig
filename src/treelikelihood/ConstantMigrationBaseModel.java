@@ -24,9 +24,9 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	public ConstantMigrationBaseModel(double[][] Q_) {	
 		Q = Q_;
 		num_locations=Q_.length;
-		//matrixExponentiator=new Matlab7MatrixExp(Q);
+		matrixExponentiator=new Matlab7MatrixExp(Q);
 		//matrixExponentiator=new TaylorMatrixExp(Q);
-		matrixExponentiator=new MolerMatrixExp(Q);
+		//matrixExponentiator=new MolerMatrixExp(Q);
 	}
 
 	// Methods

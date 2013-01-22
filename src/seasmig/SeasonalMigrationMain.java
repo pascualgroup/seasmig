@@ -232,16 +232,7 @@ public class SeasonalMigrationMain
 			if (i%10==0) System.out.println();
 		}
 		
-		long startTime4= System.currentTimeMillis();		
-		for (int i=1;i<200;i++) {
-			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
-			MatrixExponentiator test4 = new ReMolerMatrixExp(testMatrix);;
-			for (int j=0;j<1200;j++) {
-				double[][] res4=test4.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
-				if (Math.random()<0.0000000000001) System.out.println(res4);
-			}
-		}
-		long time4= System.currentTimeMillis()-startTime4;
+		
 		
 		long startTime1= System.currentTimeMillis();		
 		for (int i=1;i<200;i++) {
@@ -276,11 +267,46 @@ public class SeasonalMigrationMain
 		}
 		long time3= System.currentTimeMillis()-startTime3;
 		
+		long startTime4= System.currentTimeMillis();		
+		for (int i=1;i<200;i++) {
+			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
+			MatrixExponentiator test4 = new ReMolerMatrixExp(testMatrix);;
+			for (int j=0;j<1200;j++) {
+				double[][] res4=test4.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+				if (Math.random()<0.0000000000001) System.out.println(res4);
+			}
+		}
+		long time4= System.currentTimeMillis()-startTime4;
+		
+		long startTime5= System.currentTimeMillis();		
+		for (int i=1;i<200;i++) {
+			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
+			MatrixExponentiator test5 = new JblasMatrixExp(testMatrix);;
+			for (int j=0;j<1200;j++) {
+				double[][] res5=test5.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+				if (Math.random()<0.0000000000001) System.out.println(res5);
+			}
+		}
+		long time5= System.currentTimeMillis()-startTime5;
+		
+		long startTime6= System.currentTimeMillis();		
+		for (int i=1;i<200;i++) {
+			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
+			MatrixExponentiator test6 = new JblasMatrixExp(testMatrix);;
+			for (int j=0;j<1200;j++) {
+				double[][] res6=test6.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+				if (Math.random()<0.0000000000001) System.out.println(res6);
+			}
+		}
+		long time6= System.currentTimeMillis()-startTime6;
+		
 		System.out.println("----------------------------");
 		System.out.println("MolerMatrixExp: "+time1+"ms");
 		System.out.println("Matlab7MatrixExp: "+time2+"ms");
 		System.out.println("TaylorMatrixExp: "+time3+"ms");
 		System.out.println("ReMolerMatrixExp: "+time4+"ms");
+		System.out.println("JblasMatrixExp: "+time5+"ms");
+		System.out.println("JeblMatrixExp: "+time6+"ms");
 		
 		System.out.println("\nCompleted matrix exponentiation test");
 
