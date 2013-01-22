@@ -124,7 +124,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 			obj.put("amplitudes", amplitudes);
 			obj.put("phases", phases);
 		}
-		else if(config.migrationSeasonality == Seasonality.TWO_CONSTANT_SEASONS)
+		else if(config.migrationSeasonality == Seasonality.TWO_CONSTANT_SEASONS || config.migrationSeasonality==Seasonality.TWO_CONSTANT_SEASONS_FIXED_PHASE)
 		{
 			double[][] rates2 = new double[config.numLocations][config.numLocations];
 			for(int i = 0; i < config.numLocations; i++)
@@ -167,7 +167,7 @@ public class SeasonalMigrationModel extends GraphicalModel
 					SeasonalMigrationModel.this, "phase_" + i + "_" + j, phasePrior
 				);
 			}
-			else if(config.migrationSeasonality == Config.Seasonality.TWO_CONSTANT_SEASONS)
+			else if(config.migrationSeasonality == Config.Seasonality.TWO_CONSTANT_SEASONS || config.migrationSeasonality == Config.Seasonality.TWO_CONSTANT_SEASONS_FIXED_PHASE )
 			{
 				rate2 = new DoubleVariable(
 					SeasonalMigrationModel.this, "rate2_" + i + "_" + j, ratePrior

@@ -17,42 +17,66 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 	SeasonalMigrationModel model;
 	Config config;
 	Data data;
-	
+
 	double oldLogLikelihood;
 	long stateCount=1;
 	private long time;
 	private long oldTime;
-	
+
 	public SeasonalMigrationLikelihood(SeasonalMigrationModel model, RandomEngine rng) throws MC3KitException
 	{
 		super(model, "likelihood");
-		
+
 		oldTime=System.currentTimeMillis();
-		
+
 		setObserved(true);
-		
+
 		this.model = model;
 		this.config = model.config;		
 		this.data = model.data;
-		
-		// This is the weird way dependencies are declared. It will become unweird someday.
-		
-		if(config.migrationSeasonality == Config.Seasonality.TWO_CONSTANT_SEASONS) 		{
+
+
+		switch (config.migrationSeasonality) {
+
+		case TWO_CONSTANT_SEASONS:
+			// This is the weird way dependencies are declared. It will become unweird someday.
 			new Jack<DoubleValued>(model, this, model.twoMatrixPhase);
-		}
-		
-		for(int i = 0; i < config.numLocations; i++) 		{
-			for(int j = 0; j < config.numLocations; j++) 			{
-				if(i == j) continue;
-				
-				new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
-				if(config.migrationSeasonality == Config.Seasonality.SINUSOIDAL) 				{
+			for(int i = 0; i < config.numLocations; i++) 		{
+				for(int j = 0; j < config.numLocations; j++) 			{
+					if(i == j) continue;
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate2);					
+				}
+			}
+			break;
+		case TWO_CONSTANT_SEASONS_FIXED_PHASE:
+			// This is the weird way dependencies are declared. It will become unweird someday.
+			for(int i = 0; i < config.numLocations; i++) 		{
+				for(int j = 0; j < config.numLocations; j++) 			{
+					if(i == j) continue;
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate2);					
+				}
+			}
+			break;
+		case NONE:
+			for(int i = 0; i < config.numLocations; i++) 		{
+				for(int j = 0; j < config.numLocations; j++) 			{
+					if(i == j) continue;					
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);					
+				}
+			}
+			break;
+		case SINUSOIDAL:
+
+			for(int i = 0; i < config.numLocations; i++) 		{
+				for(int j = 0; j < config.numLocations; j++) 			{
+					if(i == j) continue;
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
 					new Jack<DoubleValued>(model, this, model.rateParams[i][j].amplitude);
-					new Jack<DoubleValued>(model, this, model.rateParams[i][j].phase);
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].phase);			
 				}
-				else if(config.migrationSeasonality ==Config.Seasonality.TWO_CONSTANT_SEASONS) 				{
-					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate2);
-				}
+				break;
 			}
 		}
 	}
@@ -62,10 +86,10 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 		recalculate();
 		return true;
 	}
-	
+
 	void recalculate() throws MC3KitException 	{
 		oldLogLikelihood = getLogP();
-		
+
 		double logLikelihood = 0.0;
 
 		MigrationBaseModel migrationBaseModel = null;
@@ -116,6 +140,32 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			migrationBaseModel = new TwoSeasonMigrationBaseModel(rates,rates2,season1Start,season1End);	
 			break;
+		case TWO_CONSTANT_SEASONS_FIXED_PHASE:		
+			rates = new double[config.numLocations][config.numLocations];
+			rates2 = new double[config.numLocations][config.numLocations];
+			for (int i=0;i<config.numLocations;i++) {
+				double row1sum=0;
+				double row2sum=0;
+				for (int j=0;j<config.numLocations;j++) {		
+					if (i!=j) {
+						rates[i][j]=model.getRateParams(i, j).getRate();
+						row1sum-=rates[i][j];
+						rates2[i][j]=model.getRateParams(i, j).getRate2();
+						row2sum-=rates2[i][j];
+					}
+				}
+				rates[i][i]=row1sum;
+				rates2[i][i]=row2sum;
+			}
+			twoMatrixPhase = config.fixedPhase;
+			// TODO: Add parameter for first season length
+
+			season1Start=0;			
+			season1Start=twoMatrixPhase;
+			season1End=0.5+season1Start;
+
+			migrationBaseModel = new TwoSeasonMigrationBaseModel(rates,rates2,season1Start,season1End);	
+			break;
 
 		case SINUSOIDAL: 
 			// model.getRateParams(i,j).getRate() // overall rate for sinusoidal model
@@ -135,19 +185,19 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 					}
 				}
 			}
-		
+
 			migrationBaseModel = new SinusoidialSeasonalMigrationBaseModel(rates, amp, phase);
 		}
-		
+
 		// TODO: maybe get likelihood to work without copy...
-		
+
 		Uniform uniform = new Uniform(model.rng);
 		LikelihoodTree workingCopy = data.trees.get(uniform.nextIntFromTo(0,data.trees.size()-1)).copy(); 
 		workingCopy.setLikelihoodModel(migrationBaseModel);
 		logLikelihood=workingCopy.logLikelihood();
-		
+
 		setLogP(logLikelihood);
-		
+
 		// TODO: organize this...
 		// Display state per hour....
 		stateCount+=1;
@@ -165,18 +215,18 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			oldTime=time;
 		}
 		//
-	
+
 	}
-	
-	
+
+
 
 	@Override
 	public boolean updateAfterRejection(Set<Jack<?>> changedParents)
 			throws MC3KitException
-	{
+			{
 		setLogP(oldLogLikelihood);
 		return true;
-	}
+			}
 
 	@Override
 	public Object makeOutputObject() {
