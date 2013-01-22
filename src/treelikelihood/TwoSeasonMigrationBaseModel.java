@@ -46,17 +46,18 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	// Methods
 	@Override
 	public double logprobability(int from_state, int to_state, double from_time, double to_time) {		
-		return Math.log(transitionMatrix(from_time, to_time).get(from_state, to_state));
+		return Math.log(transitionMatrix(from_time, to_time)[from_state][to_state]);
 	}
 
 	@Override
-	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {
+	public double[][] transitionMatrix(double from_time, double to_time) {
+		// TODO: remove make
 		double from_time_reminder = from_time % 1.0;
 		double from_time_div = from_time - from_time_reminder;
 		double to_time_reminder = to_time - from_time_div;
 		DoubleMatrix2D cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder,to_time_reminder));
 		if (cached!=null) {
-			return cached;
+			return cached.toArray();
 		}
 		else {
 			double step_start_time = from_time;
@@ -68,11 +69,11 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 				n=n+1;
 				if (isInSeason1(step_start_time)) {
 					step_end_time = Math.min(to_time,step_start_time+season1Length);
-					result = result.zMult(season1MigrationModel.transitionMatrix(step_start_time, step_end_time),null);	
+					result = result.zMult(DoubleFactory2D.dense.make(season1MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
 					step_start_time=step_end_time;				
 				} else {
 					step_end_time = Math.min(to_time,step_start_time+season2Length);
-					result = result.zMult(season2MigrationModel.transitionMatrix(step_start_time, step_end_time),null);	
+					result = result.zMult(DoubleFactory2D.dense.make(season2MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
 					step_start_time=step_end_time;			
 				}
 
@@ -84,7 +85,7 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 			}			
 			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),result);
 
-			return result;
+			return result.toArray();
 		}
 	}
 

@@ -14,7 +14,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	private int num_locations = 0;		
 
 	// cache
-	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
+	HashMap<Double, double[][]> cachedTransitionMatrices = new HashMap<Double, double[][]>();
 	final static int maxCachedTransitionMatrices=6000;
 
 	// Matrix Exponentiation
@@ -24,8 +24,9 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	public ConstantMigrationBaseModel(double[][] Q_) {	
 		Q = Q_;
 		num_locations=Q_.length;
-		matrixExponentiator=new Matlab7MatrixExp(Q);
+		//matrixExponentiator=new Matlab7MatrixExp(Q);
 		//matrixExponentiator=new TaylorMatrixExp(Q);
+		matrixExponentiator=new MolerMatrixExp(Q);
 	}
 
 	// Methods
@@ -36,24 +37,24 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			return 0;
 
 		double dt = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time-from_time)); 
-		DoubleMatrix2D cached = cachedTransitionMatrices.get(dt);
+		double[][] cached = cachedTransitionMatrices.get(dt);
 
 		if (cached!=null)  
-			return Math.log(cached.get(from_location, to_location));		
+			return Math.log(cached[from_location][to_location]);		
 		else 		
-			return Math.log(transitionMatrix(from_time, to_time).get(from_location, to_location));		
+			return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);		
 	}
 
 	@Override
-	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {		
+	public double[][] transitionMatrix(double from_time, double to_time) {		
 		double dt = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time-from_time)); 
 		
-		DoubleMatrix2D cached = cachedTransitionMatrices.get(dt);
+		double[][] cached = cachedTransitionMatrices.get(dt);
 		if (cached!=null) {
 			return cached;
 		}
 		else {
-			DoubleMatrix2D result = matrixExponentiator.expm(dt);
+			double[][] result = matrixExponentiator.expm(dt);
 			// cache result
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());

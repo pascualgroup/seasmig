@@ -22,6 +22,48 @@ public class Util {
 	
 	}
 	
+	static public String print(double[][] Q) {		
+		String returnValue = "{";
+		for (int i=0; i<Q.length;i++) {
+			if (i!=0) 
+				returnValue+=" ";
+			returnValue+="{";
+			for (int j=0; j<Q.length;j++) {
+				returnValue+=String.format("%6.3f",Q[i][j]);
+				if (j!=Q.length-1) {
+					returnValue+=",";
+				}
+			}			
+			returnValue+="}";
+			if (i!=Q.length-1) {
+				returnValue+=",\n";
+			}			
+		}
+		returnValue+="}\n";
+		return returnValue;
+	}
+	
+	static public String parse(double[][] Q) {		
+		String returnValue = "{";
+		for (int i=0; i<Q.length;i++) {
+			if (i!=0) 
+				returnValue+=" ";
+			returnValue+="{";
+			for (int j=0; j<Q.length;j++) {
+				returnValue+=String.format("%6.4f",Q[i][j]);
+				if (j!=Q.length-1) {
+					returnValue+=",";
+				}
+			}			
+			returnValue+="}";
+			if (i!=Q.length-1) {
+				returnValue+=",";
+			}			
+		}
+		returnValue+="}";
+		return returnValue;
+	}
+	
 	
 	public static FRexpResult log2(double value)
 	{
@@ -74,4 +116,6 @@ public class Util {
 		public int e = 0;
 		public double f = 0.;
 	}
+	
+	
 }

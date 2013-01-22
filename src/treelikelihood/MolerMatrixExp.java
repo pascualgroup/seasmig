@@ -8,14 +8,14 @@ import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tdouble.DoublePlusMultFirst;
 import cern.jet.math.tdouble.DoublePlusMultSecond;
 
-public class MatlabMatrixExp implements MatrixExponentiator {
+public class MolerMatrixExp implements MatrixExponentiator {
 
 	double[][] Q;
 	DenseDoubleAlgebra algebra = new DenseDoubleAlgebra();
 	DoubleMatrix2D eye; 
 	static final double q = 6.0;
 	
-	public MatlabMatrixExp(double[][] testMatrix) {
+	public MolerMatrixExp(double[][] testMatrix) {
 		Q = testMatrix;	
 		eye = DoubleFactory2D.dense.identity(Q.length);
 	}
@@ -89,7 +89,7 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 			end
 	 */
 	@Override
-	public DoubleMatrix2D expm(double t) {
+	public double[][] expm(double t) {
 		
 		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(DoubleFunctions.mult(t));
 		FRexpResult fe = Util.log2(algebra.normInfinity(A)); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
@@ -114,7 +114,7 @@ public class MatlabMatrixExp implements MatrixExponentiator {
 		E=algebra.inverse(D).zMult(E, null); // E = D \ E;
 		for (int k=1;k<=s;k++) 
 			E=E.zMult(E, null); // E = E*E 
-		return E;
+		return E.toArray();
 	}
 
 

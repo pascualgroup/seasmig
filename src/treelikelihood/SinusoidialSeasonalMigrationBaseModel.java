@@ -53,11 +53,11 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 	// Methods
 	@Override
 	public double logprobability(int from_state, int to_state, double from_time, double to_time) {		
-		return Math.log(transitionMatrix(from_time, to_time).get(from_state, to_state));
+		return Math.log(transitionMatrix(from_time, to_time)[from_state][to_state]);
 	}
 
 	@Override
-	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {
+	public double[][] transitionMatrix(double from_time, double to_time) {
 		return baseModel.transitionMatrix(from_time, to_time);
 	}
 

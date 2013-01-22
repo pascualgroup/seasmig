@@ -231,7 +231,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 	}
 
 	@Override
-	public DoubleMatrix2D expm(double tt) {
+	public double[][] expm(double tt) {
 
 		//	Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
 		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(DoubleFunctions.mult(tt));
@@ -257,7 +257,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			for (int i=0;i<s;i++) 
 				F=F.zMult(F, null); // F = F*F;  % Squaring
 		}
-		return F;
+		return F.toArray();
 	}
 
 }
