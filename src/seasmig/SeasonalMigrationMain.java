@@ -217,7 +217,7 @@ public class SeasonalMigrationMain
 			MatrixExponentiator test1 = new MolerMatrixExp(testMatrix);
 			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);
 			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);
-			MatrixExponentiator test4 = new ReMolerMatrixExp(testMatrix);
+			MatrixExponentiator test4 = new JamaMolerMatrixExp(testMatrix);
 			MatrixExponentiator test5 = new JblasMatrixExp(testMatrix);
 
 			for (double t=0;t<500;t=(t+0.1)*2) {
@@ -234,7 +234,7 @@ public class SeasonalMigrationMain
 					System.out.println("\nMolerMatrixExp: "+treelikelihood.Util.print(test1.expm(t)));					
 					System.out.println("Matlab7MatrixExp: "+treelikelihood.Util.print(test2.expm(t)));
 					System.out.println("TaylorMatrixExp: "+treelikelihood.Util.print(test3.expm(t)));
-					System.out.println("ReMolerMatrixExp: "+treelikelihood.Util.print(test4.expm(t)));
+					System.out.println("JamaMolerMatrixExp: "+treelikelihood.Util.print(test4.expm(t)));
 					System.out.println("JblasMatrixExp: "+treelikelihood.Util.print(test5.expm(t)));
 	
 				}
@@ -280,7 +280,7 @@ public class SeasonalMigrationMain
 		long startTime4= System.currentTimeMillis();		
 		for (int i=1;i<50;i++) {
 			double[][] testMatrix = Data.makeRandomMigrationMatrix(n,(double) i/100.0);
-			MatrixExponentiator test4 = new ReMolerMatrixExp(testMatrix);;
+			MatrixExponentiator test4 = new JamaMolerMatrixExp(testMatrix);;
 			for (int j=0;j<1200;j++) {
 				double[][] res4=test4.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
 				if (Math.random()<0.0000000000001) System.out.println(res4);
@@ -302,7 +302,7 @@ public class SeasonalMigrationMain
 		System.out.println("\nMolerMatrixExp: "+time1+"ms");
 		System.out.println("Matlab7MatrixExp: "+time2+"ms");
 		System.out.println("TaylorMatrixExp: "+time3+"ms");
-		System.out.println("ReMolerMatrixExp: "+time4+"ms");
+		System.out.println("JamaMolerMatrixExp: "+time4+"ms");
 		System.out.println("JblasMatrixExp: "+time5+"ms");
 		
 		System.out.println("\nCompleted matrix exponentiation test");

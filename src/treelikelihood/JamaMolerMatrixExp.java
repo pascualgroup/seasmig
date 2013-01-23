@@ -3,13 +3,13 @@ package treelikelihood;
 import Jama.Matrix;
 import treelikelihood.Util.FRexpResult;
 
-public class ReMolerMatrixExp implements MatrixExponentiator {
+public class JamaMolerMatrixExp implements MatrixExponentiator {
 
 	double[][] Q;	
 	Matrix eye; 
 	static final double q = 6.0;
 	
-	public ReMolerMatrixExp(double[][] Q_) {
+	public JamaMolerMatrixExp(double[][] Q_) {
 		Q = Q_;	
 		eye = Matrix.identity(Q.length,Q.length);
 	}
