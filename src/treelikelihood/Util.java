@@ -1,17 +1,26 @@
 package treelikelihood;
 
 public class Util {
-	
+
 	static final double minValue = 1E-300;
-		
+
 	static double logSumExp(double[] alphas, double min) {
-		// TODO: add overflow underlow check...
 		double returnValue;
 		double sumExp = 0;
-		for (int i=0;i<alphas.length;i++) {	
-			sumExp=sumExp+Math.exp(alphas[i]-min);
+		if (Double.NEGATIVE_INFINITY!=min) {		
+			for (int i=0;i<alphas.length;i++) {			
+				sumExp=sumExp+Math.exp(alphas[i]-min);
+			}
+			returnValue=min+Math.log(sumExp);
 		}
-		returnValue=min+Math.log(sumExp);
+		else {
+			for (int i=0;i<alphas.length;i++) {	
+				if (Double.NEGATIVE_INFINITY!=alphas[i])
+					sumExp=sumExp+Math.exp(alphas[i]);
+			}
+			returnValue=Math.log(sumExp);
+		}
+
 		if (!Double.isNaN(returnValue)) {
 			return returnValue;
 		}
@@ -20,9 +29,9 @@ public class Util {
 			System.err.println("logSumExp==NaN: alphas: "+alphas+"\nmin="+min);			
 			return Util.minValue;			
 		}				
-	
+
 	}
-	
+
 	static public String print(double[][] Q) {		
 		String returnValue = "{";
 		for (int i=0; i<Q.length;i++) {
@@ -43,7 +52,7 @@ public class Util {
 		returnValue+="}\n";
 		return returnValue;
 	}
-	
+
 	static public String parse(double[][] Q) {		
 		String returnValue = "{";
 		for (int i=0; i<Q.length;i++) {
@@ -64,8 +73,8 @@ public class Util {
 		returnValue+="}";
 		return returnValue;
 	}
-	
-	
+
+
 	public static FRexpResult log2(double value)
 	{
 		final FRexpResult result = new FRexpResult();
@@ -117,6 +126,6 @@ public class Util {
 		public int e = 0;
 		public double f = 0.;
 	}
-	
-	
+
+
 }
