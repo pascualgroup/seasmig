@@ -13,9 +13,7 @@ public class JblasMatrixExp implements MatrixExponentiator {
 	}
 	@Override
 	public double[][] expm(double t) {
-		DoubleMatrix A = Q.mul(t);
-		
-		return MatrixFunctions.expm(A).toArray2();
+		return MatrixFunctions.expm(Q.mul(t)).toArray2();
 	}
 
 }

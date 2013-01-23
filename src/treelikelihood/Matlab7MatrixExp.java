@@ -211,7 +211,8 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		// TODO: optimize this
 		DoubleMatrix2D VplusU = V.copy().assign(U,DoubleFunctions.plus); 
 		DoubleMatrix2D VminusU = V.assign(U,DoubleFunctions.minus);
-		return algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
+		DoubleMatrix2D res=algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
+		return res;
 
 	}
 

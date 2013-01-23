@@ -29,7 +29,7 @@ public class Util {
 				returnValue+=" ";
 			returnValue+="{";
 			for (int j=0; j<Q.length;j++) {
-				returnValue+=String.format("%6.3f",Q[i][j]);
+				returnValue+=String.format("%6.2f",Q[i][j]);
 				if (j!=Q.length-1) {
 					returnValue+=",";
 				}
@@ -50,7 +50,7 @@ public class Util {
 				returnValue+=" ";
 			returnValue+="{";
 			for (int j=0; j<Q.length;j++) {
-				returnValue+=String.format("%6.4f",Q[i][j]);
+				returnValue+=String.format("%6.2f",Q[i][j]);
 				if (j!=Q.length-1) {
 					returnValue+=",";
 				}
