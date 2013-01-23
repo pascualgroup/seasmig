@@ -114,6 +114,11 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		return num_locations ;
 	}
 
+	@Override
+	public String getModelName() {		
+		return "Constant";
+	}
+
 	
 
 

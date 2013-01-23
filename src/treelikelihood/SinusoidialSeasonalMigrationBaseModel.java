@@ -78,6 +78,9 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 		return print();
 	}
 
-
+	@Override
+	public String getModelName() {		
+		return "Sinusoidial Seasonal";
+	}
 
 }

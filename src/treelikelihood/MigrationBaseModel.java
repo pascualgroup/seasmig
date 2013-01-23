@@ -8,4 +8,5 @@ public interface MigrationBaseModel  {
 	public int getNumLocations();
 	public String print();
 	public String parse();
+	public String getModelName();
 }

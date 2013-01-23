@@ -114,6 +114,9 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 		return num_states ;
 	}
 
-
+	@Override
+	public String getModelName() {		
+		return "Two Seasons";
+	}
 
 }

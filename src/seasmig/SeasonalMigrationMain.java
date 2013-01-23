@@ -191,7 +191,7 @@ public class SeasonalMigrationMain
 		System.out.println("\nCalculating tree likelihood using test models with increasing noise:");
 		for (int i=0;i<data.testModels.size();i++) {
 			if (i%config.numTestRepeats==0) {						
-				System.out.println("SEASONALITY "+Config.Seasonality.values()[i/config.numTestRepeats]);						
+				System.out.println("SEASONALITY "+data.testModels.get(i).getModelName());						
 			}
 
 			double testLikelihood = 0;

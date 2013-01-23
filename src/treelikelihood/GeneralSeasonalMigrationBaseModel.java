@@ -20,7 +20,8 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	static final int maxCachedTransitionMatrices = 16000;
 
 	// Precision Parameters
-	static final int nYearParts = 24;
+	static final int nYearParts = 12;
+	// Figure out reason why changing nYearParts can generate an error...
 	
 	// Origin Model
 	DoubleFunction[][] seasonalRates;
@@ -137,6 +138,11 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	public String parse() {
 		// TODO Auto-generated method stub
 		return print();
+	}
+
+	@Override
+	public String getModelName() {		
+		return "General Seasonal";
 	}
 
 

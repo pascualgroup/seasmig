@@ -127,10 +127,6 @@ public class Data
 				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,config.disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,config.disturbanceScale*i/3,99999),phase, phase+length));
 			}
 			for (int i=0; i<config.numTestRepeats; i++) {
-				double phase = 0.3; double length = 0.5;
-				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,config.disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,config.disturbanceScale*i/3,99999),phase, phase+length));
-			}
-			for (int i=0; i<config.numTestRepeats; i++) {
 				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,config.disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,config.disturbanceScale*i/3,1),disturbMigrationMatrix(phases,config.disturbanceScale*i/3,1)));
 			}
 			System.out.println(" generated "+testModels.size()+" test models");
