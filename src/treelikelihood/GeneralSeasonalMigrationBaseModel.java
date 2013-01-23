@@ -14,13 +14,13 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check this...
 	
 	// Precision Parameter
-	static final double timePrecision = 1.0/365.0;
+	static final double timePrecision = 1.0/100.0;
 	
 	// Cache Parameters 
 	static final int maxCachedTransitionMatrices = 16000;
 
 	// Precision Parameters
-	static final int nYearParts = 36;
+	static final int nYearParts = 24;
 	
 	// Origin Model
 	DoubleFunction[][] seasonalRates;

@@ -114,6 +114,8 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		return num_locations ;
 	}
 
+	
+
 
 
 

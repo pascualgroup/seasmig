@@ -156,12 +156,10 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				}
 				rates[i][i]=row1sum;
 				rates2[i][i]=row2sum;
-			}
-			twoMatrixPhase = config.fixedPhase;
+			}			
 			// TODO: Add parameter for first season length
-
-			season1Start=0;			
-			season1Start=twoMatrixPhase;
+	
+			season1Start=config.fixedPhase;
 			season1End=0.5+season1Start;
 
 			migrationBaseModel = new TwoSeasonMigrationBaseModel(rates,rates2,season1Start,season1End);	
