@@ -34,17 +34,8 @@ public class Data
 			System.out.print("Loading trees... ");			
 			File treeFile = new File(config.treeFilename);
 			FileReader reader = new FileReader(treeFile);
-			NexusImporter nexusImporter = null;
-			List<jebl.evolution.trees.Tree> nexsusTrees = null;
-			try {
-				nexusImporter = new NexusImporter(reader);			
-				nexsusTrees = nexusImporter.importTrees();
-			}
-			catch (Exception e) {
-				System.err.println("Error importing nexsus trees from: "+config.treeFilename);
-				System.err.println(e.getMessage());
-				System.exit(-1);
-			}
+			NexusImporter nexusImporter = new NexusImporter(reader);
+			List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
 			System.out.println("loaded "+nexsusTrees.size()+" trees");
 
 			System.out.print("Keeping tail... ");		
@@ -216,7 +207,6 @@ public class Data
 		}
 
 	}
-
 
 	private double[][] myMatrixCopy(double[][] q) {
 		double [][] returnValue = new double[q.length][];
