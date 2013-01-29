@@ -1,6 +1,6 @@
 {
-	"chainCount" : 4,
-	"tuneEvery" : 50,
-	"tuneFor" : 50000,
-	"printEveryNStates" = 100000
+	"chainCount" : 16,
+	"migrationSeasonality" : "TWO_CONSTANT_SEASONS",
+	"numTreesFromTail" : 20,
+	"tuneEvery" : 50
 }
