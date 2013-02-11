@@ -27,21 +27,21 @@ public class Config
 	public String demcStatsFilename = "demc_stats.jsons";
 	public boolean recordHeatedStats = false;
 	public String swapStatsFilename = "swap_stats.txt";
-	public LogLevel logLevel = LogLevel.INFO;
+	public LogLevel logLevel = LogLevel.ERROR;
 	public String logFilename = "debug.log";
 
 	// MCMC & LOG RELATED PARAMETERS
 	// in iterations
-	public long thin = 20;
+	public long thin = 50;
 
-	public long tuneEvery = 5; 
-	public long tuneFor = 50000; 
+	public long tuneEvery = 50; 
+	public long tuneFor = 100000; 
 	
-	public long initialHistoryCount = 10000;
-	public long recordHistoryAfter = 10000;
+	public long initialHistoryCount = 20000;
+	public long recordHistoryAfter = 40000;
 	
 	public int chainCount = 16;
-	public double heatPower = 1.0;
+	public double heatPower = 3.0;
 	
 	// DISPLAY RELATED PARAMTERS
 	public int printEveryNStates = 100000;

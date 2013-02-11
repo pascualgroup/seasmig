@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 import mc3kit.FormattingLogger;
 import mc3kit.MCMC;
 import mc3kit.PowerHeatFunction;
+import mc3kit.graphical.step.BlockDifferentialEvolutionStep;
 import mc3kit.graphical.step.PriorLikelihoodOutputStep;
 import mc3kit.graphical.step.SampleOutputStep;
 import mc3kit.graphical.step.SwapStep;
@@ -25,7 +26,6 @@ import treelikelihood.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sun.xml.internal.ws.message.Util;
 
 public class SeasonalMigrationMain
 {
@@ -35,7 +35,7 @@ public class SeasonalMigrationMain
 		{
 			// Load config
 			System.out.print("Loading config file... ");
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			Config config = null;
 			try {
 				config = gson.fromJson(new FileReader("config.json"), Config.class);
@@ -114,15 +114,15 @@ public class SeasonalMigrationMain
 			univarStep.setRecordStatsAfterTuning(true);
 
 			// Differential evolution step
-//			BlockDifferentialEvolutionStep deStep = new BlockDifferentialEvolutionStep();
-//			deStep.setStatsFilename(config.demcStatsFilename);
-//			deStep.setRecordHistoryEvery(config.thin);
-//			deStep.setRecordHistoryAfter(config.recordHistoryAfter);
-//			deStep.setTuneEvery(config.tuneEvery);
-//			deStep.setTuneFor(config.tuneFor);
-//			deStep.setInitialHistoryCount(config.initialHistoryCount);
-//			deStep.setRecordHeatedStats(false);
-//			deStep.setRecordStatsAfterTuning(true);
+			BlockDifferentialEvolutionStep deStep = new BlockDifferentialEvolutionStep();
+			deStep.setStatsFilename(config.demcStatsFilename);
+			deStep.setRecordHistoryEvery(config.thin);
+			deStep.setRecordHistoryAfter(config.recordHistoryAfter);
+			deStep.setTuneEvery(config.tuneEvery);
+			deStep.setTuneFor(config.tuneFor);
+			deStep.setInitialHistoryCount(config.initialHistoryCount);
+			deStep.setRecordHeatedStats(false);
+			deStep.setRecordStatsAfterTuning(true);
 
 			// Swap steps: even (0,1), (2,3), etc. Odd (1,2), (3,4), etc.
 			// Set up to allow parallelization of all swaps.
@@ -146,7 +146,7 @@ public class SeasonalMigrationMain
 
 			// Set up execution order for the steps
 			mcmc.addStep(univarStep);
-//			mcmc.addStep(deStep);
+			mcmc.addStep(deStep);
 			for(int i = 0; i < config.chainCount; i++)	{
 				mcmc.addStep(evenSwapStep);
 				mcmc.addStep(oddSwapStep);				
