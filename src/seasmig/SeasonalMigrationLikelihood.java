@@ -158,7 +158,7 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				rates2[i][i]=row2sum;
 			}			
 			// TODO: Add parameter for first season length
-	
+
 			season1Start=config.fixedPhase;
 			season1End=0.5+season1Start;
 
@@ -186,13 +186,23 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 
 			migrationBaseModel = new SinusoidialSeasonalMigrationBaseModel(rates, amp, phase);
 		}
-
+			
 		// TODO: maybe get likelihood to work without copy...
-
-		Uniform uniform = new Uniform(model.rng);
-		LikelihoodTree workingCopy = data.trees.get(uniform.nextIntFromTo(0,data.trees.size()-1)).copy(); 
-		workingCopy.setLikelihoodModel(migrationBaseModel);
-		logLikelihood=workingCopy.logLikelihood();
+		if (config.useAllTreesForSingleLikelihoodCalculation) {
+			for (LikelihoodTree tree : data.trees) {
+				LikelihoodTree workingCopy=tree.copy();
+				workingCopy.setLikelihoodModel(migrationBaseModel); 				
+				logLikelihood+=workingCopy.logLikelihood();
+			}
+			// TODO: think of way to consider independence of trees in overall LL
+			logLikelihood/=(data.trees.size());
+		}
+		else {
+			Uniform uniform = new Uniform(model.rng);
+			LikelihoodTree workingCopy = data.trees.get(uniform.nextIntFromTo(0,data.trees.size()-1)).copy(); 
+			workingCopy.setLikelihoodModel(migrationBaseModel);
+			logLikelihood=workingCopy.logLikelihood();
+		}
 
 		setLogP(logLikelihood);
 

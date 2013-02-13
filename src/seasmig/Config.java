@@ -14,7 +14,9 @@ public class Config
 	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,TWO_CONSTANT_SEASONS_FIXED_PHASE,SINUSOIDAL }; //TODO: DEBUG SINUSODIAL //TODO: ADD CONTINUOUS SEASONAL MODEL
 	enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
-	enum RunMode {	NORMAL,	TEST1, TEST2};
+	enum RunMode {	NORMAL,	TEST1, TEST2}
+
+	public boolean useAllTreesForSingleLikelihoodCalculation = true;
 	
 	public Long randomSeed;
 	
