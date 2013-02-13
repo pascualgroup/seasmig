@@ -7,7 +7,7 @@ import cern.jet.math.tdouble.DoubleFunctions;
 public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Precision Parameter
-	static final double timePrecision = 1.0/365.0;
+	static final double timePrecision = 1.0E-5;
 
 	// Rate Matrix  
 	final double[][] Q;
@@ -26,8 +26,8 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		num_locations=Q_.length;
 		//matrixExponentiator=new Matlab7MatrixExp(Q);
 		//matrixExponentiator=new TaylorMatrixExp(Q);
-		//matrixExponentiator=new MolerMatrixExp(Q);
-		matrixExponentiator=new JblasMatrixExp(Q);
+		matrixExponentiator=new MolerMatrixExp(Q);
+		//matrixExponentiator=new JblasMatrixExp(Q);
 	}
 
 	// Methods

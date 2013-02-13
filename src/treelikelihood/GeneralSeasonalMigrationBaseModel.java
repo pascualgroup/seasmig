@@ -12,15 +12,16 @@ import cern.jet.math.tdouble.DoubleFunctions;
 
 public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check this...
+	// TODO: Failes degeneracy test....
 	
 	// Precision Parameter
-	static final double timePrecision = 1.0/100.0;
+	static final double timePrecision = 1E-2;
 	
 	// Cache Parameters 
 	static final int maxCachedTransitionMatrices = 16000;
 
 	// Precision Parameters
-	static final int nYearParts = 12;
+	static final int nYearParts = 36;
 	// Figure out reason why changing nYearParts can generate an error...
 	
 	// Origin Model

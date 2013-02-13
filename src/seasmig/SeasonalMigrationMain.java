@@ -186,10 +186,11 @@ public class SeasonalMigrationMain
 		testFile.createNewFile();
 		PrintStream testStream = new PrintStream(testFile);
 		System.out.println("Calculating tree likelihood using degenerate models:");				
-
+		
+		
 		for (int i=0;i<data.testModels.size();i++) {
 			System.out.println("SEASONALITY "+data.testModels.get(i).getModelName());						
-			
+			long startTime= System.currentTimeMillis();	
 			double testLikelihood = 0;
 			for (LikelihoodTree tree : data.trees) {
 				System.out.print(".");
@@ -199,7 +200,10 @@ public class SeasonalMigrationMain
 			}
 			testLikelihood=testLikelihood/data.trees.size();
 			System.out.println(testLikelihood);
+			long duration= System.currentTimeMillis()-startTime;
+			System.out.println("duration: "+duration+"ms");
 		}
+		
 		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");
 		testStream.close();
 		System.exit(0);
