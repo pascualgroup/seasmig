@@ -49,23 +49,14 @@ public class SeasonalMigrationMain
 			System.out.print("Writing full config options to out.config...");
 			config.outputToFile("out.config",gson);
 			System.out.println(" done");
-
-			if (config.runMode==RunMode.TEST1 || config.runMode==RunMode.TEST2) {
-				// Roughly comparing results of several different exponentiation algorithms 
-				testMatrixExponentiation(config.numLocations);
-			}
-
+			
 			// Load data files and prepare data....			
 			Data data = new Data(config);
-
-			// Tests...			
-			if (config.runMode==RunMode.TEST1 || config.runMode==RunMode.TEST2) {
-				System.out.print("Running likelihood test...\n");
-				testLikelihood(config, data);				
-				System.out.print("Completed likelihood test!\n\n");
-
+			
+			if (config.runMode==RunMode.TEST_USING_GENERATED_TREES || config.runMode==RunMode.TEST_USING_INPUT_TREES || config.runMode==RunMode.TEST_MODEL_DEGENERACY) {
+				runTests(config,data);
 			}
-
+			
 			System.out.print("Initializing MCMC STEP 1...");
 			MCMC mcmc = new MCMC();
 			mcmc.setRandomSeed(config.randomSeed);
@@ -167,6 +158,55 @@ public class SeasonalMigrationMain
 		}
 	}
 
+	private static void runTests(Config config, Data data) throws IOException {
+
+		if (config.runMode==RunMode.TEST_USING_GENERATED_TREES || config.runMode==RunMode.TEST_USING_INPUT_TREES) {
+			// Roughly comparing results of several different exponentiation algorithms 
+			testMatrixExponentiation(config.numLocations);
+		}
+
+			// Tests...			
+		if (config.runMode==RunMode.TEST_USING_GENERATED_TREES || config.runMode==RunMode.TEST_USING_INPUT_TREES) {
+			System.out.print("Running likelihood test...\n");
+			testLikelihood(config, data);				
+			System.out.print("Completed likelihood test!\n\n");
+
+		}
+		
+		if (config.runMode==RunMode.TEST_MODEL_DEGENERACY) {
+			testModelDegeneracy(config, data);
+		}
+		
+	}
+
+	private static void testModelDegeneracy(Config config, Data data) throws IOException {
+		// Creating test file 
+		File testFile = new File("out.test");
+		testFile.delete();
+		testFile.createNewFile();
+		PrintStream testStream = new PrintStream(testFile);
+		System.out.println("Calculating tree likelihood using degenerate models:");				
+
+		for (int i=0;i<data.testModels.size();i++) {
+			System.out.println("SEASONALITY "+data.testModels.get(i).getModelName());						
+			
+			double testLikelihood = 0;
+			for (LikelihoodTree tree : data.trees) {
+				System.out.print(".");
+				LikelihoodTree workingCopy = tree.copy();
+				workingCopy.setLikelihoodModel(data.testModels.get(i));
+				testLikelihood+=workingCopy.logLikelihood();
+			}
+			testLikelihood=testLikelihood/data.trees.size();
+			System.out.println(testLikelihood);
+		}
+		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");
+		testStream.close();
+		System.exit(0);
+		
+	}
+	
+	
 	private static void testLikelihood(Config config, Data data) throws IOException {
 		// Creating test file 
 		File testFile = new File("out.test");

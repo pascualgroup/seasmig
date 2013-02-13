@@ -14,13 +14,13 @@ public class Config
 	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,TWO_CONSTANT_SEASONS_FIXED_PHASE,SINUSOIDAL }; //TODO: DEBUG SINUSODIAL //TODO: ADD CONTINUOUS SEASONAL MODEL
 	enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
-	enum RunMode {	NORMAL,	TEST1, TEST2}
+	enum RunMode {	NORMAL,	TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY}
 
 	public boolean useAllTreesForSingleLikelihoodCalculation = true;
 	
 	public Long randomSeed;
 	
-	public RunMode runMode = RunMode.NORMAL;
+	public RunMode runMode = RunMode.TEST_MODEL_DEGENERACY;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -58,7 +58,7 @@ public class Config
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add statese & combine files 
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
-	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
+	public String locationFilename ="regions.txt"; // null if locations are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree

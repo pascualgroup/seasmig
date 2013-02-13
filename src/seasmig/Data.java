@@ -76,7 +76,7 @@ public class Data
 			}	
 			break;
 
-		case TEST1:
+		case TEST_USING_GENERATED_TREES:
 			// TODO: add more tests + test files ....
 			// TODO: add tests for states...
 			System.out.print("Generating test trees... ");
@@ -132,7 +132,7 @@ public class Data
 			System.out.println(" generated "+testModels.size()+" test models");
 			break;
 
-		case TEST2:{
+		case TEST_USING_INPUT_TREES:{
 			// TODO: add more tests + test files ....
 			// TODO: add tests for states...
 			System.out.print("Generating test trees based on input tree topology ... ");
@@ -199,6 +199,94 @@ public class Data
 			for (int i=0; i<config.numTestRepeats; i++) {
 				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,config.disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,config.disturbanceScale*i/3,1),disturbMigrationMatrix(phases,config.disturbanceScale*i/3,1)));
 			}
+			System.out.println(" generated "+testModels.size()+" test models");
+
+		}
+		break;
+
+		case TEST_MODEL_DEGENERACY:{
+			// TODO: add more tests + test files ....
+			// TODO: add tests for states...
+			System.out.print("Building degenerate test models... ");
+
+			// Generate test data and trees
+
+			// For constant model...
+			Q = makeRandomMigrationMatrix(config.numLocations,2); 
+
+			// For two seasonal model...
+			QW = myMatrixCopy(Q);
+			QS = myMatrixCopy(Q);
+
+			// For sinusoidal model...
+			rates = myMatrixCopy(Q);
+			amps = makeRandomMigrationMatrix(config.numLocations,0);
+			phases = makeRandomMigrationMatrix(config.numLocations,1);
+
+			// For two constant seasons model...
+			double phase = 0.3; double length = 0.5;
+
+			switch (config.migrationSeasonality) {
+			case NONE:	
+				createModel = new ConstantMigrationBaseModel(Q); 
+				break;
+			case TWO_CONSTANT_SEASONS: case TWO_CONSTANT_SEASONS_FIXED_PHASE:
+				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
+				break;
+			case SINUSOIDAL:
+				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
+				break;
+			}
+
+			System.out.print(" done!\nLoading trees... ");			
+			treeFile = new File(config.treeFilename);
+			reader = new FileReader(treeFile);
+			nexusImporter = new NexusImporter(reader);
+			nexsusTrees = nexusImporter.importTrees();
+			System.out.println("loaded "+nexsusTrees.size()+" trees");
+
+			System.out.print("Keeping tail... ");		
+			nexsusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
+			for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
+				nexsusTreeTail.add(nexsusTrees.get(i));
+			}
+			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
+
+			// Convert trees to internal tree representation
+			if (config.locationFilename!=null) {
+				System.out.print("Loading traits... ");
+				AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilename, config.stateFilename);
+				// TODO: think about this...
+				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributeLoader.getAttributes().get("locations");
+				HashMap<String,Double> stateMap = (HashMap<String,Double>) attributeLoader.getAttributes().get("states");
+				System.out.println("loaded "+locationMap.size()+" taxon traits");
+
+				System.out.print("Reparsing trees... ");
+				if (stateMap==null) {
+					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
+						trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,config.numLocations));
+					}
+				}
+				else {
+					// TODO: this...
+				}
+				System.out.println(" reparsed "+trees.size()+" trees");
+			}
+			else {
+				// TODO: add load states from trees...
+				System.out.print("Reparsing trees... ");
+				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
+					trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, config.numLocations));
+				}		
+				System.out.println(" reparsed "+trees.size()+" trees");
+			}				
+
+			testModels = new ArrayList<MigrationBaseModel>();
+
+			testModels.add(new ConstantMigrationBaseModel(Q));
+			testModels.add(new TwoSeasonMigrationBaseModel(QW,QS,phase, phase+length));
+			testModels.add(new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases));
+
 			System.out.println(" generated "+testModels.size()+" test models");
 
 		}
