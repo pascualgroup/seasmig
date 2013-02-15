@@ -49,7 +49,7 @@ public class Config
 	public int printEveryNStates = 100000;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS_FIXED_PHASE;
+	public Seasonality migrationSeasonality = Seasonality.NONE;
 	public StateModel stateModel = StateModel.NONE; // TODO: this...
 	public int numLocations = 3;  // TODO: add support of one location....
 							      // TODO: add as an attribute loaded with attribute loader...
@@ -62,8 +62,8 @@ public class Config
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
-	public int numTreesFromTail = 2; // at most number of trees to read from tree file's tail
-	
+	public int numTreesFromTail = 4; // at most number of trees to read from tree file's tail
+			
 	// TEST RELATED PARAMETERS	
 	// TEST1+TEST2
 	public int numTestTrees = 2;

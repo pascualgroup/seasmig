@@ -93,7 +93,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		double[] alphas=new double[num_locations];
 		double min = Util.minValue;
 		if (root.location==UNKNOWN_LOCATION) {
-			// reroot on known node
 			for (int rootLocation=0;rootLocation<num_locations;rootLocation++) {				
 				double alpha=conditionalLogLikelihood(root, rootLocation);
 				alphas[rootLocation]=alpha;
@@ -129,15 +128,12 @@ public class TreeWithLocations implements LikelihoodTree {
 					loglikelihood=loglikelihood+conditionalLogLikelihood(child,child.location)+likelihoodModel.logprobability(nodeLocation, child.location, node.time, child.time);
 				}
 				else {
-					double[] alphas=likelihoodModel.probability(nodeLocation,node.time,child.time);
-					for (int i=0;i<alphas.length;i++) {
-						alphas[i]=Math.log(alphas[i]);
-					}
+					double[] alphas=new double[num_locations];
 					double min = Double.POSITIVE_INFINITY;
 					for (int childLocation=0;childLocation<num_locations;childLocation++) {
-						double alpha = conditionalLogLikelihood(child, childLocation);						
-						alphas[childLocation]+=alpha;
-						if (alphas[childLocation]<min) min=alphas[childLocation];
+						double alpha = likelihoodModel.logprobability(nodeLocation, childLocation, node.time, child.time)+conditionalLogLikelihood(child, childLocation);						
+						alphas[childLocation]=alpha;
+						if (alpha<min) min=alpha;
 					}
 					loglikelihood=loglikelihood+Util.logSumExp(alphas,min);					
 				}			 
@@ -146,6 +142,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			return loglikelihood;		
 		}
 	}
+
 
 	@Override
 	public String print() {
