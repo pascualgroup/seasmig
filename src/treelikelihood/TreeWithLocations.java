@@ -18,11 +18,13 @@ public class TreeWithLocations implements LikelihoodTree {
 	Node root = null;		
 	int num_locations = 0;
 	private MigrationBaseModel likelihoodModel = null;
+	private int UNKNOWN_LOCATION; 
 
 
 	// Generate a random tree based on createTreeModel .... 
-	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {
+	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
 		num_locations=createTreeModel.getNumLocations();
+		UNKNOWN_LOCATION=num_locations;
 		root = new Node(0,0,num_locations);
 		makeRandomTree(createTreeModel, root, numNodes);		
 	}
@@ -30,6 +32,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	// Generate random tree states based on input tree topology and model .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree) {
 		num_locations=createTreeModel.getNumLocations();
+		UNKNOWN_LOCATION=num_locations;
 		likelihoodModel=createTreeModel;
 		root = new Node(0,0,num_locations);
 		makeSubTree(tree,(String)null, root,tree.getRootNode());
@@ -63,6 +66,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	// locations are loaded from nexsus tree trait location_attribute name
 	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, String locationAttributeName, int num_locations_) {
 		num_locations=num_locations_;
+		UNKNOWN_LOCATION=num_locations;
 		root = new Node(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,0,num_locations);
 		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
 	}
@@ -71,9 +75,10 @@ public class TreeWithLocations implements LikelihoodTree {
 	// locations are loaded from a hashmap	
 	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
 		num_locations=num_locations_;
+		UNKNOWN_LOCATION=num_locations;
 		Integer location = locationMap.get(tree.getTaxon(tree.getRootNode()));
 		if (location==null) 
-			location=-1;
+			location=UNKNOWN_LOCATION;
 		root = new Node(location,0,num_locations);
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 	}
@@ -87,7 +92,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	public double logLikelihood() {
 		double[] alphas=new double[num_locations];
 		double min = Util.minValue;
-		if (root.location==MigrationBaseModel.UNKNOWN_LOCATION) {
+		if (root.location==UNKNOWN_LOCATION) {
+			// reroot on known node
 			for (int rootLocation=0;rootLocation<num_locations;rootLocation++) {				
 				double alpha=conditionalLogLikelihood(root, rootLocation);
 				alphas[rootLocation]=alpha;
@@ -104,6 +110,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public LikelihoodTree copy() {
 		TreeWithLocations newTree = new TreeWithLocations();
 		newTree.num_locations=num_locations;
+		newTree.UNKNOWN_LOCATION=UNKNOWN_LOCATION;
 		newTree.root=new Node(root.location,root.time,num_locations);
 		treeCopyNoCache(root,newTree.root);		
 		return newTree;
@@ -117,26 +124,28 @@ public class TreeWithLocations implements LikelihoodTree {
 		else {
 			double loglikelihood=0;
 			for (Node child : node.children) {
-				if (child.location!=MigrationBaseModel.UNKNOWN_LOCATION) {
+				if (child.location!=UNKNOWN_LOCATION) {
 					assert child.time>node.time;
 					loglikelihood=loglikelihood+conditionalLogLikelihood(child,child.location)+likelihoodModel.logprobability(nodeLocation, child.location, node.time, child.time);
 				}
 				else {
-					double[] alphas=new double[num_locations];
+					double[] alphas=likelihoodModel.probability(nodeLocation,node.time,child.time);
+					for (int i=0;i<alphas.length;i++) {
+						alphas[i]=Math.log(alphas[i]);
+					}
 					double min = Double.POSITIVE_INFINITY;
 					for (int childLocation=0;childLocation<num_locations;childLocation++) {
-						double alpha = likelihoodModel.logprobability(nodeLocation, childLocation, node.time, child.time)+conditionalLogLikelihood(child, childLocation);						
-						alphas[childLocation]=alpha;
-						if (alpha<min) min=alpha;
+						double alpha = conditionalLogLikelihood(child, childLocation);						
+						alphas[childLocation]+=alpha;
+						if (alphas[childLocation]<min) min=alphas[childLocation];
 					}
-					loglikelihood=loglikelihood+ Util.logSumExp(alphas,min);
+					loglikelihood=loglikelihood+Util.logSumExp(alphas,min);					
 				}			 
 			}
 			node.cachedConditionalLogLikelihood[nodeLocation]=loglikelihood;
 			return loglikelihood;		
 		}
 	}
-
 
 	@Override
 	public String print() {
@@ -187,11 +196,11 @@ public class TreeWithLocations implements LikelihoodTree {
 			jebl.evolution.graphs.Node inputSubTree) {
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {	
 			Taxon taxon = inputTree.getTaxon(node);
-			Integer location = MigrationBaseModel.UNKNOWN_LOCATION;
+			Integer location = UNKNOWN_LOCATION;
 			if (taxon!=null) {
 				location = locationMap.get(inputTree.getTaxon(node).toString());
 				if (location==null) 
-					location=-1;
+					location=UNKNOWN_LOCATION;
 			}			
 			outputSubTree.children.add(new Node(location,outputSubTree.time+inputTree.getLength(node)/*+jitter*(cern.jet.random.Uniform.staticNextDouble()-0.5)*/,num_locations));
 			makeSubTree(inputTree,locationMap, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
@@ -239,7 +248,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private void removeInternalLocations(Node node) {
 		if (node.children.size()!=0) {
-			node.location=MigrationBaseModel.UNKNOWN_LOCATION;
+			node.location=UNKNOWN_LOCATION;
 			for (Node child : node.children) {
 				removeInternalLocations(child);				
 			}
@@ -268,10 +277,10 @@ public class TreeWithLocations implements LikelihoodTree {
 			time=time_;
 			// TODO: add caching of unknown states...
 			// TODO: change to a throw phrase...
-			if (location>=num_locations_) {
+			if (location>=num_locations_ && location!=UNKNOWN_LOCATION) {
 				System.err.println("error creating node with location: "+location+" out of range: 0<location<"+(num_locations-1));		
 			}
-			cachedConditionalLogLikelihood = new double[num_locations_];
+			cachedConditionalLogLikelihood = new double[num_locations_+1];
 		}
 	}
 

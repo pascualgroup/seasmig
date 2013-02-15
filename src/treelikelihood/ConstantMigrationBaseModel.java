@@ -34,9 +34,6 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	@Override
 	public double logprobability(int from_location, int to_location, double from_time, double to_time) {
 
-		if (to_location==MigrationBaseModel.UNKNOWN_LOCATION) 
-			return 0;
-
 		double dt = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time-from_time)); 
 		double[][] cached = cachedTransitionMatrices.get(dt);
 
@@ -119,10 +116,15 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		return "Constant";
 	}
 
-	
+	@Override
+	public double[] probability(int from_location, double from_time,	double to_time) {
+		double dt = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time-from_time)); 
+		double[][] cached = cachedTransitionMatrices.get(dt);
 
-
-
-
+		if (cached!=null)  
+			return cached[from_location];		
+		else 		
+			return transitionMatrix(from_time, to_time)[from_location];	
+	}
 
 }

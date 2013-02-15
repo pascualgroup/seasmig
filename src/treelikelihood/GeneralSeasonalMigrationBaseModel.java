@@ -68,6 +68,12 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	public double logprobability(int from_location, int to_location, double from_time, double to_time) {		
 		return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);
 	}
+	
+	// Methods
+	@Override
+	public double[] probability(int from_state,  double from_time, double to_time) {		
+		return transitionMatrix(from_time, to_time)[from_state];
+	}
 
 	@Override
 	public double[][] transitionMatrix(double from_time, double to_time) {
