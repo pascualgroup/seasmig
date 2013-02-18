@@ -16,7 +16,7 @@ public class Config
 	
 	enum RunMode {	NORMAL,	TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY}
 
-	public boolean useAllTreesForSingleLikelihoodCalculation = true;
+	public boolean useAllTreesForSingleLikelihoodCalculation = false;
 	
 	public Long randomSeed;
 	
@@ -34,16 +34,16 @@ public class Config
 
 	// MCMC & LOG RELATED PARAMETERS
 	// in iterations
-	public long thin = 50;
+	public long thin = 20;
 
-	public long tuneEvery = 50; 
-	public long tuneFor = 100000; 
+	public long tuneEvery = 500; 
+	public long tuneFor = 1000; 
 	
 	public long initialHistoryCount = 20000;
 	public long recordHistoryAfter = 40000;
 	
 	public int chainCount = 16;
-	public double heatPower = 3.0;
+	public double heatPower = 2.0;
 	
 	// DISPLAY RELATED PARAMTERS
 	public int printEveryNStates = 100000;
@@ -62,7 +62,7 @@ public class Config
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
-	public int numTreesFromTail = 4; // at most number of trees to read from tree file's tail
+	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
 			
 	// TEST RELATED PARAMETERS	
 	// TEST1+TEST2
