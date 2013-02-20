@@ -1,6 +1,3 @@
 {
-	"chainCount" : 2,
-	"migrationSeasonality" : "TWO_CONSTANT_SEASONS",
-	"numTreesFromTail" : 2,
-	"tuneEvery" : 50
+
 }

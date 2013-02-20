@@ -106,6 +106,9 @@ public class Data
 			case SINUSOIDAL:
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 				break;
+			default: 
+				System.err.println("Migration Seasonality: "+config.migrationSeasonality+" not implemented for this configuration!!!");
+				System.exit(-1);
 			}
 
 			for (int i=0;i<config.numTestTrees;i++) {
@@ -162,6 +165,9 @@ public class Data
 			case SINUSOIDAL:
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 				break;
+			default: 
+				System.err.println("Migration Seasonality: "+config.migrationSeasonality+" not implemented for this configuration!!!");
+				System.exit(-1);
 			}
 
 			System.out.print("Loading trees... ");			
@@ -236,6 +242,9 @@ public class Data
 			case SINUSOIDAL:
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 				break;
+			default: 
+				System.err.println("Migration Seasonality: "+config.migrationSeasonality+" not implemented for this configuration!!!");
+				System.exit(-1);
 			}
 
 			System.out.print(" done!\nLoading trees... ");			

@@ -49,6 +49,17 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				}
 			}
 			break;
+		case TWO_CONSTANT_SEASONS_ALTERNATIVE_PARAMS:
+			// This is the weird way dependencies are declared. It will become unweird someday.
+			new Jack<DoubleValued>(model, this, model.twoMatrixPhase);
+			for(int i = 0; i < config.numLocations; i++) 		{
+				for(int j = 0; j < config.numLocations; j++) 			{
+					if(i == j) continue;
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate);
+					new Jack<DoubleValued>(model, this, model.rateParams[i][j].rate2);					
+				}
+			}
+			break;
 		case TWO_CONSTANT_SEASONS_FIXED_PHASE:
 			// This is the weird way dependencies are declared. It will become unweird someday.
 			for(int i = 0; i < config.numLocations; i++) 		{
@@ -78,6 +89,10 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 				}
 				break;
 			}
+			break;
+		default: 
+			System.err.println("Migration Seasonality: "+config.migrationSeasonality+" not implemented for this configuration!!!");
+			System.exit(-1);
 		}
 	}
 
@@ -185,6 +200,10 @@ public class SeasonalMigrationLikelihood extends RandomVariable<NoDistribution>
 			}
 
 			migrationBaseModel = new SinusoidialSeasonalMigrationBaseModel(rates, amp, phase);
+			break;
+		default: 
+			System.err.println("Migration Seasonality: "+config.migrationSeasonality+" not implemented for this configuration!!!");
+			System.exit(-1);		
 		}
 			
 		// TODO: maybe get likelihood to work without copy...
