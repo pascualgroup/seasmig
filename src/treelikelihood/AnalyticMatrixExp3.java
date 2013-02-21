@@ -4,7 +4,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 
 	double[][] Q = new double[3][3];
 	double Lambda;
-	double Delta;
+	double Delta; 
 	double Disc;
 	
 	public AnalyticMatrixExp3(double[][] Q) {
@@ -20,7 +20,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 				Q[0][1]*Q[2][0]+Q[1][0]*Q[2][0]+Q[1][2]*Q[2][0]+
 				Q[0][1]*Q[2][1]+Q[0][2]*Q[2][1]+Q[1][0]*Q[2][1];
 		
-		Disc = Math.sqrt(Delta);
+		Disc = (Math.sqrt(Delta));
 	}
 	
 	@Override
