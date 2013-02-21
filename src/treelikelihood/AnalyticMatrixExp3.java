@@ -59,8 +59,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 
 			return returnValue;
 		} 
-
-		return returnValue;		
+		return returnValue;
 	}
 
 	public static void main(String[] args)

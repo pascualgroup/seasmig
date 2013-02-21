@@ -1,7 +1,5 @@
 package treelikelihood;
 import java.util.HashMap;
-import cern.colt.matrix.tdouble.DoubleFactory2D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.jet.math.tdouble.DoubleFunctions;
 
 public class ConstantMigrationBaseModel implements MigrationBaseModel {
@@ -30,6 +28,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			break;
 		case 3:
 			matrixExponentiator=new AnalyticMatrixExp3(Q);
+			//matrixExponentiator=new Matlab7MatrixExp(Q);
 			break;			
 		default:
 			matrixExponentiator=new Matlab7MatrixExp(Q);	
