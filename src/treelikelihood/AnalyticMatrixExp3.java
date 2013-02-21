@@ -22,7 +22,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 				Q[0][1]*Q[2][0]+Q[1][0]*Q[2][0]+Q[1][2]*Q[2][0]+
 				Q[0][1]*Q[2][1]+Q[0][2]*Q[2][1]+Q[1][0]*Q[2][1];
 		
-		Epsilon = Math.sqrt(-4*Delta+Math.pow(Delta,2));
+		Epsilon = Math.sqrt(-4*Delta+Lambda*Lambda);
 		
 	}
 	
