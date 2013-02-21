@@ -32,17 +32,17 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 		
 		double[][] returnValue = new double[3][3];
 		
-		double denum1=4*Delta+(Epsilon-Delta)*Delta;
-		double denum3=-4*Delta+(Epsilon+Delta)*Delta;;
+		double denum1=4*Delta+(Epsilon-Lambda)*Lambda;
+		double denum3=-4*Delta+(Epsilon+Lambda)*Lambda;
 		if (denum1!=0 && denum3!=0 && Delta!=0) {
-			double exp1 = Math.exp(0.5*t*(Epsilon-Delta));			
-			double exp3 = Math.exp(-0.5*t*(Epsilon+Delta));
+			double exp1 = Math.exp(0.5*t*(Epsilon-Lambda));			
+			double exp3 = Math.exp(-0.5*t*(Epsilon+Lambda));
 			
 			for (int i=0;i<3;i++) {				
 				returnValue[i][i]=
-					exp1*(-2*Q[i][(i+1)%3]*Q[i][(i+1)%3]+Q[i][(i+1)%3]*(Epsilon+Delta-4*Q[i][(i+2)%3]-2*Q[(i+1)%3][i])+Q[i][(i+2)%3]*(Epsilon+Delta-2*Q[i][(i+2)%3]-2*Q[(i+2)%3][i]))/denum1+
-					(Delta+Q[i][(i+1)%3]*Q[i][(i+1)%3]+Q[(i+1)%3][(i+2)%3]*Q[(i+1)%3][(i+2)%3]+Q[i][(i+1)%3]*(-Delta+2*Q[i][(i+2)%3]+Q[(i+1)%3][i])+Q[i][(i+2)%3]*(-Delta+Q[(i+2)%3][i]))/Delta+
-					2*exp3*(2*Q[i][(i+1)%3]*Q[i][(i+1)%3]+Q[i][(i+1)%3]*(Epsilon-Delta+4*Q[i][(i+2)%3]+2*Q[(i+1)%3][i])+Q[i][(i+2)%3]*(Epsilon-Delta+2*Q[i][(i+2)%3]+2*Q[(i+2)%3][i]))/denum3;
+					exp1*(-2*Q[i][(i+1)%3]*Q[i][(i+1)%3]+Q[i][(i+1)%3]*(Epsilon+Lambda-4*Q[i][(i+2)%3]-2*Q[(i+1)%3][i])+Q[i][(i+2)%3]*(Epsilon+Lambda-2*Q[i][(i+2)%3]-2*Q[(i+2)%3][i]))/denum1+
+					(Delta+Q[i][(i+1)%3]*Q[i][(i+1)%3]+Q[i][(i+2)%3]*Q[i][(i+2)%3]+Q[i][(i+1)%3]*(-Lambda+2*Q[i][(i+2)%3]+Q[(i+1)%3][i])+Q[i][(i+2)%3]*(-Lambda+Q[(i+2)%3][i]))/Delta+
+					exp3*(2*Q[i][(i+1)%3]*Q[i][(i+1)%3]+Q[i][(i+1)%3]*(Epsilon-Lambda+4*Q[i][(i+2)%3]+2*Q[(i+1)%3][i])+Q[i][(i+2)%3]*(Epsilon-Lambda+2*Q[i][(i+2)%3]+2*Q[(i+2)%3][i]))/denum3;
 			}
 			
 			for (int i=0;i<3;i++) {				
