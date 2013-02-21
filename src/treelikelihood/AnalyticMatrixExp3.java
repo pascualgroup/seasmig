@@ -50,10 +50,11 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 			for (int i=0;i<3;i++) {	
 				for (int j=0;j<3;j++) {
 					if (i==j) continue;
+					int notij=3-(i|j);					
 					returnValue[i][j]=
-							-exp1*(-2*Q[i][j]*Q[i][j]+Q[i][j]*(Epsilon+Lambda-2*Q[i][(j+1)%3]-2*Q[j][(j+1)%3]-2*Q[j][(i+1)%3])+2*Q[i][(j+2)%3]*Q[(i+1)%3][j])/denum1+
-							(-Q[i][j]*Q[i][j]+Q[i][(j+2)%3]*Q[(i+1)%3][j]+Q[i][j]*(Lambda-Q[i][(j+2)%3]-Q[(i+2)%3][(j+1)%3]-Q[(i+2)%3][(j+2)%3]))/Delta+
-							-exp3*(2*Q[i][j]*Q[i][j]+Q[i][j]*(Epsilon-Lambda+2*Q[i][(j+1)%3]+2*Q[j][(j+1)%3]+2*Q[j][(j+2)%3])-2*Q[i][(j+2)%3]*Q[(i+1)%3][j])/denum3;
+						-exp1*(Q[i][j]*(Epsilon+Lambda-2*Q[i][j]-2*Q[j][i]-2*Q[j][notij]-2*Q[i][notij])+2*Q[i][notij]*Q[notij][j])/denum1+
+						(Q[i][notij]*Q[notij][j]+Q[i][j]*(Lambda-Q[i][notij]-Q[i][j]-Q[j][i]-Q[j][notij]))/Delta+
+						-exp3*(Q[i][j]*(Epsilon-Lambda+2*Q[i][j]+2*Q[j][i]+2*Q[j][notij]+2*Q[i][notij])-2*Q[i][notij]*Q[notij][j])/denum3;
 							
 				}
 			}
