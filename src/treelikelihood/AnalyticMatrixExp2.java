@@ -24,8 +24,8 @@ public class AnalyticMatrixExp2 implements MatrixExponentiator {
 		if (denum!=0) {
 			double exp = Math.exp(t*(-Q[0][1]-Q[1][0]));			
 			returnValue[0][0]=(exp*Q[0][1]+Q[1][0])/denum;
-			returnValue[0][1]=(exp-1)*Q[0][1]/denum;
-			returnValue[1][0]=(exp-1)*Q[1][0]/denum;
+			returnValue[0][1]=(1-exp)*Q[0][1]/denum;
+			returnValue[1][0]=(1-exp)*Q[1][0]/denum;
 			returnValue[1][1]=(exp*Q[1][0]+Q[0][1])/denum;
 			return returnValue;
 		} 
