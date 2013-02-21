@@ -24,10 +24,20 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	public ConstantMigrationBaseModel(double[][] Q_) {	
 		Q = Q_;
 		num_locations=Q_.length;
-		matrixExponentiator=new Matlab7MatrixExp(Q);
-		//matrixExponentiator=new TaylorMatrixExp(Q);
-		//matrixExponentiator=new MolerMatrixExp(Q);
-		//matrixExponentiator=new JblasMatrixExp(Q);
+		switch (num_locations) {
+		case 2:
+			matrixExponentiator=new AnalyticMatrixExp2(Q);
+			break;
+		case 3:
+			matrixExponentiator=new AnalyticMatrixExp3(Q);
+			break;			
+		default:
+			matrixExponentiator=new Matlab7MatrixExp(Q);	
+			//matrixExponentiator=new TaylorMatrixExp(Q);
+			//matrixExponentiator=new MolerMatrixExp(Q);
+			//matrixExponentiator=new JblasMatrixExp(Q);
+		}
+		
 	}
 
 	// Methods
