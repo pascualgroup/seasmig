@@ -38,7 +38,6 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 			double exp1 = Math.exp(0.5*t*(Epsilon-Lambda));			
 			double exp3 = Math.exp(-0.5*t*(Epsilon+Lambda));
 
-			// OK
 			for (int i=0;i<3;i++) {	
 				returnValue[i][i]=
 						exp1*(-2*Q[i][(i+1)%3]*Q[i][(i+1)%3]+Q[i][(i+1)%3]*(Epsilon+Lambda-4*Q[i][(i+2)%3]-2*Q[(i+1)%3][i])+Q[i][(i+2)%3]*(Epsilon+Lambda-2*Q[i][(i+2)%3]-2*Q[(i+2)%3][i]))/denum1+
@@ -46,7 +45,6 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 						exp3*(2*Q[i][(i+1)%3]*Q[i][(i+1)%3]+Q[i][(i+1)%3]*(Epsilon-Lambda+4*Q[i][(i+2)%3]+2*Q[(i+1)%3][i])+Q[i][(i+2)%3]*(Epsilon-Lambda+2*Q[i][(i+2)%3]+2*Q[(i+2)%3][i]))/denum3;
 			}
 
-			// TODO:
 			for (int i=0;i<3;i++) {	
 				for (int j=0;j<3;j++) {
 					if (i==j) continue;
