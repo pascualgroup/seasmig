@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -15,20 +17,24 @@ import jebl.evolution.io.NexusImporter;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.math.Random;
 
-public class Data
-{
+public class TestTrees implements Collection<LikelihoodTree> {
+	// TODO: This...
 	public Vector<LikelihoodTree> trees = new Vector<LikelihoodTree>();
 	Config config = null;
+	enum TestType {NORMAL, TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY};
 
 	// TEST MODELS
 	MigrationBaseModel createModel = null;
 	List<MigrationBaseModel> testModels = null;
+	private SimpleRootedTree numTestTips;
+	private int numLocations;
+	private int disturbanceScale;
 
-	public Data(Config config_) throws IOException, ImportException 	{
+	public TestTrees(Config config_, TestType testType, int numTestRepeats, int numTestLocations, int numTestTrees) throws IOException, ImportException 	{
 
 		config = config_;		
 
-		switch (config.runMode) {
+		switch (testType) {
 		case NORMAL:
 			// Load trees
 			System.out.print("Loading trees... ");			
@@ -49,16 +55,17 @@ public class Data
 			// Convert trees to internal tree representation
 			if (config.locationFilename!=null) {
 				System.out.print("Loading traits... ");
-				AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilename, config.stateFilename);
-				// TODO: think about this...
-				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributeLoader.getAttributes().get("locations");
-				HashMap<String,Double> stateMap = (HashMap<String,Double>) attributeLoader.getAttributes().get("states");
+				AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilename, config.stateFilename);	
+				HashMap<String,Object> attributes = attributeLoader.getAttributes();
+				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
+				HashMap<String,Double> stateMap = (HashMap<String,Double>) attributes.get("states");
+				int numLocations = (Integer) attributes.get("numLocations");
 				System.out.println("loaded "+locationMap.size()+" taxon traits");
 
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,config.numLocations));
+						trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
 					}
 				}
 				else {
@@ -84,16 +91,16 @@ public class Data
 			// Generate test data and trees
 
 			// For constant model...
-			double[][] Q = makeRandomMigrationMatrix(config.numLocations,2); 
+			double[][] Q = makeRandomMigrationMatrix(numTestLocations,2); 
 
 			// For two seasonal model...
 			double[][] QW = myMatrixCopy(Q);
-			double[][] QS = makeRandomMigrationMatrix(config.numLocations,3); 
+			double[][] QS = makeRandomMigrationMatrix(numTestLocations,3); 
 
 			// For sinusoidal model...
 			double[][] rates = myMatrixCopy(Q);
-			double[][] amps = makeRandomMigrationMatrix(config.numLocations,1);
-			double[][] phases = makeRandomMigrationMatrix(config.numLocations,1);
+			double[][] amps = makeRandomMigrationMatrix(numTestLocations,1);
+			double[][] phases = makeRandomMigrationMatrix(numTestLocations,1);
 
 			switch (config.migrationSeasonality) {
 			case NONE:	
@@ -111,8 +118,8 @@ public class Data
 				System.exit(-1);
 			}
 
-			for (int i=0;i<config.numTestTrees;i++) {
-				TreeWithLocations testTree = new TreeWithLocations(createModel,config.numTestTips);
+			for (int i=0;i<numTestTrees;i++) {
+				TreeWithLocations testTree = new TreeWithLocations(createModel,numTestTips);
 				testTree.removeInternalLocations();
 				trees.add(testTree);
 			}
@@ -122,20 +129,22 @@ public class Data
 
 			testModels = new ArrayList<MigrationBaseModel>();
 
-			for (int i=0; i<config.numTestRepeats; i++) {
-				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, config.disturbanceScale*i,99999)));
+			for (int i=0; i<numTestRepeats; i++) {
+				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, disturbanceScale*i,99999)));
 			}
-			for (int i=0; i<config.numTestRepeats; i++) {
+			for (int i=0; i<numTestRepeats; i++) {
 				double phase = Math.max(0,Math.min(1,0.3+i/3*(Random.nextDouble()-0.5))); double length = 0.5;
-				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,config.disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,config.disturbanceScale*i/3,99999),phase, phase+length));
+				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,disturbanceScale*i/3,99999),phase, phase+length));
 			}
-			for (int i=0; i<config.numTestRepeats; i++) {
-				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,config.disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,config.disturbanceScale*i/3,1),disturbMigrationMatrix(phases,config.disturbanceScale*i/3,1)));
+			for (int i=0; i<numTestRepeats; i++) {
+				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,disturbanceScale*i/3,1),disturbMigrationMatrix(phases,disturbanceScale*i/3,1)));
 			}
 			System.out.println(" generated "+testModels.size()+" test models");
 			break;
 
 		case TEST_USING_INPUT_TREES:{
+			// TODO: get number of locations from trees...
+			
 			// TODO: add more tests + test files ....
 			// TODO: add tests for states...
 			System.out.print("Generating test trees based on input tree topology ... ");
@@ -143,16 +152,16 @@ public class Data
 			// Generate test data and trees
 
 			// For constant model...
-			Q = makeRandomMigrationMatrix(config.numLocations,2); 
+			Q = makeRandomMigrationMatrix(numTestLocations,2); 
 
 			// For two seasonal model...
 			QW = myMatrixCopy(Q);
-			QS = makeRandomMigrationMatrix(config.numLocations,3); 
+			QS = makeRandomMigrationMatrix(numTestLocations,3); 
 
 			// For sinusoidal model...
 			rates = myMatrixCopy(Q);
-			amps = makeRandomMigrationMatrix(config.numLocations,1);
-			phases = makeRandomMigrationMatrix(config.numLocations,1);
+			amps = makeRandomMigrationMatrix(numTestLocations,1);
+			phases = makeRandomMigrationMatrix(numTestLocations,1);
 
 			switch (config.migrationSeasonality) {
 			case NONE:	
@@ -183,7 +192,7 @@ public class Data
 				nexsusTreeTail.add(nexsusTrees.get(i));
 			}
 			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
-			for (int i=0; i<config.numTestTrees;i++) {				
+			for (int i=0; i<numTestTrees;i++) {				
 				TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree) nexsusTreeTail.get(Random.nextInt(nexsusTreeTail.size())));
 				testTree.fillRandomTraits();
 				testTree.removeInternalLocations();
@@ -195,15 +204,15 @@ public class Data
 
 			testModels = new ArrayList<MigrationBaseModel>();
 
-			for (int i=0; i<config.numTestRepeats; i++) {
-				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, config.disturbanceScale*i,99999)));
+			for (int i=0; i<numTestRepeats; i++) {
+				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, disturbanceScale*i,99999)));
 			}
-			for (int i=0; i<config.numTestRepeats; i++) {
+			for (int i=0; i<numTestRepeats; i++) {
 				double phase = Math.max(0,Math.min(1,0.3+i/3*(Random.nextDouble()-0.5))); double length = 0.5;
-				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,config.disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,config.disturbanceScale*i/3,99999),phase, phase+length));
+				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,disturbanceScale*i/3,99999),phase, phase+length));
 			}
-			for (int i=0; i<config.numTestRepeats; i++) {
-				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,config.disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,config.disturbanceScale*i/3,1),disturbMigrationMatrix(phases,config.disturbanceScale*i/3,1)));
+			for (int i=0; i<numTestRepeats; i++) {
+				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,disturbanceScale*i/3,1),disturbMigrationMatrix(phases,disturbanceScale*i/3,1)));
 			}
 			System.out.println(" generated "+testModels.size()+" test models");
 
@@ -218,7 +227,7 @@ public class Data
 			// Generate test data and trees
 
 			// For constant model...
-			Q = makeRandomMigrationMatrix(config.numLocations,2); 
+			Q = makeRandomMigrationMatrix(numLocations,2); 
 
 			// For two seasonal model...
 			QW = myMatrixCopy(Q);
@@ -226,8 +235,8 @@ public class Data
 
 			// For sinusoidal model...
 			rates = myMatrixCopy(Q);
-			amps = makeRandomMigrationMatrix(config.numLocations,0);
-			phases = makeRandomMigrationMatrix(config.numLocations,1);
+			amps = makeRandomMigrationMatrix(numLocations,0);
+			phases = makeRandomMigrationMatrix(numLocations,1);
 
 			// For two constant seasons model...
 			double phase = 0.3; double length = 0.5;
@@ -347,6 +356,73 @@ public class Data
 		return returnValue;
 	}
 
+
+	@Override
+	public boolean add(LikelihoodTree tree) {
+		trees.add(tree);
+		return true;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends LikelihoodTree> moreTrees) {
+		trees.addAll(moreTrees);
+		return true;
+	}
+
+	@Override
+	public void clear() {
+		trees.clear();
+	}
+
+	@Override
+	public boolean contains(Object tree) {
+		return trees.contains(tree);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> trees) {
+		return trees.containsAll(trees);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return trees.isEmpty();
+	}
+
+	@Override
+	public Iterator<LikelihoodTree> iterator() {
+		return trees.iterator();
+	}
+
+	@Override
+	public boolean remove(Object tree) {
+		return trees.remove(tree);
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> treesToRemove) {
+		return trees.removeAll(treesToRemove);
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> treesToRetain) {
+		return trees.retainAll(treesToRetain);
+	}
+
+	@Override
+	public int size() {
+		return trees.size();
+	}
+
+	@Override
+	public Object[] toArray() {
+		return trees.toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] treesToArray) {
+		return trees.toArray(treesToArray);
+	}
 
 
 

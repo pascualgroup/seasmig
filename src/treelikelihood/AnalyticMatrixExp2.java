@@ -1,5 +1,7 @@
 package treelikelihood;
 
+import org.junit.Test;
+
 public class AnalyticMatrixExp2 implements MatrixExponentiator {
 	
 	// Q has to be a proper rate matrix with Q[i][i] = -Sum of rest of row i
@@ -33,7 +35,8 @@ public class AnalyticMatrixExp2 implements MatrixExponentiator {
 		return returnValue;		
 	}
 	
-	public static void main(String[] args)
+	@Test
+	public void test()
 	{
 		// TODO: This...
 		MatrixExponentiator matrixExponentiator1 = new AnalyticMatrixExp2(new double[][]{{-3,3},{0.5,-0.5}});	
@@ -74,11 +77,7 @@ public class AnalyticMatrixExp2 implements MatrixExponentiator {
 			}
 		}
 		long time2= System.currentTimeMillis()-startTime2;
-		System.out.println("time1: "+time1+"[ms] time2: "+time2+"[ms]");
-		
-		
-		
-		
+		System.out.println("time1: "+time1+"[ms] time2: "+time2+"[ms]");	
 	}
 
 }

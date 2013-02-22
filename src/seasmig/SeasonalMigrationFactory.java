@@ -1,5 +1,6 @@
 package seasmig;
 
+import mc3kit.Chain;
 import mc3kit.MC3KitException;
 import mc3kit.MCMC;
 import mc3kit.Model;
@@ -17,8 +18,8 @@ public class SeasonalMigrationFactory implements ModelFactory
 	}
 	
 	@Override
-	public Model createModel(MCMC mcmc) throws MC3KitException
-	{
+	public Model createModel(Chain initialChain) throws MC3KitException {
+		// TODO Auto-generated method stub
 		return new SeasonalMigrationModel(mcmc, config, data);
 	}
 }

@@ -23,6 +23,9 @@ import java.util.*;
 import java.util.logging.*;
 import java.io.*;
 
+import seasmig.Config;
+import seasmig.Data;
+
 import static java.lang.String.format;
 import static java.lang.Math.*;
 import static mc3kit.util.Utils.*;

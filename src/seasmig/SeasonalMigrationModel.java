@@ -13,7 +13,7 @@ import mc3kit.MC3KitException;
 import mc3kit.MCMC;
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModel extends GraphicalModel
+public class SeasonalMigrationModel extends Model
 // TODO: Go over this...
 {
 	Config config;

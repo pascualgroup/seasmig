@@ -1,5 +1,7 @@
 package treelikelihood;
 
+import org.junit.Test;
+
 public class AnalyticMatrixExp3 implements MatrixExponentiator {
 
 	// Q has to be a proper rate matrix with Q[i][i] = -Sum of rest of row i
@@ -62,8 +64,8 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 		return null;
 	}
 
-	public static void main(String[] args)
-	{
+	@Test
+	public void test() {
 		// TODO: This...
 		MatrixExponentiator matrixExponentiator1 = new AnalyticMatrixExp3(new double[][]{{-3,1,2},{0.5,-4,3.5},{4,6,-10}});
 		MatrixExponentiator matrixExponentiator2 = new Matlab7MatrixExp(new double[][]{{-3,1,2},{0.5,-4,3.5},{4,6,-10}});

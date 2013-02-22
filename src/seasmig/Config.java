@@ -4,6 +4,7 @@ package seasmig;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.logging.Level;
 
 import com.google.gson.Gson;
 
@@ -14,13 +15,7 @@ public class Config
 	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,TWO_CONSTANT_SEASONS_FIXED_PHASE,SINUSOIDAL, TWO_CONSTANT_SEASONS_ALTERNATIVE_PARAMS }; //TODO: DEBUG SINUSODIAL //TODO: ADD CONTINUOUS SEASONAL MODEL
 	enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
-	enum RunMode {	NORMAL,	TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY}
-
-	public boolean useAllTreesForSingleLikelihoodCalculation = false;
-	
 	public Long randomSeed;
-	
-	public RunMode runMode = RunMode.NORMAL;
 	
 	// LOG RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
@@ -29,21 +24,22 @@ public class Config
 	public String demcStatsFilename = "demc_stats.jsons";
 	public boolean recordHeatedStats = false;
 	public String swapStatsFilename = "swap_stats.txt";
-	public LogLevel logLevel = LogLevel.ERROR;
+	public Level logLevel = Level.INFO;
 	public String logFilename = "debug.log";
 
 	// MCMC & LOG RELATED PARAMETERS
 	// in iterations
-	public long thin = 20;
+	public long burnIn = 2000;
+	public long iterCount = 100000000L;	
 
-	public long tuneEvery = 500; 
-	public long tuneFor = 0; 
-	
-	public long initialHistoryCount = 20000;
-	public long recordHistoryAfter = 40000;
-	
-	public int chainCount = 16;
-	public double heatPower = 2.0;
+//	public long tuneEvery = 500; 
+//	public long tuneFor = 0; 
+//	
+//	public long initialHistoryCount = 20000;
+//	public long recordHistoryAfter = 40000;
+//	
+//	public int chainCount = 16;
+//	public double heatPower = 2.0;
 	
 	// DISPLAY RELATED PARAMTERS
 	public int printEveryNStates = 100000;
@@ -51,8 +47,6 @@ public class Config
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.NONE;
 	public StateModel stateModel = StateModel.NONE; // TODO: this...
-	public int numLocations = 3;  // TODO: add support of one location....
-							      // TODO: add as an attribute loaded with attribute loader...
 	public double fixedPhase = 0.1;
 	
 	// MODEL DATA RELATED PARAMETERS
@@ -63,17 +57,7 @@ public class Config
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
-			
-	// TEST RELATED PARAMETERS	
-	// TEST1+TEST2
-	public int numTestTrees = 2;
-
-	// TEST1
-	public int numTestTips = 1200;
-	public int numTestRepeats = 5; 
-	public double disturbanceScale = 0.3;
-
-	
+	public Integer numLocations = null; // needs to be specified if locations are loaded from trees....
 		
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) throws IOException {
@@ -83,8 +67,6 @@ public class Config
 		PrintStream configOutputStream = new PrintStream(configOutputFile);
 		configOutputStream.print(gson.toJson(this).toString());
 		configOutputStream.close();
-	}
-
-	
+	}	
 	
 }

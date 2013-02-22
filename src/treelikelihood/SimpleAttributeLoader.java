@@ -7,38 +7,39 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SimpleAttributeLoader implements AttributeLoader{
 	// TODO: change this to a different and single file type for attributes....
 	// TODO: add grouping of locations together .....
 	
 	HashMap<String, Object> attributes = new HashMap<String,Object>();
-	List<String> attributeNames = new ArrayList<String>();
 
 	public SimpleAttributeLoader(String locationFilename,String stateFilename) throws NumberFormatException, IOException {
 		if (locationFilename!=null) {
-			attributes.put("locations",readLocations(locationFilename));
-			attributeNames.add("locations");
+			processLocations(locationFilename);							
 		}
 		if (stateFilename!=null) {
-			attributes.put("states",readStates(stateFilename));
-			attributeNames.add("states");
+			processStates(stateFilename);
 		}
 	}
 
+	
 	@Override
 	public HashMap<String, Object> getAttributes() {
 		return attributes;
 	}
 	
-	HashMap<String, Integer> readLocations(String fileName) throws NumberFormatException, IOException {
+	void processLocations(String fileName) throws NumberFormatException, IOException {
 
 		FileInputStream locationFIStream = new FileInputStream(fileName);
 		DataInputStream locationDIStream = new DataInputStream(locationFIStream);
 		BufferedReader locationReader = new BufferedReader(new InputStreamReader(locationDIStream));
 
 		HashMap<String,Integer> locationMap = new HashMap<String,Integer>();
+		Set<Integer> locations = new HashSet<Integer>();
 
 		String strLine;
 		//Read File Line By Line
@@ -46,12 +47,15 @@ public class SimpleAttributeLoader implements AttributeLoader{
 			String taxa = strLine;
 			Integer state = Integer.parseInt(locationReader.readLine());
 			locationMap.put(taxa, state);
+			locations.add(state);			
 		}
 
-		return locationMap;
+		attributes.put("locations",locationMap);
+		attributes.put("numLocations",locations.size());
+		
 	}
 	
-	HashMap<String, Double> readStates(String fileName) throws NumberFormatException, IOException {
+	void processStates(String fileName) throws NumberFormatException, IOException {
 
 		FileInputStream stateFIStream = new FileInputStream(fileName);
 		DataInputStream stateDIStream = new DataInputStream(stateFIStream);
@@ -67,12 +71,12 @@ public class SimpleAttributeLoader implements AttributeLoader{
 			stateMap.put(taxa, state);
 		}
 
-		return stateMap;
+		attributes.put("states",stateMap);
 	}
 
 	@Override
-	public List<String> getAttributeNames() {
-		return attributeNames;
+	public Set<String> getAttributeNames() {
+		return attributes.keySet();
 	}
 
 }
