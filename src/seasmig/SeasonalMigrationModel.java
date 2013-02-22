@@ -14,6 +14,7 @@ import mc3kit.MC3KitException;
 import mc3kit.MCMC;
 import mc3kit.Model;
 
+@SuppressWarnings("serial")
 public class SeasonalMigrationModel extends Model
 // TODO: Go over this...
 {
