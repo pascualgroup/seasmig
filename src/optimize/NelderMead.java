@@ -1,4 +1,4 @@
-package seasmig;
+package optimize;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,6 +15,23 @@ public class NelderMead {
 	double rho = -0.5;
 	double sigma = 0.5;
 	double nu = 0.00001;
+	private double terminationCondition = 1e-4;
+	private Vector<Vector<Double>> x0s;
+	
+	
+	public NelderMead() {
+		this(makeInitPoints(15, 5));
+	}
+	
+	public NelderMead(Vector<Vector<Double>> x0s) {
+		this(x0s,1e-4);
+	}
+	
+	public NelderMead(Vector<Vector<Double>> x0s, double terminationCondition) {
+		this.x0s=x0s;
+		this.terminationCondition=terminationCondition;
+	}
+	
 
 	// Keeping pair of <x, f(x)>		
 	public class XsFxsComparator implements Comparator<Pair<Vector<Double>,Double>> {
@@ -80,7 +97,6 @@ public class NelderMead {
 	}
 	
 	void noise(Vector<Pair<Vector<Double>, Double>> simplex) {
-		//Double sigma = Random.nextDouble();
 		for (int i=0; i<(simplex.size()-1);i++) {
 			nu = -Math.log(Random.nextDouble())*0.0001;
 			Vector<Double> xi_new = simplex.get(i).getValue0();
@@ -93,7 +109,7 @@ public class NelderMead {
 	}
 
 
-	Vector<Vector<Double>> makeInitPoints(int n, int m) {			
+	static Vector<Vector<Double>> makeInitPoints(int n, int m) {			
 		Vector<Vector<Double>> x0s = new Vector<Vector<Double>>(n);
 		for (int i=0;i<n;i++) {
 			x0s.add(new Vector<Double>(m));
@@ -105,9 +121,8 @@ public class NelderMead {
 		return x0s;
 	}
 
-
-	void NM(Vector<Vector<Double>> x0s) { 
-
+	
+	public Pair<Vector<Double>,Double> optimize() {
 		int n = x0s.size();
 
 		// Evaluate						
@@ -118,7 +133,6 @@ public class NelderMead {
 			gamma = -Math.log(Random.nextDouble())*2.0;
 			rho = -Math.log(Random.nextDouble())*(-0.5);	
 			
-			if (Random.nextDouble()<0.01) System.out.println(simplex.get(0));
 			// Order
 			order(simplex);
 			Double fxn=simplex.get(simplex.size()-1).getValue1();
@@ -157,13 +171,16 @@ public class NelderMead {
 			reduce(simplex);
 			// Noise
 			noise(simplex);
-		} 
+		}
+		
+		order(simplex);
+		return (simplex.get(0));
 
 	}
 
 	private boolean termination_condition(
 			Vector<Pair<Vector<Double>, Double>> simplex) {			
-		return (Math.abs(simplex.get(0).getValue1())<0.0001);
+		return (Math.abs(simplex.get(0).getValue1())<terminationCondition );
 	}
 
 	private Vector<Pair<Vector<Double>, Double>> evaluate(Vector<Vector<Double>> x0s) {

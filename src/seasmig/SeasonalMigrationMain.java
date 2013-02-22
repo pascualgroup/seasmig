@@ -54,7 +54,7 @@ public class SeasonalMigrationMain
 
 		MCMC.setLogLevel(config.logLevel);
 
-		ModelFactory mf = new SeasonalMigrationFactory(config, data) {
+		ModelFactory mf = new SeasonalMigrationFactory(config, trees) {
 			@Override
 			public Model createModel(Chain initialChain) throws MC3KitException {
 				Model m = new Model(initialChain);

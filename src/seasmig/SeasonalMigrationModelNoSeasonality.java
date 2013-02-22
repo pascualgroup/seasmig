@@ -47,13 +47,13 @@ public class SeasonalMigrationModelNoSeasonality extends Model
 		 for(int i = 0; i < config.numLocations; i++) {
 			for(int j = 0; j < config.numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
-				rateParams[i][j] = new RateParams(i, j);
+				new DoubleVariable(m, "rateParams"+Integer.toString(i)+Integer.toString(j), new ExponentialDistribution(m,"ratePrior"));
 			}
 		 }
 
-		likeVar = new SeasonalMigrationLikelihood(this, rng);
+		likeVar = new SeasonalMigrationLikelihood(m,rng);
 		
-		  m.endConstruction();
+		m.endConstruction();
 
 	} 
 
