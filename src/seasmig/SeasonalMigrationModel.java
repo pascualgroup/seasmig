@@ -7,11 +7,10 @@ import java.util.*;
 
 import seasmig.Config.Seasonality;
 
+import mc3kit.DoubleDistribution;
+import mc3kit.DoubleVariable;
 import mc3kit.MC3KitException;
 import mc3kit.MCMC;
-import mc3kit.graphical.*;
-import mc3kit.graphical.distributions.*;
-import mc3kit.graphical.types.*;
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModel extends GraphicalModel
