@@ -26,9 +26,9 @@ public class Util {
 		}
 		else {
 			// TODO: This...
-//			System.err.print(sumExp);				
-//			System.err.print("logSumExp==NaN: alphas: "+alphas+"\nmin="+min);			
-			return Util.minValue;			
+			//System.err.print(sumExp);				
+			//System.err.print("logSumExp==NaN: alphas: "+alphas+"\nmin="+min);			
+			return Double.NEGATIVE_INFINITY;			
 		}				
 
 	}
