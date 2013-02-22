@@ -20,45 +20,45 @@
 package mc3kit;
 
 @SuppressWarnings("serial")
-public class IntVariable extends Variable implements IntValued {
+public class BinaryVariable extends Variable implements BinaryValued {
   
-  private int value;
+  private boolean value;
   
-  protected IntVariable() { }
+  protected BinaryVariable() { }
   
-  public IntVariable(Model model, int value) {
+  public BinaryVariable(Model model, boolean value) {
     this(model, (String)null, value);
   }
   
-  public IntVariable(Model model, String name) {
+  public BinaryVariable(Model model, String name) {
     super(model, name, false);
   }
   
-  public IntVariable(Model model, String name, int value) {
+  public BinaryVariable(Model model, String name, boolean value) {
     super(model, name, true);
     this.value = value;
   }
   
-  public IntVariable(Model model, int value, IntDistribution dist) throws MC3KitException {
+  public BinaryVariable(Model model, boolean value, BinaryDistribution dist) throws MC3KitException {
     this(model, null, value, dist);
   }
   
-  public IntVariable(Model model, String name, int value, IntDistribution dist) throws MC3KitException {
+  public BinaryVariable(Model model, String name, boolean value, BinaryDistribution dist) throws MC3KitException {
     super(model, name, true, dist);
     this.value = value;
   }
   
-  public IntVariable(Model model, String name, IntDistribution dist) throws MC3KitException {
+  public BinaryVariable(Model model, String name, BinaryDistribution dist) throws MC3KitException {
     super(model, name, false, dist);
   }
 
   @Override
-  public int getValue() {
+  public boolean getValue() {
     return value;
   }
 
   @Override
-  public void setValue(int value) {
+  public void setValue(boolean value) {
     if(isObserved()) {
       throw new UnsupportedOperationException("Can't set value on an observed variable.");
     }
@@ -69,25 +69,25 @@ public class IntVariable extends Variable implements IntValued {
   }
   
   @Override
-  public IntVariable setDistribution(Distribution dist) throws MC3KitException {
+  public BinaryVariable setDistribution(Distribution dist) throws MC3KitException {
     super.setDistribution(dist);
     return this;
   }
 
   @Override
   public boolean update() {
-    IntDistribution dist = (IntDistribution)getDistribution();
+    BinaryDistribution dist = (BinaryDistribution)getDistribution();
     setLogP(dist.getLogP(this));
     return false;
   }
 
   @Override
   public Object makeOutputObject() {
-    return value;
+    return value ? 1 : 0;
   }
   
   @Override
   public String makeOutputString() {
-    return Integer.toString(value);
+    return value ? "1" : "0";
   }
 }
