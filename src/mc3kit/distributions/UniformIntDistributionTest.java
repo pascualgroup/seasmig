@@ -42,11 +42,12 @@ public class UniformIntDistributionTest {
 
   @Test
   public void test() throws Throwable {
+	  
     long burnIn = 5000;
-    long iterCount = 10000;
+    long iterCount = 100000;
     
     MCMC mcmc = new MCMC();
-    mcmc.setRandomSeed(100L);
+    mcmc.setRandomSeed(101L);
     
     MCMC.setLogLevel(Level.INFO);
     
@@ -56,7 +57,7 @@ public class UniformIntDistributionTest {
         Model m = new Model(initialChain);
         
         m.beginConstruction();
-        new IntVariable(m, "v", new UniformIntDistribution(m, 1,10));
+        new IntVariable(m, "v", new UniformIntDistribution(m, 1,4));
         m.endConstruction();
         
         return m;
@@ -86,6 +87,6 @@ public class UniformIntDistributionTest {
     
     double mean = sum / (double)N;
     System.err.printf("mean = %f\n", mean);
-    assertEquals(5.5, mean, 0.02);
+    assertEquals(2.5, mean, 0.02);
   }
 }

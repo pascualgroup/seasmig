@@ -28,8 +28,8 @@ public class UniformIntDistribution extends IntDistribution {
 
 	// Random uniform distribution from min to max inclusive .....
 
-	static int MaxRange = 1000000; // TODO: get working range
-	static int MinRange = -1000000; // TODO: get working range
+	static int MaxRange = 1000000; // TODO: find precision error free working range
+	static int MinRange = -1000000; // TODO: find precision error working range
 	double min; // TODO: int?
 	double max; // TODO: int?
 	double logP; 
@@ -54,15 +54,15 @@ public class UniformIntDistribution extends IntDistribution {
 		super(model, name);
 
 		if(min >= max) {
-			throw new IllegalArgumentException("min must be less than max.");
+			throw new IllegalArgumentException("min: "+min+" must be less than max: "+max);
 		}
 		
 		if(min >= MaxRange) {
-			throw new IllegalArgumentException("min must be less than MaxRange="+MaxRange);
+			throw new IllegalArgumentException("min: "+min+" must be less than MaxRange: "+MaxRange);
 		}
 		
 		if(max <= MinRange) {
-			throw new IllegalArgumentException("max must be greater than MinRange="+MinRange);
+			throw new IllegalArgumentException("max: "+max+" must be greater than MinRange: "+MinRange);
 		}
 
 		this.min = min;
