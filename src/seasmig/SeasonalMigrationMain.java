@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 
 import jebl.evolution.io.ImportException;
 
@@ -44,7 +45,7 @@ public class SeasonalMigrationMain
 		System.out.println(" done");
 
 		// Load data files and prepare data....			
-		Data data = new Data(config);
+		Collection<LikelihoodTree> trees = new TreesFromFile(config);
 		
 		// Setup MCMC
 		System.out.print("Setting up MCMC....");

@@ -6,18 +6,19 @@ import cern.jet.random.engine.RandomEngine;
 import java.util.*;
 
 import seasmig.Config.Seasonality;
+import treelikelihood.LikelihoodTree;
 
 import mc3kit.DoubleDistribution;
 import mc3kit.DoubleVariable;
 import mc3kit.MC3KitException;
 import mc3kit.MCMC;
+import mc3kit.Model;
 
-@SuppressWarnings("serial")
 public class SeasonalMigrationModel extends Model
 // TODO: Go over this...
 {
 	Config config;
-	Data data;
+	Collection<LikelihoodTree> trees;
 	RandomEngine rng;
 
 	DoubleVariable ratePriorRate;
@@ -34,12 +35,12 @@ public class SeasonalMigrationModel extends Model
 
 	RateParams[][] rateParams;
 
-	public SeasonalMigrationModel(MCMC mcmc, Config config, Data data) throws MC3KitException
+	public SeasonalMigrationModel(MCMC mcmc, Config config, Collection<LikelihoodTree> trees) throws MC3KitException
 	{
 		super(mcmc);
 
 		this.config = config;
-		this.data = data;	
+		this.trees = trees;	
 	} 
 
 	@Override

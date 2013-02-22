@@ -281,6 +281,11 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 	}
 
+	@Override
+	public int getNumLocations() {		
+		return num_locations;
+	}
+
 
 }
 
