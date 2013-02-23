@@ -17,7 +17,7 @@ public class Config
 	
 	public Long randomSeed;
 	
-	// LOG RELATED PARAMETERS
+	// IO RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String varStatsFilename = "var_stats.jsons";
@@ -26,20 +26,23 @@ public class Config
 	public String swapStatsFilename = "swap_stats.txt";
 	public Level logLevel = Level.INFO;
 	public String logFilename = "debug.log";
+	public String checkpointFilename = "checkpoint.bin";
 
-	// MCMC & LOG RELATED PARAMETERS
-	// in iterations
-	public long burnIn = 2000;
-	public long iterCount = 100000000L;	
+	// MCMC RELATED PARAMETERS
+	public long burnIn = 2000; 	// in iterations	
+	public long iterationCount = 100000000L;
+	
+	public long tuneEvery = 500; 
+	public long tuneFor = 0;
+	public long thin = 50;
+	
+	public long initialHistoryCount = 20000;
+	public long checkpointEvery = 100000;
 
-//	public long tuneEvery = 500; 
-//	public long tuneFor = 0; 
-//	
-//	public long initialHistoryCount = 20000;
-//	public long recordHistoryAfter = 40000;
-//	
-//	public int chainCount = 16;
-//	public double heatPower = 2.0;
+	public int chainCount = 16;
+	public double heatPower = 2.0;
+	
+	public double targetAcceptanceRate = 0.25;
 	
 	// DISPLAY RELATED PARAMTERS
 	public int printEveryNStates = 100000;
@@ -58,7 +61,8 @@ public class Config
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
 	public Integer numLocations = null; // needs to be specified if locations are loaded from trees....
-		
+
+
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) throws IOException {
 		File configOutputFile = new File("out.config.json");

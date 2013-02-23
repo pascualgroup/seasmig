@@ -22,7 +22,7 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 
 
 	Config config;
-	Collection<LikelihoodTree> trees;
+	Data data;
 	int numLocations;
 
 	DoubleVariable[][] rates;	
@@ -31,25 +31,23 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 
 	protected SeasonalMigrationModelNoSeasonality() { }
 
-	public SeasonalMigrationModelNoSeasonality(Chain initialChain, Config config, Collection<LikelihoodTree> trees) throws MC3KitException
+	public SeasonalMigrationModelNoSeasonality(Chain initialChain, Config config, Data data) throws MC3KitException
 	{
 		super(initialChain);
 		this.config = config;
-		this.trees = trees;		
-		numLocations=trees.iterator().next().getNumLocations();
-
+		this.data = data;		
+		numLocations=data.getNumLocations();
+		
 		beginConstruction();
 
-		new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0,trees.size()-1));
+		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0,data.getTrees().size()-1));
 
-		new DoubleVariable(this, "ratePriorRate", new ExponentialDistribution(this, 1.0));
-		new DoubleVariable(this, "ratePrior", new ExponentialDistribution(this,"ratePriorRate"));
-
+		DoubleDistribution ratePrior = new ExponentialDistribution(this,1.0);
 
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
-				new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), new ExponentialDistribution(this,"ratePrior"));
+				new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), ratePrior);
 			}
 		}
 
@@ -64,8 +62,7 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 		private double oldLogP;
 
 
-		LikelihoodVariable(SeasonalMigrationModelNoSeasonality m) throws MC3KitException
-		{
+		LikelihoodVariable(SeasonalMigrationModelNoSeasonality m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true);
@@ -73,8 +70,8 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 			// Add dependencies between likelihood variable and parameters
 			m.addEdge(this, m.treeIndex);
 
-			for(int i = 0; i < config.numLocations; i++) {
-				for(int j = 0; j < config.numLocations; j++) {
+			for(int i = 0; i < numLocations; i++) {
+				for(int j = 0; j < numLocations; j++) {
 					if (i==j) continue;				
 					m.addEdge(this,rates[i][j]);
 				}
@@ -98,71 +95,30 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 		 */
 		@Override
 		public boolean update() {
-			
-			oldLogLikelihood = getLogP();
 
-			double logLikelihood = 0.0;
-
-			MigrationBaseModel migrationBaseModel = null;
-
-			double[][] rates = new double[config.numLocations][config.numLocations];
-				for (int i=0;i<config.numLocations;i++) {
-					double rowsum=0;
-					for (int j=0;j<config.numLocations;j++) {
-						if (i!=j) {
-							rates[i][j]=model.getRateParams(i, j).getRate();
-							rowsum-=rates[i][j];
-						}
-					}
-					rates[i][i]=rowsum;
-				}
-
-				migrationBaseModel = new ConstantMigrationBaseModel(rates);
-				break;
-
-			
-				
-		
-			LikelihoodTree workingCopy = trees.get(treeIndex).copy(); 
-			workingCopy.setLikelihoodModel(migrationBaseModel);
-			logLikelihood=workingCopy.logLikelihood();
-			
-
-			setLogP(logLikelihood);
-
-			// TODO: organize this...
-			// Display state per hour....
-			stateCount+=1;
-			if (stateCount==25) {
-				time = System.currentTimeMillis();
-				System.out.printf("%d\t%.2f\t%.2f hours/million states\n",stateCount*config.chainCount,logLikelihood,(time-oldTime)/((double)config.chainCount)/100L*1000000L/(60L*60L*1000L));
-			}
-			if (stateCount==250) {
-				time = System.currentTimeMillis();
-				System.out.printf("%d\t%.2f\t%.2f hours/million states\n",stateCount*config.chainCount,logLikelihood,(time-oldTime)/((double)config.chainCount)/1000L*1000000L/(60L*60L*1000L));
-			}
-			if (stateCount%(config.printEveryNStates/config.chainCount)==0) {
-				time = System.currentTimeMillis();
-				System.out.printf("%d\t%.2f\t%.2f hours/million states\n",stateCount*config.chainCount,logLikelihood,(time-oldTime)/((double)config.chainCount)/10000L*1000000L/(60L*60L*1000L));
-				oldTime=time;
-			}
 			double logP = 0.0;
 
-			for(double x : data) {
-				double w = weight.getValue();
-				double[] logPs = new double[2];
-				for(int i = 0; i < 2; i++) {
-					double mean = means[i].getValue();
-					double prec = precs[i].getValue();
-					logPs[i] = NormalDistribution.getLogPPrecision(mean, prec, x);
+			double[][] ratesdoubleForm = new double[config.numLocations][config.numLocations];
+			for (int i=0;i<config.numLocations;i++) {
+				double rowsum=0;
+				for (int j=0;j<config.numLocations;j++) {
+					if (i!=j) {
+						ratesdoubleForm[i][j]=rates[i][j].getValue();
+						rowsum-=rates[i][j].getValue();
+					}
 				}
-				double[] coeffs = new double[] { w, 1.0 - w };
-
-				logP += logSumExp(logPs, coeffs);
+				ratesdoubleForm[i][i]=rowsum;
 			}
-			setLogP(logP);
-			oldLogP = logP;
 
+			// TODO: add update to migration model instead of reconstructing...
+			MigrationBaseModel migrationBaseModel = new ConstantMigrationBaseModel(ratesdoubleForm);
+
+			LikelihoodTree workingCopy = data.getTrees().get(treeIndex.getValue()).copy(); 
+			workingCopy.setLikelihoodModel(migrationBaseModel);
+			logP=workingCopy.logLikelihood();
+			
+			setLogP(logP);
+			oldLogP=logP;
 			return true;
 		}
 

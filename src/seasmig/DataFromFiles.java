@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Vector;
 
 import treelikelihood.*;
@@ -17,12 +18,13 @@ import jebl.evolution.io.NexusImporter;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.math.Random;
 
-public class TreesFromFile implements Collection<LikelihoodTree>
+public class DataFromFiles implements Data
 {
 	public Vector<LikelihoodTree> trees = new Vector<LikelihoodTree>();
 	Config config = null;
+	int numLocations = 0;
 
-	public TreesFromFile(Config config_) throws IOException, ImportException 	{
+	public DataFromFiles(Config config_) throws IOException, ImportException 	{
 
 		config = config_;		
 
@@ -49,7 +51,7 @@ public class TreesFromFile implements Collection<LikelihoodTree>
 			HashMap<String,Object> attributes = attributeLoader.getAttributes();
 			HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
 			HashMap<String,Double> stateMap = (HashMap<String,Double>) attributes.get("states");
-			int numLocations = (Integer) attributes.get("numLocations");
+			numLocations = (Integer) attributes.get("numLocations");
 			System.out.println("loaded "+locationMap.size()+" taxon traits");
 
 			System.out.print("Reparsing trees... ");
@@ -65,9 +67,10 @@ public class TreesFromFile implements Collection<LikelihoodTree>
 		}
 		else {
 			// TODO: add load states from trees...
+			numLocations=config.numLocations; // TODO: get this to be automatically loaded from trees
 			System.out.print("Reparsing trees... ");
 			for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-				trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, config.numLocations));
+				trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
 			}		
 			System.out.println(" reparsed "+trees.size()+" trees");
 		}	
@@ -76,70 +79,14 @@ public class TreesFromFile implements Collection<LikelihoodTree>
 	}
 
 	@Override
-	public boolean add(LikelihoodTree tree) {
-		trees.add(tree);
-		return true;
+	public int getNumLocations() {		
+		return numLocations;
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends LikelihoodTree> moreTrees) {
-		trees.addAll(moreTrees);
-		return true;
+	public List<LikelihoodTree> getTrees() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-
-	@Override
-	public void clear() {
-		trees.clear();
-	}
-
-	@Override
-	public boolean contains(Object tree) {
-		return trees.contains(tree);
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> trees) {
-		return trees.containsAll(trees);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return trees.isEmpty();
-	}
-
-	@Override
-	public Iterator<LikelihoodTree> iterator() {
-		return trees.iterator();
-	}
-
-	@Override
-	public boolean remove(Object tree) {
-		return trees.remove(tree);
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> treesToRemove) {
-		return trees.removeAll(treesToRemove);
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> treesToRetain) {
-		return trees.retainAll(treesToRetain);
-	}
-
-	@Override
-	public int size() {
-		return trees.size();
-	}
-
-	@Override
-	public Object[] toArray() {
-		return trees.toArray();
-	}
-
-	@Override
-	public <T> T[] toArray(T[] treesToArray) {
-		return trees.toArray(treesToArray);
-	}
-
+	
 }

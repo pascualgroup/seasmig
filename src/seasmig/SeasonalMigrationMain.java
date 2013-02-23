@@ -2,9 +2,12 @@ package seasmig;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.Date;
 
 import jebl.evolution.io.ImportException;
 
@@ -14,11 +17,22 @@ import mc3kit.MC3KitException;
 import mc3kit.MCMC;
 import mc3kit.Model;
 import mc3kit.ModelFactory;
+import mc3kit.Step;
+import mc3kit.SwapStep;
+import mc3kit.VerificationStep;
+import mc3kit.SwapStep.SwapParity;
 import mc3kit.distributions.UniformIntDistribution;
+import mc3kit.example.ExampleModelFactory;
+import mc3kit.output.SampleOutputStep;
+import mc3kit.proposal.DEMCProposalStep;
 import mc3kit.proposal.UnivariateProposalStep;
 
 
 import treelikelihood.*;
+
+import cern.jet.random.Normal;
+import cern.jet.random.engine.MersenneTwister;
+import cern.jet.random.engine.RandomEngine;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -45,55 +59,116 @@ public class SeasonalMigrationMain
 		System.out.println(" done");
 
 		// Load data files and prepare data....			
-		Collection<LikelihoodTree> trees = new TreesFromFile(config);
-		
+		Data data = new DataFromFiles(config);
+
 		// Setup MCMC
 		System.out.print("Setting up MCMC....");
-		MCMC mcmc = new MCMC();
-		mcmc.setRandomSeed(config.randomSeed); // TODO: check that this changes...
+		try {
+			MCMC mcmc;
 
-		MCMC.setLogLevel(config.logLevel);
-
-		ModelFactory mf = new SeasonalMigrationFactory(config, trees) {
-			@Override
-			public Model createModel(Chain initialChain) throws MC3KitException {
-				Model m = new Model(initialChain);
-				
-				m.beginConstruction();
-				new IntVariable(m, "v", new UniformIntDistribution(m, 1,4));
-				m.endConstruction();
-
-				return m;
+			// If a checkpoint file exists, pick up where we left off
+			File checkpointFile = new File(config.checkpointFilename);
+			if(checkpointFile.exists()) {
+				mcmc = MCMC.loadFromFile(checkpointFile.getPath());
 			}
-		};
+			// Otherwise, construct a new MCMC
+			else {
+				mcmc = new MCMC(); 
 
-		mcmc.setModelFactory(mf);
+				// Object that will be asked to create model objects for each chain
+				mcmc.setModelFactory(new SeasonalMigrationFactory(config, data));
 
-		UnivariateProposalStep proposalStep = new UnivariateProposalStep(0.25, 100, config.burnIn);
-		mcmc.addStep(proposalStep);
+				// Number of chains
+				mcmc.setChainCount(config.chainCount);
 
-		System.out.println(" done!");
-		// Run, collect statistics, and check moments against expected distribution
-		
-		System.out.println("Running MCMC...");
-		
-		System.out.println("state\tlikelihood\thours/million states");
-		double sum = 0;
-		for(long i = 0; i < config.iterCount; i++) {
-			mcmc.step();
-			mcmc.getModel().recalculate();
+				// Chains will explore Prior * [Likelihood^tau]
+				// where tau == x^heatPower
+				// x == 0.0 for the hottest chain (chainId: chainCount - 1);
+				// x == 1.0 for the coldest chain (chainId: 0)
+				mcmc.setHeatFunction(config.heatPower);
 
-			assertEquals(i + 1, mcmc.getIterationCount());
+				// Simple default Metropolis-Hastings step for each variable;
+				// these will tune to try to reach the target acceptance rate during the burn-in
+				// period.
+				// 
+				// Proposals are minimally intelligent:
+				// - normal proposals for distributions with real support (e.g., normal)
+				// - multiplier proposals for distributions with positive real support (e.g., gamma)
+				// - uniform proposals restricted to min, max for distributions with finite support
+				//   (e.g., uniform, beta)
+				// - Gibbs sample for binary-valued variables
+				// A natural extension would be to automatically choose Gibbs samplers
+				// intelligently, but that's not in the current version.
+				Step univarStep = new UnivariateProposalStep(config.targetAcceptanceRate, config.burnIn, config.tuneEvery);
 
-			if(i >= config.burnIn) {
-				int val = mcmc.getModel().getIntVariable("v").getValue();
-				sum += val;
+				// "Differential evolution MCMC" step, which proposes changes to multiple
+				// variables simultaneously, taking into account their correlations in a clever way.
+				// Proposes at multiple scales: 8, 16, 32, ... variables at a time.
+				// (Since this model only has 5 parameters, it'll just do all 5.)
+				// For details of method and parameters, see source for DEMCProposalStep and methods paper
+				Step demcStep = new DEMCProposalStep(
+						config.targetAcceptanceRate,
+						config.burnIn, // Only tune during the burn-in period
+						config.tuneEvery,
+						config.thin, // Thin historical samples for DEMC in memory
+						config.initialHistoryCount, // Collect this many samples before starting DEMC proposals
+						8, // Minimum number of variables to propose at a time
+						128, // Maximum number of variables to propose at a time
+						true, // Use standard "parallel" DEMC proposals (no projection)
+						true, // Also use double-size parallel DEMC proposals
+						true // Also use snooker proposals
+						);
+
+				// Swap steps: even (0/1, 2/3, 4/5) and odd (1/2, 3/4, 5/6);
+				// alternating these sets of pairs of chains ensures up to chainCount/2
+				// parallelization while swapping, where
+				// No tuning, but tuneEvery used to print swap statistics to log file
+				// every so often
+				Step evenSwapStep = new SwapStep(SwapParity.EVEN, config.tuneEvery);
+				Step oddSwapStep = new SwapStep(SwapParity.ODD, config.tuneEvery);
+
+				// Verification step: just asks all models to recalculate
+				// log prior, likelihood from scratch and compares to existing value;
+				// throws an exception if too much error has accumulated.
+				Step verificationStep = new VerificationStep(config.thin);
+
+				// Sample output step
+				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);
+
+				// Assemble all steps into a sequence; repeat swaps chainCount times
+				// since they're so cheap and beneficial for mixing.
+				// Each iteration thus includes many little steps:
+				// - Proposes changes to all individual parameters
+				// - Proposes changes using parallel DEMC, double-size parallel DEMC,
+				//   and snooker DEMC at multiple scales
+				// - Proposes chainCount * 2 swaps
+				// - Every thin iterations, writes samples to a file
+				mcmc.addStep(univarStep);
+				mcmc.addStep(demcStep);
+				for(int i = 0; i < config.chainCount; i++) {
+					mcmc.addStep(evenSwapStep);
+					mcmc.addStep(oddSwapStep);
+				}
+				mcmc.addStep(verificationStep);
+				mcmc.addStep(sampOutStep);
 			}
+
+			// Run the thing until checkpointEvery steps at a time;
+			// write the checkpoint file in between.
+			// The runFor call automatically parallelizes chains.
+			while(mcmc.getIterationCount() < config.iterationCount) {
+				mcmc.runFor(config.checkpointEvery);
+				mcmc.writeToFile(config.checkpointFilename);
+			}
+
+			// Tells the MCMC to stop the thread pool so this program will exit
+			mcmc.shutdown();
 		}
-
-		double N = config.iterCount - config.burnIn;
-		System.out.println(sum/N);		
-		System.out.println("done!");	
+		catch(Throwable e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
-	
 }
+
+
