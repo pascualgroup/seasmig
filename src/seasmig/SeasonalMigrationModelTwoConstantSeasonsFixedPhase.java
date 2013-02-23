@@ -9,28 +9,31 @@ import mc3kit.distributions.*;
 
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelTwoConstantSeasons extends Model {
+public class SeasonalMigrationModelTwoConstantSeasonsFixedPhase extends Model {
 
 
 	Config config;
 	Data data;
 	int numLocations;
+	double seasonalPhase;
 
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] logRatios;
-	DoubleVariable seasonalPhase;
+	
 	IntVariable treeIndex;
 	LikelihoodVariable likeVar;
 	private int nTrees;	
 
-	protected SeasonalMigrationModelTwoConstantSeasons() { }
+	protected SeasonalMigrationModelTwoConstantSeasonsFixedPhase() { }
 
-	public SeasonalMigrationModelTwoConstantSeasons(Chain initialChain, Config config, Data data) throws MC3KitException
+	public SeasonalMigrationModelTwoConstantSeasonsFixedPhase(Chain initialChain, Config config, Data data) throws MC3KitException
 	{
 		super(initialChain);
 		this.config = config;
 		this.data = data;		
 		numLocations=data.getNumLocations();
+		seasonalPhase = config.fixedPhase;
+		
 		nTrees=data.getTrees().size();		
 		rates = new DoubleVariable[numLocations][numLocations];
 		logRatios = new DoubleVariable[numLocations][numLocations];
@@ -38,11 +41,9 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		beginConstruction();
 		
 		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
-		
-		seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
+		DoubleDistribution logRatioPrior = new UniformDistribution(this,-10.0,10.0);
 		
 		DoubleDistribution ratePrior = new ExponentialDistribution(this,1.0);
-		DoubleDistribution logRatioPrior = new UniformDistribution(this,-10.0,10.0);
 
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
@@ -63,15 +64,14 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		private double oldLogP;
 
 
-		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasons m) throws MC3KitException {
+		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasonsFixedPhase m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true);
 
 			// Add dependencies between likelihood variable and parameters
 			m.addEdge(this, m.treeIndex);
-			m.addEdge(this, m.seasonalPhase);
-
+		
 			for(int i = 0; i < numLocations; i++) {
 				for(int j = 0; j < numLocations; j++) {
 					if (i==j) continue;				
@@ -119,7 +119,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 			}
 
 			// TODO: add update to migration model instead of reconstructing...
-			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhase.getValue(),seasonalPhase.getValue()+0.5);
+			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhase,seasonalPhase+0.5);
 
 			LikelihoodTree workingCopy = data.getTrees().get(treeIndex.getValue()).copy(); 
 			workingCopy.setLikelihoodModel(migrationBaseModel);
