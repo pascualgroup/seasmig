@@ -17,7 +17,7 @@ import jebl.evolution.io.NexusImporter;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.math.Random;
 
-public class TestTrees implements Collection<LikelihoodTree> {
+public class TestData implements Data {
 	// TODO: This...
 	public Vector<LikelihoodTree> trees = new Vector<LikelihoodTree>();
 	Config config = null;
@@ -30,7 +30,7 @@ public class TestTrees implements Collection<LikelihoodTree> {
 	private int numLocations;
 	private int disturbanceScale;
 
-	public TestTrees(Config config_, TestType testType, int numTestRepeats, int numTestLocations, int numTestTrees) throws IOException, ImportException 	{
+	public TestData(Config config_, TestType testType, int numTestRepeats, int numTestLocations, int numTestTrees) throws IOException, ImportException 	{
 
 		config = config_;		
 
@@ -75,15 +75,18 @@ public class TestTrees implements Collection<LikelihoodTree> {
 			}
 			else {
 				// TODO: add load states from trees...
+				numLocations=config.numLocations;
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, config.numLocations));
+					trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}	
 			break;
 
 		case TEST_USING_GENERATED_TREES:
+			
+			numLocations=numTestLocations;
 			// TODO: add more tests + test files ....
 			// TODO: add tests for states...
 			System.out.print("Generating test trees... ");
@@ -143,6 +146,8 @@ public class TestTrees implements Collection<LikelihoodTree> {
 			break;
 
 		case TEST_USING_INPUT_TREES:{
+			
+			numLocations=numTestLocations;
 			// TODO: get number of locations from trees...
 			
 			// TODO: add more tests + test files ....
@@ -171,7 +176,7 @@ public class TestTrees implements Collection<LikelihoodTree> {
 				double phase = 0.3; double length = 0.5;
 				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
 				break;
-			case SINUSOIDAL:
+			case SINUSOIDAL: 
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 				break;
 			default: 
@@ -220,6 +225,8 @@ public class TestTrees implements Collection<LikelihoodTree> {
 		break;
 
 		case TEST_MODEL_DEGENERACY:{
+			
+			numLocations=numTestLocations;
 			// TODO: add more tests + test files ....
 			// TODO: add tests for states...
 			System.out.print("Building degenerate test models... ");
@@ -282,7 +289,7 @@ public class TestTrees implements Collection<LikelihoodTree> {
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,config.numLocations));
+						trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
 					}
 				}
 				else {
@@ -294,7 +301,7 @@ public class TestTrees implements Collection<LikelihoodTree> {
 				// TODO: add load states from trees...
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, config.numLocations));
+					trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}				
@@ -356,73 +363,18 @@ public class TestTrees implements Collection<LikelihoodTree> {
 		return returnValue;
 	}
 
-
 	@Override
-	public boolean add(LikelihoodTree tree) {
-		trees.add(tree);
-		return true;
+	public List<LikelihoodTree> getTrees() {
+		return trees;
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends LikelihoodTree> moreTrees) {
-		trees.addAll(moreTrees);
-		return true;
+	public int getNumLocations() {
+		return numLocations;
 	}
 
-	@Override
-	public void clear() {
-		trees.clear();
-	}
 
-	@Override
-	public boolean contains(Object tree) {
-		return trees.contains(tree);
-	}
 
-	@Override
-	public boolean containsAll(Collection<?> trees) {
-		return trees.containsAll(trees);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return trees.isEmpty();
-	}
-
-	@Override
-	public Iterator<LikelihoodTree> iterator() {
-		return trees.iterator();
-	}
-
-	@Override
-	public boolean remove(Object tree) {
-		return trees.remove(tree);
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> treesToRemove) {
-		return trees.removeAll(treesToRemove);
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> treesToRetain) {
-		return trees.retainAll(treesToRetain);
-	}
-
-	@Override
-	public int size() {
-		return trees.size();
-	}
-
-	@Override
-	public Object[] toArray() {
-		return trees.toArray();
-	}
-
-	@Override
-	public <T> T[] toArray(T[] treesToArray) {
-		return trees.toArray(treesToArray);
-	}
 
 
 

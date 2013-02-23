@@ -1,34 +1,23 @@
 package seasmig;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.GregorianCalendar;
-import java.util.logging.Level;
-
 import jebl.evolution.io.ImportException;
-
-import mc3kit.Chain;
-import mc3kit.IntVariable;
-import mc3kit.MC3KitException;
-import mc3kit.MCMC;
-import mc3kit.Model;
-import mc3kit.ModelFactory;
-import mc3kit.distributions.UniformIntDistribution;
-import mc3kit.proposal.UnivariateProposalStep;
 
 import org.junit.Test;
 
+import seasmig.TestData.TestType;
 import treelikelihood.*;
+import treelikelihood.matrixexp.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class SeasonalMigrationTest {
-// TODO: this...	
+// TODO: Implement this...	
 	
 	private static int numTestRepeats = 100;
 	private static int numLocations = 3;
@@ -132,77 +121,77 @@ public class SeasonalMigrationTest {
 
 	}
 
-	@Test
-	public void testMain() throws Throwable
-	{
-		// Load config
-		System.out.print("Loading config file... ");
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		Config config = null;
-		try {
-			config = gson.fromJson(new FileReader("config.json"), Config.class);
-			System.out.println(" done");
-		}
-		catch(Throwable e)	{
-			config=new Config();
-			System.out.println("config.json file not found, using default config. See out.config.json for details");			
-		}			
-
-		System.out.print("Writing full config options to out.config...");
-		config.outputToFile("out.config",gson);
-		System.out.println(" done");
-
-		// Load data files and prepare data....			
-		Data data = new Data(config);
-
-		// Setup MCMC
-		System.out.print("Setting up MCMC....");
-		MCMC mcmc = new MCMC();
-		mcmc.setRandomSeed(config.randomSeed); // TODO: check that this changes...
-
-		MCMC.setLogLevel(config.logLevel);
-
-		ModelFactory mf = new SeasonalMigrationFactory(config, data) {
-			@Override
-			public Model createModel(Chain initialChain) throws MC3KitException {
-				Model m = new Model(initialChain);
-
-				m.beginConstruction();
-				new IntVariable(m, "v", new UniformIntDistribution(m, 1,4));
-				m.endConstruction();
-
-				return m;
-			}
-		};
-
-		mcmc.setModelFactory(mf);
-
-		UnivariateProposalStep proposalStep = new UnivariateProposalStep(0.25, 100, config.burnIn);
-		mcmc.addStep(proposalStep);
-
-		System.out.println(" done!");
-		// Run, collect statistics, and check moments against expected distribution
-
-		System.out.println("Running MCMC...");
-
-		System.out.println("state\tlikelihood\thours/million states");
-		double sum = 0;
-		for(long i = 0; i < config.iterCount; i++) {
-			mcmc.step();
-			mcmc.getModel().recalculate();
-
-			assertEquals(i + 1, mcmc.getIterationCount());
-
-			if(i >= config.burnIn) {
-				int val = mcmc.getModel().getIntVariable("v").getValue();
-				sum += val;
-			}
-		}
-
-		double N = config.iterCount - config.burnIn;
-		System.out.println(sum/N);		
-		System.out.println("done!");	
-	}
+//	@Test
+//	public void testMain() throws Throwable
+//	{
+//		// Load config
+//		System.out.print("Loading config file... ");
+//		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//		Config config = null;
+//		try {
+//			config = gson.fromJson(new FileReader("config.json"), Config.class);
+//			System.out.println(" done");
+//		}
+//		catch(Throwable e)	{
+//			config=new Config();
+//			System.out.println("config.json file not found, using default config. See out.config.json for details");			
+//		}			
+//
+//		System.out.print("Writing full config options to out.config...");
+//		config.outputToFile("out.config",gson);
+//		System.out.println(" done");
+//
+//		// Load data files and prepare data....			
+//		Data data = new TestData(config,)
+//
+//		// Setup MCMC
+//		System.out.print("Setting up MCMC....");
+//		MCMC mcmc = new MCMC();
+//		mcmc.setRandomSeed(config.randomSeed); // TODO: check that this changes...
+//
+//		MCMC.setLogLevel(config.logLevel);
+//
+//		ModelFactory mf = new SeasonalMigrationFactory(config, data) {
+//			@Override
+//			public Model createModel(Chain initialChain) throws MC3KitException {
+//				Model m = new Model(initialChain);
+//
+//				m.beginConstruction();
+//				new IntVariable(m, "v", new UniformIntDistribution(m, 1,4));
+//				m.endConstruction();
+//
+//				return m;
+//			}
+//		};
+//
+//		mcmc.setModelFactory(mf);
+//
+//		UnivariateProposalStep proposalStep = new UnivariateProposalStep(0.25, 100, config.burnIn);
+//		mcmc.addStep(proposalStep);
+//
+//		System.out.println(" done!");
+//		// Run, collect statistics, and check moments against expected distribution
+//
+//		System.out.println("Running MCMC...");
+//
+//		System.out.println("state\tlikelihood\thours/million states");
+//		double sum = 0;
+//		for(long i = 0; i < config.iterCount; i++) {
+//			mcmc.step();
+//			mcmc.getModel().recalculate();
+//
+//			assertEquals(i + 1, mcmc.getIterationCount());
+//
+//			if(i >= config.burnIn) {
+//				int val = mcmc.getModel().getIntVariable("v").getValue();
+//				sum += val;
+//			}
+//		}
+//
+//		double N = config.iterCount - config.burnIn;
+//		System.out.println(sum/N);		
+//		System.out.println("done!");	
+//	}
 
 	@Test
 	public void testModelDegeneracy() throws IOException, ImportException {
@@ -224,7 +213,7 @@ public class SeasonalMigrationTest {
 		System.out.println(" done");
 
 		// Load data files and prepare data....			
-		Data data = new Data(config);
+		Data data = new TestData(config,TestType.TEST_MODEL_DEGENERACY,3,3,10);
 
 		// Creating test file 
 		File testFile = new File("out.test");
@@ -234,17 +223,17 @@ public class SeasonalMigrationTest {
 		System.out.println("Calculating tree likelihood using degenerate models:");				
 
 
-		for (int i=0;i<data.testModels.size();i++) {
-			System.out.println("SEASONALITY "+data.testModels.get(i).getModelName());						
+		for (int i=0;i<((TestData) data).testModels.size();i++) {
+			System.out.println("SEASONALITY "+((TestData) data).testModels.get(i).getModelName());						
 			long startTime= System.currentTimeMillis();	
 			double testLikelihood = 0;
-			for (LikelihoodTree tree : data.trees) {
+			for (LikelihoodTree tree : data.getTrees()) {
 				System.out.print(".");
 				LikelihoodTree workingCopy = tree.copy();
-				workingCopy.setLikelihoodModel(data.testModels.get(i));
+				workingCopy.setLikelihoodModel(((TestData) data).testModels.get(i));
 				testLikelihood+=workingCopy.logLikelihood();
 			}
-			testLikelihood=testLikelihood/data.trees.size();
+			testLikelihood=testLikelihood/data.getTrees().size();
 			System.out.println(testLikelihood);
 			long duration= System.currentTimeMillis()-startTime;
 			System.out.println("duration: "+duration+"ms");
@@ -277,7 +266,7 @@ public class SeasonalMigrationTest {
 		System.out.println(" done");
 
 		// Load data files and prepare data....			
-		Data data = new Data(config);
+		Data data = new TestData(config,TestType.TEST_USING_GENERATED_TREES,10,3,5);
 
 		// Creating test file 
 		File testFile = new File("out.test");
@@ -286,33 +275,33 @@ public class SeasonalMigrationTest {
 		PrintStream testStream = new PrintStream(testFile);
 		System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality+",");				
 		testStream.print("{\""+config.migrationSeasonality+"\",");
-		testStream.print(data.createModel.parse());
-		System.out.println(data.createModel.print());
+		testStream.print(((TestData)data).createModel.parse());
+		System.out.println(((TestData)data).createModel.print());
 		double createLikelihood = 0;
-		for (LikelihoodTree tree : data.trees) {
+		for (LikelihoodTree tree : data.getTrees()) {
 			System.out.print(".");
 			// TODO: maybe get likelihood to not require copy...
 			LikelihoodTree workingCopy = tree.copy();
-			workingCopy.setLikelihoodModel(data.createModel);
+			workingCopy.setLikelihoodModel(((TestData)data).createModel);
 			createLikelihood+=workingCopy.logLikelihood();
 		}
-		createLikelihood=createLikelihood/data.trees.size();
+		createLikelihood=createLikelihood/data.getTrees().size();
 		System.out.println(createLikelihood);
 
 		System.out.println("\nCalculating tree likelihood using test models with increasing noise:");
-		for (int i=0;i<data.testModels.size();i++) {
+		for (int i=0;i<((TestData)data).testModels.size();i++) {
 			if (i%numTestRepeats ==0) {						
-				System.out.println("SEASONALITY "+data.testModels.get(i).getModelName());						
+				System.out.println("SEASONALITY "+((TestData)data).testModels.get(i).getModelName());						
 			}
 
 			double testLikelihood = 0;
-			for (LikelihoodTree tree : data.trees) {
+			for (LikelihoodTree tree : data.getTrees()) {
 				System.out.print(".");
 				LikelihoodTree workingCopy = tree.copy();
-				workingCopy.setLikelihoodModel(data.testModels.get(i));
+				workingCopy.setLikelihoodModel(((TestData)data).testModels.get(i));
 				testLikelihood+=workingCopy.logLikelihood();
 			}
-			testLikelihood=testLikelihood/data.trees.size();
+			testLikelihood=testLikelihood/data.getTrees().size();
 			System.out.println(testLikelihood);
 		}
 		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");

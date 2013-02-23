@@ -12,7 +12,7 @@ import mc3kit.LogLevel;
 
 public class Config
 {
-	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,TWO_CONSTANT_SEASONS_FIXED_PHASE,SINUSOIDAL, TWO_CONSTANT_SEASONS_ALTERNATIVE_PARAMS }; //TODO: DEBUG SINUSODIAL //TODO: ADD CONTINUOUS SEASONAL MODEL
+	enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,TWO_CONSTANT_SEASONS_FIXED_PHASE, SINUSOIDAL};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
 	enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
 	public Long randomSeed;
@@ -28,7 +28,7 @@ public class Config
 	public long iterationCount = 100000000L;
 	
 	public long tuneEvery = 500; 
-	public long tuneFor = 0;
+	public long tuneFor = 10000;
 	public long thin = 50;
 	
 	public long initialHistoryCount = 20000;
@@ -43,8 +43,8 @@ public class Config
 	public int printEveryNStates = 100000;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.NONE;
-	public StateModel stateModel = StateModel.NONE; // TODO: this...
+	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
+	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	public double fixedPhase = 0.1;
 	
 	// MODEL DATA RELATED PARAMETERS

@@ -9,7 +9,7 @@ import mc3kit.distributions.*;
 
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelTwoConstantSeasons extends Model {
+public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extends Model {
 
 
 	Config config;
@@ -23,9 +23,9 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 	LikelihoodVariable likeVar;
 	private int nTrees;	
 
-	protected SeasonalMigrationModelTwoConstantSeasons() { }
+	protected SeasonalMigrationModelTwoConstantSeasonsOrigParametarization() { }
 
-	public SeasonalMigrationModelTwoConstantSeasons(Chain initialChain, Config config, Data data) throws MC3KitException
+	public SeasonalMigrationModelTwoConstantSeasonsOrigParametarization(Chain initialChain, Config config, Data data) throws MC3KitException
 	{
 		super(initialChain);
 		this.config = config;
@@ -62,7 +62,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		private double oldLogP;
 
 
-		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasons m) throws MC3KitException {
+		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasonsOrigParametarization m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true);
