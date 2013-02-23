@@ -1,5 +1,9 @@
 package treelikelihood;
 import java.util.HashMap;
+
+import treelikelihood.matrixexp.AnalyticMatrixExp2;
+import treelikelihood.matrixexp.AnalyticMatrixExp3;
+import treelikelihood.matrixexp.Matlab7MatrixExp;
 import cern.jet.math.tdouble.DoubleFunctions;
 
 public class ConstantMigrationBaseModel implements MigrationBaseModel {

@@ -1,5 +1,7 @@
 package treelikelihood.matrixexp;
 
+import treelikelihood.MatrixExponentiator;
+import treelikelihood.Util;
 import treelikelihood.Util.FRexpResult;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;

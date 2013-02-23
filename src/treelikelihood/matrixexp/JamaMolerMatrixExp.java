@@ -2,6 +2,7 @@ package treelikelihood.matrixexp;
 
 import Jama.Matrix;
 import treelikelihood.MatrixExponentiator;
+import treelikelihood.Util;
 import treelikelihood.Util.FRexpResult;
 
 public class JamaMolerMatrixExp implements MatrixExponentiator {
