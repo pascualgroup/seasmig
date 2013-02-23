@@ -85,8 +85,7 @@ public class DataFromFiles implements Data
 
 	@Override
 	public List<LikelihoodTree> getTrees() {
-		// TODO Auto-generated method stub
-		return null;
+		return trees;
 	}
 	
 }

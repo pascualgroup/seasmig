@@ -1,6 +1,8 @@
-package treelikelihood;
+package treelikelihood.matrixexp;
 
 import java.util.Vector; // 
+
+import treelikelihood.MatrixExponentiator;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;

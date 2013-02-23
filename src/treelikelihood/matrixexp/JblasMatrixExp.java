@@ -1,7 +1,9 @@
-package treelikelihood;
+package treelikelihood.matrixexp;
 
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
+
+import treelikelihood.MatrixExponentiator;
 
 
 public class JblasMatrixExp implements MatrixExponentiator {

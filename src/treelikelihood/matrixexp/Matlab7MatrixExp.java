@@ -1,4 +1,4 @@
-package treelikelihood;
+package treelikelihood.matrixexp;
 
 import treelikelihood.Util.FRexpResult;
 import cern.colt.matrix.tdouble.DoubleFactory2D;

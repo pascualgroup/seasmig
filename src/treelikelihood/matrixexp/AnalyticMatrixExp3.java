@@ -1,6 +1,8 @@
-package treelikelihood;
+package treelikelihood.matrixexp;
 
 import org.junit.Test;
+
+import treelikelihood.MatrixExponentiator;
 
 public class AnalyticMatrixExp3 implements MatrixExponentiator {
 

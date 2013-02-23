@@ -27,7 +27,8 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 
 	DoubleVariable[][] rates;	
 	IntVariable treeIndex;
-	LikelihoodVariable likeVar;	
+	LikelihoodVariable likeVar;
+	private int nTrees;	
 
 	protected SeasonalMigrationModelNoSeasonality() { }
 
@@ -37,17 +38,19 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 		this.config = config;
 		this.data = data;		
 		numLocations=data.getNumLocations();
+		nTrees=data.getTrees().size();		
+		rates = new DoubleVariable[numLocations][numLocations];
 		
 		beginConstruction();
-
-		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0,data.getTrees().size()-1));
+		
+		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
 
 		DoubleDistribution ratePrior = new ExponentialDistribution(this,1.0);
 
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
-				new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), ratePrior);
+				rates[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), ratePrior);
 			}
 		}
 
@@ -98,10 +101,10 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 
 			double logP = 0.0;
 
-			double[][] ratesdoubleForm = new double[config.numLocations][config.numLocations];
-			for (int i=0;i<config.numLocations;i++) {
+			double[][] ratesdoubleForm = new double[numLocations][numLocations];
+			for (int i=0;i<numLocations;i++) {
 				double rowsum=0;
-				for (int j=0;j<config.numLocations;j++) {
+				for (int j=0;j<numLocations;j++) {
 					if (i!=j) {
 						ratesdoubleForm[i][j]=rates[i][j].getValue();
 						rowsum-=rates[i][j].getValue();
