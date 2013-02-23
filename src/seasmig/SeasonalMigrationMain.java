@@ -1,38 +1,16 @@
 package seasmig;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.Date;
-
-import jebl.evolution.io.ImportException;
-
-import mc3kit.Chain;
-import mc3kit.IntVariable;
-import mc3kit.MC3KitException;
 import mc3kit.MCMC;
-import mc3kit.Model;
-import mc3kit.ModelFactory;
 import mc3kit.Step;
 import mc3kit.SwapStep;
 import mc3kit.VerificationStep;
 import mc3kit.SwapStep.SwapParity;
-import mc3kit.distributions.UniformIntDistribution;
-import mc3kit.example.ExampleModelFactory;
 import mc3kit.output.SampleOutputStep;
 import mc3kit.proposal.DEMCProposalStep;
 import mc3kit.proposal.UnivariateProposalStep;
 
-
-import treelikelihood.*;
-
-import cern.jet.random.Normal;
-import cern.jet.random.engine.MersenneTwister;
-import cern.jet.random.engine.RandomEngine;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

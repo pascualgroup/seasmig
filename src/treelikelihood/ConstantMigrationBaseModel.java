@@ -32,13 +32,9 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			break;
 		case 3:
 			matrixExponentiator=new AnalyticMatrixExp3(Q);
-			//matrixExponentiator=new Matlab7MatrixExp(Q);
 			break;			
 		default:
 			matrixExponentiator=new Matlab7MatrixExp(Q);	
-			//matrixExponentiator=new TaylorMatrixExp(Q);
-			//matrixExponentiator=new MolerMatrixExp(Q);
-			//matrixExponentiator=new JblasMatrixExp(Q);
 		}
 		
 	}

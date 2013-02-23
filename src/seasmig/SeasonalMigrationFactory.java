@@ -23,11 +23,11 @@ public class SeasonalMigrationFactory implements ModelFactory
 		case NONE:			
 			return new SeasonalMigrationModelNoSeasonality(initialChain, config, data);			
 
-//		case TWO_CONSTANT_SEASONS:			
-//			return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, trees);			
-//
+		case TWO_CONSTANT_SEASONS:			
+			return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data);			
+
 //		case TWO_CONSTANT_SEASONS_FIXED_PHASE:			
-//			return new SeasonalMigrationModelTwoConstantSeasonsFixedPhase(initialChain, config, trees);			
+//			return new SeasonalMigrationModelTwoConstantSeasonsFixedPhase(initialChain, config, data);			
 //
 //		case SINUSOIDAL:			
 //			return new SeasonalMigrationModelTwoConstantSeasonsSinusoidal(initialChain, config, trees);			

@@ -19,13 +19,8 @@ public class Config
 	
 	// IO RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
-	//public String priorLikelihoodFilename = "prior_likelihood.txt";
-	//public String varStatsFilename = "var_stats.jsons";
-	//public String demcStatsFilename = "demc_stats.jsons";
-	public boolean recordHeatedStats = false;
 	public String swapStatsFilename = "swap_stats.txt";
 	public Level logLevel = Level.INFO;
-	public String logFilename = "debug.log";
 	public String checkpointFilename = "checkpoint.bin";
 
 	// MCMC RELATED PARAMETERS
