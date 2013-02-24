@@ -35,9 +35,9 @@ public class Config implements Serializable
 	public long checkpointEvery = 1000;
 
 	public int chainCount = 4;
-	public double heatPower = 2.0;
+	public double heatPower = 3.0;
 	
-	public double targetAcceptanceRate = 0.25;
+	public double targetAcceptanceRate = 0.05;
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;

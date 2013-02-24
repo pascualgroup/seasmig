@@ -6,8 +6,6 @@ import treelikelihood.TwoSeasonMigrationBaseModel;
 
 import mc3kit.*;
 import mc3kit.distributions.*;
-import mc3kit.graph.Node;
-
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModelTwoConstantSeasons extends Model {
@@ -20,7 +18,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] diffMultipliers;
 	DoubleVariable seasonalPhase;
-	DoubleVariable treeIndex;
+	IntVariable treeIndex;
 	LikelihoodVariable likeVar;
 	private int nTrees;	
 
@@ -38,7 +36,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 
 		beginConstruction();
 
-		treeIndex = new DoubleVariable(this, "treeIndex", new UniformDistribution(this, 0, nTrees));
+		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees));
 
 		seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
 

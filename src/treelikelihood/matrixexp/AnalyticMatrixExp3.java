@@ -1,6 +1,8 @@
 package treelikelihood.matrixexp;
 
 import treelikelihood.MatrixExponentiator;
+import treelikelihood.Util;
+
 import org.junit.Test;
 
 public class AnalyticMatrixExp3 implements MatrixExponentiator {
@@ -25,7 +27,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 
 		Delta = Q[0][2]*Q[1][0]+Q[0][1]*Q[1][2]+Q[0][2]*Q[1][2]+
 				Q[0][1]*Q[2][0]+Q[1][0]*Q[2][0]+Q[1][2]*Q[2][0]+
-				Q[0][1]*Q[2][1]+Q[0][2]*Q[2][1]+Q[1][0]*Q[2][1];
+				Q[0][1]*Q[2][1]+Q[0][2]*Q[2][1]+Q[1][0]*Q[2][1]+Util.minValue;
 
 		Epsilon = Math.sqrt(-4*Delta+Lambda*Lambda);
 
@@ -37,8 +39,8 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 
 		double[][] returnValue = new double[3][3];
 
-		double denum1=4*Delta+(Epsilon-Lambda)*Lambda;
-		double denum3=-4*Delta+(Epsilon+Lambda)*Lambda;
+		double denum1=4*Delta+(Epsilon-Lambda)*Lambda+Util.minValue;
+		double denum3=-4*Delta+(Epsilon+Lambda)*Lambda+Util.minValue;
 		if (denum1!=0 && denum3!=0 && Delta!=0) {
 			double exp1 = Math.exp(0.5*t*(Epsilon-Lambda));			
 			double exp3 = Math.exp(-0.5*t*(Epsilon+Lambda));

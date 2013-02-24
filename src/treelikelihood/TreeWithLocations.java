@@ -27,7 +27,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
 		num_locations=createTreeModel.getNumLocations();
 		UNKNOWN_LOCATION=num_locations;
-		root = new Node(0,0,num_locations);
+		root = new Node(UNKNOWN_LOCATION,0,num_locations);
 		makeRandomTree(createTreeModel, root, numNodes);		
 	}
 
