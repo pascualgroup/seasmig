@@ -3,6 +3,7 @@ package treelikelihood.matrixexp;
 import org.junit.Test;
 
 import treelikelihood.MatrixExponentiator;
+import treelikelihood.Util;
 
 public class AnalyticMatrixExp2 implements MatrixExponentiator {
 	
@@ -19,7 +20,7 @@ public class AnalyticMatrixExp2 implements MatrixExponentiator {
 				this.Q[i][j]=Q[i][j];
 			}
 		}
-		denum=Q[0][1]+Q[1][0];
+		denum=Q[0][1]+Q[1][0]+Util.minValue;
 	}
 	
 	@Override

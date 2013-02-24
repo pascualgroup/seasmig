@@ -36,7 +36,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 
 		beginConstruction();
 
-		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees));
+		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
 
 		seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
 

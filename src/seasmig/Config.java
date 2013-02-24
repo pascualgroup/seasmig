@@ -51,7 +51,7 @@ public class Config implements Serializable
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
-	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
+	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
 	public Integer numLocations = null; // needs to be specified if locations are loaded from trees....
 	
 	protected Config() {};
