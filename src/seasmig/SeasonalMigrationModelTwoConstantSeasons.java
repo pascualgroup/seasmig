@@ -108,8 +108,8 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 				double rowsum2=0;
 				for (int j=0;j<numLocations;j++) {
 					if (i!=j) {
-						rates1doubleForm[i][j]=rates[i][j].getValue()*Math.exp(-logRatios[i][j].getValue());
-						rates2doubleForm[i][j]=rates[i][j].getValue()*Math.exp(logRatios[i][j].getValue());
+						rates1doubleForm[i][j]=rates[i][j].getValue()*Math.exp(-logRatios[i][j].getValue()/2.0);
+						rates2doubleForm[i][j]=rates[i][j].getValue()*Math.exp(logRatios[i][j].getValue()/2.0);
 						rowsum1-=rates1doubleForm[i][j];
 						rowsum2-=rates2doubleForm[i][j];
 					}
