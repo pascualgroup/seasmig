@@ -21,8 +21,7 @@ public class Config implements Serializable
 	public String swapStatsFilename = "swap_stats.txt";
 	public Level logLevel = Level.INFO;
 	public String checkpointFilename = "checkpoint.bin";
-	public String priorLikelihoodFilenameRoot = "prior_likelihood";
-	public String priorLikelihoodType = ".txt";
+	public String priorLikelihoodFilename = "prior_likelihood.txt";	
 
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 2000; 	// in iterations	

@@ -1,6 +1,6 @@
 /***
   This file is part of mc3kit.
-
+  
   Copyright (C) 2013 Edward B. Baskerville
 
   This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 
   You should have received a copy of the GNU Affero General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ***/
+***/
 
 package mc3kit.output;
 
@@ -29,22 +29,22 @@ import mc3kit.output.SampleWriterFactory;
 @SuppressWarnings("serial")
 public class SampleOutputStep implements Step
 {
-	String filename;
-	String format;
-	boolean useQuotes;
-	long thin;
-	int chainId;
-
-	public SampleOutputStep(String filename, long thin) {
-		this(filename, null, false, thin, 0);
-	}
-
+  String filename;
+  String format;
+  boolean useQuotes;
+  long thin;
+  int chainId;
+	
+  public SampleOutputStep(String filename, long thin) {
+    this(filename, null, false, thin, 0);
+  }
+  
 	public SampleOutputStep(String filename, String format, boolean useQuotes, long thin, int chainId) {
-		this.filename = filename;
-		this.format = format;
-		this.useQuotes = useQuotes;
-		this.thin = thin;
-		this.chainId = chainId;
+	  this.filename = filename;
+	  this.format = format;
+	  this.useQuotes = useQuotes;
+	  this.thin = thin;
+	  this.chainId = chainId;
 	}
 
 	/*** METHODS ***/
@@ -52,46 +52,46 @@ public class SampleOutputStep implements Step
 	@Override
 	public List<Task> makeTasks(int chainCount) throws MC3KitException
 	{
-		List<Task> Tasks = new ArrayList<Task>();
+	  List<Task> Tasks = new ArrayList<Task>();
 		Tasks.add(new SampleOutputTask());
 		return Tasks;
 	}
-
+	
 	/*** Task CLASS ***/
-
+	
 	private class SampleOutputTask implements Task
 	{
 		SampleWriter writer;
-
+		
 		private long iterationCount;
-
+		
 		@Override
 		public int[] getChainIds()
 		{
 			return new int[] { chainId };
 		}
-
+		
 		SampleOutputTask() throws MC3KitException
 		{
 			try {
-				writer = SampleWriterFactory.getFactory().createSampleWriter(filename, format, useQuotes);
-			}
-			catch(FileNotFoundException e) {
-				throw new MC3KitException("File not found", e);
-			}
+        writer = SampleWriterFactory.getFactory().createSampleWriter(filename, format, useQuotes);
+      }
+      catch(FileNotFoundException e) {
+        throw new MC3KitException("File not found", e);
+      }
 		}
-
+		
 		@Override
 		public void step(Chain[] chains) throws MC3KitException
 		{
-			iterationCount++;
-
-			Chain chain = chains[0];
+      iterationCount++;
+      
+      Chain chain = chains[0];
 			if(iterationCount % thin == 0)
 			{
-				chain.getLogger().info(format("Writing sample %d", iterationCount));
+	      chain.getLogger().info(format("Writing sample %d", iterationCount));
 				Model model = chain.getModel();
-
+				
 				writer.writeSample(model);
 			}
 		}

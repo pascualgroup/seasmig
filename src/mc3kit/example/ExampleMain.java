@@ -29,6 +29,7 @@ import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
 import mc3kit.*;
 import mc3kit.SwapStep.SwapParity;
+import mc3kit.output.PriorLikelihoodOutputStep;
 import mc3kit.output.SampleOutputStep;
 import mc3kit.proposal.DEMCProposalStep;
 import mc3kit.proposal.UnivariateProposalStep;
@@ -42,6 +43,7 @@ public class ExampleMain {
   static final long checkpointEvery = 10000;
   static final String checkpointFilename = "checkpoint.bin";
   static final String sampleFilename = "samples.jsons";
+  static final String plFilename = "prior_likelihood.txt";
   
   static final int dataSize = 100;
   static final double weight = 0.2;
@@ -148,6 +150,9 @@ public class ExampleMain {
         // Sample output step
         Step sampOutStep = new SampleOutputStep(sampleFilename, thin);
         
+        // Prior-likelihood output step for marginal likelihood calculation
+        Step plOutStep = new PriorLikelihoodOutputStep(plFilename, thin);
+        
         // Assemble all steps into a sequence; repeat swaps chainCount times
         // since they're so cheap and beneficial for mixing.
         // Each iteration thus includes many little steps:
@@ -164,6 +169,7 @@ public class ExampleMain {
         }
         mcmc.addStep(verificationStep);
         mcmc.addStep(sampOutStep);
+        mcmc.addStep(plOutStep);
       }
       
       // Run the thing until checkpointEvery steps at a time;

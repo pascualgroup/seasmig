@@ -20,7 +20,6 @@
 package mc3kit.output;
 
 import java.io.*;
-import java.util.Map;
 
 import mc3kit.*;
 
@@ -59,16 +58,6 @@ public class JsonsSampleWriter implements SampleWriter
 	{
 	  writer.println("---");
 		gson.toJson(model.makeHierarchicalSample(), writer);
-		writer.println();
-		writer.flush();
-	}
-
-	@Override
-	public void writeFlatData(Map<String, String> flatData)
-			throws MC3KitException {
-		// TODO: check this!!!!
-		writer.println("---");
-		gson.toJson(flatData, writer);
 		writer.println();
 		writer.flush();
 	}

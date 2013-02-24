@@ -2,16 +2,24 @@ package seasmig;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.PrintWriter;
+import java.util.Date;
+
 import mc3kit.MCMC;
 import mc3kit.Step;
 import mc3kit.SwapStep;
 import mc3kit.VerificationStep;
 import mc3kit.SwapStep.SwapParity;
+import mc3kit.example.ExampleModelFactory;
 import mc3kit.output.PriorLikelihoodOutputStep;
 import mc3kit.output.SampleOutputStep;
 import mc3kit.proposal.DEMCProposalStep;
 import mc3kit.proposal.UnivariateProposalStep;
 
+
+import cern.jet.random.Normal;
+import cern.jet.random.engine.MersenneTwister;
+import cern.jet.random.engine.RandomEngine;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,8 +48,6 @@ public class SeasonalMigrationMain
 		// Load data files and prepare data....			
 		Data data = new DataFromFiles(config);
 
-		// Setup MCMC
-		System.out.print("Setting up MCMC....");
 		try {
 			MCMC mcmc;
 
@@ -52,10 +58,11 @@ public class SeasonalMigrationMain
 			}
 			// Otherwise, construct a new MCMC
 			else {
+
 				mcmc = new MCMC(); 
 
 				// Object that will be asked to create model objects for each chain
-				mcmc.setModelFactory(new SeasonalMigrationFactory(config, data));
+				mcmc.setModelFactory(new SeasonalMigrationFactory(config,data));
 
 				// Number of chains
 				mcmc.setChainCount(config.chainCount);
@@ -91,7 +98,7 @@ public class SeasonalMigrationMain
 						config.tuneEvery,
 						config.thin, // Thin historical samples for DEMC in memory
 						config.initialHistoryCount, // Collect this many samples before starting DEMC proposals
-						8, // Minimum number of variables to propose at a time
+						4, // Minimum number of variables to propose at a time
 						128, // Maximum number of variables to propose at a time
 						true, // Use standard "parallel" DEMC proposals (no projection)
 						true, // Also use double-size parallel DEMC proposals
@@ -114,11 +121,9 @@ public class SeasonalMigrationMain
 				// Sample output step
 				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);
 
-				// Prior & likelihood output step
-				Step[] priorLikelihoodOutStep = new PriorLikelihoodOutputStep[config.chainCount];
-				for (int i=0; i<config.chainCount;i++) {
-					priorLikelihoodOutStep[i]=new PriorLikelihoodOutputStep(config.priorLikelihoodFilenameRoot+Integer.toString(i)+config.priorLikelihoodType, config.thin,i);
-				}
+				// Prior-likelihood output step for marginal likelihood calculation
+				Step plOutStep = new PriorLikelihoodOutputStep(config.priorLikelihoodFilename, config.thin);
+
 				// Assemble all steps into a sequence; repeat swaps chainCount times
 				// since they're so cheap and beneficial for mixing.
 				// Each iteration thus includes many little steps:
@@ -135,9 +140,7 @@ public class SeasonalMigrationMain
 				}
 				mcmc.addStep(verificationStep);
 				mcmc.addStep(sampOutStep);
-				for (int i=0;i<config.chainCount;i++) {
-					mcmc.addStep(priorLikelihoodOutStep[i]);
-				}
+				mcmc.addStep(plOutStep);
 			}
 
 			// Run the thing until checkpointEvery steps at a time;
@@ -145,7 +148,7 @@ public class SeasonalMigrationMain
 			// The runFor call automatically parallelizes chains.
 			while(mcmc.getIterationCount() < config.iterationCount) {
 				mcmc.runFor(config.checkpointEvery);
-				//mcmc.writeToFile(config.checkpointFilename);
+				mcmc.writeToFile(config.checkpointFilename);
 			}
 
 			// Tells the MCMC to stop the thread pool so this program will exit
@@ -157,5 +160,6 @@ public class SeasonalMigrationMain
 		}
 	}
 }
+
 
 

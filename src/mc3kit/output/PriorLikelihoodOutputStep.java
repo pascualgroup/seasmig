@@ -1,73 +1,64 @@
-/***
-  This file is part of mc3kit.
-
-  Copyright (C) 2013 Edward B. Baskerville
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Affero General Public License for more details.
-
-  You should have received a copy of the GNU Affero General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ***/
-
 package mc3kit.output;
 
-import java.io.FileNotFoundException;
-import static java.lang.String.*;
 import java.util.*;
-
-import seasmig.Config;
+import java.io.*;
 
 import mc3kit.*;
-import mc3kit.output.SampleWriterFactory;
+import mc3kit.util.*;
 
 @SuppressWarnings("serial")
-public class PriorLikelihoodOutputStep implements Step
+public class PriorLikelihoodOutputStep implements Step, Serializable
 {
-	String filename;
-	String format;
-	boolean useQuotes;
-	long thin;
-	int chainId;
+	private String filename;
+	private long thin;
+	private int chainCount;
 
-	public PriorLikelihoodOutputStep(String filename, long thin) {
-		this(filename, null, false, thin, 0);
-	}
-
-	public PriorLikelihoodOutputStep(String filename, long thin, int chainId) {
-		this(filename, null, false, thin, chainId);
-	}
-
-	public PriorLikelihoodOutputStep(String filename, String format, boolean useQuotes, long thin, int chainId) {
-		this.filename = filename;
-		this.format = format;
-		this.useQuotes = useQuotes;
-		this.thin = thin;
-		this.chainId = chainId;
-	}
+	transient PrintWriter writer;
+	transient Collector<LogPriorLikelihoodValue> collector;
+	//	Map<Long, ValueCollector> collectedValues;
 
 	/*** METHODS ***/
+
+	protected PriorLikelihoodOutputStep() { };
+
+	public PriorLikelihoodOutputStep(String filename, long thin) throws FileNotFoundException {
+		this.filename = filename;
+		this.thin = thin;
+
+		writer = new PrintWriter(new FileOutputStream(filename, false));
+		writer.println("iteration\tchainId\tlogPrior\tlogLikelihood");
+		writer.flush();
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		writer = new PrintWriter(new FileOutputStream(filename, true));
+	}
+
+	private synchronized List<LogPriorLikelihoodValue> takeValue(long iteration, int index, double logPrior, double logLikelihood) {
+		if(collector == null) {
+			collector = new Collector<LogPriorLikelihoodValue>(chainCount);
+		}
+		return collector.takeValue(iteration, index, new LogPriorLikelihoodValue(logPrior, logLikelihood));
+	}
 
 	@Override
 	public List<Task> makeTasks(int chainCount) throws MC3KitException
 	{
-		List<Task> Tasks = new ArrayList<Task>();
-		Tasks.add(new SampleOutputTask());
-		return Tasks;
+		this.chainCount = chainCount;
+		List<Task> tasks = new ArrayList<Task>(chainCount);
+		for(int i = 0; i < chainCount; i++)
+		{
+			tasks.add(new PLOutputTask(i));
+		}
+		return tasks;
 	}
 
-	/*** Task CLASS ***/
+	/*** TASK CLASS ***/
 
-	private class SampleOutputTask implements Task
+	private class PLOutputTask implements Task
 	{
-		SampleWriter writer;
+		int chainId;
 
 		private long iterationCount;
 
@@ -77,14 +68,9 @@ public class PriorLikelihoodOutputStep implements Step
 			return new int[] { chainId };
 		}
 
-		SampleOutputTask() throws MC3KitException
+		PLOutputTask(int chainId) throws MC3KitException
 		{
-			try {
-				writer = SampleWriterFactory.getFactory().createSampleWriter(filename, format, useQuotes);
-			}
-			catch(FileNotFoundException e) {
-				throw new MC3KitException("File not found", e);
-			}
+			this.chainId = chainId;
 		}
 
 		@Override
@@ -92,16 +78,37 @@ public class PriorLikelihoodOutputStep implements Step
 		{
 			iterationCount++;
 
-			if(iterationCount % thin == 0) 	{
+			if(iterationCount % thin == 0)
+			{
+				assert(chains.length == 1);
 				Chain chain = chains[0];
-				chain.getLogger().info(format("Writing prior & likelihood %d", iterationCount));
-				Map<String,String> priorLikelihoodSample = new LinkedHashMap<String,String>();
-				priorLikelihoodSample.put("iterCount", Long.toString(iterationCount));
-				priorLikelihoodSample.put("chainID",Integer.toString(chainId));
-				priorLikelihoodSample.put("logPrior", Double.toString(chains[0].getModel().getLogPrior()));
-				priorLikelihoodSample.put("logLikelihood",Double.toString(chains[0].getModel().getLogLikelihood()));	
-				writer.writeFlatData(priorLikelihoodSample);
+				Model model = chain.getModel();
+
+				List<LogPriorLikelihoodValue> plValues = takeValue(iterationCount, chainId, model.getLogPrior(), model.getLogLikelihood());
+
+				if(plValues != null)
+				{
+					for(int i = 0; i < chainCount; i++)
+					{
+						writer.printf("%d\t%d\t%.3f\t%.3f\n", iterationCount, i,
+								plValues.get(i).logPrior,
+								plValues.get(i).logLikelihood);
+					}
+					writer.flush();
+				}
 			}
+		}
+	}
+
+	private class LogPriorLikelihoodValue
+	{
+		double logPrior;
+		double logLikelihood;
+
+		LogPriorLikelihoodValue(double logPrior, double logLikelihood)
+		{
+			this.logPrior = logPrior;
+			this.logLikelihood = logLikelihood;
 		}
 	}
 }

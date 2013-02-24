@@ -53,7 +53,42 @@ public class CsvSampleWriter implements SampleWriter
 	public synchronized void writeSample(Model model) throws MC3KitException
 	{
 	  Map<String, String> samp = model.makeFlatSample();
-	  writeFlatData(samp);
+	  
+		// Establish keys to use and write headers if unestablished
+		if(keys == null)
+		{
+			keys = new LinkedHashSet<String>(samp.keySet());
+			
+			int i = 0;
+			for(String key : keys)
+			{
+				writer.write(formattedString(key));
+				if(i < keys.size() - 1)
+				{
+					writer.write(delimiter);
+				}
+				i++;
+			}
+			writer.println();
+		}
+		
+		// Write quoted, quote-escaped data as string
+		int i = 0;
+		for(String key : keys)
+		{
+			String value = samp.get(key);
+			if(value != null)
+			{
+				String str = formattedString(value);
+				writer.write(str);
+			}
+			if(i < keys.size() - 1)
+			{
+				writer.write(delimiter);
+			}
+			i++;
+		}
+		writer.println();
 	}
 	
 	private String formattedString(String str) throws MC3KitException
@@ -68,48 +103,5 @@ public class CsvSampleWriter implements SampleWriter
 				);
 			return str;
 		}
-	}
-
-	@Override
-	public void writeFlatData(Map<String, String> flatData)
-			throws MC3KitException {
-
-		// Establish keys to use and write headers if unestablished
-		if(keys == null)
-		{
-			keys = new LinkedHashSet<String>(flatData.keySet());
-			
-			int i = 0;
-			for(String key : keys)
-			{
-				writer.write(formattedString(key));
-				if(i < keys.size() - 1)
-				{
-					writer.write(delimiter);
-				}
-				i++;
-			}
-			writer.println();
-			writer.flush();
-		}
-		
-		// Write quoted, quote-escaped data as string
-		int i = 0;
-		for(String key : keys)
-		{
-			String value = flatData.get(key);
-			if(value != null)
-			{
-				String str = formattedString(value);
-				writer.write(str);
-			}
-			if(i < keys.size() - 1)
-			{
-				writer.write(delimiter);
-			}
-			i++;
-		}
-		writer.println();
-		writer.flush();
 	}
 }
