@@ -90,6 +90,7 @@ public class CsvSampleWriter implements SampleWriter
 				i++;
 			}
 			writer.println();
+			writer.flush();
 		}
 		
 		// Write quoted, quote-escaped data as string
@@ -109,6 +110,6 @@ public class CsvSampleWriter implements SampleWriter
 			i++;
 		}
 		writer.println();
-		
+		writer.flush();
 	}
 }
