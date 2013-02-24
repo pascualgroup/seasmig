@@ -27,7 +27,7 @@ import mc3kit.*;
 import mc3kit.output.SampleWriterFactory;
 
 @SuppressWarnings("serial")
-public class SampleOutputStep implements Step
+public class PriorLikelihoodOutputStep implements Step
 {
 	String filename;
 	String format;
@@ -35,11 +35,11 @@ public class SampleOutputStep implements Step
 	long thin;
 	int chainId;
 
-	public SampleOutputStep(String filename, long thin) {
+	public PriorLikelihoodOutputStep(String filename, long thin) {
 		this(filename, null, false, thin, 0);
 	}
 
-	public SampleOutputStep(String filename, String format, boolean useQuotes, long thin, int chainId) {
+	public PriorLikelihoodOutputStep(String filename, String format, boolean useQuotes, long thin, int chainId) {
 		this.filename = filename;
 		this.format = format;
 		this.useQuotes = useQuotes;
@@ -87,12 +87,16 @@ public class SampleOutputStep implements Step
 			iterationCount++;
 
 			Chain chain = chains[0];
-			if(iterationCount % thin == 0)
-			{
-				chain.getLogger().info(format("Writing sample %d", iterationCount));
-				Model model = chain.getModel();
-
-				writer.writeSample(model);
+			for (int i=0; i<chains.length;i++) {
+				if(iterationCount % thin == 0) 	{
+					chain.getLogger().info(format("Writing prior & likelihood %d", iterationCount));
+					Map<String,String> priorLikelihoodSample = new LinkedHashMap<String,String>();
+					priorLikelihoodSample.put("iterCount", Long.toString(iterationCount));
+					priorLikelihoodSample.put("chainID",Integer.toString(i));
+					priorLikelihoodSample.put("logPrior", Double.toString(chains[i].getModel().getLogPrior()));
+					priorLikelihoodSample.put("logLikelihood",Double.toString(chains[i].getModel().getLogLikelihood()));	
+					writer.writeFlatData(priorLikelihoodSample);
+				}
 			}
 		}
 	}

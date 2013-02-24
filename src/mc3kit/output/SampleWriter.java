@@ -20,10 +20,12 @@
 package mc3kit.output;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import mc3kit.*;
 
 public interface SampleWriter extends Serializable
 {
 	public void writeSample(Model model) throws MC3KitException;
+	public void writeFlatData(Map<String,String> flatData) throws MC3KitException;
 }

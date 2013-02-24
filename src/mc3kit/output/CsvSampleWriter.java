@@ -53,11 +53,31 @@ public class CsvSampleWriter implements SampleWriter
 	public synchronized void writeSample(Model model) throws MC3KitException
 	{
 	  Map<String, String> samp = model.makeFlatSample();
-	  
+	  writeFlatData(samp);
+	}
+	
+	private String formattedString(String str) throws MC3KitException
+	{
+		if(useQuotes)
+			return String.format("\"%s\"", str.replaceAll("\"", "\"\""));
+		else
+		{
+			if(str.contains(delimiter))
+				throw new MC3KitException(
+					String.format("Delimiter found in string in non-quote mode: %s.", str)
+				);
+			return str;
+		}
+	}
+
+	@Override
+	public void writeFlatData(Map<String, String> flatData)
+			throws MC3KitException {
+
 		// Establish keys to use and write headers if unestablished
 		if(keys == null)
 		{
-			keys = new LinkedHashSet<String>(samp.keySet());
+			keys = new LinkedHashSet<String>(flatData.keySet());
 			
 			int i = 0;
 			for(String key : keys)
@@ -76,7 +96,7 @@ public class CsvSampleWriter implements SampleWriter
 		int i = 0;
 		for(String key : keys)
 		{
-			String value = samp.get(key);
+			String value = flatData.get(key);
 			if(value != null)
 			{
 				String str = formattedString(value);
@@ -89,19 +109,6 @@ public class CsvSampleWriter implements SampleWriter
 			i++;
 		}
 		writer.println();
-	}
-	
-	private String formattedString(String str) throws MC3KitException
-	{
-		if(useQuotes)
-			return String.format("\"%s\"", str.replaceAll("\"", "\"\""));
-		else
-		{
-			if(str.contains(delimiter))
-				throw new MC3KitException(
-					String.format("Delimiter found in string in non-quote mode: %s.", str)
-				);
-			return str;
-		}
+		
 	}
 }

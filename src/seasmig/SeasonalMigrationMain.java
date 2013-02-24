@@ -7,6 +7,7 @@ import mc3kit.Step;
 import mc3kit.SwapStep;
 import mc3kit.VerificationStep;
 import mc3kit.SwapStep.SwapParity;
+import mc3kit.output.PriorLikelihoodOutputStep;
 import mc3kit.output.SampleOutputStep;
 import mc3kit.proposal.DEMCProposalStep;
 import mc3kit.proposal.UnivariateProposalStep;
@@ -113,6 +114,9 @@ public class SeasonalMigrationMain
 				// Sample output step
 				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);
 
+				// Prior & likelihood output step
+				Step priorLikelihoodOutStep = new PriorLikelihoodOutputStep(config.priorLikelihoodFilename, config.thin);
+				
 				// Assemble all steps into a sequence; repeat swaps chainCount times
 				// since they're so cheap and beneficial for mixing.
 				// Each iteration thus includes many little steps:
@@ -129,6 +133,7 @@ public class SeasonalMigrationMain
 				}
 				mcmc.addStep(verificationStep);
 				mcmc.addStep(sampOutStep);
+				mcmc.addStep(priorLikelihoodOutStep);
 			}
 
 			// Run the thing until checkpointEvery steps at a time;

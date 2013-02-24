@@ -18,6 +18,7 @@ import jebl.evolution.io.NexusImporter;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.math.Random;
 
+@SuppressWarnings("serial")
 public class DataFromFiles implements Data
 {
 	public Vector<LikelihoodTree> trees = new Vector<LikelihoodTree>();
