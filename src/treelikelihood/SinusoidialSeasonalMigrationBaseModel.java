@@ -4,6 +4,7 @@ import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.tdouble.*;
 
 
+@SuppressWarnings("serial")
 public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check this...
 

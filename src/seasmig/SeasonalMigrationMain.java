@@ -141,7 +141,7 @@ public class SeasonalMigrationMain
 			// The runFor call automatically parallelizes chains.
 			while(mcmc.getIterationCount() < config.iterationCount) {
 				mcmc.runFor(config.checkpointEvery);
-				mcmc.writeToFile(config.checkpointFilename);
+		//		mcmc.writeToFile(config.checkpointFilename);
 			}
 
 			// Tells the MCMC to stop the thread pool so this program will exit

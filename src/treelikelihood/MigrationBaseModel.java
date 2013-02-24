@@ -1,7 +1,9 @@
 package treelikelihood;
 
+import java.io.Serializable;
 
-public interface MigrationBaseModel  {		
+
+public interface MigrationBaseModel extends Serializable {		
 	public double logprobability(int from_location, int to_location, double from_time, double to_time);
 	public double[][] transitionMatrix(double from_time, double to_time);
 	public int getNumLocations();

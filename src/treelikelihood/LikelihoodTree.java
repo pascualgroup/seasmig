@@ -1,6 +1,8 @@
 package treelikelihood;
 
-public interface LikelihoodTree {
+import java.io.Serializable;
+
+public interface LikelihoodTree extends Serializable {
 	public void setLikelihoodModel(Object likelihoodModel);
 	public double logLikelihood();
 	String print();

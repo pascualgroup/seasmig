@@ -1,5 +1,6 @@
 package treelikelihood;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 
 
+@SuppressWarnings("serial")
 public class TreeWithLocations implements LikelihoodTree {
 
 	// Tree generate parameters for test purpose
@@ -261,7 +263,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	// Nodes in this tree...
-	public class Node {	
+	public class Node implements Serializable {	
 		Node parent = null;
 		List<Node> children = new ArrayList<Node>();
 		int location = 0; // Locations are translated to a discrete integer index 0...num_locations

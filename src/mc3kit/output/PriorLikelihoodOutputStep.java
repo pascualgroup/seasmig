@@ -86,9 +86,9 @@ public class PriorLikelihoodOutputStep implements Step
 		{
 			iterationCount++;
 
-			Chain chain = chains[0];
 			for (int i=0; i<chains.length;i++) {
 				if(iterationCount % thin == 0) 	{
+					Chain chain = chains[i];
 					chain.getLogger().info(format("Writing prior & likelihood %d", iterationCount));
 					Map<String,String> priorLikelihoodSample = new LinkedHashMap<String,String>();
 					priorLikelihoodSample.put("iterCount", Long.toString(iterationCount));

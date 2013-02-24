@@ -7,6 +7,7 @@ import org.javatuples.Pair;
 
 import cern.colt.matrix.tdouble.*;
 
+@SuppressWarnings("serial")
 public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 
 	// Cache Parameters
