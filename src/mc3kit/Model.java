@@ -46,7 +46,7 @@ public class Model implements Observer, Serializable {
   
   List<Variable> unobservedVariables;
   
-  private double logPrior;
+  public double logPrior;
   private double logLikelihood;
   
   private double oldLogPrior;

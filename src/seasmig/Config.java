@@ -34,7 +34,7 @@ public class Config implements Serializable
 	public long initialHistoryCount = 200;
 	public long checkpointEvery = 1000;
 
-	public int chainCount = 16;
+	public int chainCount = 4;
 	public double heatPower = 2.0;
 	
 	public double targetAcceptanceRate = 0.25;
@@ -53,7 +53,7 @@ public class Config implements Serializable
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
 	public Integer numLocations = null; // needs to be specified if locations are loaded from trees....
-
+	
 	protected Config() {};
 	
 	// OUTPUT CONFIG TO FILE

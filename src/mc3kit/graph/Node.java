@@ -25,7 +25,7 @@ import java.util.*;
 @SuppressWarnings("serial")
 public class Node extends Observable  implements Serializable {
   String name;
-  Graph graph;
+  protected Graph graph;
   
   public Node() { }
   

@@ -3,6 +3,7 @@ package treelikelihood;
 public class Util {
 
 	public static final double minValue = Double.MIN_VALUE;
+	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
 	protected Util() {};
 
@@ -11,7 +12,11 @@ public class Util {
 		for (int i=0;i<alphas.length;i++) {			
 			sumExp=sumExp+Math.exp(alphas[i]-min);
 		}
-		return min+Math.log(sumExp);
+		double returnValue=min+Math.log(sumExp);
+		if (Double.isNaN(returnValue) ){
+			return minNegative;
+		}
+		return returnValue;
 
 	}
 

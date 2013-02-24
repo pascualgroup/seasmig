@@ -54,12 +54,16 @@ public class SeasonalMigrationMain
 			// If a checkpoint file exists, pick up where we left off
 			File checkpointFile = new File(config.checkpointFilename);
 			if(checkpointFile.exists()) {
+				System.out.println("Checking out from: "+config.checkpointFilename);
 				mcmc = MCMC.loadFromFile(checkpointFile.getPath());
 			}
 			// Otherwise, construct a new MCMC
 			else {
 
 				mcmc = new MCMC(); 
+				
+				if (config.randomSeed!=null)
+					mcmc.setRandomSeed(config.randomSeed);
 
 				// Object that will be asked to create model objects for each chain
 				mcmc.setModelFactory(new SeasonalMigrationFactory(config,data));

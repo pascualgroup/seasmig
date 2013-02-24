@@ -6,19 +6,21 @@ import treelikelihood.TwoSeasonMigrationBaseModel;
 
 import mc3kit.*;
 import mc3kit.distributions.*;
+import mc3kit.graph.Node;
 
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModelTwoConstantSeasons extends Model {
+
 
 	Config config;
 	Data data;
 	int numLocations;
 
 	DoubleVariable[][] rates;	
-	DoubleVariable[][] logRatios;
+	DoubleVariable[][] diffMultipliers;
 	DoubleVariable seasonalPhase;
-	IntVariable treeIndex;
+	DoubleVariable treeIndex;
 	LikelihoodVariable likeVar;
 	private int nTrees;	
 
@@ -32,22 +34,22 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		numLocations=data.getNumLocations();
 		nTrees=data.getTrees().size();		
 		rates = new DoubleVariable[numLocations][numLocations];
-		logRatios = new DoubleVariable[numLocations][numLocations];
-		
+		diffMultipliers = new DoubleVariable[numLocations][numLocations];
+
 		beginConstruction();
-		
-		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
-		
+
+		treeIndex = new DoubleVariable(this, "treeIndex", new UniformDistribution(this, 0, nTrees));
+
 		seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
-		
+
 		DoubleDistribution ratePrior = new ExponentialDistribution(this,1.0);
-		DoubleDistribution logRatioPrior = new UniformDistribution(this,-10.0,10.0);
+		DoubleDistribution diffMultiplierPrior = new UniformDistribution(this,-1.0,1.0);
 
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
-				rates[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), ratePrior);
-				logRatios[i][j] = new DoubleVariable(this, "ratioParams."+Integer.toString(i)+"."+Integer.toString(j), logRatioPrior);
+				rates[i][j] = new DoubleVariable(this, "meanRates."+Integer.toString(i)+"."+Integer.toString(j), ratePrior);
+				diffMultipliers[i][j] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i)+"."+Integer.toString(j), diffMultiplierPrior);
 			}
 		}
 
@@ -59,7 +61,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 	} 
 
 	private class LikelihoodVariable extends Variable {
-		private double oldLogP;
+		private double oldLogLikelihood;
 
 
 		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasons m) throws MC3KitException {
@@ -73,9 +75,9 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 
 			for(int i = 0; i < numLocations; i++) {
 				for(int j = 0; j < numLocations; j++) {
-					if (i==j) continue;				
+					if (i==j) continue;
 					m.addEdge(this,rates[i][j]);
-					m.addEdge(this,logRatios[i][j]);
+					m.addEdge(this,diffMultipliers[i][j]);
 				}
 			}
 		}
@@ -98,7 +100,8 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		@Override
 		public boolean update() {
 
-			double logP = 0.0;
+			double logLikelihood = 0.0;
+			//double logPrior = 0.0;
 
 			double[][] rates1doubleForm = new double[numLocations][numLocations];
 			double[][] rates2doubleForm = new double[numLocations][numLocations];
@@ -107,8 +110,8 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 				double rowsum2=0;
 				for (int j=0;j<numLocations;j++) {
 					if (i!=j) {
-						rates1doubleForm[i][j]=rates[i][j].getValue()*Math.exp(-logRatios[i][j].getValue());
-						rates2doubleForm[i][j]=rates[i][j].getValue()*Math.exp(logRatios[i][j].getValue());
+						rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
+						rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
 						rowsum1-=rates1doubleForm[i][j];
 						rowsum2-=rates2doubleForm[i][j];
 					}
@@ -120,15 +123,17 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 			// TODO: add update to migration model instead of reconstructing...
 			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhase.getValue(),seasonalPhase.getValue()+0.5);
 
-			LikelihoodTree workingCopy = data.getTrees().get(treeIndex.getValue()).copy(); 
+			LikelihoodTree workingCopy = data.getTrees().get((int)treeIndex.getValue()).copy(); 
 			workingCopy.setLikelihoodModel(migrationBaseModel);
-			logP=workingCopy.logLikelihood();
+			logLikelihood=workingCopy.logLikelihood();
 			
-			setLogP(logP);
-			oldLogP=logP;
+			setLogP(logLikelihood);			
+			oldLogLikelihood=logLikelihood;
+			
+			
+			
 			return true;
 		}
-
 
 		/*
 		 * If you want to avoid calculating the log-probability again
@@ -137,7 +142,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		 */
 		@Override
 		public boolean updateAfterRejection() {
-			setLogP(oldLogP);
+			setLogP(oldLogLikelihood);
 			return true;
 		}
 

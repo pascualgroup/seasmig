@@ -99,7 +99,9 @@ public class TreeWithLocations implements LikelihoodTree {
 		if (root.location==UNKNOWN_LOCATION) {
 			for (int rootLocation=0;rootLocation<num_locations;rootLocation++) {				
 				double alpha=conditionalLogLikelihood(root, rootLocation);
-				alphas[rootLocation]=alpha;
+				if (Double.isNaN(alpha))  
+					alpha=Util.minNegative;
+				alphas[rootLocation]=alpha;	
 				if (alpha<min) min=alpha;				
 			}
 			return Util.logSumExp(alphas,min);
@@ -135,7 +137,9 @@ public class TreeWithLocations implements LikelihoodTree {
 					double[] alphas=new double[num_locations];
 					double min = Double.POSITIVE_INFINITY;
 					for (int childLocation=0;childLocation<num_locations;childLocation++) {
-						double alpha = likelihoodModel.logprobability(nodeLocation, childLocation, node.time, child.time)+conditionalLogLikelihood(child, childLocation);						
+						double alpha = likelihoodModel.logprobability(nodeLocation, childLocation, node.time, child.time)+conditionalLogLikelihood(child, childLocation);
+						if (Double.isNaN(alpha))  
+							alpha=Util.minNegative;
 						alphas[childLocation]=alpha;
 						if (alpha<min) min=alpha;
 					}
