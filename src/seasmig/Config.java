@@ -35,7 +35,7 @@ public class Config implements Serializable
 	public long initialHistoryCount = 20000;
 	public long checkpointEvery = 100;
 
-	public int chainCount = 2;
+	public int chainCount = 16;
 	public double heatPower = 2.0;
 	
 	public double targetAcceptanceRate = 0.25;
@@ -48,7 +48,7 @@ public class Config implements Serializable
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add statese & combine files 
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
-	public String locationFilename ="locations.txt"; // null if locations are loaded from tree
+	public String locationFilename ="regions.txt"; // null if locations are loaded from tree
 	public String treeFilename = "beastInput.trees"; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
