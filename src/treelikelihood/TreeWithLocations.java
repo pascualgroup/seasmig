@@ -20,7 +20,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	Node root = null;		
 	int num_locations = 0;
 	private MigrationBaseModel likelihoodModel = null;
-	private int UNKNOWN_LOCATION; 
+	private int UNKNOWN_LOCATION;
+	private int numIdentifiedLocations; 
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
@@ -80,6 +81,8 @@ public class TreeWithLocations implements LikelihoodTree {
 		Integer location = locationMap.get(tree.getTaxon(tree.getRootNode()));
 		if (location==null) 
 			location=UNKNOWN_LOCATION;
+		else
+			numIdentifiedLocations+=1;
 		root = new Node(location,0,num_locations);
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 	}
@@ -199,6 +202,8 @@ public class TreeWithLocations implements LikelihoodTree {
 				location = locationMap.get(inputTree.getTaxon(node).toString());
 				if (location==null) 
 					location=UNKNOWN_LOCATION;
+				else
+					numIdentifiedLocations+=1;
 			}			
 			outputSubTree.children.add(new Node(location,outputSubTree.time+inputTree.getLength(node)/*+jitter*(cern.jet.random.Uniform.staticNextDouble()-0.5)*/,num_locations));
 			makeSubTree(inputTree,locationMap, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
@@ -289,6 +294,10 @@ public class TreeWithLocations implements LikelihoodTree {
 		return num_locations;
 	}
 
+	public int getNumIdentifiedLocations() {
+		// TODO: this for trees with states...
+		return numIdentifiedLocations;
+	}
 
 }
 

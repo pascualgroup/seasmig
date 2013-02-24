@@ -59,9 +59,13 @@ public class DataFromFiles implements Data
 
 			System.out.print("Reparsing trees... ");
 			if (stateMap==null) {
+				double numIdentifiedLocations=0;
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
 					trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
+					numIdentifiedLocations+=((TreeWithLocations)trees.get(trees.size()-1)).getNumIdentifiedLocations();
 				}
+				numIdentifiedLocations=numIdentifiedLocations/trees.size();
+				System.out.print("identified "+numIdentifiedLocations+" tip locations on average per tree");
 			}
 			else {
 				// TODO: this...
