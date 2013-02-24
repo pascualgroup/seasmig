@@ -23,6 +23,8 @@ import java.io.FileNotFoundException;
 import static java.lang.String.*;
 import java.util.*;
 
+import seasmig.Config;
+
 import mc3kit.*;
 import mc3kit.output.SampleWriterFactory;
 
@@ -37,6 +39,10 @@ public class PriorLikelihoodOutputStep implements Step
 
 	public PriorLikelihoodOutputStep(String filename, long thin) {
 		this(filename, null, false, thin, 0);
+	}
+
+	public PriorLikelihoodOutputStep(String filename, long thin, int chainId) {
+		this(filename, null, false, thin, chainId);
 	}
 
 	public PriorLikelihoodOutputStep(String filename, String format, boolean useQuotes, long thin, int chainId) {
@@ -86,17 +92,15 @@ public class PriorLikelihoodOutputStep implements Step
 		{
 			iterationCount++;
 
-			for (int i=0; i<chains.length;i++) {
-				if(iterationCount % thin == 0) 	{
-					Chain chain = chains[i];
-					chain.getLogger().info(format("Writing prior & likelihood %d", iterationCount));
-					Map<String,String> priorLikelihoodSample = new LinkedHashMap<String,String>();
-					priorLikelihoodSample.put("iterCount", Long.toString(iterationCount));
-					priorLikelihoodSample.put("chainID",Integer.toString(i));
-					priorLikelihoodSample.put("logPrior", Double.toString(chains[i].getModel().getLogPrior()));
-					priorLikelihoodSample.put("logLikelihood",Double.toString(chains[i].getModel().getLogLikelihood()));	
-					writer.writeFlatData(priorLikelihoodSample);
-				}
+			if(iterationCount % thin == 0) 	{
+				Chain chain = chains[0];
+				chain.getLogger().info(format("Writing prior & likelihood %d", iterationCount));
+				Map<String,String> priorLikelihoodSample = new LinkedHashMap<String,String>();
+				priorLikelihoodSample.put("iterCount", Long.toString(iterationCount));
+				priorLikelihoodSample.put("chainID",Integer.toString(chainId));
+				priorLikelihoodSample.put("logPrior", Double.toString(chains[0].getModel().getLogPrior()));
+				priorLikelihoodSample.put("logLikelihood",Double.toString(chains[0].getModel().getLogLikelihood()));	
+				writer.writeFlatData(priorLikelihoodSample);
 			}
 		}
 	}

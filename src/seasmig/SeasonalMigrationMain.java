@@ -115,8 +115,10 @@ public class SeasonalMigrationMain
 				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);
 
 				// Prior & likelihood output step
-				Step priorLikelihoodOutStep = new PriorLikelihoodOutputStep(config.priorLikelihoodFilename, config.thin);
-				
+				Step[] priorLikelihoodOutStep = new PriorLikelihoodOutputStep[config.chainCount];
+				for (int i=0; i<config.chainCount;i++) {
+					priorLikelihoodOutStep[i]=new PriorLikelihoodOutputStep(config.priorLikelihoodFilenameRoot+Integer.toString(i)+config.priorLikelihoodType, config.thin,i);
+				}
 				// Assemble all steps into a sequence; repeat swaps chainCount times
 				// since they're so cheap and beneficial for mixing.
 				// Each iteration thus includes many little steps:
@@ -133,7 +135,9 @@ public class SeasonalMigrationMain
 				}
 				mcmc.addStep(verificationStep);
 				mcmc.addStep(sampOutStep);
-				mcmc.addStep(priorLikelihoodOutStep);
+				for (int i=0;i<config.chainCount;i++) {
+					mcmc.addStep(priorLikelihoodOutStep[i]);
+				}
 			}
 
 			// Run the thing until checkpointEvery steps at a time;
@@ -141,7 +145,7 @@ public class SeasonalMigrationMain
 			// The runFor call automatically parallelizes chains.
 			while(mcmc.getIterationCount() < config.iterationCount) {
 				mcmc.runFor(config.checkpointEvery);
-		//		mcmc.writeToFile(config.checkpointFilename);
+				//mcmc.writeToFile(config.checkpointFilename);
 			}
 
 			// Tells the MCMC to stop the thread pool so this program will exit

@@ -24,7 +24,7 @@ public class MHUniformIntRandomProposer extends VariableProposer {
 		Chain chain = model.getChain();
 		RandomEngine rng = chain.getRng();
 
-		chain.getLogger().finest("MHUniformProposer stepping");
+		chain.getLogger().finest("MHUniformIntProposer stepping");
 
 		double oldLogLikelihood = model.getLogLikelihood();
 		double oldLogPrior = model.getLogPrior();

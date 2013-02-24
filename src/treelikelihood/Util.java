@@ -2,7 +2,7 @@ package treelikelihood;
 
 public class Util {
 
-	public static final double minValue = 1E-300;
+	public static final double minValue = Double.MIN_VALUE;
 
 	protected Util() {};
 	
