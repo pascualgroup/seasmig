@@ -17,6 +17,8 @@ public class SimpleAttributeLoader implements AttributeLoader{
 	
 	HashMap<String, Object> attributes = new HashMap<String,Object>();
 
+	protected SimpleAttributeLoader() {};
+	
 	public SimpleAttributeLoader(String locationFilename,String stateFilename) throws NumberFormatException, IOException {
 		if (locationFilename!=null) {
 			processLocations(locationFilename);							

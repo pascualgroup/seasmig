@@ -30,6 +30,8 @@ public class TestData implements Data {
 	private int numLocations;
 	private int disturbanceScale;
 
+	protected TestData() {};
+	
 	public TestData(Config config_, TestType testType, int numTestRepeats, int numTestLocations, int numTestTrees) throws IOException, ImportException 	{
 
 		config = config_;		

@@ -12,7 +12,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	static final double timePrecision = 1.0E-5;
 
 	// Rate Matrix  
-	final double[][] Q;
+	double[][] Q;
 	private int num_locations = 0;		
 
 	// cache
@@ -22,6 +22,8 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	// Matrix Exponentiation
 	MatrixExponentiator matrixExponentiator;	
 
+	protected ConstantMigrationBaseModel() {};
+	
 	// Constructor	
 	public ConstantMigrationBaseModel(double[][] Q_) {	
 		Q = Q_;

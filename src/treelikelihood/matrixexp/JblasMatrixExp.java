@@ -10,6 +10,8 @@ public class JblasMatrixExp implements MatrixExponentiator {
 	
 	private DoubleMatrix Q;
 	
+	protected JblasMatrixExp() {};
+	
 	public JblasMatrixExp(double[][] Q_) {
 		Q=new DoubleMatrix(Q_);
 	}

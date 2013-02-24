@@ -24,6 +24,8 @@ public class DataFromFiles implements Data
 	Config config = null;
 	int numLocations = 0;
 
+	protected DataFromFiles() {};
+	
 	public DataFromFiles(Config config_) throws IOException, ImportException 	{
 
 		config = config_;		

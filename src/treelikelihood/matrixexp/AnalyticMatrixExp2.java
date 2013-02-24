@@ -11,6 +11,8 @@ public class AnalyticMatrixExp2 implements MatrixExponentiator {
 	double[][] Q = new double[2][2]; 
 	double denum;
 	
+	protected AnalyticMatrixExp2() {};
+	
 	public AnalyticMatrixExp2(double[][] Q) {
 		for (int i=0;i<Q.length;i++) {
 			for (int j=0;j<Q.length;j++) {

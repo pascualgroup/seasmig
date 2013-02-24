@@ -10,6 +10,8 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 	private int num_states = 0;
 	GeneralSeasonalMigrationBaseModel baseModel;
 
+	protected SinusoidialSeasonalMigrationBaseModel() {};
+	
 	public class SeasonalRatePlusSineFunction implements DoubleFunction {
 
 		private double rate;

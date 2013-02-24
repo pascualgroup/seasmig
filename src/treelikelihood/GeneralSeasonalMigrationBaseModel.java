@@ -38,6 +38,8 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	private int num_locations = 0;
 	private double dt = 1.0/(double)nYearParts; 
 
+	protected GeneralSeasonalMigrationBaseModel() {};
+	
 	// Constructor	
 	public GeneralSeasonalMigrationBaseModel(DoubleFunction[][] seasonalRates_) {	
 		// TODO: Check this...

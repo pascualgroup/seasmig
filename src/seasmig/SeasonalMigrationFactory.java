@@ -10,7 +10,9 @@ public class SeasonalMigrationFactory implements ModelFactory
 {
 	Config config;
 	Data data;
-
+	
+	protected SeasonalMigrationFactory() {};
+	
 	public SeasonalMigrationFactory(Config config, Data data)
 	{
 		this.config = config;

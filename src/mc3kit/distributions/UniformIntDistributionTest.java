@@ -13,6 +13,8 @@ import org.junit.Test;
 
 @SuppressWarnings("serial")
 public class UniformIntDistributionTest {
+	
+	protected UniformIntDistributionTest() {};
 
 	@Before
 	public void setUp() throws Exception {

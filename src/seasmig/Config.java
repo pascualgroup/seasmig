@@ -32,15 +32,12 @@ public class Config
 	public long thin = 50;
 	
 	public long initialHistoryCount = 20000;
-	public long checkpointEvery = 100000;
+	public long checkpointEvery = 100;
 
 	public int chainCount = 16;
 	public double heatPower = 2.0;
 	
 	public double targetAcceptanceRate = 0.25;
-	
-	// DISPLAY RELATED PARAMTERS
-	public int printEveryNStates = 100000;
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
@@ -57,7 +54,8 @@ public class Config
 	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
 	public Integer numLocations = null; // needs to be specified if locations are loaded from trees....
 
-
+	protected Config() {};
+	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) throws IOException {
 		File configOutputFile = new File("out.config.json");

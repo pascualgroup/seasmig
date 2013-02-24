@@ -4,6 +4,8 @@ public class Util {
 
 	public static final double minValue = 1E-300;
 
+	protected Util() {};
+	
 	static double logSumExp(double[] alphas, double min) {
 		double returnValue;
 		double sumExp = 0;

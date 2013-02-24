@@ -8,6 +8,8 @@ public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusCon
 	BrownianMotionPlusSeasonalityFunction logSeasonalStatesTransitionProbabilities[] = null;
 	private MigrationBaseModel migrationBaseModel;	
 	
+	protected MigrationPlusSeasonalBrowninanBaseModel() {};
+	
 	public class BrownianMotionPlusSeasonalityFunction {
 
 		private double alpha; 				

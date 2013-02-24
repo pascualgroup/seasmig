@@ -18,6 +18,8 @@ public class MolerMatrixExp implements MatrixExponentiator {
 	private double normInfQ; 
 	static final double q = 6.0;
 	
+	protected MolerMatrixExp() {};
+	
 	public MolerMatrixExp(double[][] testMatrix) {
 		Q = testMatrix;	
 		eye = DoubleFactory2D.dense.identity(Q.length);

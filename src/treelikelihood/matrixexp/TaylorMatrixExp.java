@@ -24,6 +24,8 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	
 	DoubleFactory2D F = DoubleFactory2D.dense; 
 	
+	protected TaylorMatrixExp() {};
+	
 	public TaylorMatrixExp(double[][] testMatrix) {
 		Q = DoubleFactory2D.dense.make(testMatrix);
 		zeroMatrix = F.make(Q.rows(),Q.rows(),0);

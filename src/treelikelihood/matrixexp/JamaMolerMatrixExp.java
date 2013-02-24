@@ -11,6 +11,8 @@ public class JamaMolerMatrixExp implements MatrixExponentiator {
 	Matrix eye; 
 	static final double q = 6.0;
 	
+	protected JamaMolerMatrixExp() {};
+	
 	public JamaMolerMatrixExp(double[][] Q_) {
 		Q = Q_;	
 		eye = Matrix.identity(Q.length,Q.length);

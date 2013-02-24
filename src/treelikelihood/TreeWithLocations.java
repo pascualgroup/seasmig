@@ -20,7 +20,6 @@ public class TreeWithLocations implements LikelihoodTree {
 	private MigrationBaseModel likelihoodModel = null;
 	private int UNKNOWN_LOCATION; 
 
-
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
 		num_locations=createTreeModel.getNumLocations();
@@ -176,7 +175,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 
-	private TreeWithLocations() {
+	protected TreeWithLocations() {
 	}
 
 	private void treeCopyNoCache(Node from, Node to) {
@@ -269,6 +268,8 @@ public class TreeWithLocations implements LikelihoodTree {
 		double time = 0;
 		double[] cachedConditionalLogLikelihood = null;
 
+		protected Node() {};
+		
 		public Node(int location_, double time_, int num_locations_) {
 			location=location_;
 			time=time_;

@@ -7,8 +7,6 @@ import org.javatuples.Pair;
 
 import cern.colt.matrix.tdouble.*;
 
-
-
 public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 
 	// Cache Parameters
@@ -32,6 +30,8 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	HashMap<Pair<Double,Double>, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, DoubleMatrix2D>();
 
 	private int num_states = 0;
+	
+	protected TwoSeasonMigrationBaseModel() {};
 
 	// Constructor	
 	public TwoSeasonMigrationBaseModel(double[][] Q1_,double[][] Q2_, double season1Start_, double season1End_) {		

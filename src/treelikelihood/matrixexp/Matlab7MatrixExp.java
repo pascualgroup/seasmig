@@ -107,8 +107,10 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	static final DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Util.minValue);
 
-	final double[][] Q;
+	double[][] Q;
 
+	protected Matlab7MatrixExp() {};
+	
 	public Matlab7MatrixExp(double[][] Q_) {
 		Q = Q_;	
 	}
