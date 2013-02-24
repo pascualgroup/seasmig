@@ -27,12 +27,12 @@ public class Config implements Serializable
 	public long burnIn = 2000; 	// in iterations	
 	public long iterationCount = 100000000L;
 	
-	public long tuneEvery = 1000; 
+	public long tuneEvery = 200; 
 	public long tuneFor = 10000;
 	public long thin = 50;
 	
-	public long initialHistoryCount = 20000;
-	public long checkpointEvery = 100;
+	public long initialHistoryCount = 200;
+	public long checkpointEvery = 1000;
 
 	public int chainCount = 16;
 	public double heatPower = 2.0;

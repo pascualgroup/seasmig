@@ -95,7 +95,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public double logLikelihood() {
 		double[] alphas=new double[num_locations];
-		double min = Util.minValue;
+		double min = Double.POSITIVE_INFINITY;
 		if (root.location==UNKNOWN_LOCATION) {
 			for (int rootLocation=0;rootLocation<num_locations;rootLocation++) {				
 				double alpha=conditionalLogLikelihood(root, rootLocation);
@@ -247,7 +247,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 
 	}
-
 
 	private void removeInternalLocations(Node node) {
 		if (node.children.size()!=0) {

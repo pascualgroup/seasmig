@@ -5,33 +5,13 @@ public class Util {
 	public static final double minValue = Double.MIN_VALUE;
 
 	protected Util() {};
-	
-	static double logSumExp(double[] alphas, double min) {
-		double returnValue;
-		double sumExp = 0;
-		if (Double.NEGATIVE_INFINITY!=min) {		
-			for (int i=0;i<alphas.length;i++) {			
-				sumExp=sumExp+Math.exp(alphas[i]-min);
-			}
-			returnValue=min+Math.log(sumExp);
-		}
-		else {
-			for (int i=0;i<alphas.length;i++) {	
-				if (Double.NEGATIVE_INFINITY!=alphas[i])
-					sumExp=sumExp+Math.exp(alphas[i]);
-			}
-			returnValue=Math.log(sumExp);
-		}
 
-		if (!Double.isNaN(returnValue)) {
-			return returnValue;
+	static double logSumExp(double[] alphas, double min) {
+		double sumExp = 0;		
+		for (int i=0;i<alphas.length;i++) {			
+			sumExp=sumExp+Math.exp(alphas[i]-min);
 		}
-		else {
-			// TODO: This...
-			//System.err.print(sumExp);				
-			//System.err.print("logSumExp==NaN: alphas: "+alphas+"\nmin="+min);			
-			return Double.NEGATIVE_INFINITY;			
-		}				
+		return min+Math.log(sumExp);
 
 	}
 
