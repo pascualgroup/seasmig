@@ -26,6 +26,7 @@ import static mc3kit.util.Utils.makeMap;
 import mc3kit.*;
 import mc3kit.util.*;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -146,6 +147,8 @@ public class DEMCProposalStep implements Step {
     List<BlockSizeManager> blockSizeManagers;
     
     /*** CONSTRUCTOR ***/
+    
+    protected DEMCProposalTask() { };
     
     public DEMCProposalTask(int chainId) {
       this.chainId = chainId;
@@ -295,7 +298,7 @@ public class DEMCProposalStep implements Step {
     
     /*** MANAGER FOR PROPOSALS FOR A SINGLE BLOCK SIZE ***/
     
-    private class BlockSizeManager
+    private class BlockSizeManager implements Serializable
     {
       int blockSize;
       
