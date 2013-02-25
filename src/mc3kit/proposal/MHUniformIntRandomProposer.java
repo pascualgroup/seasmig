@@ -2,7 +2,7 @@ package mc3kit.proposal;
 
 import static mc3kit.util.Math.*;
 import static java.lang.String.format;
-import treelikelihood.Util;
+import seasmig.util.Util;
 import cern.jet.random.engine.RandomEngine;
 import mc3kit.*;
 
