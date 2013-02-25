@@ -21,7 +21,8 @@ public class Config implements Serializable
 	public String swapStatsFilename = "swap_stats.txt";
 	public Level logLevel = Level.INFO;
 	public String checkpointFilename = "checkpoint.bin";
-	public String priorLikelihoodFilename = "prior_likelihood.txt";	
+	public String priorLikelihoodFilename = "prior_likelihood.txt";
+	public String mlFilename = "ml.txt";
 
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 2000; 	// in iterations	
@@ -30,9 +31,10 @@ public class Config implements Serializable
 	public long tuneEvery = 200; 
 	public long tuneFor = 10000;
 	public long thin = 50;
+	public long mlthin = 500;
 	
 	public long initialHistoryCount = 200;
-	public long checkpointEvery = 1000;
+	public long checkpointEvery = 100;
 
 	public int chainCount = 4;
 	public double heatPower = 3.0;
@@ -53,6 +55,8 @@ public class Config implements Serializable
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
 	public Integer numLocations = null; // needs to be specified if locations are loaded from trees....
+	
+
 	
 	protected Config() {};
 	

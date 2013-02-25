@@ -14,6 +14,7 @@ import mc3kit.SwapStep;
 import mc3kit.VerificationStep;
 import mc3kit.SwapStep.SwapParity;
 import mc3kit.example.ExampleModelFactory;
+import mc3kit.monitoring.MarginalLikelihoodStep;
 import mc3kit.output.PriorLikelihoodOutputStep;
 import mc3kit.output.SampleOutputStep;
 import mc3kit.proposal.DEMCProposalStep;
@@ -127,6 +128,9 @@ public class SeasonalMigrationMain
 
 				// Sample output step
 				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);
+				
+				// Marginal-likelihood calculation during run
+		        Step mlOutStep = new MarginalLikelihoodStep(config.mlFilename, config.burnIn, config.mlthin);
 
 				// Prior-likelihood output step for marginal likelihood calculation
 				Step plOutStep = new PriorLikelihoodOutputStep(config.priorLikelihoodFilename, config.thin);
