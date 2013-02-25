@@ -151,6 +151,7 @@ public class SeasonalMigrationMain
 				}
 				mcmc.addStep(verificationStep);
 				mcmc.addStep(sampOutStep);
+				mcmc.addStep(mlOutStep);
 				mcmc.addStep(plOutStep);
 			}
 
