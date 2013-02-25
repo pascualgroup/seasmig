@@ -5,6 +5,9 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.Date;
 
+import seasmig.data.DataFromFiles;
+import seasmig.models.SeasonalMigrationFactory;
+
 import mc3kit.MCMC;
 import mc3kit.Step;
 import mc3kit.SwapStep;
