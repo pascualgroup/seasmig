@@ -18,6 +18,12 @@ public class JblasMatrixExp implements MatrixExponentiator {
 	public double[][] expm(double t) {
 		return MatrixFunctions.expm(Q.mul(t)).toArray2();
 	}
+	
+	@Override
+	public boolean checkMethod() {
+		// TODO: this....
+		return true;
+	}
 
 }
 

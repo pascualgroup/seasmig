@@ -36,6 +36,9 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			break;
 		case 3:
 			matrixExponentiator=new AnalyticMatrixExp3(Q);
+			if (!matrixExponentiator.checkMethod()) {
+				matrixExponentiator=new Matlab7MatrixExp(Q);
+			}
 			break;			
 		default:
 			matrixExponentiator=new Matlab7MatrixExp(Q);	

@@ -82,5 +82,10 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 		
 	}
 	
+	@Override
+	public boolean checkMethod() {
+		// TODO: this....
+		return true;
+	}
 
 }

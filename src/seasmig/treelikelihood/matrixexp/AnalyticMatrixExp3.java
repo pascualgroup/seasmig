@@ -3,8 +3,8 @@ package seasmig.treelikelihood.matrixexp;
 import org.junit.Test;
 
 import seasmig.treelikelihood.MatrixExponentiator;
-import seasmig.util.Util;
 
+@SuppressWarnings("serial")
 public class AnalyticMatrixExp3 implements MatrixExponentiator {
 
 	// Q has to be a proper rate matrix with Q[i][i] = -Sum of rest of row i
@@ -13,6 +13,10 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 	double Lambda;
 	double Delta; 
 	double Epsilon;
+	
+	boolean methodOK;
+	private double denum1;
+	private double denum3;
 
 	protected AnalyticMatrixExp3() {};
 	
@@ -27,9 +31,14 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 
 		Delta = Q[0][2]*Q[1][0]+Q[0][1]*Q[1][2]+Q[0][2]*Q[1][2]+
 				Q[0][1]*Q[2][0]+Q[1][0]*Q[2][0]+Q[1][2]*Q[2][0]+
-				Q[0][1]*Q[2][1]+Q[0][2]*Q[2][1]+Q[1][0]*Q[2][1]+Util.minValue;
-
+				Q[0][1]*Q[2][1]+Q[0][2]*Q[2][1]+Q[1][0]*Q[2][1];
+		
 		Epsilon = Math.sqrt(-4*Delta+Lambda*Lambda);
+		
+		denum1=4*Delta+(Epsilon-Lambda)*Lambda;
+		denum3=-4*Delta+(Epsilon+Lambda)*Lambda;
+		
+		methodOK = (denum1>0) && (denum3>0) && !Double.isNaN(Epsilon);
 
 	}
 
@@ -39,8 +48,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 
 		double[][] returnValue = new double[3][3];
 
-		double denum1=4*Delta+(Epsilon-Lambda)*Lambda+Util.minValue;
-		double denum3=-4*Delta+(Epsilon+Lambda)*Lambda+Util.minValue;
+		
 		if (denum1!=0 && denum3!=0 && Delta!=0) {
 			double exp1 = Math.exp(0.5*t*(Epsilon-Lambda));			
 			double exp3 = Math.exp(-0.5*t*(Epsilon+Lambda));
@@ -112,5 +120,10 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 		long time2= System.currentTimeMillis()-startTime2;
 		System.out.println("time1: "+time1+"[ms] time2: "+time2+"[ms]");
 
+	}
+
+	@Override
+	public boolean checkMethod() {		
+		return methodOK;
 	}
 }

@@ -127,26 +127,21 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private double conditionalLogLikelihood(Node node, int nodeLocation) {
 
-		if (node.cachedConditionalLogLikelihood[nodeLocation]!=0) {					
+		if (node.cachedConditionalLogLikelihood[nodeLocation]!=0) { 
 			return node.cachedConditionalLogLikelihood[nodeLocation];
 		}
 		else {
 			double loglikelihood=0;
 			for (Node child : node.children) {
 				if (child.location!=UNKNOWN_LOCATION) {
-					assert child.time>node.time;
+					
 					loglikelihood=loglikelihood+conditionalLogLikelihood(child,child.location)+likelihoodModel.logprobability(nodeLocation, child.location, node.time, child.time);
 				}
 				else {
 					double[] alphas=new double[num_locations];
 					double min = Double.POSITIVE_INFINITY;
 					for (int childLocation=0;childLocation<num_locations;childLocation++) {
-						double condLike=conditionalLogLikelihood(child, childLocation);
-						// TODO; DEBUG
-						if (condLike<=Util.minNegative || Double.isInfinite(condLike)) {
-							System.err.println("here");
-						}
-						double alpha = likelihoodModel.logprobability(nodeLocation, childLocation, node.time, child.time)+condLike;
+						double alpha = likelihoodModel.logprobability(nodeLocation, childLocation, node.time, child.time)+conditionalLogLikelihood(child, childLocation);
 						if (Double.isNaN(alpha))  
 							alpha=Util.minNegative;
 						alphas[childLocation]=alpha;

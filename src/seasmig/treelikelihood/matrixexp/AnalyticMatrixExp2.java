@@ -5,12 +5,14 @@ import org.junit.Test;
 import seasmig.treelikelihood.*;
 import seasmig.util.Util;
 
+@SuppressWarnings("serial")
 public class AnalyticMatrixExp2 implements MatrixExponentiator {
 	
 	// Q has to be a proper rate matrix with Q[i][i] = -Sum of rest of row i
 	
 	double[][] Q = new double[2][2]; 
 	double denum;
+	boolean methodOK;
 	
 	protected AnalyticMatrixExp2() {};
 	
@@ -21,6 +23,7 @@ public class AnalyticMatrixExp2 implements MatrixExponentiator {
 			}
 		}
 		denum=Q[0][1]+Q[1][0]+Util.minValue;
+		methodOK=(denum>0);			
 	}
 	
 	@Override
@@ -83,6 +86,11 @@ public class AnalyticMatrixExp2 implements MatrixExponentiator {
 		}
 		long time2= System.currentTimeMillis()-startTime2;
 		System.out.println("time1: "+time1+"[ms] time2: "+time2+"[ms]");	
+	}
+
+	@Override
+	public boolean checkMethod() {		
+		return methodOK;
 	}
 
 }

@@ -123,6 +123,10 @@ public class MolerMatrixExp implements MatrixExponentiator {
 		return E.toArray();
 	}
 
-
+	@Override
+	public boolean checkMethod() {
+		// TODO: this....
+		return true;
+	}
 
 }

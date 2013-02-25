@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public interface MatrixExponentiator extends Serializable {
 	
-	// Should return exp(Q*t)
-	double[][] expm(double t);
+	double[][] expm(double t); 	// return exp(Q*t)
+	boolean checkMethod(); // check if method is applicable to a specific Q matrix
 
 }

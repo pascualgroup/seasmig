@@ -100,6 +100,12 @@ public class JamaMolerMatrixExp implements MatrixExponentiator {
 		return E.getArray();
 	}
 
+	@Override
+	public boolean checkMethod() {
+		// TODO: this....
+		return true;
+	}
+
 
 
 }

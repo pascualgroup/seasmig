@@ -265,5 +265,11 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		}
 		return F.toArray();
 	}
+	
+	@Override
+	public boolean checkMethod() {
+		// TODO: this....
+		return true;
+	}
 
 }
