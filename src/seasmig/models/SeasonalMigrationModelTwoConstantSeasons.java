@@ -19,17 +19,22 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] diffMultipliers;
 	DoubleVariable seasonalPhase;
+	double seasonalPhaseRealization;
 	IntVariable treeIndex;
 	LikelihoodVariable likeVar;
 	private int nTrees;	
+	
+	boolean fixedPhase;
 
 	protected SeasonalMigrationModelTwoConstantSeasons() { }
 
-	public SeasonalMigrationModelTwoConstantSeasons(Chain initialChain, Config config, Data data) throws MC3KitException
+	public SeasonalMigrationModelTwoConstantSeasons(Chain initialChain, Config config, Data data, boolean fixedPhase) throws MC3KitException
 	{
 		super(initialChain);
+				
 		this.config = config;
-		this.data = data;		
+		this.data = data;
+		this.fixedPhase=fixedPhase;
 		numLocations=data.getNumLocations();
 		nTrees=data.getTrees().size();		
 		rates = new DoubleVariable[numLocations][numLocations];
@@ -40,9 +45,14 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
 		treeIndex.sample();
 
-		seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
-		seasonalPhase.sample();
-
+		if (!fixedPhase) {
+			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
+			seasonalPhase.sample();
+		}
+		else {
+			seasonalPhaseRealization=config.fixedPhase;
+		}
+		
 		DoubleDistribution ratePriorDist = new ExponentialDistribution(this,1.0);
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 
@@ -74,13 +84,14 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 
 			// Add dependencies between likelihood variable and parameters
 			m.addEdge(this, m.treeIndex);
-			m.addEdge(this, m.seasonalPhase);
+			if (!fixedPhase)
+				m.addEdge(this, m.seasonalPhase);
 
 			for(int i = 0; i < numLocations; i++) {
 				for(int j = 0; j < numLocations; j++) {
 					if (i==j) continue;
 					m.addEdge(this,rates[i][j]);
-					m.addEdge(this,diffMultipliers[i][j]);
+					m.addEdge(this,diffMultipliers[i][j]);		
 				}
 			}
 		}
@@ -124,7 +135,9 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 			}
 
 			// TODO: add update to migration model instead of reconstructing...
-			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhase.getValue(),seasonalPhase.getValue()+0.5);
+			if (!fixedPhase)
+				seasonalPhaseRealization=seasonalPhase.getValue();
+			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhaseRealization,seasonalPhaseRealization+0.5);
 
 			LikelihoodTree workingCopy = data.getTrees().get((int)treeIndex.getValue()).copy(); 
 			workingCopy.setLikelihoodModel(migrationBaseModel);
