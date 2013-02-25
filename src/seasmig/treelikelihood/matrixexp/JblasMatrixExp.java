@@ -1,10 +1,9 @@
-package treelikelihood.matrixexp;
+package seasmig.treelikelihood.matrixexp;
 
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 
-import treelikelihood.MatrixExponentiator;
-
+import seasmig.treelikelihood.MatrixExponentiator;
 
 public class JblasMatrixExp implements MatrixExponentiator {
 	

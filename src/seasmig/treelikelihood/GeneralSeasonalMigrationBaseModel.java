@@ -1,4 +1,4 @@
-package treelikelihood;
+package seasmig.treelikelihood;
 
 import java.util.HashMap;
 import java.util.Vector;
@@ -10,6 +10,7 @@ import cern.jet.math.tdouble.DoubleFunctions;
 
 
 
+@SuppressWarnings("serial")
 public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check this...
 	// TODO: Failes degeneracy test....

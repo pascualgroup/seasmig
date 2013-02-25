@@ -1,9 +1,10 @@
-package treelikelihood.matrixexp;
+package seasmig.treelikelihood.matrixexp;
 
+import seasmig.treelikelihood.MatrixExponentiator;
+import seasmig.util.Util;
+import seasmig.util.Util.FRexpResult;
 import Jama.Matrix;
-import treelikelihood.MatrixExponentiator;
-import treelikelihood.Util;
-import treelikelihood.Util.FRexpResult;
+
 
 public class JamaMolerMatrixExp implements MatrixExponentiator {
 

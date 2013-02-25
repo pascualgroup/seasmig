@@ -1,9 +1,13 @@
-package treelikelihood;
+package seasmig.treelikelihood;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import seasmig.LikelihoodTree;
+import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.util.Util;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
@@ -104,7 +108,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				alphas[rootLocation]=alpha;	
 				if (alpha<min) min=alpha;				
 			}
-			return Util.logSumExp(alphas,min);
+			return seasmig.util.Util.logSumExp(alphas,min);
 		}
 		else {
 			return conditionalLogLikelihood(root,root.location);					

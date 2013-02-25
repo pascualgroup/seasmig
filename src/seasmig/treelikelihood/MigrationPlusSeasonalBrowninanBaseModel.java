@@ -1,4 +1,6 @@
-package treelikelihood;
+package seasmig.treelikelihood;
+
+import seasmig.util.Util;
 
 public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusContinousStateBaseModel {
 	// TODO: go over this...

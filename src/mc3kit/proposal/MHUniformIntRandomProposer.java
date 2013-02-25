@@ -3,10 +3,8 @@ package mc3kit.proposal;
 import static mc3kit.util.Math.*;
 import static java.lang.String.format;
 import treelikelihood.Util;
-import cern.jet.random.Uniform;
 import cern.jet.random.engine.RandomEngine;
 import mc3kit.*;
-import mc3kit.util.Random;
 
 
 

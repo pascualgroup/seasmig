@@ -4,14 +4,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import treelikelihood.*;
-
+import seasmig.treelikelihood.AttributeLoader;
+import seasmig.treelikelihood.ConstantMigrationBaseModel;
+import seasmig.LikelihoodTree;
+import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.SimpleAttributeLoader;
+import seasmig.treelikelihood.SinusoidialSeasonalMigrationBaseModel;
+import seasmig.treelikelihood.TreeWithLocations;
+import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.trees.SimpleRootedTree;

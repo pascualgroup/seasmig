@@ -1,4 +1,4 @@
-package treelikelihood;
+package seasmig.treelikelihood;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("serial")
 public class SimpleAttributeLoader implements AttributeLoader{
 	// TODO: change this to a different and single file type for attributes....
 	// TODO: add grouping of locations together .....

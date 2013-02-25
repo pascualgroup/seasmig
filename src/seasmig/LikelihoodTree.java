@@ -1,4 +1,4 @@
-package treelikelihood;
+package seasmig;
 
 import java.io.Serializable;
 

@@ -1,7 +1,6 @@
-package treelikelihood;
+package seasmig.treelikelihood;
 
 import cern.colt.function.DoubleFunction;
-import cern.colt.matrix.tdouble.*;
 
 
 @SuppressWarnings("serial")

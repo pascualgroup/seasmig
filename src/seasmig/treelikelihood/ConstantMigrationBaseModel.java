@@ -1,11 +1,13 @@
-package treelikelihood;
+package seasmig.treelikelihood;
 import java.util.HashMap;
 
-import treelikelihood.matrixexp.AnalyticMatrixExp2;
-import treelikelihood.matrixexp.AnalyticMatrixExp3;
-import treelikelihood.matrixexp.Matlab7MatrixExp;
+import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
+import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
+import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
+
 import cern.jet.math.tdouble.DoubleFunctions;
 
+@SuppressWarnings("serial")
 public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Precision Parameter

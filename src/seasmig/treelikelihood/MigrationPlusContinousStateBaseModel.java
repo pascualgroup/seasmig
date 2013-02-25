@@ -1,4 +1,4 @@
-package treelikelihood;
+package seasmig.treelikelihood;
 
 public interface MigrationPlusContinousStateBaseModel {
 

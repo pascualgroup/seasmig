@@ -4,19 +4,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Vector;
 
-import treelikelihood.*;
-
+import seasmig.treelikelihood.AttributeLoader;
+import seasmig.treelikelihood.SimpleAttributeLoader;
+import seasmig.treelikelihood.TreeWithLocations;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.trees.SimpleRootedTree;
-import jebl.math.Random;
 
 @SuppressWarnings("serial")
 public class DataFromFiles implements Data

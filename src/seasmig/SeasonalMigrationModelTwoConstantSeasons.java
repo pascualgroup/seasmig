@@ -1,9 +1,7 @@
 package seasmig;
 
-import treelikelihood.LikelihoodTree;
-import treelikelihood.MigrationBaseModel;
-import treelikelihood.TwoSeasonMigrationBaseModel;
-
+import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
 import mc3kit.*;
 import mc3kit.distributions.*;
 

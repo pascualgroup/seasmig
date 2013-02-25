@@ -1,9 +1,9 @@
-package treelikelihood.matrixexp;
+package seasmig.treelikelihood.matrixexp;
 
 import java.util.Vector; // 
 
-import treelikelihood.MatrixExponentiator;
-import treelikelihood.Util;
+import seasmig.treelikelihood.MatrixExponentiator;
+import seasmig.util.Util;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;

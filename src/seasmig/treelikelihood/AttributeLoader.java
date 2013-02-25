@@ -1,7 +1,6 @@
-package treelikelihood;
+package seasmig.treelikelihood;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 public interface AttributeLoader extends Serializable {

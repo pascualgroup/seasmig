@@ -1,4 +1,4 @@
-package treelikelihood;
+package seasmig.util;
 
 import cern.jet.random.engine.RandomEngine;
 
@@ -9,7 +9,7 @@ public class Util {
 
 	protected Util() {};
 
-	static double logSumExp(double[] alphas, double min) {
+	public static double logSumExp(double[] alphas, double min) {
 		double sumExp = 0;		
 		for (int i=0;i<alphas.length;i++) {			
 			sumExp=sumExp+Math.exp(alphas[i]-min);

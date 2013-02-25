@@ -10,8 +10,12 @@ import jebl.evolution.io.ImportException;
 import org.junit.Test;
 
 import seasmig.TestData.TestType;
-import treelikelihood.*;
-import treelikelihood.matrixexp.*;
+import seasmig.treelikelihood.*;
+import seasmig.treelikelihood.matrixexp.JamaMolerMatrixExp;
+import seasmig.treelikelihood.matrixexp.JblasMatrixExp;
+import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
+import seasmig.treelikelihood.matrixexp.MolerMatrixExp;
+import seasmig.treelikelihood.matrixexp.TaylorMatrixExp;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -35,21 +39,21 @@ public class SeasonalMigrationTest {
 			MatrixExponentiator test5 = new JblasMatrixExp(testMatrix);
 
 			for (double t=0;t<500;t=(t+0.1)*2) {
-				String res1=treelikelihood.Util.parse(test1.expm(t));
-				String res2=treelikelihood.Util.parse(test2.expm(t));
-				String res3=treelikelihood.Util.parse(test3.expm(t));
-				String res4=treelikelihood.Util.parse(test4.expm(t));
-				String res5=treelikelihood.Util.parse(test5.expm(t));
+				String res1=seasmig.util.Util.parse(test1.expm(t));
+				String res2=seasmig.util.Util.parse(test2.expm(t));
+				String res3=seasmig.util.Util.parse(test3.expm(t));
+				String res4=seasmig.util.Util.parse(test4.expm(t));
+				String res5=seasmig.util.Util.parse(test5.expm(t));
 
 				if (res1.equalsIgnoreCase(res2) && res2.equalsIgnoreCase(res3) && res3.equalsIgnoreCase(res4)  && res4.equalsIgnoreCase(res5)) {
 					System.out.print(".");
 				}
 				else {
-					System.out.println("\nMolerMatrixExp: "+treelikelihood.Util.print(test1.expm(t)));					
-					System.out.println("Matlab7MatrixExp: "+treelikelihood.Util.print(test2.expm(t)));
-					System.out.println("TaylorMatrixExp: "+treelikelihood.Util.print(test3.expm(t)));
-					System.out.println("JamaMolerMatrixExp: "+treelikelihood.Util.print(test4.expm(t)));
-					System.out.println("JblasMatrixExp: "+treelikelihood.Util.print(test5.expm(t)));
+					System.out.println("\nMolerMatrixExp: "+seasmig.util.Util.print(test1.expm(t)));					
+					System.out.println("Matlab7MatrixExp: "+seasmig.util.Util.print(test2.expm(t)));
+					System.out.println("TaylorMatrixExp: "+seasmig.util.Util.print(test3.expm(t)));
+					System.out.println("JamaMolerMatrixExp: "+seasmig.util.Util.print(test4.expm(t)));
+					System.out.println("JblasMatrixExp: "+seasmig.util.Util.print(test5.expm(t)));
 
 				}
 			}

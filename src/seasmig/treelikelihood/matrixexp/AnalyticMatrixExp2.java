@@ -1,9 +1,9 @@
-package treelikelihood.matrixexp;
+package seasmig.treelikelihood.matrixexp;
 
 import org.junit.Test;
 
-import treelikelihood.MatrixExponentiator;
-import treelikelihood.Util;
+import seasmig.treelikelihood.*;
+import seasmig.util.Util;
 
 public class AnalyticMatrixExp2 implements MatrixExponentiator {
 	
