@@ -28,11 +28,11 @@ public class TestData implements Data {
 	// TODO: This...
 	public Vector<LikelihoodTree> trees = new Vector<LikelihoodTree>();
 	Config config = null;
-	enum TestType {NORMAL, TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY};
+	public enum TestType {NORMAL, TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY};
 
 	// TEST MODELS
-	MigrationBaseModel createModel = null;
-	List<MigrationBaseModel> testModels = null;
+	public MigrationBaseModel createModel = null;
+	public List<MigrationBaseModel> testModels = null;
 	private SimpleRootedTree numTestTips;
 	private int numLocations;
 	private int disturbanceScale;
@@ -338,7 +338,7 @@ public class TestData implements Data {
 		return returnValue;
 	}
 
-	static double[][] makeRandomMigrationMatrix(int size, double scale) {
+	public static double[][] makeRandomMigrationMatrix(int size, double scale) {
 		// For test purposes...
 		double[][] returnValue = new double[size][size];
 		for (int i=0;i<size;i++) {

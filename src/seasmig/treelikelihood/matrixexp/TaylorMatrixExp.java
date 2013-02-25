@@ -8,6 +8,7 @@ import seasmig.util.Util;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
+@SuppressWarnings("serial")
 public class TaylorMatrixExp implements MatrixExponentiator {
 	// TODO: this has many numerical issues...
 

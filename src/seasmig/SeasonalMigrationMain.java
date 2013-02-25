@@ -2,9 +2,6 @@ package seasmig;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.PrintWriter;
-import java.util.Date;
-
 import seasmig.data.DataFromFiles;
 import seasmig.models.SeasonalMigrationFactory;
 
@@ -13,17 +10,12 @@ import mc3kit.Step;
 import mc3kit.SwapStep;
 import mc3kit.VerificationStep;
 import mc3kit.SwapStep.SwapParity;
-import mc3kit.example.ExampleModelFactory;
 import mc3kit.monitoring.MarginalLikelihoodStep;
 import mc3kit.output.PriorLikelihoodOutputStep;
 import mc3kit.output.SampleOutputStep;
 import mc3kit.proposal.DEMCProposalStep;
 import mc3kit.proposal.UnivariateProposalStep;
 
-
-import cern.jet.random.Normal;
-import cern.jet.random.engine.MersenneTwister;
-import cern.jet.random.engine.RandomEngine;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

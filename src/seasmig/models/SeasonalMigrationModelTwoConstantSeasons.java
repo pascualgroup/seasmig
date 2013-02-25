@@ -38,17 +38,21 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		beginConstruction();
 
 		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
+		treeIndex.sample();
 
 		seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
+		seasonalPhase.sample();
 
-		DoubleDistribution ratePrior = new ExponentialDistribution(this,1.0);
-		DoubleDistribution diffMultiplierPrior = new UniformDistribution(this,-1.0,1.0);
+		DoubleDistribution ratePriorDist = new ExponentialDistribution(this,1.0);
+		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
-				rates[i][j] = new DoubleVariable(this, "meanRates."+Integer.toString(i)+"."+Integer.toString(j), ratePrior);
-				diffMultipliers[i][j] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i)+"."+Integer.toString(j), diffMultiplierPrior);
+				rates[i][j] = new DoubleVariable(this, "meanRates."+Integer.toString(i)+"."+Integer.toString(j), ratePriorDist);
+				rates[i][j].sample();
+				diffMultipliers[i][j] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i)+"."+Integer.toString(j), diffMultiplierPriorDist);
+				diffMultipliers[i][j].sample();
 			}
 		}
 

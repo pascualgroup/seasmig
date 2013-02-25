@@ -56,6 +56,7 @@ function F = expm(A)
 		% End of expm
  */
 
+@SuppressWarnings("serial")
 public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	// Pade Coefficients m based ("not zero based")

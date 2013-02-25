@@ -56,8 +56,6 @@ public class Config implements Serializable
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
 	public Integer numLocations = null; // needs to be specified if locations are loaded from trees....
 	
-
-	
 	protected Config() {};
 	
 	// OUTPUT CONFIG TO FILE

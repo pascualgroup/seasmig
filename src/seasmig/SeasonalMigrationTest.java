@@ -9,7 +9,8 @@ import jebl.evolution.io.ImportException;
 
 import org.junit.Test;
 
-import seasmig.TestData.TestType;
+import seasmig.data.TestData;
+import seasmig.data.TestData.TestType;
 import seasmig.treelikelihood.*;
 import seasmig.treelikelihood.matrixexp.JamaMolerMatrixExp;
 import seasmig.treelikelihood.matrixexp.JblasMatrixExp;
