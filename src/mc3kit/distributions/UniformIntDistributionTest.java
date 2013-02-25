@@ -13,8 +13,6 @@ import org.junit.Test;
 
 @SuppressWarnings("serial")
 public class UniformIntDistributionTest {
-	
-	protected UniformIntDistributionTest() {};
 
 	@Before
 	public void setUp() throws Exception {
@@ -63,7 +61,7 @@ public class UniformIntDistributionTest {
 			assertEquals(i + 1, mcmc.getIterationCount());
 
 			if(i >= burnIn) {
-				int val = mcmc.getModel().getIntVariable("v").getValue();
+				int val = ((IntVariable)mcmc.getModel().getVariable("v")).getValue();
 				sum += val;
 			}
 		}

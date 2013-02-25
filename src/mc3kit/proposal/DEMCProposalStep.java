@@ -148,8 +148,6 @@ public class DEMCProposalStep implements Step {
     
     /*** CONSTRUCTOR ***/
     
-    protected DEMCProposalTask() { };
-    
     public DEMCProposalTask(int chainId) {
       this.chainId = chainId;
     }

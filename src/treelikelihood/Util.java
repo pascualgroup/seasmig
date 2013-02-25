@@ -1,5 +1,7 @@
 package treelikelihood;
 
+import cern.jet.random.engine.RandomEngine;
+
 public class Util {
 
 	public static final double minValue = Double.MIN_VALUE;
@@ -113,6 +115,14 @@ public class Util {
 	{
 		public int e = 0;
 		public double f = 0.;
+	}
+
+	public static int nextIntFromToExcept(RandomEngine rng, int min, int max, int except) {
+		int newValue =  min + (int)(rng.nextDouble() * ((max-1 - min) + 1));
+		if (newValue==except) {
+			newValue=max;
+		}
+		return newValue;
 	}
 
 

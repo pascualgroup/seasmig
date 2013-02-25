@@ -21,6 +21,7 @@ package mc3kit.functions;
 
 import mc3kit.*;
 
+import java.io.Serializable;
 import java.util.*;
 
 @SuppressWarnings("serial")
@@ -78,7 +79,7 @@ public class DoubleSumFunction extends DoubleFunction {
     return false;
   }
   
-  private class Summand {
+  private class Summand implements Serializable {
     double coeff;
     ModelEdge edge;
     

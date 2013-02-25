@@ -2,18 +2,23 @@ package mc3kit.proposal;
 
 import static mc3kit.util.Math.*;
 import static java.lang.String.format;
+import treelikelihood.Util;
+import cern.jet.random.Uniform;
 import cern.jet.random.engine.RandomEngine;
 import mc3kit.*;
+import mc3kit.util.Random;
+
+
 
 @SuppressWarnings("serial")
 public class MHUniformIntRandomProposer extends VariableProposer {
 
-	double min;
-	double max;
+	int min;
+	int max;
 
 	protected MHUniformIntRandomProposer() { }
 
-	public MHUniformIntRandomProposer(String name, double min, double max) {
+	public MHUniformIntRandomProposer(String name, int min, int max) {
 		super(name);
 		this.min = min;
 		this.max = max;
@@ -22,8 +27,7 @@ public class MHUniformIntRandomProposer extends VariableProposer {
 	@Override
 	public void step(Model model) throws MC3KitException {
 		Chain chain = model.getChain();
-		RandomEngine rng = chain.getRng();
-
+		
 		chain.getLogger().finest("MHUniformIntProposer stepping");
 
 		double oldLogLikelihood = model.getLogLikelihood();
@@ -31,15 +35,12 @@ public class MHUniformIntRandomProposer extends VariableProposer {
 
 		chain.getLogger().finest(format("oldLP, oldLL: %f, %f", oldLogPrior, oldLogLikelihood));
 
-		IntVariable rv = model.getIntVariable(getName());
+		IntVariable rv = (IntVariable) model.getVariable(getName());
 
 		int oldValue = rv.getValue();
 
-		// TODO: check this...
-		int newValue =  oldValue+1 + (int)(rng.nextDouble() * ((max-1 - min) + 1));
-		if (newValue>max) {
-			newValue=newValue-(int)max+(int)min-1;
-		}
+		RandomEngine rng = model.getRng();
+		int newValue=Util.nextIntFromToExcept(rng , min, max, oldValue);
 
 		chain.getLogger().finest(format("oldVal, newVal = %d, %d", oldValue, newValue));
 

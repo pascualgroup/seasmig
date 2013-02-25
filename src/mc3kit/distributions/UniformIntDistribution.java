@@ -15,8 +15,8 @@ public class UniformIntDistribution extends IntDistribution {
 
 	static int MaxRange = 1000000; // TODO: find precision error free working range
 	static int MinRange = -1000000; // TODO: find precision error working range
-	double min; // TODO: int?
-	double max; 
+	int min; 
+	int max; 
 	double logP; 
 	ModelEdge minEdge;
 	ModelEdge maxEdge;
@@ -76,6 +76,7 @@ public class UniformIntDistribution extends IntDistribution {
 		// TODO: check this...
 		double min = minEdge == null ? this.min : getDoubleValue(minEdge);
 		double max = maxEdge == null ? this.max : getDoubleValue(maxEdge);
-		((IntVariable)var).setValue( (int)min + (int)(getRng().nextDouble() * ((max - min) + 1))); 
+		double doubleValue = this.getRng().nextDouble();
+		((IntVariable)var).setValue( (int)min + (int)(doubleValue * ((max - min) + 1))); 
 	}
 }

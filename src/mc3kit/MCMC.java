@@ -331,6 +331,10 @@ public class MCMC implements Serializable {
     return chains[chainId];
   }
   
+  public synchronized ModelFactory getModelFactory() { 
+    return modelFactory;
+  }
+  
   public synchronized Model getModel() {
     return getChain(0).getModel();
   }

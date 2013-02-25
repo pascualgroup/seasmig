@@ -22,6 +22,7 @@ package mc3kit.partition;
 import mc3kit.*;
 import mc3kit.util.*;
 
+import java.io.Serializable;
 import java.util.*;
 
 import cern.jet.random.Uniform;
@@ -64,12 +65,7 @@ public class PartitionVariable extends Variable
 	}
 	
 	public void associateVariablesWithDistributions(ModelNode[] vars, ModelNode[] dists) {
-	  associate(vars, dists, new Associator() {
-      @Override
-      public void associate(ModelNode tail, ModelNode head) throws MC3KitException {
-        ((Variable)tail).setDistribution((Distribution)head);
-      }
-	  });
+	  associate(vars, dists, new DistributionAssociator());
 	}
 	
 	public IterableBitSet getGroup(int g)
@@ -173,7 +169,7 @@ public class PartitionVariable extends Variable
 		return groups[assignment[i]].cardinality();
 	}
 	
-	private class Association
+	private class Association implements Serializable
 	{
 		ModelNode[] tails;
 		ModelNode[] heads;
@@ -190,6 +186,13 @@ public class PartitionVariable extends Variable
 		{
 		  associator.associate(tails[i], heads[g]);
 		}
+	}
+	
+  private class DistributionAssociator implements Associator, Serializable {
+    @Override
+    public void associate(ModelNode tail, ModelNode head) throws MC3KitException {
+      ((Variable)tail).setDistribution((Distribution)head);
+    }
 	}
 
   @Override

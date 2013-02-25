@@ -29,7 +29,7 @@ public class UniformDistribution extends DoubleDistribution {
   double max;
   double logP;
   
-  protected UniformDistribution() {};
+  protected UniformDistribution() { }
   
   public UniformDistribution(Model model) {
     this(model, null);

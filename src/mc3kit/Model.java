@@ -46,7 +46,7 @@ public class Model implements Observer, Serializable {
   
   List<Variable> unobservedVariables;
   
-  public double logPrior;
+  private double logPrior;
   private double logLikelihood;
   
   private double oldLogPrior;
@@ -435,11 +435,6 @@ public class Model implements Observer, Serializable {
     return (DoubleVariable)graph.getNode(name);
   }
   
-  public IntVariable getIntVariable(String name) {
-	return (IntVariable)graph.getNode(name);	
-  }
-  
-  
   public DoubleFunction getDoubleFunction(String name) {
     return (DoubleFunction)graph.getNode(name);
   }
@@ -487,8 +482,4 @@ public class Model implements Observer, Serializable {
   public Logger getLogger() {
     return chain.getLogger();
   }
-
-
-
-
 }

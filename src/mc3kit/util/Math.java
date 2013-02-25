@@ -286,4 +286,16 @@ public final class Math {
       sum += value;
     return sum;
   }
+  
+  public static double integrateTrapezoid(double[] x, double[] y) {
+    double sum = 0.0;
+    for(int i = 0; i < x.length - 1; i++) {
+      if(x[i+1] < x[i]) {
+        throw new IllegalArgumentException("Integrator assumes x-values are in order smallest to largest.");
+      }
+      
+      sum += (x[i + 1] - x[i]) * (y[i + 1] + y[i]) / 2.0;
+    }
+    return sum;
+  }
 }

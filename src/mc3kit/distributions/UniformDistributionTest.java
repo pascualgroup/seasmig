@@ -26,9 +26,7 @@ import mc3kit.DoubleVariable;
 import org.junit.Test;
 
 public class UniformDistributionTest {
-	
-  protected UniformDistributionTest() {};
-	
+  
   @Test
   public void minMaxEqual() {
     try {
