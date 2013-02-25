@@ -1,5 +1,7 @@
-package seasmig;
+package seasmig.models;
 
+import seasmig.Config;
+import seasmig.Data;
 import mc3kit.Chain;
 import mc3kit.MC3KitException;
 import mc3kit.Model;

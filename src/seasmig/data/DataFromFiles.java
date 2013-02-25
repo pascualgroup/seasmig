@@ -1,4 +1,4 @@
-package seasmig;
+package seasmig.data;
 
 import java.io.File;
 import java.io.FileReader;
@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
+import seasmig.Config;
+import seasmig.Data;
+import seasmig.LikelihoodTree;
 import seasmig.treelikelihood.AttributeLoader;
 import seasmig.treelikelihood.SimpleAttributeLoader;
 import seasmig.treelikelihood.TreeWithLocations;
