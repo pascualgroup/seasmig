@@ -1,4 +1,4 @@
-package seasmig;
+package seasmig.data;
 
 import java.io.File;
 import java.io.FileReader;
@@ -10,6 +10,8 @@ import java.util.Vector;
 
 import seasmig.treelikelihood.AttributeLoader;
 import seasmig.treelikelihood.ConstantMigrationBaseModel;
+import seasmig.Config;
+import seasmig.Data;
 import seasmig.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.SimpleAttributeLoader;
