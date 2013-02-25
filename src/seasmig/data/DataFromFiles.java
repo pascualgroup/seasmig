@@ -1,12 +1,19 @@
 package seasmig.data;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 
 import seasmig.Config;
 import seasmig.Data;
@@ -26,7 +33,33 @@ public class DataFromFiles implements Data
 	int numLocations = 0;
 
 	protected DataFromFiles() {};
-	
+
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException {		 
+	}
+
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();	
+		config = gson.fromJson(new FileReader("out.config.json"), Config.class);		
+	}
+
+	@SuppressWarnings("unused")
+	private void readObjectNoData() throws ObjectStreamException {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();	
+		try {
+			config = gson.fromJson(new FileReader("out.config.json"), Config.class);
+		} catch (JsonSyntaxException e) {
+			System.err.println("Failed to unpack out.config.json");			
+			e.printStackTrace();
+		} catch (JsonIOException e) {
+			System.err.println("Failed to unpack out.config.json");
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			System.err.println("Failed to unpack out.config.json file not found!");
+			e.printStackTrace();
+		}	
+	}
+
+
 	public DataFromFiles(Config config_) throws IOException, ImportException 	{
 
 		config = config_;		
@@ -94,5 +127,5 @@ public class DataFromFiles implements Data
 	public List<LikelihoodTree> getTrees() {
 		return trees;
 	}
-	
+
 }
