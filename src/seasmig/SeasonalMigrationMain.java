@@ -49,9 +49,6 @@ public class SeasonalMigrationMain
 		config.outputToFile("out.config",gson);
 		System.out.println(" done");
 
-		// Load data files and prepare data....			
-		Data data = new DataFromFiles(config);
-
 		try {
 			MCMC mcmc;
 
@@ -63,9 +60,12 @@ public class SeasonalMigrationMain
 			}
 			// Otherwise, construct a new MCMC
 			else {
+				
+				// Load data files and prepare data....			
+				Data data = new DataFromFiles(config);
 
 				mcmc = new MCMC(); 
-				
+
 				if (config.randomSeed!=null)
 					mcmc.setRandomSeed(config.randomSeed);
 
@@ -128,9 +128,9 @@ public class SeasonalMigrationMain
 
 				// Sample output step
 				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);
-				
+
 				// Marginal-likelihood calculation during run
-		        Step mlOutStep = new MarginalLikelihoodStep(config.mlFilename, config.burnIn, config.mlthin);
+				Step mlOutStep = new MarginalLikelihoodStep(config.mlFilename, config.burnIn, config.mlthin);
 
 				// Prior-likelihood output step for marginal likelihood calculation
 				Step plOutStep = new PriorLikelihoodOutputStep(config.priorLikelihoodFilename, config.thin);

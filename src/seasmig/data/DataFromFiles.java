@@ -39,7 +39,13 @@ public class DataFromFiles implements Data
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();	
-		config = gson.fromJson(new FileReader("out.config.json"), Config.class);		
+		config = gson.fromJson(new FileReader("out.config.json"), Config.class);	
+		try {
+			loadDataFromFiles(config);
+		} catch (ImportException e) {
+			System.err.println("Failed to unpack out.config.json");
+			e.printStackTrace();
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -48,20 +54,33 @@ public class DataFromFiles implements Data
 		try {
 			config = gson.fromJson(new FileReader("out.config.json"), Config.class);
 		} catch (JsonSyntaxException e) {
-			System.err.println("Failed to unpack out.config.json");			
+			System.err.println("Failed to unpack out.config.json JsonSyntaxException ");			
 			e.printStackTrace();
 		} catch (JsonIOException e) {
-			System.err.println("Failed to unpack out.config.json");
+			System.err.println("Failed to unpack out.config.json JsonIOException");
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			System.err.println("Failed to unpack out.config.json file not found!");
+			System.err.println("Failed to unpack out.config.json FileNotFoundException");
 			e.printStackTrace();
 		}	
+		try {
+			loadDataFromFiles(config);			
+		} catch (IOException e) {
+			System.err.println("Failed to unpack out.config.json IOException");
+			e.printStackTrace();
+			e.printStackTrace();
+		} catch (ImportException e) {
+			System.err.println("Failed to unpack out.config.json ImportExceptoin");
+			e.printStackTrace();
+			e.printStackTrace();		}
 	}
 
 
 	public DataFromFiles(Config config_) throws IOException, ImportException 	{
+		loadDataFromFiles(config_);
+	}
 
+	private void loadDataFromFiles(Config config_) throws IOException, ImportException {
 		config = config_;		
 
 		// Load trees
@@ -114,7 +133,6 @@ public class DataFromFiles implements Data
 			}		
 			System.out.println(" reparsed "+trees.size()+" trees");
 		}	
-
 
 	}
 
