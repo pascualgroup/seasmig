@@ -19,7 +19,7 @@ public class Config implements Serializable
 	// IO RELATED PARAMETERS
 	public String sampleFilename = "samples.jsons";
 	public String swapStatsFilename = "swap_stats.txt";
-	public Level logLevel = Level.INFO;
+	public Level logLevel = Level.SEVERE;
 	public String checkpointFilename = "checkpoint.bin";
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String mlFilename = "ml.txt";
@@ -39,7 +39,7 @@ public class Config implements Serializable
 	public int chainCount = 4;
 	public double heatPower = 3.0;
 	
-	public double targetAcceptanceRate = 0.05;
+	public double targetAcceptanceRate = 0.25;
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
