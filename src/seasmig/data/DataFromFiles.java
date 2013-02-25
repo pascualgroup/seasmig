@@ -28,9 +28,9 @@ import jebl.evolution.trees.SimpleRootedTree;
 @SuppressWarnings("serial")
 public class DataFromFiles implements Data
 {
-	public Vector<LikelihoodTree> trees = new Vector<LikelihoodTree>();
+	public Vector<LikelihoodTree> trees;
 	Config config = null;
-	int numLocations = 0;
+	int numLocations;
 
 	protected DataFromFiles() {};
 
@@ -39,11 +39,11 @@ public class DataFromFiles implements Data
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();	
-		config = gson.fromJson(new FileReader("out.config.json"), Config.class);	
+		config = gson.fromJson(new FileReader("config.json"), Config.class);	
 		try {
 			loadDataFromFiles(config);
 		} catch (ImportException e) {
-			System.err.println("Failed to unpack out.config.json");
+			System.err.println("Failed to unpack config.json");
 			e.printStackTrace();
 		}
 	}
@@ -52,25 +52,25 @@ public class DataFromFiles implements Data
 	private void readObjectNoData() throws ObjectStreamException {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();	
 		try {
-			config = gson.fromJson(new FileReader("out.config.json"), Config.class);
+			config = gson.fromJson(new FileReader("config.json"), Config.class);
 		} catch (JsonSyntaxException e) {
-			System.err.println("Failed to unpack out.config.json JsonSyntaxException ");			
+			System.err.println("Failed to unpack config.json JsonSyntaxException ");			
 			e.printStackTrace();
 		} catch (JsonIOException e) {
-			System.err.println("Failed to unpack out.config.json JsonIOException");
+			System.err.println("Failed to unpack config.json JsonIOException");
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			System.err.println("Failed to unpack out.config.json FileNotFoundException");
+			System.err.println("Failed to unpack config.json FileNotFoundException");
 			e.printStackTrace();
 		}	
 		try {
 			loadDataFromFiles(config);			
 		} catch (IOException e) {
-			System.err.println("Failed to unpack out.config.json IOException");
+			System.err.println("Failed to unpack config.json IOException");
 			e.printStackTrace();
 			e.printStackTrace();
 		} catch (ImportException e) {
-			System.err.println("Failed to unpack out.config.json ImportExceptoin");
+			System.err.println("Failed to unpack config.json ImportExceptoin");
 			e.printStackTrace();
 			e.printStackTrace();		}
 	}
@@ -81,7 +81,9 @@ public class DataFromFiles implements Data
 	}
 
 	private void loadDataFromFiles(Config config_) throws IOException, ImportException {
-		config = config_;		
+		config = config_;
+		trees = new Vector<LikelihoodTree>();
+		numLocations=0;
 
 		// Load trees
 		System.out.print("Loading trees... ");			
