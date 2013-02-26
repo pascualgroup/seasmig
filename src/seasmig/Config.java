@@ -12,7 +12,7 @@ import com.google.gson.Gson;
 public class Config implements Serializable
 {
 	public static enum Seasonality { NONE, TWO_CONSTANT_SEASONS, SINUSOIDAL};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
-	public static enum TwoConstantSeasonsParameterization { FIX_FROM_DIFF, FIX_TO_DIFF, ORIGNIAL_PARAMETERIZATION_ALL_FREE, DIFF_PARAMETERIZATION };
+	public static enum TwoConstantSeasonsParameterization { FIX_FROM_DIFF, FIX_TO_DIFF, DIRECT_ALL_FREE, DIFF_PARAMETERIZATION };
 	public static enum TwoConstantSeasonsPhase { FREE, FIXED };
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
