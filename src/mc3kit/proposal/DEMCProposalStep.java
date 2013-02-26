@@ -29,6 +29,7 @@ import mc3kit.util.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.gson.*;
@@ -164,7 +165,10 @@ public class DEMCProposalStep implements Step {
       assert (chains.length == 1);
 
       Chain chain = chains[0];
-      chain.getLogger().fine(format("DEMCProposalStep stepping %d", chainId));
+      Logger logger = chain.getLogger();
+      if(logger.isLoggable(Level.FINE)) {
+        logger.fine(format("DEMCProposalStep stepping %d", chainId));
+      }
       Model model = chain.getModel();
       
       initialize(model);
@@ -257,7 +261,9 @@ public class DEMCProposalStep implements Step {
       blockSizeManagers = new ArrayList<BlockSizeManager>();
       while(blockSize <= maxBlockSize && blockSize <= varNames.size())
       {
-        model.getLogger().fine(format("Creating block size manager for block size = %d", blockSize));
+        if(model.getLogger().isLoggable(Level.FINE)) {
+          model.getLogger().fine(format("Creating block size manager for block size = %d", blockSize));
+        }
         blockSizeManagers.add(new BlockSizeManager(blockSize));
         blockSize *= 2;
       }
@@ -321,7 +327,9 @@ public class DEMCProposalStep implements Step {
       
       void step(Chain chain, Model model) throws MC3KitException
       {
-        chain.getLogger().finer(format("Stepping block size %d", blockSize));
+        if(chain.getLogger().isLoggable(Level.FINER)) {
+          chain.getLogger().finer(format("Stepping block size %d", blockSize));
+        }
         
         proposeDEMC(chain, model);
         recordStats(chain, chainId);
@@ -355,24 +363,34 @@ public class DEMCProposalStep implements Step {
           
           if(iterationCount <= tuneFor)
           {
-            logger.fine(format("Tuning for %d...", blockSize));
+            if(logger.isLoggable(Level.FINE)) {
+              logger.fine(format("Tuning for %d...", blockSize));
+            }
             
             if(useParallel) {
               double parallelRate = parallelSmallCounter.getRate(CounterType.ACCEPTANCE);
-              logger.fine(format("Old parallelGammaFactor: %f", parallelGammaFactor));
+              if(logger.isLoggable(Level.FINE)) {
+                logger.fine(format("Old parallelGammaFactor: %f", parallelGammaFactor));
+              }
               parallelGammaFactor = adjustTuningParameter(
                 parallelGammaFactor, parallelRate, targetAcceptanceRate
               );
-              logger.fine(format("New parallelGammaFactor: %f", parallelGammaFactor));
+              if(logger.isLoggable(Level.FINE)) {
+                logger.fine(format("New parallelGammaFactor: %f", parallelGammaFactor));
+              }
             }
             
             if(useSnooker) {
               double snookerRate = snookerCounter.getRate(CounterType.ACCEPTANCE);
-              logger.fine(format("Old snookerGammaFactor: %f", snookerGammaFactor));
+              if(logger.isLoggable(Level.FINE)) {
+                logger.fine(format("Old snookerGammaFactor: %f", snookerGammaFactor));
+              }
               snookerGammaFactor = adjustTuningParameter(
                 snookerGammaFactor, snookerRate, targetAcceptanceRate
               );
-              logger.fine(format("New snookerGammaFactor: %f", snookerGammaFactor));
+              if(logger.isLoggable(Level.FINE)) {
+                logger.fine(format("New snookerGammaFactor: %f", snookerGammaFactor));
+              }
             }
           }
           parallelSmallCounter.reset();
@@ -408,7 +426,10 @@ public class DEMCProposalStep implements Step {
         // Variable names chosen to match those in paper.
         
         Logger logger = xModel.getLogger();
-        logger.finer(format("Proposing %d...", blockSize));
+        
+        if(logger.isLoggable(Level.FINE)) {
+          logger.finer(format("Proposing %d...", blockSize));
+        }
         
         double priorHeatExp = chain.getPriorHeatExponent();
         double likeHeatExp = chain.getLikelihoodHeatExponent();
@@ -420,12 +441,17 @@ public class DEMCProposalStep implements Step {
         // Get order of entries in a way that makes covarying/anti-covarying
         // entries tend to get lumped together
         int[] entryOrder = getEntryOrder(refVec);
-        logger.finer(format("Entry order %d: %s", blockSize, Arrays.toString(entryOrder)));
+        
+        if(logger.isLoggable(Level.FINER)) {
+          logger.finer(format("Entry order %d: %s", blockSize, Arrays.toString(entryOrder)));
+        }
         
         // Do a snooker, small parallel, and large parallel proposal for each block
         for(int i = 0; i < entryOrder.length; i += blockSize)
         {
-          logger.finer(format("Proposing blockSize %d, blockStart %d", blockSize, i));
+          if(logger.isLoggable(Level.FINER)) {
+            logger.finer(format("Proposing blockSize %d, blockStart %d", blockSize, i));
+          }
           int blockEnd = i + blockSize;
           if(blockEnd > entryOrder.length) blockEnd = entryOrder.length;
           int[] block = Arrays.copyOfRange(entryOrder, i, blockEnd);
@@ -533,7 +559,9 @@ public class DEMCProposalStep implements Step {
         }
         
         // Perform update
-        logger.fine(format("Setting entries %s to %s", Arrays.toString(block), xNew));
+        if(logger.isLoggable(Level.FINE)) {
+          logger.fine(format("Setting entries %s to %s", Arrays.toString(block), xNew));
+        }
         double oldLogPrior = xModel.getLogPrior();
         double oldLogLike = xModel.getLogLikelihood();
         

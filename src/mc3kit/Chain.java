@@ -38,6 +38,8 @@ public class Chain implements Serializable
 	
 	long iterationCount;
 	
+	transient Logger _logger;
+	
 	protected Chain() { }
 	
 	Chain(MCMC mcmc, int chainId, int chainCount, double priorHeatExponent, double likelihoodHeatExponent, RandomEngine rng)
@@ -102,7 +104,10 @@ public class Chain implements Serializable
 	}
 	
 	public Logger getLogger() {
-	  return Logger.getLogger("mc3kit.Chain." + chainId);
+	  if(_logger == null) {
+	   _logger = Logger.getLogger("mc3kit.Chain." + chainId);
+	  }
+	  return _logger;
 	}
 	
 	public long getIterationCount() {

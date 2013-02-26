@@ -23,7 +23,6 @@ import cern.jet.random.engine.RandomEngine;
 import mc3kit.*;
 import static java.lang.Math.exp;
 import static mc3kit.util.Math.*;
-import static java.lang.String.format;
 
 @SuppressWarnings("serial")
 public class MHMultiplierProposer extends VariableProposer {
@@ -42,12 +41,8 @@ public class MHMultiplierProposer extends VariableProposer {
     Chain chain = model.getChain();
     RandomEngine rng = chain.getRng();
     
-    chain.getLogger().finest("MHMultiplierProposer stepping");
-    
     double oldLogLikelihood = model.getLogLikelihood();
     double oldLogPrior = model.getLogPrior();
-    
-    chain.getLogger().finest(format("oldLP, oldLL: %f, %f", oldLogPrior, oldLogLikelihood));
     
     DoubleVariable rv = model.getDoubleVariable(getName());
     
@@ -56,8 +51,6 @@ public class MHMultiplierProposer extends VariableProposer {
     double multiplier = exp(logMultiplier);
     
     double newValue = multiplier * oldValue;
-    
-    chain.getLogger().finest(format("oldVal, newVal = %f, %f", oldValue, newValue));
     
     if(!rv.valueIsValid(newValue))
     {
@@ -71,8 +64,6 @@ public class MHMultiplierProposer extends VariableProposer {
 
     double newLogPrior = model.getLogPrior();
     double newLogLikelihood = model.getLogLikelihood();
-    
-    chain.getLogger().finest(format("newLP, newLL: %f, %f", newLogPrior, newLogLikelihood));
     
     boolean accepted = shouldAcceptMetropolisHastings(rng,
       chain.getPriorHeatExponent(), chain.getLikelihoodHeatExponent(),

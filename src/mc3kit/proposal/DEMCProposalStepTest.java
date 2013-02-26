@@ -22,8 +22,6 @@ package mc3kit.proposal;
 import static java.lang.Math.sqrt;
 import static org.junit.Assert.*;
 
-import java.util.logging.Level;
-
 import mc3kit.Chain;
 import mc3kit.DoubleVariable;
 import mc3kit.MC3KitException;
@@ -56,8 +54,6 @@ public class DEMCProposalStepTest {
     
     MCMC mcmc = new MCMC();
     mcmc.setRandomSeed(100L);
-    
-    MCMC.setLogLevel(Level.INFO);
     
     ModelFactory mf = new ModelFactory() {
       @Override
@@ -121,8 +117,6 @@ public class DEMCProposalStepTest {
     MCMC mcmc = new MCMC();
     mcmc.setRandomSeed(100L);
     
-    MCMC.setLogLevel(Level.INFO);
-    
     ModelFactory mf = new ModelFactory() {
       @Override
       public Model createModel(Chain initialChain) throws MC3KitException {
@@ -184,8 +178,6 @@ public class DEMCProposalStepTest {
     
     MCMC mcmc = new MCMC();
     mcmc.setRandomSeed(100L);
-    
-    MCMC.setLogLevel(Level.INFO);
     
     ModelFactory mf = new ModelFactory() {
       @Override
@@ -252,7 +244,6 @@ public class DEMCProposalStepTest {
     mcmc.setRandomSeed(100L);
     mcmc.setChainCount(chainCount);
     mcmc.setHeatFunction(1.0, 0.0, 3.0, 0.1);
-    MCMC.setLogLevel(Level.INFO);
     
     ModelFactory mf = new ModelFactory() {
       @Override
@@ -324,7 +315,6 @@ public class DEMCProposalStepTest {
     mcmc.setRandomSeed(100L);
     mcmc.setChainCount(chainCount);
     mcmc.setHeatFunction(1.0, 0.0, 3.0, 0.1);
-    MCMC.setLogLevel(Level.INFO);
     
     ModelFactory mf = new ModelFactory() {
       @Override
@@ -396,7 +386,6 @@ public class DEMCProposalStepTest {
     mcmc.setRandomSeed(100L);
     mcmc.setChainCount(1);
     mcmc.setHeatFunction(3.0, 0.0);
-    MCMC.setLogLevel(Level.INFO);
     
     ModelFactory mf = new ModelFactory() {
       @Override
@@ -464,7 +453,6 @@ public class DEMCProposalStepTest {
     mcmc.setRandomSeed(100L);
     mcmc.setChainCount(1);
     mcmc.setHeatFunction(3.0, 0.0);
-    MCMC.setLogLevel(Level.INFO);
     
     ModelFactory mf = new ModelFactory() {
       @Override
@@ -539,7 +527,6 @@ public class DEMCProposalStepTest {
     mcmc.setRandomSeed(100L);
     mcmc.setChainCount(chainCount);
     mcmc.setHeatFunction(1.0, 0.0, 3.0, 0.1);
-    MCMC.setLogLevel(Level.INFO);
     
     ModelFactory mf = new ModelFactory() {
       @Override
@@ -620,7 +607,6 @@ public class DEMCProposalStepTest {
     mcmc.setRandomSeed(99L);
     mcmc.setChainCount(chainCount);
     mcmc.setHeatFunction(1.0, 0.0, 3.0, 0.1);
-    MCMC.setLogLevel(Level.INFO);
     
     ModelFactory mf = new ModelFactory() {
       @Override

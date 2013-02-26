@@ -19,28 +19,12 @@
 
 package mc3kit;
 
-@SuppressWarnings("serial")
-public abstract class DoubleFunction extends Function implements DoubleValued {
-  private double value;
+public interface DoubleArrayValued {
+  int getLength();
   
-  protected DoubleFunction() { }
+  double[] getValue();
+  void setValue(double[] value);
   
-  public DoubleFunction(Model model) {
-    this(model, null);
-  }
-
-  public DoubleFunction(Model model, String name) {
-    super(model, name);
-    this.value = Double.NaN;
-  }
-
-  @Override
-  public double getValue() {
-    return value;
-  }
-
-  @Override
-  public void setValue(double value) {
-    this.value = value;
-  }
+  double getValue(int index);
+  void setValue(int index, double value);
 }

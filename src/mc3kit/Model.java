@@ -93,6 +93,8 @@ public class Model implements Observer, Serializable {
   }
   
   public void endConstruction() throws MC3KitException {
+    Logger logger = getLogger();
+    
     logPrior = 0.0;
     logLikelihood = 0.0;
     
@@ -100,17 +102,17 @@ public class Model implements Observer, Serializable {
       throw new MC3KitException("endConstruction called with wrong state");
     }
     
-    if(getLogger().isLoggable(Level.FINE)) {
-      getLogger().fine("NODE ORDER:");
+    if(logger.isLoggable(Level.FINE)) {
+      logger.fine("NODE ORDER:");
       for(Node node : graph.orderedNodesHeadToTail()) {
         if(node instanceof Variable) {
-          getLogger().fine(format("  %s", node.getName()));
+          logger.fine(format("  %s", node.getName()));
         }
       }
       
-      getLogger().fine("EDGES:");
+      logger.fine("EDGES:");
       for(Edge edge : graph.getEdges()) {
-        getLogger().fine(format("  %s -> %s", edge.getTail(), edge.getHead()));
+        logger.fine(format("  %s -> %s", edge.getTail(), edge.getHead()));
       }
     }
     
@@ -121,10 +123,14 @@ public class Model implements Observer, Serializable {
         Variable var = (Variable)node;
         if(!var.isObserved() && !changedValueVars.contains(var)) {
           var.sample();
-          getLogger().fine(format("Sampling %s: %s", var, var.makeOutputString()));
+          if(logger.isLoggable(Level.FINE)) {
+            logger.fine(format("Sampling %s: %s", var, var.makeOutputString()));
+          }
         }
         else if(!var.isObserved()) {
-          getLogger().fine(format("Not sampling %s", var));
+          if(logger.isLoggable(Level.FINE)) {
+            logger.fine(format("Not sampling %s", var));
+          }
         }
       }
       

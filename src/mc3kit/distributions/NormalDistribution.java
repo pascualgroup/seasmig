@@ -67,29 +67,29 @@ public class NormalDistribution extends DoubleDistribution {
     return new MHNormalProposer(varName);
   }
   
-  public <T extends ModelNode & DoubleValued> NormalDistribution setMean(T meanNode) throws MC3KitException {
-    meanEdge = updateEdge(meanEdge, meanNode);
+  public NormalDistribution setMean(DoubleValued meanNode) throws MC3KitException {
+    meanEdge = updateEdge(meanEdge, (ModelNode)meanNode);
     return this;
   }
   
-  public <T extends ModelNode & DoubleValued> NormalDistribution setVariance(T varNode) throws MC3KitException {
+  public NormalDistribution setVariance(DoubleValued varNode) throws MC3KitException {
     precEdge = updateEdge(precEdge, null);
     stdDevEdge = updateEdge(stdDevEdge, null);
-    varEdge = updateEdge(varEdge, varNode);
+    varEdge = updateEdge(varEdge, (ModelNode)varNode);
     return this;
   }
   
-  public <T extends ModelNode & DoubleValued> NormalDistribution setStdDev(T stdDevNode) throws MC3KitException {
+  public NormalDistribution setStdDev(DoubleValued stdDevNode) throws MC3KitException {
     precEdge = updateEdge(precEdge, null);
     varEdge = updateEdge(varEdge, null);
-    stdDevEdge = updateEdge(stdDevEdge, stdDevNode);
+    stdDevEdge = updateEdge(stdDevEdge, (ModelNode)stdDevNode);
     return this;
   }
   
-  public <T extends ModelNode & DoubleValued> NormalDistribution setPrecision(T precNode) throws MC3KitException {
+  public NormalDistribution setPrecision(DoubleValued precNode) throws MC3KitException {
     varEdge = updateEdge(varEdge, null);
     stdDevEdge = updateEdge(stdDevEdge, null);
-    precEdge = updateEdge(precEdge, precNode);
+    precEdge = updateEdge(precEdge, (ModelNode)precNode);
     return this;
   }
 
@@ -156,6 +156,13 @@ public class NormalDistribution extends DoubleDistribution {
       assert varEdge == null;
       sd = sqrt(1.0/getDoubleValue(precEdge));
     }
+    
+    assert !Double.isNaN(mean);
+    assert !Double.isInfinite(mean);
+    
+    assert sd != 0;
+    assert !Double.isNaN(sd);
+    assert !Double.isInfinite(sd);
     
     double newVal = new Normal(mean, sd, getRng()).nextDouble();
     assert !Double.isNaN(newVal);

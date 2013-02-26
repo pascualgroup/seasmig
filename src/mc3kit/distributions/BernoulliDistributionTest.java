@@ -49,7 +49,7 @@ public class BernoulliDistributionTest {
     MCMC mcmc = new MCMC();
     mcmc.setRandomSeed(100L);
     
-    MCMC.setLogLevel(Level.INFO);
+    mcmc.setLogLevel(Level.INFO);
     
     ModelFactory mf = new ModelFactory() {
       @Override

@@ -112,7 +112,7 @@ public class ExponentialDistribution extends DoubleDistribution {
       rate = 1.0 / getDoubleValue(scaleEdge);
     }
     else {
-      rate = 1.0;
+      rate = this.rate;
     }
     double newVal = new Exponential(rate, getRng()).nextDouble();
     

@@ -20,6 +20,10 @@
 package mc3kit.proposal;
 
 import static java.lang.String.format;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import cern.jet.random.engine.RandomEngine;
 import mc3kit.*;
 import static java.lang.Math.*;
@@ -36,14 +40,17 @@ public class GibbsBinaryProposer extends VariableProposer {
   @Override
   public void step(Model model) throws MC3KitException {
     Chain chain = model.getChain();
+    Logger logger = chain.getLogger();
     RandomEngine rng = chain.getRng();
     
-    chain.getLogger().finest("GibbsBinaryProposer stepping");
 
     double oldLogPrior = model.getLogPrior();
     double oldLogLike = model.getLogLikelihood();
-    
-    chain.getLogger().finest(format("oldLP, oldLL: %f, %f", oldLogPrior, oldLogLike));
+
+    if(logger.isLoggable(Level.FINEST)) {
+      logger.finest("GibbsBinaryProposer stepping");
+      logger.finest(format("oldLP, oldLL: %f, %f", oldLogPrior, oldLogLike));
+    }
     
     BinaryVariable v = model.getBinaryVariable(getName());
     boolean oldValue = v.getValue();
@@ -56,7 +63,9 @@ public class GibbsBinaryProposer extends VariableProposer {
     double newLogPrior = model.getLogPrior();
     double newLogLike = model.getLogLikelihood();
     
-    chain.getLogger().finest(format("newLP, newLL: %f, %f", newLogPrior, newLogLike));
+    if(logger.isLoggable(Level.FINEST)) {
+      logger.finest(format("newLP, newLL: %f, %f", newLogPrior, newLogLike));
+    }
     
     // For this to be a Gibbs step, the ratio of the probability of acceptance (change the value)
     // to rejection (keep the value what it was) needs to be the ratio of the conditional densities

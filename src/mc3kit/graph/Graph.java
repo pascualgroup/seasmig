@@ -21,6 +21,7 @@ package mc3kit.graph;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.lang.String.format;
@@ -43,6 +44,8 @@ public class Graph extends Observable implements Serializable {
 
   Map<Node, Set<Edge>> tailNodeMap;
   Map<Node, Set<Edge>> headNodeMap;
+  
+  transient Logger _logger;
   
   public Graph() {
     nodes = new LinkedHashSet<Node>();
@@ -250,6 +253,7 @@ public class Graph extends Observable implements Serializable {
    * @throws IllegalArgumentException ***/
   
   private void updateOrder(Edge edge) throws IllegalArgumentException {
+    Logger logger = getLogger();
     
     // Implementation of the PK algorithm, published in
     // Pearce, David J. and Paul H. J. Kelly. 2007.
@@ -264,7 +268,9 @@ public class Graph extends Observable implements Serializable {
     int tailOrder = tail.getOrder();
     int headOrder = head.getOrder();
     assert tailOrder != headOrder;
-    getLogger().finest(format("old order: tail %d, head %d", tailOrder, headOrder));
+    if(logger.isLoggable(Level.FINEST)) {
+      logger.finest(format("old order: tail %d, head %d", tailOrder, headOrder));
+    }
     if(headOrder < tailOrder) {
       // If the head already has a lower order, then do nothing
       return;
@@ -273,13 +279,17 @@ public class Graph extends Observable implements Serializable {
     // Find affected forward & backward nodes
     // (delta_xy^F, delta_xy^B in paper)
     Set<Node> fwNodes = findAffectedForwardNodes(edge);
-    getLogger().finest(format("affected fw: %s", fwNodes));
     Set<Node> bwNodes = findAffectedBackwardNodes(edge);
-    getLogger().finest(format("affected bw: %s", bwNodes));
+    if(logger.isLoggable(Level.FINEST)) {
+      logger.finest(format("affected fw: %s", fwNodes));
+      logger.finest(format("affected bw: %s", bwNodes));
+    }
 
     // Get sorted list of all indexes
     applyNewIndexes(fwNodes, bwNodes);
-    getLogger().finest(format("new order: tail %d, head %d", tail.getOrder(), head.getOrder()));
+    if(logger.isLoggable(Level.FINEST)) {
+      logger.finest(format("new order: tail %d, head %d", tail.getOrder(), head.getOrder()));
+    }
   }
 
   private Set<Node> findAffectedForwardNodes(Edge edge) throws IllegalArgumentException {
@@ -335,6 +345,8 @@ public class Graph extends Observable implements Serializable {
   }
   
   private void applyNewIndexes(Set<Node> fwNodes, Set<Node> bwNodes) {
+    Logger logger = getLogger();
+    
     Set<Node> intersection = new HashSet<Node>(fwNodes);
     intersection.retainAll(bwNodes);
     assert intersection.isEmpty();
@@ -347,7 +359,9 @@ public class Graph extends Observable implements Serializable {
     for (Node node : fwNodes)
       indexes[i++] = node.getOrder();
     Arrays.sort(indexes);
-    getLogger().finest(format("indexes: %s", Arrays.toString(indexes)));
+    if(logger.isLoggable(Level.FINEST)) {
+      logger.finest(format("indexes: %s", Arrays.toString(indexes)));
+    }
     
     Comparator<Node> comparator = new Comparator<Node>() {
       @Override
@@ -381,7 +395,7 @@ public class Graph extends Observable implements Serializable {
       for(Edge edge : tailNodeMap.get(node)) {
         Node head = edge.getHead();
         if(!visited.contains(head)) {
-          Logger.getLogger("mc3kit.graph.Graph").severe(format("node %s: dependency %s not yet visited\n", node, head));
+          getLogger().severe(format("node %s: dependency %s not yet visited\n", node, head));
           valid = false;
         }
       }
@@ -392,6 +406,9 @@ public class Graph extends Observable implements Serializable {
   }
   
   private Logger getLogger() {
-    return Logger.getLogger("mc3kit.graph.Graph");
+    if(_logger == null) {
+      _logger = Logger.getLogger("mc3kit.graph.Graph");
+    }
+    return _logger;
   }
 }

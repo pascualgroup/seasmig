@@ -22,9 +22,8 @@ package mc3kit;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.*;
+import java.util.regex.Pattern;
 import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 
 import static java.lang.String.format;
 
@@ -55,19 +54,34 @@ public class MCMC implements Serializable {
 
   TaskManager[][] taskManagers;
 
+  Level logLevel;
+  String logFilename;
+  transient Logger _rootLogger;
+  transient Logger _logger;
+  
   /*** THREAD POOL MANAGEMENT ***/
 
   transient ThreadPoolExecutor threadPool;
   transient ExecutorCompletionService<Object> completionService;
   transient TerminationManager terminationManager;
   transient long terminationCount;
-
+  
   public MCMC() {
     steps = new ArrayList<Step>();
   }
   
-  public Logger getLogger() {
-    return Logger.getLogger("mc3kit.MCMC");
+  private Logger getRootLogger() {
+    if(_rootLogger == null) {
+      _rootLogger = Logger.getLogger("");
+    }
+    return _rootLogger;
+  }
+  
+  private Logger getLogger() {
+    if(_logger == null) {
+      _logger = Logger.getLogger("mc3kit.MCMC");
+    }
+    return _logger;
   }
   
   private void initialize() throws Throwable {
@@ -104,8 +118,17 @@ public class MCMC implements Serializable {
     initialized = true;
   }
   
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException, SecurityException, MC3KitException {
     in.defaultReadObject();
+    
+    if(logLevel != null) {
+      setLogLevelPrivate(logLevel);
+    }
+    
+    if(logFilename != null) {
+      setLogFilenamePrivate(logFilename);
+    }
+    
     if(initialized) {
       initializeThreadPool();
     }
@@ -127,7 +150,6 @@ public class MCMC implements Serializable {
     }
     
     // Make chains
-    int chainCount = getChainCount();
     chains = new Chain[chainCount];
     for(int i = 0; i < chainCount; i++) {
       RandomEngine rng = makeRandomEngine();
@@ -164,7 +186,7 @@ public class MCMC implements Serializable {
     Map<Step, List<Task>> taskMap = new HashMap<Step, List<Task>>();
 
     taskManagers = new TaskManager[steps.size()][];
-    TaskManager[][] taskManagersByChain = new TaskManager[steps.size()][getChainCount()];
+    TaskManager[][] taskManagersByChain = new TaskManager[steps.size()][chainCount];
     for (int i = 0; i < steps.size(); i++) {
       // Get existing tasks for the Step object, or create new ones
       Step step = steps.get(i);
@@ -243,8 +265,8 @@ public class MCMC implements Serializable {
    * 
    */
   public synchronized void writeToFile(String filePath) throws FileNotFoundException, IOException {
-    Path path = FileSystems.getDefault().getPath(filePath);
-    String filename = path.getName(path.getNameCount() - 1).toString();
+    String[] pathComponents = filePath.split(Pattern.quote(System.getProperty("path.separator")));
+    String filename = pathComponents[pathComponents.length - 1];
     
     File tmpFile = File.createTempFile(filename, null);
     ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(tmpFile));
@@ -325,7 +347,7 @@ public class MCMC implements Serializable {
   }
   
   Chain getChain(int chainId) {
-    if (chainId < 0 || chainId >= getChainCount())
+    if (chainId < 0 || chainId >= chainCount)
       return null;
 
     return chains[chainId];
@@ -481,95 +503,80 @@ public class MCMC implements Serializable {
   
   /*** ACCESSORS ***/
 
-  public void setModelFactory(ModelFactory modelFactory) throws MC3KitException {
+  public synchronized void setModelFactory(ModelFactory modelFactory) throws MC3KitException {
     throwIfInitialized();
     this.modelFactory = modelFactory;
   }
 
-  public int getChainCount() {
-    return chainCount;
-  }
-
-  public void setChainCount(int chainCount) throws MC3KitException {
+  public synchronized void setChainCount(int chainCount) throws MC3KitException {
     throwIfInitialized();
     this.chainCount = chainCount;
   }
   
-  public void addTask(final Task task) throws MC3KitException {
-    throwIfInitialized();
-    steps.add(new Step() {
-      @Override
-      public List<Task> makeTasks(int chainCount) throws MC3KitException {
-        List<Task> list = new ArrayList<Task>();
-        list.add(task);
-        return list;
-      }
-    });
-  }
-  
-  public void addStep(Step step) throws MC3KitException {
+  public synchronized void addStep(Step step) throws MC3KitException {
     throwIfInitialized();
     steps.add(step);
   }
 
-  public HeatFunction getHeatFunction() {
-    return heatFunction;
-  }
-
-  public void setHeatFunction(double heatPower) throws MC3KitException {
+  public synchronized void setHeatFunction(double heatPower) throws MC3KitException {
     throwIfInitialized();
     setHeatFunction(new PowerHeatFunction(heatPower, 0.0));
   }
   
-  public void setHeatFunction(double heatPower, double minHeatExponent) throws MC3KitException {
+  public synchronized void setHeatFunction(double heatPower, double minHeatExponent) throws MC3KitException {
     throwIfInitialized();
     setHeatFunction(new PowerHeatFunction(heatPower, minHeatExponent));
   }
   
-  public void setHeatFunction(double likeHeatPower, double minLikeHeatExponent, double priorHeatPower, double minPriorHeatExponent)
+  public synchronized void setHeatFunction(double likeHeatPower, double minLikeHeatExponent, double priorHeatPower, double minPriorHeatExponent)
       throws MC3KitException {
     throwIfInitialized();
     setHeatFunction(new PowerHeatFunction(likeHeatPower, minLikeHeatExponent, priorHeatPower, minPriorHeatExponent));
   }
   
-  public void setHeatFunction(HeatFunction heatFunction) throws MC3KitException {
+  public synchronized void setHeatFunction(HeatFunction heatFunction) throws MC3KitException {
     throwIfInitialized();
     this.heatFunction = heatFunction;
   }
 
-  public Long getRandomSeed() {
-    return randomSeed;
-  }
-
-  public void setRandomSeed(Long randomSeed) throws MC3KitException {
+  public synchronized void setRandomSeed(Long randomSeed) throws MC3KitException {
     throwIfInitialized();
     this.randomSeed = randomSeed;
   }
   
-  public synchronized static void setLogLevel(Level level) {
-    Logger logger = Logger.getLogger("");
-    logger.setLevel(level);
-    for(Handler handler : logger.getHandlers()) {
+  public synchronized void setLogLevel(Level level) throws MC3KitException {
+    throwIfInitialized();
+    setLogLevelPrivate(level);
+  }
+  
+  private synchronized void setLogLevelPrivate(Level level) throws MC3KitException {
+    this.logLevel = level;
+    Logger rootLogger = getRootLogger();
+    rootLogger.setLevel(level);
+    for(Handler handler : rootLogger.getHandlers()) {
       handler.setLevel(level);
     }
   }
   
-  public synchronized static void setLogFilename(String filename) throws SecurityException, IOException {
-    for(Handler handler : Logger.getLogger("").getHandlers()) {
-      Logger.getLogger("").removeHandler(handler);
+  public synchronized void setLogFilename(String filename) throws SecurityException, IOException, MC3KitException {
+    throwIfInitialized();
+    setLogFilenamePrivate(filename);
+  }
+  
+  private synchronized void setLogFilenamePrivate(String filename) throws SecurityException, IOException, MC3KitException {
+    this.logFilename = filename;
+    Logger rootLogger = getRootLogger();
+    for(Handler handler : rootLogger.getHandlers()) {
+      rootLogger.removeHandler(handler);
     }
     
     if(filename == null || filename.equals("-") || filename.equals("")) {
       ConsoleHandler handler = new ConsoleHandler();
-      Logger.getLogger("").addHandler(handler);
+      rootLogger.addHandler(handler);
     }
     else {
       FileHandler handler = new FileHandler(filename);
-      Logger.getLogger("").addHandler(handler);
+      rootLogger.addHandler(handler);
     }
-  }
-  
-  public synchronized static void addLogHandler(Handler handler) {
-    Logger.getLogger("").addHandler(handler);
   }
 }

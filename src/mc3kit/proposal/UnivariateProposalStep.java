@@ -91,14 +91,10 @@ public class UnivariateProposalStep implements Step {
 
       Chain chain = chains[0];
       
-      chain.getLogger().fine("UnivariateProposalStep stepping");
-      
       Model model = chain.getModel();
       initialize(model);
       
       RandomEngine rng = chain.getRng();
-
-      chain.getLogger().fine(format("univariate stepping %d", chainId));
 
       Uniform unif = new Uniform(rng);
 

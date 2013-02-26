@@ -84,6 +84,6 @@ public abstract class ModelNode extends Node {
   }
   
   public Logger getLogger() {
-    return model.getChain().getLogger();
+    return model.getLogger();
   }
 }
