@@ -93,12 +93,16 @@ public class DataFromFiles implements Data
 		List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
 		System.out.println("loaded "+nexsusTrees.size()+" trees");
 
-		System.out.print("Keeping tail... ");		
+		System.out.print("Keeping tail... ");
+		double meanNumTaxa=0;
 		List<jebl.evolution.trees.Tree> nexsusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
 		for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
 			nexsusTreeTail.add(nexsusTrees.get(i));
+			meanNumTaxa+=nexsusTrees.get(i).getTaxa().size();
 		}
-		System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
+		meanNumTaxa/=nexsusTreeTail.size();
+		System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");
+		System.out.println(meanNumTaxa+" taxa on average per tree");
 
 		// TODO: add states....
 		// Convert trees to internal tree representation

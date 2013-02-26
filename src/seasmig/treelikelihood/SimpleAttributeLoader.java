@@ -33,7 +33,7 @@ public class SimpleAttributeLoader implements AttributeLoader{
 		return attributes;
 	}
 	
-	void processLocations(String fileName) throws NumberFormatException, IOException {
+	void processLocations(String fileName) throws IOException {
 
 		FileInputStream locationFIStream = new FileInputStream(fileName);
 		DataInputStream locationDIStream = new DataInputStream(locationFIStream);
@@ -44,11 +44,19 @@ public class SimpleAttributeLoader implements AttributeLoader{
 
 		String strLine;
 		//Read File Line By Line
+		int i=0;
 		while ((strLine = locationReader.readLine()) != null)   {
+			i=i+2;
 			String taxa = strLine;
-			Integer state = Integer.parseInt(locationReader.readLine());
-			locationMap.put(taxa, state);
-			locations.add(state);			
+			try {
+				Integer state = Integer.parseInt(locationReader.readLine());
+				locationMap.put(taxa, state);
+				locations.add(state);
+			}
+			catch (NumberFormatException e) {
+				System.err.println("Failed to parse trait on line: "+i+" of "+fileName);				
+			}
+						
 		}
 
 		attributes.put("locations",locationMap);
