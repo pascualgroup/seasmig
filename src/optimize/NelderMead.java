@@ -1,5 +1,6 @@
 package optimize;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
@@ -8,7 +9,8 @@ import jebl.math.Random;
 
 import org.javatuples.Pair;
 
-public class NelderMead {
+@SuppressWarnings("serial")
+public class NelderMead implements Serializable {
 
 	double alpha = 1;
 	double gamma = 2;
@@ -17,21 +19,25 @@ public class NelderMead {
 	double nu = 0.00001;
 	private double terminationCondition = 1e-4;
 	private Vector<Vector<Double>> x0s;
+	private SimpleDoubleFunction fx;
 	
-	
-	public NelderMead() {
-		this(makeInitPoints(15, 5));
+	public interface SimpleDoubleFunction {
+		double eval(Vector<Double> x);
 	}
 	
-	public NelderMead(Vector<Vector<Double>> x0s) {
-		this(x0s,1e-4);
+	protected NelderMead() {
 	}
 	
-	public NelderMead(Vector<Vector<Double>> x0s, double terminationCondition) {
+	public NelderMead(SimpleDoubleFunction fx, Vector<Vector<Double>> x0s) {
+		this(fx, x0s,1e-4);
+	}
+	
+	public NelderMead(SimpleDoubleFunction fx, Vector<Vector<Double>> x0s, double terminationCondition) {
 		this.x0s=x0s;
+		this.fx=fx;
 		this.terminationCondition=terminationCondition;
-	}
-	
+		
+	}	
 
 	// Keeping pair of <x, f(x)>		
 	public class XsFxsComparator implements Comparator<Pair<Vector<Double>,Double>> {
@@ -120,7 +126,6 @@ public class NelderMead {
 		
 		return x0s;
 	}
-
 	
 	public Pair<Vector<Double>,Double> optimize() {
 		int n = x0s.size();
@@ -192,11 +197,7 @@ public class NelderMead {
 	}
 
 	private Double feval(Vector<Double> vector) {
-		Double returnValue=0.0;
-		for (int i=0;i<vector.size();i++) {
-			returnValue+=Math.abs((1-Math.pow(vector.get(i), i+1)))+Math.abs((vector.get(i)-1)*Random.nextDouble());
-		}
-		return returnValue;
+		return fx.eval(vector);
 	}
 
 }

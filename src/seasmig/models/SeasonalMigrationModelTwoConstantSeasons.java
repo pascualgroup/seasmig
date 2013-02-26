@@ -10,8 +10,7 @@ import mc3kit.distributions.*;
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModelTwoConstantSeasons extends Model {
-
-
+	
 	Config config;
 	Data data;
 	int numLocations;
@@ -81,11 +80,16 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		endConstruction();
 
 	} 
+	
+	@Override
+	public double getMaxLikelihood() {
+		return likeVar.getLogMaxLikelihood();
+	}
 
 	private class LikelihoodVariable extends Variable {
 		private double oldLogLikelihood;
-
-
+		private double logMaxLikelihood = Double.NEGATIVE_INFINITY;
+		
 		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasons m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
@@ -106,6 +110,11 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 						m.addEdge(this,diffMultipliers[i][j]);		
 				}
 			}
+		}
+
+
+		public double getLogMaxLikelihood() {
+			return logMaxLikelihood;
 		}
 
 
@@ -160,13 +169,15 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 			if (!fixedPhase)
 				seasonalPhaseRealization=seasonalPhase.getValue();
 			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhaseRealization,seasonalPhaseRealization+0.5);
-			
 			LikelihoodTree workingCopy = data.getTrees().get((int)treeIndex.getValue()).copy(); 
 			workingCopy.setLikelihoodModel(migrationBaseModel);
 			logLikelihood=workingCopy.logLikelihood();								
 			
 			setLogP(logLikelihood);			
 			oldLogLikelihood=logLikelihood;
+			if (logLikelihood>logMaxLikelihood) {
+				logMaxLikelihood=logLikelihood;
+			}
 			return true;
 		}
 
@@ -180,6 +191,6 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 			setLogP(oldLogLikelihood);
 			return true;
 		}
-
+		
 	}
 }
