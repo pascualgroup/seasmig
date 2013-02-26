@@ -32,8 +32,6 @@ public class UniformIntDistributionTest {
 		MCMC mcmc = new MCMC();
 		mcmc.setRandomSeed(101L);
 
-		MCMC.setLogLevel(Level.INFO);
-
 		ModelFactory mf = new ModelFactory() {
 			@Override
 			public Model createModel(Chain initialChain) throws MC3KitException {
