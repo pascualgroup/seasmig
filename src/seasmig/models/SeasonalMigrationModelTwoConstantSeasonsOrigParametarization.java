@@ -22,15 +22,18 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 	DoubleVariable seasonalPhase;
 	IntVariable treeIndex;
 	LikelihoodVariable likeVar;
-	private int nTrees;	
+	private int nTrees;
+	private boolean fixPhase;
+	private double seasonalPhaseRealization;	
 
 	protected SeasonalMigrationModelTwoConstantSeasonsOrigParametarization() { }
 
-	public SeasonalMigrationModelTwoConstantSeasonsOrigParametarization(Chain initialChain, Config config, Data data) throws MC3KitException
+	public SeasonalMigrationModelTwoConstantSeasonsOrigParametarization(Chain initialChain, Config config, Data data, boolean fixPhase) throws MC3KitException
 	{
 		super(initialChain);
 		this.config = config;
 		this.data = data;		
+		this.fixPhase = fixPhase;
 		numLocations=data.getNumLocations();
 		nTrees=data.getTrees().size();		
 		rates1 = new DoubleVariable[numLocations][numLocations];
@@ -40,8 +43,10 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 		
 		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
 		
-		seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
-		
+		if (!fixPhase)
+			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
+		else
+			seasonalPhaseRealization = config.fixedPhase;
 		DoubleDistribution ratePrior = new ExponentialDistribution(this,1.0);
 
 		for(int i = 0; i < numLocations; i++) {
@@ -70,7 +75,10 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 
 			// Add dependencies between likelihood variable and parameters
 			m.addEdge(this, m.treeIndex);
-			m.addEdge(this, m.seasonalPhase);
+			
+			if (!fixPhase) {
+				m.addEdge(this, m.seasonalPhase);
+			}
 
 			for(int i = 0; i < numLocations; i++) {
 				for(int j = 0; j < numLocations; j++) {
@@ -119,8 +127,12 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 			}
 
 			// TODO: add update to migration model instead of reconstructing...
-			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhase.getValue(),seasonalPhase.getValue()+0.5);
-
+			MigrationBaseModel migrationBaseModel;
+			if (!fixPhase)
+				migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhase.getValue(),seasonalPhase.getValue()+0.5);
+			else 
+				migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhaseRealization,seasonalPhaseRealization+0.5);
+			
 			LikelihoodTree workingCopy = data.getTrees().get(treeIndex.getValue()).copy(); 
 			workingCopy.setLikelihoodModel(migrationBaseModel);
 			logP=workingCopy.logLikelihood();

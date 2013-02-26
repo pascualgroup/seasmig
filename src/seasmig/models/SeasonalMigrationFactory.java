@@ -1,6 +1,8 @@
 package seasmig.models;
 
 import seasmig.Config;
+import seasmig.Config.TwoConstantSeasonsParameterization;
+import seasmig.Config.TwoConstantSeasonsPhase;
 import seasmig.Data;
 import mc3kit.Chain;
 import mc3kit.MC3KitException;
@@ -12,9 +14,9 @@ public class SeasonalMigrationFactory implements ModelFactory
 {
 	Config config;
 	Data data;
-	
+
 	protected SeasonalMigrationFactory() {};
-	
+
 	public SeasonalMigrationFactory(Config config, Data data)
 	{
 		this.config = config;
@@ -27,14 +29,32 @@ public class SeasonalMigrationFactory implements ModelFactory
 		case NONE:			
 			return new SeasonalMigrationModelNoSeasonality(initialChain, config, data);			
 
-		case TWO_CONSTANT_SEASONS:			
-			return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,false);			
+		case TWO_CONSTANT_SEASONS: 
+			boolean fixPhase = false;
+			switch (config.twoSeasonPhase) {
+			case FIXED:
+				fixPhase=true;
+				break;
+			case FREE:
+				fixPhase=false;
+				break;
+			default: 
+				System.err.println(config.twoSeasonPhase+" two season phase not implemented!");
+			}
+			boolean fixTo = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF;
+			boolean fixFrom = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF;
 
-		case TWO_CONSTANT_SEASONS_FIXED_PHASE:			
-			return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,true);			
-//
-//		case SINUSOIDAL:			
-//			return new SeasonalMigrationModelTwoConstantSeasonsSinusoidal(initialChain, config, trees);			
+			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.ORIGNIAL_PARAMETERIZATION_ALL_FREE) {
+				return new SeasonalMigrationModelTwoConstantSeasonsOrigParametarization(initialChain, config, data,fixPhase);
+			}
+			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION) {
+				return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,fixPhase, fixFrom, fixTo);
+			}
+			break;
+			//
+			//		case SINUSOIDAL:			
+			//			return new SeasonalMigrationModelTwoConstantSeasonsSinusoidal(initialChain, config, trees);			
+
 		}
 		return null;
 	}

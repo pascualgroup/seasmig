@@ -11,7 +11,9 @@ import com.google.gson.Gson;
 @SuppressWarnings("serial")
 public class Config implements Serializable
 {
-	public static enum Seasonality {	NONE, TWO_CONSTANT_SEASONS,TWO_CONSTANT_SEASONS_FIXED_PHASE, SINUSOIDAL};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
+	public static enum Seasonality { NONE, TWO_CONSTANT_SEASONS, SINUSOIDAL};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
+	public static enum TwoConstantSeasonsParameterization { ALL_FREE, FIX_FROM_DIFF, FIX_TO_DIFF, ORIGNIAL_PARAMETERIZATION_ALL_FREE, DIFF_PARAMETERIZATION };
+	public static enum TwoConstantSeasonsPhase { FREE, FIXED };
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
 	public Long randomSeed;
@@ -23,18 +25,18 @@ public class Config implements Serializable
 	public String checkpointFilename = "checkpoint.bin";
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String mlFilename = "ml.txt";
-
+	public long checkpointEvery = 100;
+	public long thin = 50;
+	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 2000; 	// in iterations	
 	public long iterationCount = 100000000L;
 	
 	public long tuneEvery = 200; 
 	public long tuneFor = 10000;
-	public long thin = 50;
 	public long mlthin = 500;
 	
 	public long initialHistoryCount = 200;
-	public long checkpointEvery = 100;
 
 	public int chainCount = 4;
 	public double heatPower = 3.0;
@@ -43,6 +45,8 @@ public class Config implements Serializable
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
+	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.ALL_FREE; 
+	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE;
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	public double fixedPhase = 0.1;
 	
