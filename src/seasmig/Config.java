@@ -45,8 +45,8 @@ public class Config implements Serializable
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
-	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION; 
-	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE;
+	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.FIX_TO_DIFF; 
+	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FIXED;
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	public double fixedPhase = 0.1;
 	

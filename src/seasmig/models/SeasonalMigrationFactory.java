@@ -46,10 +46,16 @@ public class SeasonalMigrationFactory implements ModelFactory
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.ORIGNIAL_PARAMETERIZATION_ALL_FREE) {
 				return new SeasonalMigrationModelTwoConstantSeasonsOrigParametarization(initialChain, config, data,fixPhase);
 			}
-			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION) {
+			else if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF) {
 				return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,fixPhase, fixFrom, fixTo);
 			}
+			else {
+				System.err.println("twiSeasonParameterization"+config.twoSeasonParameterization+" not implemented!");
+				System.exit(1);
+			}
 			break;
+			default:
+				
 			//
 			//		case SINUSOIDAL:			
 			//			return new SeasonalMigrationModelTwoConstantSeasonsSinusoidal(initialChain, config, trees);			
