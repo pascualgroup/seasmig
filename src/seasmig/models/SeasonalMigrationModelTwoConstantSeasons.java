@@ -91,7 +91,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 				for(int j = 0; j < numLocations; j++) {
 					if (i==j) continue;
 					m.addEdge(this,rates[i][j]);
-					m.addEdge(this,diffMultipliers[i][j]);		
+					m.addEdge(this,diffMultipliers[i][j]);							
 				}
 			}
 		}
@@ -113,7 +113,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		 */
 		@Override
 		public boolean update() {
-
+			
 			double logLikelihood = 0.0;
 			//double logPrior = 0.0;
 
@@ -138,10 +138,10 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 			if (!fixedPhase)
 				seasonalPhaseRealization=seasonalPhase.getValue();
 			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhaseRealization,seasonalPhaseRealization+0.5);
-
+			
 			LikelihoodTree workingCopy = data.getTrees().get((int)treeIndex.getValue()).copy(); 
 			workingCopy.setLikelihoodModel(migrationBaseModel);
-			logLikelihood=workingCopy.logLikelihood();
+			logLikelihood=workingCopy.logLikelihood();								
 			
 			setLogP(logLikelihood);			
 			oldLogLikelihood=logLikelihood;
