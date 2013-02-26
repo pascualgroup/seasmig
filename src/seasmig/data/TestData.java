@@ -118,7 +118,7 @@ public class TestData implements Data {
 			case NONE:	
 				createModel = new ConstantMigrationBaseModel(Q); 
 				break;
-			case TWO_CONSTANT_SEASONS: case TWO_CONSTANT_SEASONS_FIXED_PHASE:
+			case TWO_CONSTANT_SEASONS: 
 				double phase = 0.3; double length = 0.5;
 				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
 				break;
@@ -181,7 +181,7 @@ public class TestData implements Data {
 			case NONE:	
 				createModel = new ConstantMigrationBaseModel(Q); 
 				break;
-			case TWO_CONSTANT_SEASONS: case TWO_CONSTANT_SEASONS_FIXED_PHASE:
+			case TWO_CONSTANT_SEASONS: 
 				double phase = 0.3; double length = 0.5;
 				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
 				break;
@@ -261,7 +261,7 @@ public class TestData implements Data {
 			case NONE:	
 				createModel = new ConstantMigrationBaseModel(Q); 
 				break;
-			case TWO_CONSTANT_SEASONS: case TWO_CONSTANT_SEASONS_FIXED_PHASE:
+			case TWO_CONSTANT_SEASONS: 
 				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
 				break;
 			case SINUSOIDAL:
