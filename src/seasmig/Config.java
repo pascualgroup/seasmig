@@ -34,7 +34,7 @@ public class Config implements Serializable
 	
 	public long tuneEvery = 200; 
 	public long tuneFor = 10000;
-	public long mlthin = 500;
+	public long mlthin = 100;
 	
 	public long initialHistoryCount = 200;
 
