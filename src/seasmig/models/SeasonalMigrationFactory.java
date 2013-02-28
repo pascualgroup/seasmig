@@ -40,6 +40,9 @@ public class SeasonalMigrationFactory implements ModelFactory
 			default: 
 				System.err.println(config.twoSeasonPhase+" two season phase not implemented!");
 			}
+			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION)
+				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelection(initialChain,config,data,fixPhase);
+			
 			boolean fixTo = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF;
 			boolean fixFrom = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF;
 			boolean fixSome = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_SOME;

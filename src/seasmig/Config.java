@@ -12,7 +12,22 @@ import com.google.gson.Gson;
 public class Config implements Serializable
 {
 	public static enum Seasonality { NONE, TWO_CONSTANT_SEASONS, SINUSOIDAL};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
-	public static enum TwoConstantSeasonsParameterization { FIX_FROM_DIFF, FIX_TO_DIFF, DIRECT_ALL_FREE, DIFF_PARAMETERIZATION, FIX_SOME, FIX_SOME_FROM, FIX_SOME_TO };
+	public static enum TwoConstantSeasonsParameterization 
+	{  DIRECT_ALL_FREE, 	  // Separate rates for two matrices
+	   DIFF_PARAMETERIZATION, // (1-DiffMult[i][j])*rate[i][j] is used for season1 
+	   						  // (1+DiffMult[i][j])*rate[i][j] is used for season2
+	   FIX_SOME,	   	  	  // Same as above, but only a partial set (define by fixSome)  
+	   						  // of DiffMults is used   
+	   FIX_FROM_DIFF,  		  // Same as above, but each rows uses the same DiffMult:
+	   						  // (1+-DiffMult[i])*rate[i][j] is used for season1/2 
+	   FIX_TO_DIFF,    	      // Same as above, but each col uses the same DiffMult
+	   						  // (1+-DiffMult[j])*rate[i][j] is used for season1/2
+	   FIX_SOME_FROM,		  // Same as above, but only a partial set (defined by fixSomeFromTo
+	   						  // of DiffMults is used 
+	   FIX_SOME_TO,
+	   VARIABLE_SELECTION     // (1-DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season1 
+		  					  // (1+DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season2};
+	}
 	public static enum TwoConstantSeasonsPhase { FREE, FIXED };
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
@@ -45,7 +60,7 @@ public class Config implements Serializable
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
-	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.FIX_SOME_TO; 
+	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION; 
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FIXED;
 	public double fixedPhase = 0.1;
 	public int[][] fixSome = {{0,1},{1,0},{2,0},{2,1}};
