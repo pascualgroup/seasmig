@@ -22,7 +22,6 @@ package mc3kit;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.*;
-import java.util.regex.Pattern;
 import java.io.*;
 
 import static java.lang.String.format;
@@ -264,15 +263,24 @@ public class MCMC implements Serializable {
    * @throws FileNotFoundException 
    * 
    */
-  public synchronized void writeToFile(String filePath) throws FileNotFoundException, IOException {
-    String[] pathComponents = filePath.split(Pattern.quote(System.getProperty("path.separator")));
-    String filename = pathComponents[pathComponents.length - 1];
+  public synchronized void writeToFile(String filename) throws FileNotFoundException, IOException {
+    File file = new File(filename);
+    File tmpFile = new File(filename + ".partial");
     
-    File tmpFile = File.createTempFile(filename, null);
     ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(tmpFile));
     stream.writeObject(this);
     stream.close();
-    tmpFile.renameTo(new File(filePath));
+    
+    if(file.exists()) {
+      file.delete();
+    }
+    if(!tmpFile.renameTo(file)) {
+      getLogger().severe("COULD NOT MOVE CHECKPOINT FILE");
+    }
+    assert tmpFile.getName().endsWith(".partial");
+    if(tmpFile.exists()) {
+      tmpFile.delete();
+    }
   }
   
   /**

@@ -24,7 +24,7 @@ public class MarginalLikelihoodStep implements Step {
     this.thin = thin;
     
     writer = new PrintWriter(new FileOutputStream(filename, false));
-    writer.println("iteration\tmarginalLikelihood\tmarginalLikelihoodAuto");
+    writer.println("iteration\tlogMarginalLikelihood\tlogMarginalLikelihoodAuto\tlogMarginalLikelihoodSingleSample");
     writer.flush();
   }
   
@@ -42,7 +42,7 @@ public class MarginalLikelihoodStep implements Step {
     return tasks;
   }
   
-  private synchronized void takeValue(long iteration, Chain chain, double meanLogLikes, double meanAutoLogLikes) {
+  private synchronized void takeValue(long iteration, Chain chain, double logLike, double meanLogLikes, double meanAutoLogLikes) {
     int chainCount = chain.getChainCount();
     
     if(collector == null) {
@@ -50,11 +50,12 @@ public class MarginalLikelihoodStep implements Step {
     }
     
     List<MargLikeValue> values = collector.takeValue(
-      iteration, chain.getChainId(), new MargLikeValue(chain.getLikelihoodHeatExponent(), meanLogLikes, meanAutoLogLikes)
+      iteration, chain.getChainId(), new MargLikeValue(chain.getLikelihoodHeatExponent(), logLike, meanLogLikes, meanAutoLogLikes)
     );
     
     if(values != null) {
       double[] taus = new double[chainCount];
+      double[] singles = new double[chainCount];
       double[] means = new double[chainCount];
       double[] autoMeans = new double[chainCount];
       
@@ -62,14 +63,16 @@ public class MarginalLikelihoodStep implements Step {
       for(int i = 0; i < chainCount; i++) {
         MargLikeValue vals = values.get(chainCount - 1 - i);
         taus[i] = vals.tau;
+        singles[i] = vals.logLike;
         means[i] = vals.meanLogLikes;
         autoMeans[i] = vals.meanAutoLogLikes;
       }
       
       double margLike = integrateTrapezoid(taus, means);
       double autoMargLike = integrateTrapezoid(taus, autoMeans);
+      double margLikeSingle = integrateTrapezoid(taus, singles);
       
-      writer.printf("%d\t%.3f\t%.3f", iteration, margLike, autoMargLike);
+      writer.printf("%d\t%.3f\t%.3f\t%.3f", iteration, margLike, autoMargLike, margLikeSingle);
       writer.println();
       writer.flush();
     }
@@ -117,26 +120,28 @@ public class MarginalLikelihoodStep implements Step {
         }
         
         // Marginal likelihood from last half of samples
-        if(autoLogLikes.size() % 2 == 1) {
+        if((iterationCount / thin) % 2 == 0) {
           double oldLogLike = autoLogLikes.remove(0);
           sumAutoLogLikes -= oldLogLike;
         }
         autoLogLikes.add(logLike);
         sumAutoLogLikes += logLike;
         
-        takeValue(iterationCount, chains[0], sumLogLikes / logLikeCount, sumAutoLogLikes / autoLogLikes.size());
+        takeValue(iterationCount, chains[0], logLike, sumLogLikes / logLikeCount, sumAutoLogLikes / autoLogLikes.size());
       }
     }
   }
   
   private class MargLikeValue implements Serializable {
     double tau;
+    double logLike;
     double meanLogLikes;
     double meanAutoLogLikes;
     
-    MargLikeValue(double tau, double meanLogLikes, double meanAutoLogLikes)
+    MargLikeValue(double tau, double logLike, double meanLogLikes, double meanAutoLogLikes)
     {
       this.tau = tau;
+      this.logLike = logLike;
       this.meanLogLikes = meanLogLikes;
       this.meanAutoLogLikes = meanAutoLogLikes;
     }

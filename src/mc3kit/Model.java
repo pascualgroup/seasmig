@@ -48,7 +48,6 @@ public class Model implements Observer, Serializable {
   
   private double logPrior;
   private double logLikelihood;
-  private double logMaxLikelihood;
   
   private double oldLogPrior;
   private double oldLogLikelihood;
@@ -426,10 +425,6 @@ public class Model implements Observer, Serializable {
     return logLikelihood;
   }
   
-  public double getMaxLikelihood() {
-	  return logMaxLikelihood;
-  }
-  
   public ModelNode get(String name) {
     return (ModelNode)graph.getNode(name);
   }
@@ -493,6 +488,4 @@ public class Model implements Observer, Serializable {
   public Logger getLogger() {
     return chain.getLogger();
   }
-
-
 }
