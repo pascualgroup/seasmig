@@ -12,7 +12,7 @@ import com.google.gson.Gson;
 public class Config implements Serializable
 {
 	public static enum Seasonality { NONE, TWO_CONSTANT_SEASONS, SINUSOIDAL};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
-	public static enum TwoConstantSeasonsParameterization { FIX_FROM_DIFF, FIX_TO_DIFF, DIRECT_ALL_FREE, DIFF_PARAMETERIZATION };
+	public static enum TwoConstantSeasonsParameterization { FIX_FROM_DIFF, FIX_TO_DIFF, DIRECT_ALL_FREE, DIFF_PARAMETERIZATION, FIX_SOME, FIX_SOME_FROM, FIX_SOME_TO };
 	public static enum TwoConstantSeasonsPhase { FREE, FIXED };
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
@@ -45,10 +45,13 @@ public class Config implements Serializable
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
-	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.FIX_TO_DIFF; 
+	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.FIX_SOME; 
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FIXED;
-	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	public double fixedPhase = 0.1;
+	public int[][] fixSome = {{0,1},{1,0},{2,0},{2,1}};
+	public int[] fixSomeFromTo = {0,1};
+	
+	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add statese & combine files 

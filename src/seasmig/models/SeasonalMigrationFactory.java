@@ -42,12 +42,13 @@ public class SeasonalMigrationFactory implements ModelFactory
 			}
 			boolean fixTo = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF;
 			boolean fixFrom = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF;
-
+			boolean fixSome = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_SOME;
+			 
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIRECT_ALL_FREE) {
 				return new SeasonalMigrationModelTwoConstantSeasonsOrigParametarization(initialChain, config, data,fixPhase);
 			}
-			else if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF) {
-				return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,fixPhase, fixFrom, fixTo);
+			else if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_SOME) {
+				return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,fixPhase, fixFrom, fixTo,fixSome);
 			}
 			else {
 				System.err.println("twiSeasonParameterization"+config.twoSeasonParameterization+" not implemented!");
