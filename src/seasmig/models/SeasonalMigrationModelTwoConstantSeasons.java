@@ -103,11 +103,6 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 
 	} 
 
-	@Override
-	public double getMaxLikelihood() {
-		return likeVar.getLogMaxLikelihood();
-	}
-
 	private class LikelihoodVariable extends Variable {
 		private double oldLogLikelihood;
 		private double logMaxLikelihood = Double.NEGATIVE_INFINITY;
