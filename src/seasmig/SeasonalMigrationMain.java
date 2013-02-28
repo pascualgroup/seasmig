@@ -98,7 +98,7 @@ public class SeasonalMigrationMain
 						config.tuneEvery,
 						config.thin, // Thin historical samples for DEMC in memory
 						config.initialHistoryCount, // Collect this many samples before starting DEMC proposals
-						4, // Minimum number of variables to propose at a time
+						8, // Minimum number of variables to propose at a time
 						128, // Maximum number of variables to propose at a time
 						true, // Use standard "parallel" DEMC proposals (no projection)
 						true, // Also use double-size parallel DEMC proposals
