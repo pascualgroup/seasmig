@@ -21,8 +21,13 @@ package mc3kit;
 
 import static java.lang.Math.log;
 
+import static mc3kit.util.Utils.*;
+
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static java.lang.String.*;
 
 import cern.jet.random.engine.RandomEngine;
@@ -57,7 +62,7 @@ public class SwapStep implements Step
 		this.swapParity = swapParity;
 		this.statsEvery = statsEvery;
 	}
-
+	
 	@Override
 	public List<Task> makeTasks(int chainCount)
 	{
@@ -161,18 +166,25 @@ public class SwapStep implements Step
 			if(iterationCount % statsEvery == 0)
 			{
 				List<SwapStats> statsList = collector.takeValue(iterationCount, chainIds[0] / 2,
-					new SwapStats(acceptanceCount));
+					new SwapStats(chainIds, acceptanceCount));
 				
-				if(statsList != null)
+				Logger logger = chains[0].getMCMC().getLogger("mc3kit.SwapStep");
+				if(statsList != null && logger.isLoggable(Level.INFO))
 				{
+				  Map<String, Object> swapStats = new LinkedHashMap<String, Object>();
 					for(int i = swapParity == SwapParity.EVEN ? 0 : 1; i + 1 < chainCount; i += 2)
 					{
-					  int lower = chains[0].chainId;
-					  int upper = chains[1].chainId;
-					  chains[0].getLogger().info(format(
-					    "swap rate (%d,%d) for iteration %d: %f", lower, upper, iterationCount, statsList.get(i/2).acceptanceRate)
-					  );
+					  SwapStats stats = statsList.get(i/2);
+	          swapStats.put(
+	              format("(%d,%d)", stats.chainIds[0], stats.chainIds[1]),
+	              stats.acceptanceRate
+	          );
 					}
+					
+					logger.log(Level.INFO,
+					  "SwapStep acceptance rates",
+					  makeMap("swapParity", swapParity.toString(), "swapStats", swapStats)
+					);
 				}
 				
 				acceptanceCount = 0;
@@ -182,10 +194,12 @@ public class SwapStep implements Step
 	
   class SwapStats
   {
+    int[] chainIds;
     double acceptanceRate;
     
-    SwapStats(long acceptanceCount)
+    SwapStats(int[] chainIds, long acceptanceCount)
     {
+      this.chainIds = chainIds;
       acceptanceRate = acceptanceCount / (double)statsEvery;
     }
   }

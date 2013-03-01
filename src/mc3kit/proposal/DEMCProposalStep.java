@@ -32,8 +32,6 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.gson.*;
-
 import cern.colt.*;
 import cern.colt.function.*;
 import cern.colt.matrix.*;
@@ -339,19 +337,17 @@ public class DEMCProposalStep implements Step {
       void recordStats(Chain chain, int chainId) throws MC3KitException
       {
         if(history.size() > initialHistoryCount && iterationCount % tuneEvery == 0) {
-          Map<String, Object> outputObj = makeMap(
-              "iteration", iterationCount,
-              "chainId", chainId,
-              "blockSize", blockSize,
-              "snookerGammaFactor", snookerGammaFactor,
-              "snookerRates", getCounterObject(snookerCounter),
-              "parallelGammaFactor", parallelGammaFactor,
-              "parallelSmallRates", getCounterObject(parallelSmallCounter),
-              "parallelLargeRates", getCounterObject(parallelLargeCounter)
-            );
-          
-          chain.getLogger().info(format("Recording stats for %d...", blockSize));
-          chain.getLogger().info(new GsonBuilder().setPrettyPrinting().create().toJson(outputObj));
+          Map<String, Object> infoObj = makeMap(
+            "iteration", iterationCount,
+            "chainId", chainId,
+            "blockSize", blockSize,
+            "snookerGammaFactor", snookerGammaFactor,
+            "snookerRates", getCounterObject(snookerCounter),
+            "parallelGammaFactor", parallelGammaFactor,
+            "parallelSmallRates", getCounterObject(parallelSmallCounter),
+            "parallelLargeRates", getCounterObject(parallelLargeCounter)
+          );
+          chain.getLogger().log(Level.INFO, "DEMCProposalStep acceptance rates", infoObj);
         }
       }
       
