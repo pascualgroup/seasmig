@@ -46,6 +46,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionToFromGTR 
 		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
 
+		// TODO: there is no from to in gtr... 
 		this.config = config;
 		this.data = data;
 		this.fixedPhase=fixedPhase;
