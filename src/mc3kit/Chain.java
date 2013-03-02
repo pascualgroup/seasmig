@@ -20,6 +20,7 @@
 package mc3kit;
 
 import java.io.Serializable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cern.jet.random.engine.RandomEngine;
@@ -105,7 +106,10 @@ public class Chain implements Serializable
 	
 	public Logger getLogger() {
 	  if(_logger == null) {
-	   _logger = Logger.getLogger("mc3kit.Chain." + chainId);
+	   _logger = mcmc.getLogger("mc3kit.Chain." + chainId);
+	   if(chainId != 0 && !mcmc.logAllChains) {
+	     _logger.setLevel(Level.OFF);
+	   }
 	  }
 	  return _logger;
 	}

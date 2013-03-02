@@ -24,6 +24,8 @@ import java.util.concurrent.*;
 import java.util.logging.*;
 import java.io.*;
 
+import mc3kit.util.JsonsLogFormatter;
+
 import static java.lang.String.format;
 
 import cern.jet.random.engine.*;
@@ -55,8 +57,10 @@ public class MCMC implements Serializable {
 
   Level logLevel;
   String logFilename;
-  transient Logger _rootLogger;
+  boolean logAllChains;
+  
   transient Logger _logger;
+  transient Map<String, Logger> _loggers;
   
   /*** THREAD POOL MANAGEMENT ***/
 
@@ -67,20 +71,40 @@ public class MCMC implements Serializable {
   
   public MCMC() {
     steps = new ArrayList<Step>();
+    
+    initializeLoggers();
   }
   
-  private Logger getRootLogger() {
-    if(_rootLogger == null) {
-      _rootLogger = Logger.getLogger("");
+  private void initializeLoggers() {
+    _logger = Logger.getLogger("");
+    for(Handler handler : _logger.getHandlers()) {
+      _logger.removeHandler(handler);
     }
-    return _rootLogger;
+    _loggers = new HashMap<String, Logger>();
   }
   
   private Logger getLogger() {
-    if(_logger == null) {
-      _logger = Logger.getLogger("mc3kit.MCMC");
+    return getLogger("mc3kit.MCMC");
+  }
+  
+  public Logger getLogger(String name) {
+    synchronized(_loggers) {
+      String[] pieces = name.split("\\.");
+      if(!pieces[0].equals("mc3kit")) {
+        throw new IllegalArgumentException("name must begin with mc3kit.");
+      }
+      String subName = "mc3kit";
+      for(int i = 1; i < pieces.length; i++) {
+        subName = subName + "." + pieces[i];
+        if(!_loggers.containsKey(subName)) {
+          _loggers.put(subName, Logger.getLogger(subName));
+        }
+      }
+      
+      assert _loggers.containsKey(name);
+      
+      return _loggers.get(name);
     }
-    return _logger;
   }
   
   private void initialize() throws Throwable {
@@ -119,6 +143,8 @@ public class MCMC implements Serializable {
   
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException, SecurityException, MC3KitException {
     in.defaultReadObject();
+    
+    initializeLoggers();
     
     if(logLevel != null) {
       setLogLevelPrivate(logLevel);
@@ -557,11 +583,10 @@ public class MCMC implements Serializable {
     setLogLevelPrivate(level);
   }
   
-  private synchronized void setLogLevelPrivate(Level level) throws MC3KitException {
+  private void setLogLevelPrivate(Level level) throws MC3KitException {
     this.logLevel = level;
-    Logger rootLogger = getRootLogger();
-    rootLogger.setLevel(level);
-    for(Handler handler : rootLogger.getHandlers()) {
+    _logger.setLevel(level);
+    for(Handler handler : _logger.getHandlers()) {
       handler.setLevel(level);
     }
   }
@@ -571,20 +596,29 @@ public class MCMC implements Serializable {
     setLogFilenamePrivate(filename);
   }
   
-  private synchronized void setLogFilenamePrivate(String filename) throws SecurityException, IOException, MC3KitException {
+  private void setLogFilenamePrivate(String filename) throws SecurityException, IOException, MC3KitException {
     this.logFilename = filename;
-    Logger rootLogger = getRootLogger();
-    for(Handler handler : rootLogger.getHandlers()) {
-      rootLogger.removeHandler(handler);
+    
+    for(Handler handler : _logger.getHandlers()) {
+      _logger.removeHandler(handler);
     }
+    
+    JsonsLogFormatter formatter = new JsonsLogFormatter();
     
     if(filename == null || filename.equals("-") || filename.equals("")) {
       ConsoleHandler handler = new ConsoleHandler();
-      rootLogger.addHandler(handler);
+      handler.setFormatter(formatter);
+      _logger.addHandler(handler);
     }
     else {
       FileHandler handler = new FileHandler(filename);
-      rootLogger.addHandler(handler);
+      handler.setFormatter(formatter);
+      _logger.addHandler(handler);
     }
+  }
+  
+  public synchronized void setLogAllChains(boolean logAllChains) throws MC3KitException {
+    throwIfInitialized();
+    this.logAllChains = logAllChains;
   }
 }

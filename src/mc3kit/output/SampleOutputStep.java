@@ -89,7 +89,7 @@ public class SampleOutputStep implements Step
       Chain chain = chains[0];
 			if(iterationCount % thin == 0)
 			{
-	      chain.getLogger().info(format("Writing sample %d", iterationCount));
+	      chain.getLogger().fine(format("Writing sample %d", iterationCount));
 				Model model = chain.getModel();
 				
 				writer.writeSample(model);
