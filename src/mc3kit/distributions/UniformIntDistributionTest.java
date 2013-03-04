@@ -2,8 +2,6 @@ package mc3kit.distributions;
 
 import static org.junit.Assert.*;
 
-import java.util.logging.Level;
-
 import mc3kit.*;
 import mc3kit.proposal.UnivariateProposalStep;
 

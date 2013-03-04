@@ -130,11 +130,6 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		}
 
 
-		public double getLogMaxLikelihood() {
-			return logMaxLikelihood;
-		}
-
-
 		/*
 		 * The update method is called whenever a node this variable
 		 * depends on has changed; random variables should typically

@@ -5,6 +5,7 @@ import org.jblas.MatrixFunctions;
 
 import seasmig.treelikelihood.MatrixExponentiator;
 
+@SuppressWarnings("serial")
 public class JblasMatrixExp implements MatrixExponentiator {
 	
 	private DoubleMatrix Q;
