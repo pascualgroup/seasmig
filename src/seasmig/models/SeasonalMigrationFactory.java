@@ -46,8 +46,8 @@ public class SeasonalMigrationFactory implements ModelFactory
 				fixLength=false;
 				break;
 			case FREE_PHASE_FIXED_LENGTH:
-				fixPhase=true;
-				fixLength=false;
+				fixPhase=false;
+				fixLength=true;
 				break;
 			default: 
 				System.err.println(config.twoSeasonPhase+" two season phase not implemented!");
