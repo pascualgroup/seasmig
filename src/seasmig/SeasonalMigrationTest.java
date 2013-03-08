@@ -12,6 +12,8 @@ import org.junit.Test;
 import seasmig.data.TestData;
 import seasmig.data.TestData.TestType;
 import seasmig.treelikelihood.*;
+import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
+import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 import seasmig.treelikelihood.matrixexp.JamaMolerMatrixExp;
 import seasmig.treelikelihood.matrixexp.JblasMatrixExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
@@ -38,6 +40,17 @@ public class SeasonalMigrationTest {
 			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);
 			MatrixExponentiator test4 = new JamaMolerMatrixExp(testMatrix);
 			MatrixExponentiator test5 = new JblasMatrixExp(testMatrix);
+			MatrixExponentiator test6 = null;
+			if (numLocations==3) {				
+				test6 = new AnalyticMatrixExp3(testMatrix);
+				if (!test6.checkMethod())
+					test6=null;
+			}
+			if (numLocations==2) {
+				test6 = new AnalyticMatrixExp2(testMatrix);
+				if (!test6.checkMethod())
+					test6=null;
+			}
 
 			for (double t=0;t<500;t=(t+0.1)*2) {
 				String res1=seasmig.util.Util.parse(test1.expm(t));
@@ -45,16 +58,25 @@ public class SeasonalMigrationTest {
 				String res3=seasmig.util.Util.parse(test3.expm(t));
 				String res4=seasmig.util.Util.parse(test4.expm(t));
 				String res5=seasmig.util.Util.parse(test5.expm(t));
+				String res6 = null;
+				if (test6!=null) res6 = seasmig.util.Util.parse(test6.expm(t));
 
-				if (res1.equalsIgnoreCase(res2) && res2.equalsIgnoreCase(res3) && res3.equalsIgnoreCase(res4)  && res4.equalsIgnoreCase(res5)) {
+				boolean resultsMatch=(res1.equalsIgnoreCase(res2) && res2.equalsIgnoreCase(res3) && res3.equalsIgnoreCase(res4)  && res4.equalsIgnoreCase(res5));
+				if (test6!=null) {
+					resultsMatch=resultsMatch&&(res6.equalsIgnoreCase(res1));
+				}
+				if (resultsMatch) {
 					System.out.print(".");
 				}
 				else {
-					System.out.println("\nMolerMatrixExp: "+seasmig.util.Util.print(test1.expm(t)));					
-					System.out.println("Matlab7MatrixExp: "+seasmig.util.Util.print(test2.expm(t)));
-					System.out.println("TaylorMatrixExp: "+seasmig.util.Util.print(test3.expm(t)));
-					System.out.println("JamaMolerMatrixExp: "+seasmig.util.Util.print(test4.expm(t)));
-					System.out.println("JblasMatrixExp: "+seasmig.util.Util.print(test5.expm(t)));
+					System.out.println("\nMatrix exponentiation results fail to match!\n t="+t+" \nQ=\n"+seasmig.util.Util.print(testMatrix));
+					System.out.println("MolerMatrixExp - checkMethod: "+test1.checkMethod()+"\n"+seasmig.util.Util.print(test1.expm(t)));					
+					System.out.println("Matlab7MatrixExp - checkMethod: "+test2.checkMethod()+"\n"+seasmig.util.Util.print(test2.expm(t)));
+					System.out.println("TaylorMatrixExp - checkMethod: "+test3.checkMethod()+"\n"+seasmig.util.Util.print(test3.expm(t)));
+					System.out.println("JamaMolerMatrixExp: - checkMethod: "+test4.checkMethod()+"\n"+seasmig.util.Util.print(test4.expm(t)));
+					System.out.println("JblasMatrixExp: - checkMethod: "+test5.checkMethod()+"\n"+seasmig.util.Util.print(test5.expm(t)));
+					if (numLocations==3) System.out.println("AnalyticMatrixExp3: - checkMethod: "+test6.checkMethod()+"\n"+seasmig.util.Util.print(test6.expm(t)));;
+					if (numLocations==2) System.out.println("AnalyticMatrixExp2: - checkMethod: "+test6.checkMethod()+"\n"+seasmig.util.Util.print(test6.expm(t)));;
 
 				}
 			}
@@ -115,12 +137,41 @@ public class SeasonalMigrationTest {
 			}
 		}
 		long time5= System.currentTimeMillis()-startTime5;
+		
+		long time6 = 0;
+		if (numLocations==3) {
+			long startTime6= System.currentTimeMillis();		
+			for (int i=1;i<50;i++) {
+				double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+				MatrixExponentiator test6 = new AnalyticMatrixExp3(testMatrix);;
+				for (int j=0;j<1200;j++) {
+					double[][] res6=test6.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+					if (Math.random()<0.0000000000001) System.out.println(res6);
+				}
+			}
+			time6= System.currentTimeMillis()-startTime6;
+		}
+		if (numLocations==2) {
+			long startTime6= System.currentTimeMillis();		
+			for (int i=1;i<50;i++) {
+				double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+				MatrixExponentiator test6 = new AnalyticMatrixExp2(testMatrix);;
+				for (int j=0;j<1200;j++) {
+					double[][] res6=test6.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+					if (Math.random()<0.0000000000001) System.out.println(res6);
+				}
+			}
+			time6= System.currentTimeMillis()-startTime6;
+		}
+	
 
 		System.out.println("\nMolerMatrixExp: "+time1+"ms");
 		System.out.println("Matlab7MatrixExp: "+time2+"ms");
 		System.out.println("TaylorMatrixExp: "+time3+"ms");
 		System.out.println("JamaMolerMatrixExp: "+time4+"ms");
 		System.out.println("JblasMatrixExp: "+time5+"ms");
+		if (numLocations==3) System.out.println("AnalyticMatrixExp3: "+time6+"ms");
+		if (numLocations==2) System.out.println("AnalyticMatrixExp2: "+time6+"ms");
 
 		System.out.println("\nCompleted matrix exponentiation test");
 
