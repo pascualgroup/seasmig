@@ -28,7 +28,6 @@ import cern.jet.random.Normal;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
 import mc3kit.*;
-import mc3kit.SwapStep.SwapParity;
 import mc3kit.monitoring.MarginalLikelihoodStep;
 import mc3kit.output.PriorLikelihoodOutputStep;
 import mc3kit.output.SampleOutputStep;
@@ -141,8 +140,8 @@ public class ExampleMain {
         // parallelization while swapping, where
         // No tuning, but tuneEvery used to print swap statistics to log file
         // every so often
-        Step evenSwapStep = new SwapStep(SwapParity.EVEN, tuneEvery);
-        Step oddSwapStep = new SwapStep(SwapParity.ODD, tuneEvery);
+        Step evenSwapStep = new SwapStep(ChainParity.EVEN, tuneEvery);
+        Step oddSwapStep = new SwapStep(ChainParity.ODD, tuneEvery);
         
         // Verification step: just asks all models to recalculate
         // log prior, likelihood from scratch and compares to existing value;

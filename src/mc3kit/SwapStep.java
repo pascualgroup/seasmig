@@ -36,16 +36,9 @@ import mc3kit.util.Collector;
 @SuppressWarnings("serial")
 public class SwapStep implements Step
 {
-  SwapParity swapParity;
+  ChainParity swapParity;
   long statsEvery = 100;
-  
-	/*** ENUMS ***/
-	
-	public static enum SwapParity
-	{
-		EVEN,
-		ODD
-	}
+
 
 	/*** STATE ***/
 	
@@ -57,7 +50,7 @@ public class SwapStep implements Step
 	
 	protected SwapStep() { }
 	
-	public SwapStep(SwapParity swapParity, long statsEvery) throws IOException
+	public SwapStep(ChainParity swapParity, long statsEvery) throws IOException
 	{
 		this.swapParity = swapParity;
 		this.statsEvery = statsEvery;
@@ -67,15 +60,15 @@ public class SwapStep implements Step
 	public List<Task> makeTasks(int chainCount)
 	{
 		this.chainCount = chainCount;
-		List<Task> Tasks = new ArrayList<Task>(chainCount);
-		for(int i = swapParity == SwapParity.EVEN ? 0 : 1; i + 1 < chainCount; i += 2)
+		List<Task> tasks = new ArrayList<Task>(chainCount);
+		for(int i = swapParity == ChainParity.EVEN ? 0 : 1; i + 1 < chainCount; i += 2)
 		{
-			Tasks.add(new Swapper(i, i+1));
+			tasks.add(new Swapper(i, i+1));
 		}
 		
-		collector = new Collector<SwapStats>(Tasks.size());
+		collector = new Collector<SwapStats>(tasks.size());
 		
-		return Tasks;
+		return tasks;
 	}
 	
 	/*** Task CLASS ***/
@@ -172,7 +165,7 @@ public class SwapStep implements Step
 				if(statsList != null && logger.isLoggable(Level.INFO))
 				{
 				  Map<String, Object> swapStats = new LinkedHashMap<String, Object>();
-					for(int i = swapParity == SwapParity.EVEN ? 0 : 1; i + 1 < chainCount; i += 2)
+					for(int i = swapParity == ChainParity.EVEN ? 0 : 1; i + 1 < chainCount; i += 2)
 					{
 					  SwapStats stats = statsList.get(i/2);
 	          swapStats.put(

@@ -28,4 +28,18 @@ public final class Random {
     if(i == except) i = end;
     return i;
   }
+  
+  public static IterableBitSet uniformRandomSubset(Uniform unif, int n, int k) {
+    IterableBitSet successes = new IterableBitSet(n);
+    for(int i = 0; i < k; i++)
+    {
+      int success;
+      do
+      {
+        success = unif.nextIntFromTo(0, n - 1);
+      } while(successes.get(success));
+      successes.set(success);
+    }
+    return successes;
+  }
 }

@@ -60,7 +60,7 @@ public class Chain implements Serializable
 		return mcmc;
 	}
   
-  void setModel(Model model)
+  public void setModel(Model model)
   {
     this.model = model;
   }
