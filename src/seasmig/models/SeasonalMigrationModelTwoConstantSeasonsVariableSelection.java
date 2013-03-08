@@ -40,6 +40,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 		this.config = config;
 		this.data = data;
 		this.fixedPhase=fixedPhase;
+		this.fixedPhaseLength=fixedPhaseLength;
 		numLocations=data.getNumLocations();
 		nTrees=data.getTrees().size();		
 		rates = new DoubleVariable[numLocations][numLocations];
