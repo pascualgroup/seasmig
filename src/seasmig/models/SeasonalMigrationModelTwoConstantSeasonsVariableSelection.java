@@ -20,16 +20,19 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 	BinaryVariable[][] diffIndicators;
 	
 	DoubleVariable seasonalPhase;
-	double seasonalPhaseRealization;
+	DoubleVariable seasonalLength;
+	double seasonStart;
+	double seasonEnd;
 	IntVariable treeIndex;
 	LikelihoodVariable likeVar;
 	private int nTrees;	
 
 	boolean fixedPhase;
+	boolean fixedPhaseLength;
 
 	protected SeasonalMigrationModelTwoConstantSeasonsVariableSelection() { }
 
-	public SeasonalMigrationModelTwoConstantSeasonsVariableSelection(Chain initialChain, Config config, Data data, boolean fixedPhase) throws MC3KitException
+	public SeasonalMigrationModelTwoConstantSeasonsVariableSelection(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixedPhaseLength) throws MC3KitException
 	{
 		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
@@ -48,13 +51,21 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 
 		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
 
-		if (!fixedPhase) {
-			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
+		if (fixedPhase && fixedPhaseLength) {
+			seasonStart=config.fixedPhase;			
 		}
-		else {
-			seasonalPhaseRealization=config.fixedPhase;
+		else if (!fixedPhase && fixedPhaseLength) {
+			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));			
 		}
-
+		else if (!fixedPhase && !fixedPhaseLength) {	
+			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,1));
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,0,1));			
+		}
+		else /* fixedPhase && !fixedLength */ {
+			seasonStart=config.fixedPhase;
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,0,1));			
+		}
+		
 		DoubleDistribution ratePriorDist = new ExponentialDistribution(this,1.0);
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 		BinaryDistribution diffIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
@@ -89,6 +100,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 			m.addEdge(this, m.treeIndex);
 			if (!fixedPhase)
 				m.addEdge(this, m.seasonalPhase);
+			if (!fixedPhaseLength)
+				m.addEdge(this, m.seasonalLength);
 
 			for(int i = 0; i < numLocations; i++) {
 				for(int j = 0; j < numLocations; j++) {
@@ -144,9 +157,36 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 			}
 
 			// TODO: add update to migration model instead of reconstructing...
-			if (!fixedPhase)
-				seasonalPhaseRealization=seasonalPhase.getValue();
-			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhaseRealization,seasonalPhaseRealization+0.5);
+			if (fixedPhase && fixedPhaseLength) {
+				seasonStart=config.fixedPhase;	
+				seasonEnd = seasonStart+0.5;
+			}
+			else if (!fixedPhase && fixedPhaseLength) {
+				seasonStart=seasonalPhase.getValue();
+				seasonEnd=seasonalPhase.getValue()+0.5;			
+			}
+			else if (!fixedPhase && !fixedPhaseLength) {
+				if (seasonalPhase.getValue()+seasonalLength.getValue()<1) {
+					seasonStart=seasonalPhase.getValue();
+					seasonEnd=seasonalPhase.getValue()+seasonalLength.getValue();
+				} 
+				else {
+					seasonStart=seasonalPhase.getValue()+seasonalLength.getValue()-1.0;
+					seasonEnd=seasonalPhase.getValue();
+				}						
+			}
+			else /* fixedPhase && !fixedLength */ {					
+				if (config.fixedPhase+seasonalLength.getValue()<1) {
+					seasonStart=config.fixedPhase;
+					seasonEnd=seasonStart+seasonalLength.getValue();
+				} 
+				else {
+					seasonStart=config.fixedPhase+seasonalLength.getValue()-1.0;
+					seasonEnd=config.fixedPhase;
+				}			
+			}			
+			
+			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonStart,seasonEnd);
 			LikelihoodTree workingCopy = data.getTrees().get((int)treeIndex.getValue()).copy(); 
 			workingCopy.setLikelihoodModel(migrationBaseModel);
 			logLikelihood=workingCopy.logLikelihood();								

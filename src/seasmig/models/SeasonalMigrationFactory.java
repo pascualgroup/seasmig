@@ -30,18 +30,30 @@ public class SeasonalMigrationFactory implements ModelFactory
 
 		case TWO_CONSTANT_SEASONS: 
 			boolean fixPhase = false;
+			boolean fixLength = false;
 			switch (config.twoSeasonPhase) {
-			case FIXED:
+			// TODO: test this
+			case FIXED_PHASE_FIXED_LENGTH:
 				fixPhase=true;
+				fixLength=true;
 				break;
-			case FREE:
+			case FREE_PHASE_FREE_LENGTH:
 				fixPhase=false;
+				fixLength=false;
+				break;
+			case FIXED_PHASE_FREE_LENGTH:
+				fixPhase=true;
+				fixLength=false;
+				break;
+			case FREE_PHASE_FIXED_LENGTH:
+				fixPhase=true;
+				fixLength=false;
 				break;
 			default: 
 				System.err.println(config.twoSeasonPhase+" two season phase not implemented!");
 			}
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION)
-				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelection(initialChain,config,data,fixPhase);
+				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelection(initialChain,config,data,fixPhase,fixLength);
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION_INDIVIDUAL_FROM_TO)
 				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelectionToFromGTR(initialChain,config,data,fixPhase,true,true,true,false);			
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION_INDIVIDUAL_FROM_TO_GTR)

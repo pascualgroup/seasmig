@@ -74,6 +74,10 @@ public class Model implements Observer, Serializable {
     }
   }
   
+  public List<Variable> getUnobservedVariables() {
+    return unobservedVariables;
+  }
+  
   public String[] getUnobservedVariableNames() {
     String[] varNames = new String[unobservedVariables.size()];
     for(int i = 0; i < varNames.length; i++) {
@@ -247,6 +251,8 @@ public class Model implements Observer, Serializable {
       updateQueue.put(node.getOrder(), node);
     }
     
+    Set<ModelNode> visitedNodes = new HashSet<ModelNode>();
+    
     // Traverse graph in topological order
     int lastOrder = Integer.MIN_VALUE;
     while (!updateQueue.isEmpty()) {
@@ -255,6 +261,7 @@ public class Model implements Observer, Serializable {
       lastOrder = order;
       
       ModelNode node = updateQueue.get(order);
+      visitedNodes.add(node);
       updateQueue.remove(order);
       
       Set<ModelEdge> fromEdges = visitedEdges.get(node);
@@ -297,6 +304,7 @@ public class Model implements Observer, Serializable {
             visitedEdges.put(tail, new HashSet<ModelEdge>());
           }
           visitedEdges.get(tail).add((ModelEdge)edge);
+          assert !visitedNodes.contains(tail);
           updateQueue.put(tail.getOrder(), tail);
         }
       }

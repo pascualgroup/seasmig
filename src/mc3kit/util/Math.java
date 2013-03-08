@@ -40,6 +40,28 @@ public final class Math {
   public static double logBeta(double x, double y) {
     return logGamma(x) + logGamma(y) - logGamma(x + y);
   }
+  
+  public static double logMultinomialBeta(double x, int n) {
+    double logBx = 0.0;
+    
+    logBx += n * logGamma(x);
+    logBx -= logGamma(n * x);
+    
+    return logBx;
+  }
+  
+  public static double logMultinomialBeta(double... xs) {
+    double logBx = 0.0;
+    
+    double sumX = 0.0;
+    for(double x : xs) {
+      logBx += logGamma(x);
+      sumX += x;
+    }
+    logBx -= logGamma(sumX); 
+    
+    return logBx;
+  }
 
   public static int[] getRandomPermutation(int size, Uniform uniform) {
     int[] vals = new int[size];

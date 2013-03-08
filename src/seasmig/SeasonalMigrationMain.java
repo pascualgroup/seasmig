@@ -5,11 +5,11 @@ import java.io.FileReader;
 import seasmig.data.DataFromFiles;
 import seasmig.models.SeasonalMigrationFactory;
 
+import mc3kit.ChainParity;
 import mc3kit.MCMC;
 import mc3kit.Step;
 import mc3kit.SwapStep;
 import mc3kit.VerificationStep;
-import mc3kit.SwapStep.SwapParity;
 import mc3kit.monitoring.MarginalLikelihoodStep;
 import mc3kit.output.PriorLikelihoodOutputStep;
 import mc3kit.output.SampleOutputStep;
@@ -110,8 +110,8 @@ public class SeasonalMigrationMain
 				// parallelization while swapping, where
 				// No tuning, but tuneEvery used to print swap statistics to log file
 				// every so often
-				Step evenSwapStep = new SwapStep(SwapParity.EVEN, config.tuneEvery);
-				Step oddSwapStep = new SwapStep(SwapParity.ODD, config.tuneEvery);
+				Step evenSwapStep = new SwapStep(ChainParity.EVEN, config.tuneEvery);
+				Step oddSwapStep = new SwapStep(ChainParity.ODD, config.tuneEvery);
 
 				// Verification step: just asks all models to recalculate
 				// log prior, likelihood from scratch and compares to existing value;

@@ -44,16 +44,23 @@ import cern.jet.random.engine.RandomEngine;
 @SuppressWarnings("serial")
 public class UnivariateProposalStep implements Step {
   
-  double targetAcceptanceRate = 0.25;
-  long tuneFor = 1000;
-  long tuneEvery = 100;
+  double targetAcceptanceRate;
+  long tuneFor;
+  long tuneEvery;
+  boolean reinitializePriorChains;
 
   protected UnivariateProposalStep() { }
   
   public UnivariateProposalStep(double targetAcceptanceRate, long tuneFor, long tuneEvery) {
+    this(targetAcceptanceRate, tuneFor, tuneEvery, false);
+  }
+  
+  public UnivariateProposalStep(double targetAcceptanceRate, long tuneFor, long tuneEvery,
+      boolean reinitializePriorChains) {
     this.targetAcceptanceRate = targetAcceptanceRate;
     this.tuneFor = tuneFor;
     this.tuneEvery = tuneEvery;
+    this.reinitializePriorChains = reinitializePriorChains;
   }
 
   @Override
@@ -97,39 +104,45 @@ public class UnivariateProposalStep implements Step {
       Chain chain = chains[0];
       Logger logger = chain.getLogger();
       
-      Model model = chain.getModel();
-      initialize(model);
-      
-      RandomEngine rng = chain.getRng();
-
-      Uniform unif = new Uniform(rng);
-
-      // Run all proposers in random order
-      for(int i : getRandomPermutation(proposers.length, unif)) {
-        proposers[i].step(model);
+      if(reinitializePriorChains && chain.getPriorHeatExponent() == 1.0 && chain.getLikelihoodHeatExponent() == 0.0) {
+        Model model = chain.getMCMC().getModelFactory().createModel(chain);
+        chain.setModel(model);
       }
-
-      iterationCount++;
-      
-      // Write out acceptance rates
-      if(iterationCount % tuneEvery == 0 && logger.isLoggable(Level.INFO)) {
-        Map<String, Double> acceptanceRates = new LinkedHashMap<String, Double>();
-        for(VariableProposer proposer : proposers) {
-          acceptanceRates.put(proposer.getName(), proposer.getAcceptanceRate());
+      else {
+        Model model = chain.getModel();
+        
+        initialize(model);
+        RandomEngine rng = chain.getRng();
+  
+        Uniform unif = new Uniform(rng);
+  
+        // Run all proposers in random order
+        for(int i : getRandomPermutation(proposers.length, unif)) {
+          proposers[i].step(model);
         }
-        Map<String, Object> infoObj = makeMap(
-          "iteration", iterationCount,
-          "chainId", chainId,
-          "acceptanceRates", acceptanceRates
-        );
-        logger.log(Level.INFO, "UnivariateProposalStep acceptance rates", infoObj);
-      }
-      
-      // If we're still in the tuning period, tune
-      if((iterationCount <= tuneFor) && iterationCount % tuneEvery == 0) {
-        for(VariableProposer proposer : proposers) {
-          proposer.tune(targetAcceptanceRate);
-          proposer.resetTuningPeriod();
+  
+        iterationCount++;
+        
+        // Write out acceptance rates
+        if(iterationCount % tuneEvery == 0 && logger.isLoggable(Level.INFO)) {
+          Map<String, Double> acceptanceRates = new LinkedHashMap<String, Double>();
+          for(VariableProposer proposer : proposers) {
+            acceptanceRates.put(proposer.getName(), proposer.getAcceptanceRate());
+          }
+          Map<String, Object> infoObj = makeMap(
+            "iteration", iterationCount,
+            "chainId", chainId,
+            "acceptanceRates", acceptanceRates
+          );
+          logger.log(Level.INFO, "UnivariateProposalStep acceptance rates", infoObj);
+        }
+        
+        // If we're still in the tuning period, tune
+        if((iterationCount <= tuneFor) && iterationCount % tuneEvery == 0) {
+          for(VariableProposer proposer : proposers) {
+            proposer.tune(targetAcceptanceRate);
+            proposer.resetTuningPeriod();
+          }
         }
       }
     }

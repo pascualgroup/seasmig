@@ -22,14 +22,7 @@ package mc3kit.proposal;
 import static java.lang.Math.sqrt;
 import static org.junit.Assert.*;
 
-import mc3kit.Chain;
-import mc3kit.DoubleVariable;
-import mc3kit.MC3KitException;
-import mc3kit.MCMC;
-import mc3kit.Model;
-import mc3kit.ModelFactory;
-import mc3kit.SwapStep;
-import mc3kit.SwapStep.SwapParity;
+import mc3kit.*;
 import mc3kit.distributions.NormalDistribution;
 
 import org.junit.After;
@@ -264,8 +257,8 @@ public class DEMCProposalStepTest {
     
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
     DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 2, 2, false, false, true);
-    SwapStep evenStep = new SwapStep(SwapParity.EVEN, 100 * chainCount);
-    SwapStep oddStep = new SwapStep(SwapParity.ODD, 100 * chainCount);
+    SwapStep evenStep = new SwapStep(ChainParity.EVEN, 100 * chainCount);
+    SwapStep oddStep = new SwapStep(ChainParity.ODD, 100 * chainCount);
     
     mcmc.addStep(uniStep);
     for(int i = 0; i < chainCount; i++) {
@@ -335,8 +328,8 @@ public class DEMCProposalStepTest {
     
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
     DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 2, 2, false, false, true);
-    SwapStep evenStep = new SwapStep(SwapParity.EVEN, 100 * chainCount);
-    SwapStep oddStep = new SwapStep(SwapParity.ODD, 100 * chainCount);
+    SwapStep evenStep = new SwapStep(ChainParity.EVEN, 100 * chainCount);
+    SwapStep oddStep = new SwapStep(ChainParity.ODD, 100 * chainCount);
     
     mcmc.addStep(uniStep);
     for(int i = 0; i < chainCount; i++) {
@@ -549,8 +542,8 @@ public class DEMCProposalStepTest {
     
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
     DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, varCount/4, varCount, true, false, false);
-    SwapStep evenStep = new SwapStep(SwapParity.EVEN, 100 * chainCount);
-    SwapStep oddStep = new SwapStep(SwapParity.ODD, 100 * chainCount);
+    SwapStep evenStep = new SwapStep(ChainParity.EVEN, 100 * chainCount);
+    SwapStep oddStep = new SwapStep(ChainParity.ODD, 100 * chainCount);
     
     mcmc.addStep(uniStep);
     for(int i = 0; i < chainCount; i++) {
@@ -629,8 +622,8 @@ public class DEMCProposalStepTest {
     
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
     DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, varCount/4, varCount, false, false, true);
-    SwapStep evenStep = new SwapStep(SwapParity.EVEN, 100 * chainCount);
-    SwapStep oddStep = new SwapStep(SwapParity.ODD, 100 * chainCount);
+    SwapStep evenStep = new SwapStep(ChainParity.EVEN, 100 * chainCount);
+    SwapStep oddStep = new SwapStep(ChainParity.ODD, 100 * chainCount);
     
     mcmc.addStep(uniStep);
     for(int i = 0; i < chainCount; i++) {
