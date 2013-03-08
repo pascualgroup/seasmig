@@ -5,10 +5,8 @@ import java.util.Vector;
 
 import org.javatuples.Pair;
 import cern.colt.function.DoubleFunction;
-import cern.colt.matrix.tdouble.*;
-import cern.jet.math.tdouble.DoubleFunctions;
-
-
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
 
 @SuppressWarnings("serial")
 public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
@@ -84,8 +82,8 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 		double from_time_reminder = from_time % 1.0;
 		double from_time_div = from_time - from_time_reminder;
 		double to_time_reminder = to_time - from_time_div;
-		double from_time_reminder_round = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(from_time_reminder));
-		double to_time_reminder_round = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time_reminder));
+		double from_time_reminder_round = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(from_time_reminder));
+		double to_time_reminder_round = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time_reminder));
 		double[][] cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder_round,to_time_reminder_round));
 		if (cached!=null) {
 			return cached;
@@ -93,7 +91,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 		else {			
 			// first step: 
 			double step_start_time = from_time_reminder_round;
-			double to_time_round = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time));
+			double to_time_round = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time));
 			double step_end_time = Math.min(to_time_round, Math.max(0,Math.ceil(step_start_time/dt)*dt));
 			DoubleMatrix2D result = F.identity(num_locations);	 
 			

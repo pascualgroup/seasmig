@@ -1,19 +1,17 @@
 package seasmig.treelikelihood.matrixexp;
 
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
+import cern.colt.matrix.linalg.Algebra;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.util.Util;
 import seasmig.util.Util.FRexpResult;
-import cern.colt.matrix.tdouble.DoubleFactory2D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tdouble.DoublePlusMultFirst;
-import cern.jet.math.tdouble.DoublePlusMultSecond;
 
+@SuppressWarnings("serial")
 public class MolerMatrixExp implements MatrixExponentiator {
 
 	double[][] Q;
-	DenseDoubleAlgebra algebra = new DenseDoubleAlgebra();
+	Algebra algebra = new Algebra();
 	DoubleMatrix2D eye;
 	private double normInfQ; 
 	static final double q = 6.0;
@@ -97,24 +95,24 @@ public class MolerMatrixExp implements MatrixExponentiator {
 	@Override
 	public double[][] expm(double t) {
 		
-		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(DoubleFunctions.mult(t));
+		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(cern.jet.math.Functions.mult(t));
 		FRexpResult fe = Util.log2(normInfQ*t); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
 		long s = Math.max(0, fe.e+1); //  s = max ( 0, e + 1 );
-		A.assign(cern.jet.math.tdouble.DoubleFunctions.div(1L<<s)); // A = A / 2^s;
+		A.assign(cern.jet.math.Functions.div(1L<<s)); // A = A / 2^s;
 
 		DoubleMatrix2D X = A.copy(); // X = A
 		double c = 0.5;
-		DoubleMatrix2D E = A.copy().assign(eye,DoublePlusMultFirst.plusMult(c)); // I + c * A; 
-		DoubleMatrix2D D = A.copy().assign(eye,DoublePlusMultFirst.minusMult(c)); // I - c * A; 
+		DoubleMatrix2D E = A.copy().assign(eye,cern.jet.math.Functions.plusMult(c)); // I + c * A; 
+		DoubleMatrix2D D = A.copy().assign(eye,cern.jet.math.Functions.minusMult(c)); // I - c * A; 
 		boolean p = true;
 		for (int k = 2;k<=q;k++) {
 			c = c*(q-k+1)/(k*(2*q-k+1));
 			X=X.zMult(A, null); // X = A * X;			    
-			E.assign(X,DoublePlusMultSecond.plusMult(c)); //E = E + cX;
+			E.assign(X,cern.jet.math.Functions.plusMult(c)); //E = E + cX;
 			if ( p ) 
-				D.assign(X,DoublePlusMultSecond.plusMult(c)); // D = D + cX;
+				D.assign(X,cern.jet.math.Functions.plusMult(c)); // D = D + cX;
 			else 
-				D.assign(X,DoublePlusMultSecond.minusMult(c)); // D = D - cX;	    
+				D.assign(X,cern.jet.math.Functions.minusMult(c)); // D = D - cX;	    
 			p = !p;
 		}	
 		E=algebra.inverse(D).zMult(E, null); // E = D \ E;

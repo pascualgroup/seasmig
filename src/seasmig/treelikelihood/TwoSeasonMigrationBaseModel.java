@@ -5,7 +5,9 @@ import java.util.Vector;
 
 import org.javatuples.Pair;
 
-import cern.colt.matrix.tdouble.*;
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
+
 
 @SuppressWarnings("serial")
 public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
