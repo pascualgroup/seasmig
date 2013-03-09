@@ -2,11 +2,11 @@ package seasmig.treelikelihood.matrixexp;
 
 import java.util.Vector; // 
 
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
+
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.util.Util;
-
-import cern.colt.matrix.tdouble.DoubleFactory2D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 @SuppressWarnings("serial")
 public class TaylorMatrixExp implements MatrixExponentiator {
@@ -38,7 +38,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 			cachedScale.add(i,scale);
 			next = next.zMult(Q,null,scale/(i+1.0),0,false,false);
 			scale = getScale(next);
-			next.assign(cern.jet.math.tdouble.DoubleFunctions.div(scale));	
+			next.assign(cern.jet.math.Functions.div(scale));	
 			if (scale<precision) {
 				nTaylor = i-1;
 			}
@@ -70,12 +70,12 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 		DoubleMatrix2D result = zeroMatrix.copy();
 
 		for (int i=nTaylor-1;i>=0;i=i-2) {
-			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(cachedScale.get(i)*Math.pow(t, i)));
-			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
+			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.Functions.mult(cachedScale.get(i)*Math.pow(t, i)));
+			result.assign(taylorn, cern.jet.math.Functions.plus);
 		}
 		for (int i=nTaylor-2;i>=0;i=i-2) {
-			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.tdouble.DoubleFunctions.mult(cachedScale.get(i)*Math.pow(t, i)));
-			result.assign(taylorn, cern.jet.math.tdouble.DoubleFunctions.plus);
+			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.Functions.mult(cachedScale.get(i)*Math.pow(t, i)));
+			result.assign(taylorn, cern.jet.math.Functions.plus);
 		}
 		
 		return result.toArray(); 	

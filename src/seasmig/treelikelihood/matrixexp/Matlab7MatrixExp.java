@@ -1,13 +1,11 @@
 package seasmig.treelikelihood.matrixexp;
 
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
+import cern.colt.matrix.linalg.Algebra;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.util.Util;
 import seasmig.util.Util.FRexpResult;
-import cern.colt.matrix.tdouble.DoubleFactory2D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
-import cern.jet.math.tdouble.DoublePlusMultSecond;
-import cern.jet.math.tdouble.DoubleFunctions;
 
 /*
 function F = expm(A)
@@ -106,7 +104,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			2.097847961257068e+000,  // m_vals = 9
 			5.371920351148152e+000}; // m_vals = 13
 
-	static final DenseDoubleAlgebra algebra = new DenseDoubleAlgebra(Util.minValue);
+	static final Algebra algebra = new Algebra(Util.minValue);
 
 	double[][] Q;
 
@@ -189,14 +187,14 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 						
 			// for j = m+1:-2:2
 			for (int j=m;j>=1;j-=2)  // convert j to zero based index
-				U.assign(Apowers[(j-1)/2],DoublePlusMultSecond.plusMult(c[m][j])); //  U = U + c(j)*Apowers{j/2};
+				U.assign(Apowers[(j-1)/2],cern.jet.math.Functions.plusMult(c[m][j])); //  U = U + c(j)*Apowers{j/2};
 			
 			U=A.zMult(U, null); // U = A*U;
 
 			// for j = m:-2:1
 			for (int j=(m-1);j>=0;j-=2) 
 				//				V = V + c(j)*Apowers{(j+1)/2};
-				V.assign(Apowers[j/2],DoublePlusMultSecond.plusMult(c[m][j]));
+				V.assign(Apowers[j/2],cern.jet.math.Functions.plusMult(c[m][j]));
 
 			break;
 		case 13: 
@@ -207,32 +205,32 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			// (A6*(c(14)*A6 + c(12)*A4 + c(10)*A2) 
 			//  + c(8)*A6 + c(6)*A4 + c(4)*A2 + c(2)*eye(n,classA)  
 			// );
-			U = A.zMult(A6.zMult(zSum3(A6,A4,A2,c[m][13],c[m][11],c[m][9]),null).assign(zSum4(A6,A4,A2,eye,c[m][7],c[m][5],c[m][3],c[m][1]),DoubleFunctions.plus),null);
+			U = A.zMult(A6.zMult(zSum3(A6,A4,A2,c[m][13],c[m][11],c[m][9]),null).assign(zSum4(A6,A4,A2,eye,c[m][7],c[m][5],c[m][3],c[m][1]),cern.jet.math.Functions.plus),null);
 
 			//	V = A6*(c(13)*A6 + c(11)*A4 + c(9)*A2) 
 			//  + c(7)*A6 + c(5)*A4 + c(3)*A2 + c(1)*eye(n,classA);
-			V = A6.zMult(zSum3(A6,A4,A2,c[m][12],c[m][10],c[m][8]),null).assign(zSum4(A6,A4,A2,eye,c[m][6],c[m][4],c[m][2],c[m][0]),DoubleFunctions.plus);	                    
+			V = A6.zMult(zSum3(A6,A4,A2,c[m][12],c[m][10],c[m][8]),null).assign(zSum4(A6,A4,A2,eye,c[m][6],c[m][4],c[m][2],c[m][0]),cern.jet.math.Functions.plus);	                    
 		}
 		// TODO: optimize this
-		DoubleMatrix2D VplusU = V.copy().assign(U,DoubleFunctions.plus); 
-		DoubleMatrix2D VminusU = V.assign(U,DoubleFunctions.minus);
+		DoubleMatrix2D VplusU = V.copy().assign(U,cern.jet.math.Functions.plus); 
+		DoubleMatrix2D VminusU = V.assign(U,cern.jet.math.Functions.minus);
 		DoubleMatrix2D res=algebra.inverse(VminusU).zMult(VplusU,null); // F = (-U+V)\(U+V);
 		return res;
 
 	}
 
 	static DoubleMatrix2D zSum3(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,double alpha,double beta, double gamma) {
-		DoubleMatrix2D returnValue = A.copy().assign(DoubleFunctions.mult(alpha));
-		returnValue.assign(B,DoublePlusMultSecond.plusMult(beta));
-		returnValue.assign(C,DoublePlusMultSecond.plusMult(gamma));
+		DoubleMatrix2D returnValue = A.copy().assign(cern.jet.math.Functions.mult(alpha));
+		returnValue.assign(B,cern.jet.math.Functions.plusMult(beta));
+		returnValue.assign(C,cern.jet.math.Functions.plusMult(gamma));
 		return returnValue;
 	}
 
 	static DoubleMatrix2D zSum4(DoubleMatrix2D A, DoubleMatrix2D B,DoubleMatrix2D C,DoubleMatrix2D D, double alpha,double beta, double gamma, double delta) {
-		DoubleMatrix2D returnValue = A.copy().assign(DoubleFunctions.mult(alpha));
-		returnValue.assign(B,DoublePlusMultSecond.plusMult(beta));
-		returnValue.assign(C,DoublePlusMultSecond.plusMult(gamma));
-		returnValue.assign(D,DoublePlusMultSecond.plusMult(delta));
+		DoubleMatrix2D returnValue = A.copy().assign(cern.jet.math.Functions.mult(alpha));
+		returnValue.assign(B,cern.jet.math.Functions.plusMult(beta));
+		returnValue.assign(C,cern.jet.math.Functions.plusMult(gamma));
+		returnValue.assign(D,cern.jet.math.Functions.plusMult(delta));
 		return returnValue;
 	}
 
@@ -240,7 +238,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 	public double[][] expm(double tt) {
 
 		//	Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
-		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(DoubleFunctions.mult(tt));
+		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(cern.jet.math.Functions.mult(tt));
 		double normA = algebra.norm1(A);
 		DoubleMatrix2D F=null;
 
@@ -258,7 +256,7 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 			int s = ts.e;
 			double t = ts.f;
 			if (t==0.5) s = s - 1; // s = s - (t == 0.5); % adjust s if normA/theta(end) is a power of 2.
-			A.assign(DoubleFunctions.div(1L<<s)); // A = A/2^s;    % Scaling
+			A.assign(cern.jet.math.Functions.div(1L<<s)); // A = A/2^s;    % Scaling
 			F = padeApproximantOfDegree(m_vals[m_vals.length-1],A);
 			for (int i=0;i<s;i++) 
 				F=F.zMult(F, null); // F = F*F;  % Squaring

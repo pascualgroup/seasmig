@@ -40,6 +40,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 		this.config = config;
 		this.data = data;
 		this.fixedPhase=fixedPhase;
+		this.fixedPhaseLength=fixedPhaseLength;
 		numLocations=data.getNumLocations();
 		nTrees=data.getTrees().size();		
 		rates = new DoubleVariable[numLocations][numLocations];
@@ -59,11 +60,11 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 		}
 		else if (!fixedPhase && !fixedPhaseLength) {	
 			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,1));
-			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,0,1));			
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,0,0.5));			
 		}
 		else /* fixedPhase && !fixedLength */ {
 			seasonStart=config.fixedPhase;
-			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,0,1));			
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,0,0.5));			
 		}
 		
 		DoubleDistribution ratePriorDist = new ExponentialDistribution(this,1.0);

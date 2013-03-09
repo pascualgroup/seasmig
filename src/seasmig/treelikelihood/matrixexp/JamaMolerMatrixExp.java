@@ -6,6 +6,7 @@ import seasmig.util.Util.FRexpResult;
 import Jama.Matrix;
 
 
+@SuppressWarnings("serial")
 public class JamaMolerMatrixExp implements MatrixExponentiator {
 
 	double[][] Q;	

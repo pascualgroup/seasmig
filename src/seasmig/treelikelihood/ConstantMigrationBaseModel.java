@@ -5,8 +5,6 @@ import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 
-import cern.jet.math.tdouble.DoubleFunctions;
-
 @SuppressWarnings("serial")
 public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
@@ -53,7 +51,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	@Override
 	public double logprobability(int from_location, int to_location, double from_time, double to_time) {
 
-		double dt = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time-from_time)); 
+		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
 		double[][] cached = cachedTransitionMatrices.get(dt);
 
 		if (cached!=null)  
@@ -64,7 +62,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public double[][] transitionMatrix(double from_time, double to_time) {		
-		double dt = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time-from_time)); 
+		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
 		
 		double[][] cached = cachedTransitionMatrices.get(dt);
 		if (cached!=null) {
@@ -137,7 +135,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public double[] probability(int from_location, double from_time,	double to_time) {
-		double dt = Math.max(timePrecision, DoubleFunctions.round(timePrecision).apply(to_time-from_time)); 
+		double dt = Math.max(timePrecision,cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
 		double[][] cached = cachedTransitionMatrices.get(dt);
 
 		if (cached!=null)  
