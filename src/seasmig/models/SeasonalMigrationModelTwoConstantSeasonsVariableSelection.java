@@ -14,7 +14,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 	Config config;
 	Data data;
 	int numLocations;
-	final static double minSeasonalWindowLength = 0.083333333333333; // 1 month 	
+	final static double minSeasonalWindowLength = 0.083333333333333*2.0; // 2 month 	
 
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] diffMultipliers;
