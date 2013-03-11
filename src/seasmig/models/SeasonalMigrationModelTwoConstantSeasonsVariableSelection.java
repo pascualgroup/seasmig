@@ -14,6 +14,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 	Config config;
 	Data data;
 	int numLocations;
+	final static double minSeasonalWindowLength = 0.083333333333333; // 1 month 	
 
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] diffMultipliers;
@@ -60,11 +61,11 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 		}
 		else if (!fixedPhase && !fixedPhaseLength) {	
 			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,1));
-			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,0,0.5));			
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,minSeasonalWindowLength,0.5));			
 		}
 		else /* fixedPhase && !fixedLength */ {
 			seasonStart=config.fixedPhase;
-			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,0,0.5));			
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,minSeasonalWindowLength,0.5));			
 		}
 		
 		DoubleDistribution ratePriorDist = new ExponentialDistribution(this,1.0);
@@ -192,6 +193,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 			workingCopy.setLikelihoodModel(migrationBaseModel);
 			logLikelihood=workingCopy.logLikelihood();								
 
+			// TODO: think about how to integrate over more than one tree
+			
 			setLogP(logLikelihood);			
 			oldLogLikelihood=logLikelihood;
 			if (logLikelihood>logMaxLikelihood) {
