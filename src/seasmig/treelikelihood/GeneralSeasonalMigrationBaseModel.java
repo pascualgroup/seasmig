@@ -14,7 +14,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Failes degeneracy test....
 	
 	// Precision Parameter
-	static final double timePrecision = 1E-2;
+	static final double timePrecision = 1E-5;
 	
 	// Cache Parameters 
 	static final int maxCachedTransitionMatrices = 16000;

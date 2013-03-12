@@ -1,5 +1,7 @@
 package seasmig;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -277,7 +279,7 @@ public class SeasonalMigrationTest {
 		testFile.createNewFile();
 		PrintStream testStream = new PrintStream(testFile);
 		System.out.println("Calculating tree likelihood using degenerate models:");				
-
+        double[] results = new double[((TestData) data).testModels.size()];
 
 		for (int i=0;i<((TestData) data).testModels.size();i++) {
 			System.out.println("SEASONALITY "+((TestData) data).testModels.get(i).getModelName());						
@@ -291,12 +293,17 @@ public class SeasonalMigrationTest {
 			}
 			testLikelihood=testLikelihood/data.getTrees().size();
 			System.out.println(testLikelihood);
+			results[i]=testLikelihood;
 			long duration= System.currentTimeMillis()-startTime;
 			System.out.println("duration: "+duration+"ms");
 		}
-
+		
 		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");
 		testStream.close();
+				
+		for (int i=1;i<results.length;i++) {
+			assertEquals(results[i],results[i-1], 1E-3);			
+		}
 		System.exit(0);
 
 	}
