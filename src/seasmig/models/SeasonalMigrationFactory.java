@@ -1,4 +1,4 @@
-package seasmig.models
+package seasmig.models;
 
 import seasmig.Config;
 import seasmig.Config.TwoConstantSeasonsParameterization;

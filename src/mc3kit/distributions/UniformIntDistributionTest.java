@@ -52,7 +52,7 @@ public class UniformIntDistributionTest {
 		double sum = 0;
 		for(long i = 0; i < iterCount; i++) {
 			mcmc.step();
-			mcmc.getModel().recalculate();
+			mcmc.getModel().recalculate(1E-4);
 
 			assertEquals(i + 1, mcmc.getIterationCount());
 

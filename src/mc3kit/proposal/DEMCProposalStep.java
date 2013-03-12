@@ -33,6 +33,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cern.colt.*;
+import cern.colt.function.IntComparator;
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 //import cern.colt.function.*;
 //import cern.colt.matrix.tdouble.DoubleFactory2D;
 //import cern.colt.matrix.tdouble.DoubleMatrix1D;
