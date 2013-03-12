@@ -35,6 +35,7 @@ public class PartitionVariable extends Variable
 	int[] assignment;
 	IterableBitSet[] groups;
 	
+	List<IndexAssociator> indexAssociators;
 	List<Association> associations;
 	
 	protected PartitionVariable() { }
@@ -51,7 +52,12 @@ public class PartitionVariable extends Variable
 		for(int i = 0; i < k; i++)
 			groups[i] = new IterableBitSet(n);
 		
+		indexAssociators = new ArrayList<IndexAssociator>();
 		associations = new ArrayList<Association>();
+	}
+	
+	public void associate(IndexAssociator associator) {
+	  indexAssociators.add(associator);
 	}
 	
 	public void associate(ModelNode[] tails, ModelNode[] heads, Associator associator) {
@@ -84,6 +90,10 @@ public class PartitionVariable extends Variable
 		groups[g].set(i);
 		assignment[i] = g;
 		
+    for(IndexAssociator asr : indexAssociators) {
+      asr.associate(i, g);
+    }
+		
 		for(Association asn : associations)
 		{
 			asn.setGroup(i, g);
@@ -94,9 +104,8 @@ public class PartitionVariable extends Variable
 	}
 
 	@Override
-	public void sample() throws MC3KitException
-	{
-		Distribution dist = getDistribution();
+	public void sample() throws MC3KitException {
+	  Distribution dist = getDistribution();
 		if(dist == null)
 		{
 			Uniform unif = new Uniform(getRng());
@@ -135,6 +144,13 @@ public class PartitionVariable extends Variable
 		else
 		{
 			getDistribution().sample(this);
+		}
+		
+		// Call index associators
+		for(IndexAssociator asr : indexAssociators) {
+		  for(int i = 0; i < n; i++) {
+		    asr.associate(i, assignment[i]);
+		  }
 		}
 		
 		// Associate vars and priors

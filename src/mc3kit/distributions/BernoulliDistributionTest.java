@@ -73,7 +73,7 @@ public class BernoulliDistributionTest {
     int sum = 0;
     for(long i = 0; i < iterCount; i++) {
       mcmc.step();
-      mcmc.getModel().recalculate();
+      mcmc.getModel().recalculate(1e-8);
       
       assertEquals(i + 1, mcmc.getIterationCount());
       

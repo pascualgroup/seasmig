@@ -67,7 +67,7 @@ public abstract class ModelNode extends Node {
       return null;
     }
     
-    edge = new ModelEdge(getModel(), this, headNode);
+    edge = getModel().addEdge(this, headNode);
     return edge;
   }
   

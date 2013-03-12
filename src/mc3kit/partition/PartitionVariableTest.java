@@ -90,7 +90,7 @@ public class PartitionVariableTest {
     for(long i = 0; i < iterCount; i++) {
       System.err.println("stepping " + i);
       mcmc.step();
-      mcmc.getModel().recalculate();
+      mcmc.getModel().recalculate(1e-8);
       
       assertEquals(i + 1, mcmc.getIterationCount());
       

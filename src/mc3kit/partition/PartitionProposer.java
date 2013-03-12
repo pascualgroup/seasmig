@@ -20,6 +20,7 @@
 package mc3kit.partition;
 
 import java.util.*;
+//import java.util.logging.*;
 
 import static java.lang.Math.*;
 import static mc3kit.util.Random.*;
@@ -44,6 +45,8 @@ public class PartitionProposer extends VariableProposer
 	  Chain chain = model.getChain();
 	  RandomEngine rng = chain.getRng();
 	  PartitionVariable var = (PartitionVariable)model.get(getName());
+
+//	  Logger logger = chain.getLogger();
 	  
 		if(var.getGroupCount() == 1)
 			return;

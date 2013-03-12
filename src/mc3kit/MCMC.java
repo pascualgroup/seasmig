@@ -97,7 +97,9 @@ public class MCMC implements Serializable {
       for(int i = 1; i < pieces.length; i++) {
         subName = subName + "." + pieces[i];
         if(!_loggers.containsKey(subName)) {
-          _loggers.put(subName, Logger.getLogger(subName));
+          Logger logger = Logger.getLogger(subName);
+          logger.setLevel(logLevel);
+          _loggers.put(subName, logger);
         }
       }
       
@@ -608,11 +610,13 @@ public class MCMC implements Serializable {
     if(filename == null || filename.equals("-") || filename.equals("")) {
       ConsoleHandler handler = new ConsoleHandler();
       handler.setFormatter(formatter);
+      handler.setLevel(logLevel);
       _logger.addHandler(handler);
     }
     else {
       FileHandler handler = new FileHandler(filename);
       handler.setFormatter(formatter);
+      handler.setLevel(logLevel);
       _logger.addHandler(handler);
     }
   }

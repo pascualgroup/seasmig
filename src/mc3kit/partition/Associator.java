@@ -19,9 +19,11 @@
 
 package mc3kit.partition;
 
+import java.io.Serializable;
+
 import mc3kit.MC3KitException;
 import mc3kit.ModelNode;
 
-public interface Associator {
+public interface Associator extends Serializable {
   void associate(ModelNode tail, ModelNode head) throws MC3KitException;
 }

@@ -7,9 +7,9 @@ public class DoubleArrayEntry extends DoubleFunction {
   
   protected DoubleArrayEntry() { }
   
-  public <T extends ModelNode & DoubleArrayValued> DoubleArrayEntry(Model model, T array, int index) throws MC3KitException {
+  public DoubleArrayEntry(Model model, DoubleArrayValued array, int index) throws MC3KitException {
     super(model);
-    model.addEdge(this, array);
+    model.addEdge(this, (ModelNode)array);
     this.array = array;
     this.index = index;
   }

@@ -109,14 +109,14 @@ public class MCMCTest {
     
     assertEquals(varVal, mcmc.getModel().getDoubleVariable("nv").getValue(), 0.0);
     
-    mcmc.getModel().recalculate();
+    mcmc.getModel().recalculate(1e-8);
     
     // Run, collect statistics, and check moments against expected distribution
     double sum = 0;
     double sumSq = 0;
     for(long i = 0; i < iterCount; i++) {
       mcmc.step();
-      mcmc.getModel().recalculate();
+      mcmc.getModel().recalculate(1e-8);
       
       assertEquals(iterCount + i + 1, mcmc.getIterationCount());
       
@@ -172,7 +172,7 @@ public class MCMCTest {
     double sumSq = 0;
     for(long i = 0; i < iterCount; i++) {
       mcmc.step();
-      mcmc.getModel().recalculate();
+      mcmc.getModel().recalculate(1e-8);
       
       assertEquals(i + 1, mcmc.getIterationCount());
       
@@ -223,7 +223,7 @@ public class MCMCTest {
     double sumSq = 0;
     for(long i = 0; i < iterCount; i++) {
       mcmc.step();
-      mcmc.getModel().recalculate();
+      mcmc.getModel().recalculate(1e-8);
       
       assertEquals(i + 1, mcmc.getIterationCount());
       
@@ -275,7 +275,7 @@ public class MCMCTest {
     double sumSq = 0;
     for(long i = 0; i < iterCount; i++) {
       mcmc.step();
-      mcmc.getModel().recalculate();
+      mcmc.getModel().recalculate(1e-8);
       
       assertEquals(i + 1, mcmc.getIterationCount());
       
@@ -330,7 +330,7 @@ public class MCMCTest {
     double sumSq = 0;
     for(long i = 0; i < iterCount; i++) {
       mcmc.step();
-      mcmc.getModel().recalculate();
+      mcmc.getModel().recalculate(1e-8);
       
       assertEquals(i + 1, mcmc.getIterationCount());
       
@@ -388,7 +388,7 @@ public class MCMCTest {
     double sumSq = 0;
     for(long i = 0; i < iterCount; i++) {
       mcmc.step();
-      mcmc.getModel().recalculate();
+      mcmc.getModel().recalculate(1e-8);
       
       assertEquals(i + 1, mcmc.getIterationCount());
       

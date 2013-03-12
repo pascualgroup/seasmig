@@ -33,9 +33,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cern.colt.*;
-import cern.colt.function.*;
-import cern.colt.matrix.*;
-import cern.colt.matrix.impl.*;
+//import cern.colt.function.*;
+//import cern.colt.matrix.tdouble.DoubleFactory2D;
+//import cern.colt.matrix.tdouble.DoubleMatrix1D;
+//import cern.colt.matrix.tdouble.DoubleMatrix2D;
+//import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
+
+//import cern.colt.function.tint.IntComparator;
+//import cern.colt.matrix.*;
+//import cern.colt.matrix.impl.*;
 import cern.jet.random.*;
 import cern.jet.random.engine.*;
 

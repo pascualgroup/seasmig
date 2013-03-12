@@ -45,6 +45,10 @@ public abstract class DoubleArrayFunction extends Function implements DoubleArra
     return value.clone();
   }
   
+  protected double[] getValueArray() {
+    return value;
+  }
+  
   @Override
   public void setValue(double[] value) {
     if(value.length != this.value.length) {

@@ -20,9 +20,9 @@
 package mc3kit.util;
 
 import static java.lang.Math.*;
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.linalg.Algebra;
+//import cern.colt.matrix.DoubleMatrix1D;
+//import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+//import cern.colt.matrix.linalg.Algebra;
 import cern.jet.random.*;
 import cern.jet.random.engine.RandomEngine;
 import cern.jet.stat.Gamma;

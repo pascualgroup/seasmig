@@ -146,7 +146,7 @@ public class ExampleMain {
         // Verification step: just asks all models to recalculate
         // log prior, likelihood from scratch and compares to existing value;
         // throws an exception if too much error has accumulated.
-        Step verificationStep = new VerificationStep(thin);
+        Step verificationStep = new VerificationStep(thin, 1e-8);
         
         // Sample output step
         Step sampOutStep = new SampleOutputStep(sampleFilename, thin);

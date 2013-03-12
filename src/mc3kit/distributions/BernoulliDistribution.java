@@ -25,8 +25,7 @@ import static java.lang.Math.*;
 
 @SuppressWarnings("serial")
 public class BernoulliDistribution extends BinaryDistribution {
-
-  double p;
+  double pVal;
   ModelEdge pEdge;
   
   protected BernoulliDistribution() { }
@@ -39,13 +38,18 @@ public class BernoulliDistribution extends BinaryDistribution {
     this(model, name, 0.5);
   }
   
-  public BernoulliDistribution(Model model, double p) {
-    this(model, null, p);
+  public BernoulliDistribution(Model model, DoubleValued pNode) throws MC3KitException {
+    this(model, null, 0.5);
+    setP(pNode);
   }
   
-  public BernoulliDistribution(Model model, String name, double p) {
+  public BernoulliDistribution(Model model, double pVal) {
+    this(model, null, pVal);
+  }
+  
+  public BernoulliDistribution(Model model, String name, double pVal) {
     super(model, name);
-    this.p = p;
+    this.pVal = pVal;
   }
   
   
@@ -54,10 +58,14 @@ public class BernoulliDistribution extends BinaryDistribution {
     return this;
   }
   
+  public void setP(DoubleValued pNode) throws MC3KitException {
+    pEdge = updateEdge(pEdge, (ModelNode)pNode);
+  }
+  
   @Override
   public double getLogP(Variable var) {
     boolean value = ((BinaryVariable)var).getValue();
-    double p = pEdge == null ? this.p : getDoubleValue(pEdge);
+    double p = pEdge == null ? this.pVal : getDoubleValue(pEdge);
     
     return value ? log(p) : log1p(-p);
   }
@@ -69,7 +77,7 @@ public class BernoulliDistribution extends BinaryDistribution {
 
   @Override
   public void sample(Variable var) {
-    double p = pEdge == null ? this.p : getDoubleValue(pEdge);
+    double p = pEdge == null ? this.pVal : getDoubleValue(pEdge);
     ((BinaryVariable)var).setValue(getRng().nextDouble() < p);
   }
 }

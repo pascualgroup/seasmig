@@ -61,20 +61,20 @@ public class GammaDistribution extends DoubleDistribution {
     return new MHMultiplierProposer(varName);
   }
   
-  public <T extends ModelNode & DoubleValued> GammaDistribution setShape(T shapeNode) throws MC3KitException {
-    shapeEdge = updateEdge(shapeEdge, shapeNode);
+  public GammaDistribution setShape(DoubleValued shapeNode) throws MC3KitException {
+    shapeEdge = updateEdge(shapeEdge, (ModelNode)shapeNode);
     return this;
   }
   
-  public <T extends ModelNode & DoubleValued> GammaDistribution setRate(T rateNode) throws MC3KitException {
+  public GammaDistribution setRate(DoubleValued rateNode) throws MC3KitException {
     scaleEdge = updateEdge(scaleEdge, null);
-    rateEdge = updateEdge(rateEdge, rateNode);
+    rateEdge = updateEdge(rateEdge, (ModelNode)rateNode);
     return this;
   }
   
-  public <T extends ModelNode & DoubleValued> GammaDistribution setScale(T scaleNode) throws MC3KitException {
+  public GammaDistribution setScale(DoubleValued scaleNode) throws MC3KitException {
     rateEdge = updateEdge(rateEdge, null);
-    scaleEdge = updateEdge(scaleEdge, scaleNode);
+    scaleEdge = updateEdge(scaleEdge, (ModelNode)scaleNode);
     return this;
   }
 

@@ -40,28 +40,19 @@ public class DoubleSumFunction extends DoubleFunction {
     summandMap = new LinkedHashMap<DoubleValued, Summand>(2);
   }
   
-  public <T extends ModelNode & DoubleValued> DoubleSumFunction add(T summandNode) throws MC3KitException {
+  public DoubleSumFunction add(DoubleValued summandNode) throws MC3KitException {
     return add(summandNode, 1.0);
   }
   
-  public <T extends ModelNode & DoubleValued> DoubleSumFunction add(T summandNode, double coeff) throws MC3KitException {
+  public DoubleSumFunction add(DoubleValued summandNode, double coeff) throws MC3KitException {
     if(summandMap.containsKey(summandNode)) {
       throw new IllegalArgumentException("Summand already present.");
     }
     
-    ModelEdge edge = new ModelEdge(getModel(), this, summandNode);
+    ModelEdge edge = getModel().addEdge(this, (ModelNode)summandNode);
     Summand summand = new Summand(edge, coeff);
     summandMap.put(summandNode, summand);
     
-    return this;
-  }
-  
-  public <T extends ModelNode & DoubleValued> DoubleSumFunction remove(T summandNode) throws MC3KitException {
-    Summand summand = summandMap.remove(summandNode);
-    if(summand == null) {
-      throw new IllegalArgumentException("Summand not present.");
-    }
-    getModel().removeEdge(summand.edge);
     return this;
   }
   
