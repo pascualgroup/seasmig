@@ -64,6 +64,119 @@ public class Util {
 		return returnValue;
 	}
 
+//	def calc_nuc_q_matrix(rmatrix,basefreq):
+//	bigpi = ones((4,4))
+//	count = 0
+//	for i in bigpi:
+//		count2 = 0
+//		for j in i:
+//			if count != count2:
+//				bigpi[count][count2] = basefreq[count] * basefreq[count2]
+//			else:
+//				bigpi[count][count2] = basefreq[count]
+//			count2 += 1
+//		count += 1
+//	t = rmatrix * bigpi
+//	count = 0
+//	fill_diagonal(t,0)
+//	tscale = sum(t)
+//	t= t/tscale
+//	#make it so the diags make the rows sum to 0
+//	for i in t:
+//		t[count][count] = 0-sum(i)
+//		count += 1
+//	t = t/basefreq
+//	t = transpose(t)
+//	return t
+	
+	static public double[][] calcQMatrix(double[][] rMatrix, double[] basefreq) {
+		int n = rMatrix.length;
+		double[][] piMatrix = ones(n,n);				
+		int count=0;
+		for (int i=0;i<n;i++) {
+			int count2=0;
+			for (int j=0;j<n;j++) {
+				if (count!=count2) 
+					piMatrix[count][count2]=basefreq[count]*basefreq[count2];
+				else 
+					piMatrix[count][count2]=basefreq[count];
+				count2+=1;				
+			}
+			count+=1;
+		}
+		double[][] t = mul(rMatrix, piMatrix);
+		count = 0;
+		fillDiagonal(t,0.0);				
+		double tscale = sum(t);
+		// make it so the diags make the rows sum to 0
+		for (int i=0;i<n;i++) {
+			t[i][i]=0.0-sum(t[i]);
+			count+=1;
+		}
+		div(t,basefreq);
+		return t; // TODO: transpose		
+	}
+	
+	
+	private static void div(double[][] t, double[] basefreq) {
+		int n = t.length;
+		for (int i=0;i<n;i++){
+			for (int j=0;j<n;j++){
+				t[i][j]=t[i][j]/basefreq[j];
+			}
+		}
+	}
+
+	private static double sum(double[] vector) {
+		double returnValue=0;
+		for (int i=0;i<vector.length;i++){
+			returnValue+=vector[i];			
+		}
+		return returnValue;
+	}
+
+	private static double sum(double[][] t) {
+		int n = t.length;
+		int m = t[0].length;
+		double returnValue=0;
+		for (int i=0;i<n;i++){
+			for (int j=0;j<m;j++){
+				returnValue+=t[i][j];
+			}
+		}
+		return returnValue;
+	}
+
+	private static void fillDiagonal(double[][] t, double d) {
+		for (int i=0;i<t.length;i++){
+			t[i][i]=d;
+		}	
+	}
+
+	private static double[][] mul(double[][] a, double[][] b) {
+		int n = a.length;
+		int m = a[0].length;
+		double[][] returnValue = new double[n][m];
+		for (int i=0;i<n;i++){
+			for (int j=0;j<m;j++){
+				returnValue[i][j]=a[i][j]*b[i][j];
+			}
+		}
+		return returnValue;
+	}
+
+
+	static public double[][] ones(int n, int m) {
+		double[][] returnValue = new double[n][m];
+		for (int i=0;i<n;i++){
+			for (int j=0;j<m;j++){
+				returnValue[i][j]=1.0;
+			}
+		}
+		return returnValue;
+	}
+	
+
 
 	public static FRexpResult log2(double value)
 	{
