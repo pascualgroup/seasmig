@@ -108,16 +108,26 @@ public class Util {
 		count = 0;
 		fillDiagonal(t,0.0);				
 		double tscale = sum(t);
+		div(t,tscale);
 		// make it so the diags make the rows sum to 0
 		for (int i=0;i<n;i++) {
 			t[i][i]=0.0-sum(t[i]);
 			count+=1;
 		}
 		div(t,basefreq);
-		return t; // TODO: transpose		
+		transposeSquareMatrix(t);
+		return t; 		
 	}
 	
-	
+	private static void div(double[][] t, double tscale) {
+		int n = t.length;
+		for (int i=0;i<n;i++){
+			for (int j=0;j<n;j++){
+				t[i][j]=t[i][j]/tscale;
+			}
+		}	
+	}
+
 	private static void div(double[][] t, double[] basefreq) {
 		int n = t.length;
 		for (int i=0;i<n;i++){
@@ -236,6 +246,19 @@ public class Util {
 			newValue=max;
 		}
 		return newValue;
+	}
+
+	public static void transposeSquareMatrix(double[][] mat) {	
+		int n = mat.length;		
+		for (int i=0;i<n;i++){
+			for (int j=0;j<n;j++){
+				if (i!=j) {
+					double temp=mat[i][j];
+					mat[i][j]=mat[j][i];
+					mat[j][i]=temp;
+				}
+			}
+		}			
 	}
 
 

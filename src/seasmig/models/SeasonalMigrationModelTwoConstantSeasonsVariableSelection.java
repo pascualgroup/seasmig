@@ -5,6 +5,7 @@ import seasmig.Data;
 import seasmig.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
+import seasmig.util.Util;
 import mc3kit.*;
 import mc3kit.distributions.*;
 
@@ -158,6 +159,11 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 				rates2doubleForm[i][i]=rowsum2;
 			}
 
+			// TODO: check this...
+			Util.transposeSquareMatrix(rates1doubleForm);
+			Util.transposeSquareMatrix(rates2doubleForm);
+			
+			
 			// TODO: add update to migration model instead of reconstructing...
 			if (fixedPhase && fixedPhaseLength) {
 				seasonStart=config.fixedPhase;	

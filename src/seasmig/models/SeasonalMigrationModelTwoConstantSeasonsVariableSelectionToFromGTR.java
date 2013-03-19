@@ -8,8 +8,12 @@ import seasmig.Data;
 import seasmig.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
+import seasmig.util.Util;
 import mc3kit.*;
 import mc3kit.distributions.*;
+
+// TODO: 
+// Cleanup + check GTR
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionToFromGTR extends Model {
@@ -249,6 +253,10 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionToFromGTR 
 				rates1doubleForm=newRates1doubleForm;
 				rates2doubleForm=newRates2doubleForm;	
 			}
+			
+			// TODO: check this...
+			Util.transposeSquareMatrix(rates1doubleForm);
+			Util.transposeSquareMatrix(rates2doubleForm);
 
 			// TODO: add update to migration model instead of reconstructing...
 			if (!fixedPhase)
