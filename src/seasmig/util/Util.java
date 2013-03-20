@@ -90,52 +90,52 @@ public class Util {
 //	return t
 	
 	static public double[][] calcQMatrix(double[][] rMatrix, double[] basefreq) {
+		// TODO: check this
 		int n = rMatrix.length;
+		
 		double[][] piMatrix = ones(n,n);				
-		int count=0;
 		for (int i=0;i<n;i++) {
-			int count2=0;
 			for (int j=0;j<n;j++) {
-				if (count!=count2) 
-					piMatrix[count][count2]=basefreq[count]*basefreq[count2];
-				else 
-					piMatrix[count][count2]=basefreq[count];
-				count2+=1;				
+				if (i!=j) {
+					piMatrix[i][j]=basefreq[i]*basefreq[j];
+				}
+				else {
+					piMatrix[i][j]=basefreq[i];	
+				}
 			}
-			count+=1;
 		}
+		
 		double[][] t = mul(rMatrix, piMatrix);
-		count = 0;
-		fillDiagonal(t,0.0);				
+	
+		//	fillDiagonal of t with zeros;
+		for (int i=0;i<n;i++)
+			t[i][i]=0;
+					
 		double tscale = sum(t);
-		div(t,tscale);
+		
+		// t=t/tscale
+		for (int i=0;i<n;i++) {
+			for (int j=0;j<n;j++) {
+				t[i][j]=t[i][j]/tscale;
+			}
+		}
+		
 		// make it so the diags make the rows sum to 0
 		for (int i=0;i<n;i++) {
 			t[i][i]=0.0-sum(t[i]);
-			count+=1;
 		}
-		div(t,basefreq);
-		transposeSquareMatrix(t);
-		return t; 		
-	}
-	
-	private static void div(double[][] t, double tscale) {
-		int n = t.length;
-		for (int i=0;i<n;i++){
-			for (int j=0;j<n;j++){
-				t[i][j]=t[i][j]/tscale;
-			}
-		}	
-	}
-
-	private static void div(double[][] t, double[] basefreq) {
-		int n = t.length;
+		
+		// t = t / basefreq
 		for (int i=0;i<n;i++){
 			for (int j=0;j<n;j++){
 				t[i][j]=t[i][j]/basefreq[j];
 			}
 		}
+	
+		transposeSquareMatrix(t);
+		return t; 		
 	}
+	
 
 	private static double sum(double[] vector) {
 		double returnValue=0;
@@ -155,12 +155,6 @@ public class Util {
 			}
 		}
 		return returnValue;
-	}
-
-	private static void fillDiagonal(double[][] t, double d) {
-		for (int i=0;i<t.length;i++){
-			t[i][i]=d;
-		}	
 	}
 
 	private static double[][] mul(double[][] a, double[][] b) {
@@ -186,8 +180,6 @@ public class Util {
 		return returnValue;
 	}
 	
-
-
 	public static FRexpResult log2(double value)
 	{
 		final FRexpResult result = new FRexpResult();
