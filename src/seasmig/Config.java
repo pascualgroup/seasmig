@@ -29,9 +29,7 @@ public class Config implements Serializable
 	   VARIABLE_SELECTION,     // (1-DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season1 
 		  					  // (1+DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season2};
 	   VARIABLE_SELECTION_TO,
-	   VARIABLE_SELECTION_FROM,	   
-	   VARIABLE_SELECTION_INDIVIDUAL_FROM_TO, 
-	   VARIABLE_SELECTION_INDIVIDUAL_FROM_TO_GTR
+	   VARIABLE_SELECTION_FROM	   
 	}
 	public static enum TwoConstantSeasonsPhase { FIXED_PHASE_FIXED_LENGTH, FREE_PHASE_FREE_LENGTH, FIXED_PHASE_FREE_LENGTH, FREE_PHASE_FIXED_LENGTH };
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 

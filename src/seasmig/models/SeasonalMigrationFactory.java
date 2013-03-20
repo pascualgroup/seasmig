@@ -54,10 +54,6 @@ public class SeasonalMigrationFactory implements ModelFactory
 			}
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION)
 				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelection(initialChain,config,data,fixPhase,fixLength);
-			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION_INDIVIDUAL_FROM_TO)
-				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelectionToFromGTR(initialChain,config,data,fixPhase,true,true,true,false);			
-			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION_INDIVIDUAL_FROM_TO_GTR)
-				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelectionToFromGTR(initialChain,config,data,fixPhase,true,true,true,true);
 			
 			boolean fixTo = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF;
 			boolean fixFrom = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF;
