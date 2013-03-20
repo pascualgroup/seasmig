@@ -63,34 +63,9 @@ public class Util {
 		returnValue+="}";
 		return returnValue;
 	}
-
-//	def calc_nuc_q_matrix(rmatrix,basefreq):
-//	bigpi = ones((4,4))
-//	count = 0
-//	for i in bigpi:
-//		count2 = 0
-//		for j in i:
-//			if count != count2:
-//				bigpi[count][count2] = basefreq[count] * basefreq[count2]
-//			else:
-//				bigpi[count][count2] = basefreq[count]
-//			count2 += 1
-//		count += 1
-//	t = rmatrix * bigpi
-//	count = 0
-//	fill_diagonal(t,0)
-//	tscale = sum(t)
-//	t= t/tscale
-//	#make it so the diags make the rows sum to 0
-//	for i in t:
-//		t[count][count] = 0-sum(i)
-//		count += 1
-//	t = t/basefreq
-//	t = transpose(t)
-//	return t
 	
-	static public double[][] calcQMatrix(double[][] rMatrix, double[] basefreq /* will be normalized */) {
-		// TODO: check this
+	static public double[][] calcQMatrix(double[][] rMatrix, double[] basefreq) {
+		
 		int n = rMatrix.length;
 		
 		double[][] piMatrix = new double[n][n];				
@@ -136,7 +111,7 @@ public class Util {
 		// t=transpose(t)
 		for (int i=0;i<n;i++){
 			for (int j=0;j<n;j++){
-				if (i!=j) {
+				if (i>j) {
 					double temp=t[i][j];
 					t[i][j]=t[j][i];
 					t[j][i]=temp;
@@ -175,17 +150,6 @@ public class Util {
 		for (int i=0;i<n;i++){
 			for (int j=0;j<m;j++){
 				returnValue[i][j]=a[i][j]*b[i][j];
-			}
-		}
-		return returnValue;
-	}
-
-
-	static public double[][] ones(int n, int m) {
-		double[][] returnValue = new double[n][m];
-		for (int i=0;i<n;i++){
-			for (int j=0;j<m;j++){
-				returnValue[i][j]=1.0;
 			}
 		}
 		return returnValue;
