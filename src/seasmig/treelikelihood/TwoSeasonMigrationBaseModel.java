@@ -128,4 +128,12 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 		return "Two Seasons";
 	}
 
+	@Override
+	public double[] rootfreq(double when) {
+		if (isInSeason1(when))
+			return season1MigrationModel.rootfreq(when);
+		else
+			return season2MigrationModel.rootfreq(when);
+	}
+
 }

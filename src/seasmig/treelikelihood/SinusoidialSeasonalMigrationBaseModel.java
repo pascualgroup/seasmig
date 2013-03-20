@@ -91,4 +91,10 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 		return "Sinusoidial Seasonal";
 	}
 
+	@Override
+	public double[] rootfreq(double when) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -11,4 +11,5 @@ public interface MigrationBaseModel extends Serializable {
 	public String parse();
 	public String getModelName();
 	public double[] probability(int from_location, double from_time, double to_time);
+	public double[] rootfreq(double when);
 }

@@ -10,6 +10,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Precision Parameter
 	static final double timePrecision = 1.0E-5;
+	static final double veryLongTime = 1000;
 
 	// Rate Matrix  
 	double[][] Q;
@@ -20,7 +21,9 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	final static int maxCachedTransitionMatrices=16000;
 
 	// Matrix Exponentiation
-	MatrixExponentiator matrixExponentiator;	
+	MatrixExponentiator matrixExponentiator;
+
+	private double[] basefreq;	
 
 	protected ConstantMigrationBaseModel() {};
 	
@@ -44,7 +47,8 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		default:
 			matrixExponentiator=new Matlab7MatrixExp(Q);	
 		}
-		
+		// TODO: Maybe use other method to get s.s. freq 
+		basefreq=matrixExponentiator.expm(veryLongTime)[1];	
 	}
 
 	// Methods
@@ -142,6 +146,11 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			return cached[from_location];		
 		else 		
 			return transitionMatrix(from_time, to_time)[from_location];	
+	}
+
+	@Override
+	public double[] rootfreq(double when) {
+		return basefreq;
 	}
 
 }

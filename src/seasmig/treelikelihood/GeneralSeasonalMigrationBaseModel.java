@@ -11,7 +11,7 @@ import cern.colt.matrix.DoubleMatrix2D;
 @SuppressWarnings("serial")
 public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check this...
-	// TODO: Failes degeneracy test....
+	// TODO: Fails degeneracy test....
 	
 	// Precision Parameter
 	static final double timePrecision = 1E-5;
@@ -151,6 +151,12 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	@Override
 	public String getModelName() {		
 		return "General Seasonal";
+	}
+
+	@Override
+	public double[] rootfreq(double when) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -25,7 +25,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	int num_locations = 0;
 	private MigrationBaseModel likelihoodModel = null;
 	private int UNKNOWN_LOCATION;
-	private int numIdentifiedLocations; 
+	private int numIdentifiedLocations;
+	private double[] baselogfreq; 
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
@@ -103,6 +104,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		if (root.location==UNKNOWN_LOCATION) {
 			for (int rootLocation=0;rootLocation<num_locations;rootLocation++) {				
 				double alpha=conditionalLogLikelihood(root, rootLocation);
+				if (baselogfreq!=null) alpha+=baselogfreq[rootLocation];
 				if (Double.isNaN(alpha))  
 					alpha=Util.minNegative;
 				alphas[rootLocation]=alpha;	
