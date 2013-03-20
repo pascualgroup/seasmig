@@ -22,8 +22,6 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 	BinaryVariable[][] diffIndicators;
 	DoubleVariable[] locationPopSize1;
 	DoubleVariable[] locationPopSize2;
-	DoubleVariable mu1;
-	DoubleVariable mu2;
 	
 	DoubleVariable seasonalPhase;
 	DoubleVariable seasonalLength;
@@ -40,7 +38,6 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 
 	public SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixedPhaseLength) throws MC3KitException
 	{
-		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
 
 		this.config = config;
@@ -89,8 +86,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 		}
 
 		for (int i=0; i<numLocations; i++) {
-			locationPopSize1[i] = new DoubleVariable(this, "locationPopSize",new UniformDistribution(this,0.0,1.0));
-			locationPopSize2[i] = new DoubleVariable(this, "locationPopSize",new UniformDistribution(this,0.0,1.0));
+			locationPopSize1[i] = new DoubleVariable(this, "locationPopSize1",new UniformDistribution(this,0.0,1.0));
+			locationPopSize2[i] = new DoubleVariable(this, "locationPopSize2",new UniformDistribution(this,0.0,1.0));
 		}
 		
 		// Custom likelihood variable

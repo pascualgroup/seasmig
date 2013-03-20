@@ -29,7 +29,8 @@ public class Config implements Serializable
 	   VARIABLE_SELECTION,     // (1-DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season1 
 		  					  // (1+DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season2};
 	   VARIABLE_SELECTION_TO,
-	   VARIABLE_SELECTION_FROM	   
+	   VARIABLE_SELECTION_FROM, 
+	   VARIABLE_SELECTION_GTR	   
 	}
 	public static enum TwoConstantSeasonsPhase { FIXED_PHASE_FIXED_LENGTH, FREE_PHASE_FREE_LENGTH, FIXED_PHASE_FREE_LENGTH, FREE_PHASE_FIXED_LENGTH };
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
@@ -63,7 +64,7 @@ public class Config implements Serializable
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
-	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION; 
+	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION_GTR; 
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FREE_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION...
 	public double fixedPhase = 0.12;
 	public int[][] fixSome = {{0,1},{1,0},{2,0},{2,1}};
