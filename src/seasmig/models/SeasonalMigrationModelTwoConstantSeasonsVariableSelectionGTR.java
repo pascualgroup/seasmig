@@ -22,6 +22,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 	BinaryVariable[][] diffIndicators;
 	DoubleVariable[] locationPopSize1;
 	DoubleVariable[] locationPopSize2;
+	DoubleVariable mu1;
+	DoubleVariable mu2;
 	
 	DoubleVariable seasonalPhase;
 	DoubleVariable seasonalLength;

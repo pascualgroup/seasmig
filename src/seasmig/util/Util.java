@@ -89,7 +89,7 @@ public class Util {
 //	t = transpose(t)
 //	return t
 	
-	static public double[][] calcQMatrix(double[][] rMatrix, double[] basefreq) {
+	static public double[][] calcQMatrix(double[][] rMatrix, double[] basefreq /* will be normalized */) {
 		// TODO: check this
 		int n = rMatrix.length;
 		
@@ -250,5 +250,6 @@ public class Util {
 		}
 		return newValue;
 	}
+
 
 }

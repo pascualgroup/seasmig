@@ -102,6 +102,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		double[] alphas=new double[num_locations];
 		double min = Double.POSITIVE_INFINITY;
 		if (root.location==UNKNOWN_LOCATION) {
+			baselogfreq=likelihoodModel.rootfreq(root.time);
 			for (int rootLocation=0;rootLocation<num_locations;rootLocation++) {				
 				double alpha=conditionalLogLikelihood(root, rootLocation);
 				if (baselogfreq!=null) alpha+=baselogfreq[rootLocation];
@@ -289,8 +290,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		public Node(int location_, double time_, int num_locations_) {
 			location=location_;
 			time=time_;
-			// TODO: add caching of unknown states...
-			// TODO: change to a throw phrase...
 			if (location>=num_locations_ && location!=UNKNOWN_LOCATION) {
 				System.err.println("error creating node with location: "+location+" out of range: 0<location<"+(num_locations-1));		
 			}
