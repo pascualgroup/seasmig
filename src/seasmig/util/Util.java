@@ -93,7 +93,7 @@ public class Util {
 		// TODO: check this
 		int n = rMatrix.length;
 		
-		double[][] piMatrix = ones(n,n);				
+		double[][] piMatrix = new double[n][n];				
 		for (int i=0;i<n;i++) {
 			for (int j=0;j<n;j++) {
 				if (i!=j) {
@@ -105,9 +105,10 @@ public class Util {
 			}
 		}
 		
+		// t = R*Pi
 		double[][] t = mul(rMatrix, piMatrix);
 	
-		//	fillDiagonal of t with zeros;
+		// fillDiagonal of t with zeros;
 		for (int i=0;i<n;i++)
 			t[i][i]=0;
 					
@@ -132,7 +133,17 @@ public class Util {
 			}
 		}
 	
-		transposeSquareMatrix(t);
+		// t=transpose(t)
+		for (int i=0;i<n;i++){
+			for (int j=0;j<n;j++){
+				if (i!=j) {
+					double temp=t[i][j];
+					t[i][j]=t[j][i];
+					t[j][i]=temp;
+				}
+			}
+		}	
+		
 		return t; 		
 	}
 	
@@ -239,19 +250,5 @@ public class Util {
 		}
 		return newValue;
 	}
-
-	public static void transposeSquareMatrix(double[][] mat) {	
-		int n = mat.length;		
-		for (int i=0;i<n;i++){
-			for (int j=0;j<n;j++){
-				if (i!=j) {
-					double temp=mat[i][j];
-					mat[i][j]=mat[j][i];
-					mat[j][i]=temp;
-				}
-			}
-		}			
-	}
-
 
 }

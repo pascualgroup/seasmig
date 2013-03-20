@@ -183,10 +183,6 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 				rates2doubleForm[i][i]=rowsum2;		
 			}
 
-			// TODO: check this...
-			Util.transposeSquareMatrix(rates1doubleForm);
-			Util.transposeSquareMatrix(rates2doubleForm);
-
 			// TODO: add update to migration model instead of reconstructing...
 			if (!fixedPhase)
 				seasonalPhaseRealization=seasonalPhase.getValue();

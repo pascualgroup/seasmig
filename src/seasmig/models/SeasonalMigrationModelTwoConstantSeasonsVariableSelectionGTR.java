@@ -20,7 +20,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] diffMultipliers;
 	BinaryVariable[][] diffIndicators;
-	DoubleVariable[] baseFreqPre;
+	DoubleVariable[] locationPopSize1;
+	DoubleVariable[] locationPopSize2;
 	
 	DoubleVariable seasonalPhase;
 	DoubleVariable seasonalLength;
@@ -50,7 +51,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 
 		diffMultipliers = new DoubleVariable[numLocations][numLocations];
 		diffIndicators = new BinaryVariable[numLocations][numLocations];
-		baseFreqPre = new DoubleVariable[numLocations-1];
+		locationPopSize1 = new DoubleVariable[numLocations];
+		locationPopSize2 = new DoubleVariable[numLocations];
 		
 		beginConstruction();
 
@@ -84,8 +86,9 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 			}		
 		}
 
-		for (int i=0; i<numLocations-1; i++) {
-			baseFreqPre[i] = new DoubleVariable(this, "baseFreqPreDirch",new UniformDistribution(this,0.0,1.0));
+		for (int i=0; i<numLocations; i++) {
+			locationPopSize1[i] = new DoubleVariable(this, "locationPopSize",new UniformDistribution(this,0.0,1.0));
+			locationPopSize2[i] = new DoubleVariable(this, "locationPopSize",new UniformDistribution(this,0.0,1.0));
 		}
 		
 		// Custom likelihood variable
@@ -120,8 +123,9 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 				}
 			}
 			
-			for(int i = 0; i <numLocations-1; i++) {
-				m.addEdge(this,baseFreqPre[i]);
+			for(int i = 0; i <numLocations; i++) {
+				m.addEdge(this,locationPopSize1[i]);
+				m.addEdge(this,locationPopSize2[i]);
 			}
 		}
 
@@ -151,7 +155,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 				double rowsum1=0;
 				double rowsum2=0;
 				for (int j=0;j<numLocations;j++) {
-					if (i!=j) {
+					if (i>j) {
 						if (diffIndicators[i][j].getValue()==true) {
 							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
 							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
@@ -160,6 +164,18 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 							rates1doubleForm[i][j]=rates[i][j].getValue();
 							rates2doubleForm[i][j]=rates[i][j].getValue();
 						}
+					}
+					else if (j>i) {
+						if (diffIndicators[j][i].getValue()==true) {
+							rates1doubleForm[i][j]=rates[j][i].getValue()*(1-diffMultipliers[j][i].getValue());
+							rates2doubleForm[i][j]=rates[j][i].getValue()*(1+diffMultipliers[j][i].getValue());
+						}
+						else {
+							rates1doubleForm[i][j]=rates[j][i].getValue();
+							rates2doubleForm[i][j]=rates[j][i].getValue();
+						}
+					}
+					if (i!=j) {
 						rowsum1-=rates1doubleForm[i][j];
 						rowsum2-=rates2doubleForm[i][j];
 					}
@@ -168,9 +184,16 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 				rates2doubleForm[i][i]=rowsum2;
 			}
 
-			// TODO: check this...
-			Util.transposeSquareMatrix(rates1doubleForm);
-			Util.transposeSquareMatrix(rates2doubleForm);
+			// Generate b vector
+			double[] b1 = new double[numLocations];
+			double[] b2 = new double[numLocations];
+			for (int i=0;i<numLocations;i++) {
+				b1[i]=locationPopSize1[i].getValue();
+				b2[i]=locationPopSize2[i].getValue();
+			}
+			
+			double[][] Q1 = Util.calcQMatrix(rates1doubleForm, b1);
+			double[][] Q2 = Util.calcQMatrix(rates2doubleForm, b2);
 			
 			// TODO: add update to migration model instead of reconstructing...
 			if (fixedPhase && fixedPhaseLength) {
@@ -202,7 +225,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 				}			
 			}			
 			
-			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonStart,seasonEnd);
+			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(Q1,Q2,seasonStart,seasonEnd);
 			LikelihoodTree workingCopy = data.getTrees().get((int)treeIndex.getValue()).copy(); 
 			workingCopy.setLikelihoodModel(migrationBaseModel);
 			logLikelihood=workingCopy.logLikelihood();								

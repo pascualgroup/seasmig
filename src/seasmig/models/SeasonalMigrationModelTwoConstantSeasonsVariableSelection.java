@@ -158,11 +158,6 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 				rates1doubleForm[i][i]=rowsum1;
 				rates2doubleForm[i][i]=rowsum2;
 			}
-
-			// TODO: check this...
-			Util.transposeSquareMatrix(rates1doubleForm);
-			Util.transposeSquareMatrix(rates2doubleForm);
-			
 			
 			// TODO: add update to migration model instead of reconstructing...
 			if (fixedPhase && fixedPhaseLength) {
