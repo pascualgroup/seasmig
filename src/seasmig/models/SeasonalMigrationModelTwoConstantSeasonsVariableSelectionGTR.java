@@ -73,6 +73,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 		}
 		
 		DoubleDistribution ratePriorDist = new ExponentialDistribution(this,1.0);
+		DoubleDistribution popPriorDist = new ExponentialDistribution(this,1.0);
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 		BinaryDistribution diffIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
 		
@@ -86,8 +87,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 		}
 
 		for (int i=0; i<numLocations; i++) {
-			locationPopSize1[i] = new DoubleVariable(this, "locationPopSize1."+Integer.toString(i),new UniformDistribution(this,0.0,1.0));
-			locationPopSize2[i] = new DoubleVariable(this, "locationPopSize2."+Integer.toString(i),new UniformDistribution(this,0.0,1.0));
+			locationPopSize1[i] = new DoubleVariable(this, "locationPopSize1."+Integer.toString(i),popPriorDist);
+			locationPopSize2[i] = new DoubleVariable(this, "locationPopSize2."+Integer.toString(i),popPriorDist);
 		}
 		
 		// Custom likelihood variable
@@ -115,7 +116,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 
 			for(int i = 0; i < numLocations; i++) {
 				for(int j = 0; j < numLocations; j++) {
-					if (i>j) continue;
+					if (i>=j) continue;
 					m.addEdge(this,rates[i][j]);
 					m.addEdge(this,diffMultipliers[i][j]);
 					m.addEdge(this,diffIndicators[i][j]);
@@ -154,7 +155,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 				double rowsum1=0;
 				double rowsum2=0;
 				for (int j=0;j<numLocations;j++) {
-					if (i>j) {
+					if (i<j) {
 						if (diffIndicators[i][j].getValue()==true) {
 							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
 							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
@@ -164,7 +165,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 							rates2doubleForm[i][j]=rates[i][j].getValue();
 						}
 					}
-					else if (j>i) {
+					else if (j<i) {
 						if (diffIndicators[j][i].getValue()==true) {
 							rates1doubleForm[i][j]=rates[j][i].getValue()*(1-diffMultipliers[j][i].getValue());
 							rates2doubleForm[i][j]=rates[j][i].getValue()*(1+diffMultipliers[j][i].getValue());
