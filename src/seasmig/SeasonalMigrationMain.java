@@ -24,7 +24,7 @@ public class SeasonalMigrationMain
 {
 	public static void main(String[] args) throws Throwable
 	{
-		// Load config  
+		// Load config
 		System.out.print("Loading config file... ");
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		Config config = null;
