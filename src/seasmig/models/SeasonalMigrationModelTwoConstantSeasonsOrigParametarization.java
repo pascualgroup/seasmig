@@ -5,7 +5,6 @@ import seasmig.Data;
 import seasmig.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
-import seasmig.util.Util;
 import mc3kit.*;
 import mc3kit.distributions.*;
 

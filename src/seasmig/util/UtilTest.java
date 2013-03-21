@@ -1,6 +1,5 @@
 package seasmig.util;
 
-import java.util.*;
 import static org.junit.Assert.*;
 
 import org.junit.*;
