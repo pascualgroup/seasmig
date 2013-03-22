@@ -320,6 +320,7 @@ public class TestData implements Data {
 		testFile.createNewFile();
 		PrintStream testStream = new PrintStream(testFile);
 		testStream.print(createModel.parse());
+		testStream.println();
 		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");
 		testStream.close();
 
