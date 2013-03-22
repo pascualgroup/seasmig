@@ -8,6 +8,8 @@ import org.javatuples.Pair;
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
 
+//TODO: test multiplication order... ok for Q where rows sum to 1
+
 
 @SuppressWarnings("serial")
 public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {

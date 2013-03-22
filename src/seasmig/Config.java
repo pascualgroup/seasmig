@@ -45,7 +45,7 @@ public class Config implements Serializable
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String mlFilename = "ml.txt";
 	public long checkpointEvery = 150;
-	public long thin = 50;
+	public long thin = 10;
 	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 200; 	// in iterations	
@@ -64,7 +64,7 @@ public class Config implements Serializable
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
-	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION; 
+	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION...
 	public double fixedPhase = 0.12;
 	public int[][] fixSome = {{0,1},{1,0},{2,0},{2,1}};

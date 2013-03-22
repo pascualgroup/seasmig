@@ -12,6 +12,7 @@ import cern.colt.matrix.DoubleMatrix2D;
 public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check this...
 	// TODO: Fails degeneracy test....
+	// TODO: Check zMult order... sould be ok for Q where rows sum to 1...
 	
 	// Precision Parameter
 	static final double timePrecision = 1E-5;
@@ -20,7 +21,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	static final int maxCachedTransitionMatrices = 16000;
 
 	// Precision Parameters
-	static final int nYearParts = 36;
+	static final int nYearParts = 3;
 	// Figure out reason why changing nYearParts can generate an error...
 	
 	// Origin Model
