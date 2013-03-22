@@ -3,7 +3,9 @@ package seasmig.data;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -129,7 +131,7 @@ public class TestData implements Data {
 				System.err.println("Migration Seasonality: "+config.migrationSeasonality+" not implemented for this configuration!!!");
 				System.exit(-1);
 			}
-
+			
 			for (int i=0;i<numTestTrees;i++) {
 				TreeWithLocations testTree = new TreeWithLocations(createModel,numTestTips);
 				testTree.removeInternalLocations();
@@ -151,7 +153,6 @@ public class TestData implements Data {
 			for (int i=0; i<numTestRepeats; i++) {
 				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,disturbanceScale*i/3,1),disturbMigrationMatrix(phases,disturbanceScale*i/3,1)));
 			}
-			System.out.println(" generated "+testModels.size()+" test models");
 			break;
 
 		case TEST_USING_INPUT_TREES:{
@@ -213,22 +214,7 @@ public class TestData implements Data {
 				trees.add(testTree);				
 			}
 
-			System.out.println("Generated "+trees.size()+" model based random tip annotations with input tree topology");
-			System.out.print("Generating test models... ");
-
-			testModels = new ArrayList<MigrationBaseModel>();
-
-			for (int i=0; i<numTestRepeats; i++) {
-				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, disturbanceScale*i,99999)));
-			}
-			for (int i=0; i<numTestRepeats; i++) {
-				double phase = Math.max(0,Math.min(1,0.3+i/3*(Random.nextDouble()-0.5))); double length = 0.5;
-				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,disturbanceScale*i/3,99999),phase, phase+length));
-			}
-			for (int i=0; i<numTestRepeats; i++) {
-				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,disturbanceScale*i/3,1),disturbMigrationMatrix(phases,disturbanceScale*i/3,1)));
-			}
-			System.out.println(" generated "+testModels.size()+" test models");
+			System.out.println("Generated "+trees.size()+" trees with random tip annotations and input tree topology");
 
 		}
 		break;
@@ -327,6 +313,15 @@ public class TestData implements Data {
 		break;
 
 		}
+		
+		// Creating test file 
+		File testFile = new File("out.test");
+		testFile.delete();
+		testFile.createNewFile();
+		PrintStream testStream = new PrintStream(testFile);
+		testStream.print(createModel.parse());
+		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");
+		testStream.close();
 
 	}
 

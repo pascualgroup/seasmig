@@ -50,7 +50,7 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 
 	// Methods
 	@Override
-	public double logprobability(int from_state, int to_state, double from_time, double to_time) {		
+	public double logprobability(int from_state, int to_state, double from_time, double to_time) {	
 		return Math.log(transitionMatrix(from_time, to_time)[from_state][to_state]);
 	}
 	
@@ -95,7 +95,7 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
 			}			
 			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),result);
-
+			
 			return result.toArray();
 		}
 	}

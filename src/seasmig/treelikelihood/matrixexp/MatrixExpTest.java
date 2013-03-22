@@ -277,10 +277,6 @@ public class MatrixExpTest {
 		Data data = new TestData(config,TestType.TEST_MODEL_DEGENERACY,3,3,10);
 
 		// Creating test file 
-		File testFile = new File("out.test");
-		testFile.delete();
-		testFile.createNewFile();
-		PrintStream testStream = new PrintStream(testFile);
 		System.out.println("Calculating tree likelihood using degenerate models:");				
         double[] results = new double[((TestData) data).testModels.size()];
 
@@ -300,9 +296,6 @@ public class MatrixExpTest {
 			long duration= System.currentTimeMillis()-startTime;
 			System.out.println("duration: "+duration+"ms");
 		}
-		
-		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");
-		testStream.close();
 				
 		for (int i=1;i<results.length;i++) {
 			assertEquals(results[i],results[i-1], 1E-3);			

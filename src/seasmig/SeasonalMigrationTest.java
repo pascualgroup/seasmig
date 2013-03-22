@@ -7,13 +7,25 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.GregorianCalendar;
+
 import jebl.evolution.io.ImportException;
+import mc3kit.ChainParity;
+import mc3kit.MCMC;
+import mc3kit.Step;
+import mc3kit.SwapStep;
+import mc3kit.VerificationStep;
+import mc3kit.monitoring.MarginalLikelihoodStep;
+import mc3kit.output.PriorLikelihoodOutputStep;
+import mc3kit.output.SampleOutputStep;
+import mc3kit.proposal.DEMCProposalStep;
+import mc3kit.proposal.UnivariateProposalStep;
 
 import org.junit.Test;
 
 import seasmig.data.TestData;
 import seasmig.data.TestData.TestType;
-import seasmig.treelikelihood.*;
+import seasmig.models.SeasonalMigrationFactory;
+import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 import seasmig.treelikelihood.matrixexp.JamaMolerMatrixExp;
@@ -26,11 +38,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class SeasonalMigrationTest {
-// TODO: Implement this...	
-	
+	// TODO: Implement this...	
+
 	private static int numTestRepeats = 100;
 	private static int numLocations = 3;
-	
+
 	@Test
 	public void testMatrixExponentiation() {
 		System.out.println("Testing matrix exponentiation:");
@@ -139,7 +151,7 @@ public class SeasonalMigrationTest {
 			}
 		}
 		long time5= System.currentTimeMillis()-startTime5;
-		
+
 		long time6 = 0;
 		if (numLocations==3) {
 			long startTime6= System.currentTimeMillis();		
@@ -165,7 +177,7 @@ public class SeasonalMigrationTest {
 			}
 			time6= System.currentTimeMillis()-startTime6;
 		}
-	
+
 
 		System.out.println("\nMolerMatrixExp: "+time1+"ms");
 		System.out.println("Matlab7MatrixExp: "+time2+"ms");
@@ -179,77 +191,149 @@ public class SeasonalMigrationTest {
 
 	}
 
-//	@Test
-//	public void testMain() throws Throwable
-//	{
-//		// Load config
-//		System.out.print("Loading config file... ");
-//		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//		Config config = null;
-//		try {
-//			config = gson.fromJson(new FileReader("config.json"), Config.class);
-//			System.out.println(" done");
-//		}
-//		catch(Throwable e)	{
-//			config=new Config();
-//			System.out.println("config.json file not found, using default config. See out.config.json for details");			
-//		}			
-//
-//		System.out.print("Writing full config options to out.config...");
-//		config.outputToFile("out.config",gson);
-//		System.out.println(" done");
-//
-//		// Load data files and prepare data....			
-//		Data data = new TestData(config,)
-//
-//		// Setup MCMC
-//		System.out.print("Setting up MCMC....");
-//		MCMC mcmc = new MCMC();
-//		mcmc.setRandomSeed(config.randomSeed); // TODO: check that this changes...
-//
-//		MCMC.setLogLevel(config.logLevel);
-//
-//		ModelFactory mf = new SeasonalMigrationFactory(config, data) {
-//			@Override
-//			public Model createModel(Chain initialChain) throws MC3KitException {
-//				Model m = new Model(initialChain);
-//
-//				m.beginConstruction();
-//				new IntVariable(m, "v", new UniformIntDistribution(m, 1,4));
-//				m.endConstruction();
-//
-//				return m;
-//			}
-//		};
-//
-//		mcmc.setModelFactory(mf);
-//
-//		UnivariateProposalStep proposalStep = new UnivariateProposalStep(0.25, 100, config.burnIn);
-//		mcmc.addStep(proposalStep);
-//
-//		System.out.println(" done!");
-//		// Run, collect statistics, and check moments against expected distribution
-//
-//		System.out.println("Running MCMC...");
-//
-//		System.out.println("state\tlikelihood\thours/million states");
-//		double sum = 0;
-//		for(long i = 0; i < config.iterCount; i++) {
-//			mcmc.step();
-//			mcmc.getModel().recalculate();
-//
-//			assertEquals(i + 1, mcmc.getIterationCount());
-//
-//			if(i >= config.burnIn) {
-//				int val = mcmc.getModel().getIntVariable("v").getValue();
-//				sum += val;
-//			}
-//		}
-//
-//		double N = config.iterCount - config.burnIn;
-//		System.out.println(sum/N);		
-//		System.out.println("done!");	
-//	}
+	@Test
+	public void testMain() {
+
+		// Load config   
+		System.out.print("Loading config file... ");
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Config config = null;
+		try {
+			config = gson.fromJson(new FileReader("config.json"), Config.class);
+			System.out.println(" done");
+		}
+		catch(Throwable e)	{
+			config=new Config();
+			System.out.println("config.json file not found, using default config. See out.config.json for details");			
+		}			
+
+		System.out.print("Writing full config options to out.config...");
+		config.outputToFile("out.config",gson);
+		System.out.println(" done");
+
+		try {
+			MCMC mcmc;
+
+			// If a checkpoint file exists, pick up where we left off
+			File checkpointFile = new File(config.checkpointFilename);
+			if(checkpointFile.exists()) {
+				System.out.println("Checking out from: "+config.checkpointFilename);
+				mcmc = MCMC.loadFromFile(checkpointFile.getPath());
+			}
+			// Otherwise, construct a new MCMC
+			else {
+
+				// Load data files and prepare data....			
+				//Data data = new DataFromFiles(config);
+				Data data = new TestData(config,TestType.TEST_USING_INPUT_TREES,1,3,3);
+				mcmc = new MCMC(); 
+
+				if (config.randomSeed!=null)
+					mcmc.setRandomSeed(config.randomSeed);
+
+				// Object that will be asked to create model objects for each chain
+				mcmc.setModelFactory(new SeasonalMigrationFactory(config,data));
+
+				// Number of chains
+				mcmc.setChainCount(config.chainCount);
+
+				// Chains will explore Prior * [Likelihood^tau]
+				// where tau == x^heatPower
+				// x == 0.0 for the hottest chain (chainId: chainCount - 1);
+				// x == 1.0 for the coldest chain (chainId: 0)
+				mcmc.setHeatFunction(config.heatPower);
+
+				// Simple default Metropolis-Hastings step for each variable;
+				// these will tune to try to reach the target acceptance rate during the burn-in
+				// period.
+				// 
+				// Proposals are minimally intelligent:
+				// - normal proposals for distributions with real support (e.g., normal)
+				// - multiplier proposals for distributions with positive real support (e.g., gamma)
+				// - uniform proposals restricted to min, max for distributions with finite support
+				//   (e.g., uniform, beta)
+				// - Gibbs sample for binary-valued variables
+				// A natural extension would be to automatically choose Gibbs samplers
+				// intelligently, but that's not in the current version.
+				Step univarStep = new UnivariateProposalStep(config.targetAcceptanceRate, config.burnIn, config.tuneEvery);
+
+				// "Differential evolution MCMC" step, which proposes changes to multiple
+				// variables simultaneously, taking into account their correlations in a clever way.
+				// Proposes at multiple scales: 8, 16, 32, ... variables at a time.
+				// (Since this model only has 5 parameters, it'll just do all 5.)
+				// For details of method and parameters, see source for DEMCProposalStep and methods paper
+				Step demcStep = new DEMCProposalStep(
+						config.targetAcceptanceRate,
+						config.burnIn, // Only tune during the burn-in period
+						config.tuneEvery,
+						config.thin, // Thin historical samples for DEMC in memory
+						config.initialHistoryCount, // Collect this many samples before starting DEMC proposals
+						8, // Minimum number of variables to propose at a time
+						128, // Maximum number of variables to propose at a time
+						true, // Use standard "parallel" DEMC proposals (no projection)
+						true, // Also use double-size parallel DEMC proposals
+						true // Also use snooker proposals
+						);
+
+				// Swap steps: even (0/1, 2/3, 4/5) and odd (1/2, 3/4, 5/6);
+				// alternating these sets of pairs of chains ensures up to chainCount/2
+				// parallelization while swapping, where
+				// No tuning, but tuneEvery used to print swap statistics to log file
+				// every so often
+				Step evenSwapStep = new SwapStep(ChainParity.EVEN, config.tuneEvery);
+				Step oddSwapStep = new SwapStep(ChainParity.ODD, config.tuneEvery);
+
+				// Verification step: just asks all models to recalculate
+				// log prior, likelihood from scratch and compares to existing value;
+				// throws an exception if too much error has accumulated.
+				Step verificationStep = new VerificationStep(config.thin, 1E-4);
+
+				// Sample output step
+				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);
+
+				// Marginal-likelihood calculation during run
+				Step mlOutStep = new MarginalLikelihoodStep(config.mlFilename, config.burnIn, config.mlthin);
+
+				// Prior-likelihood output step for marginal likelihood calculation
+				Step plOutStep = new PriorLikelihoodOutputStep(config.priorLikelihoodFilename, config.thin);
+
+				// Assemble all steps into a sequence; repeat swaps chainCount times
+				// since they're so cheap and beneficial for mixing.
+				// Each iteration thus includes many little steps:
+				// - Proposes changes to all individual parameters
+				// - Proposes changes using parallel DEMC, double-size parallel DEMC,
+				//   and snooker DEMC at multiple scales
+				// - Proposes chainCount * 2 swaps
+				// - Every thin iterations, writes samples to a file
+				mcmc.addStep(univarStep);
+				mcmc.addStep(demcStep);
+				for(int i = 0; i < config.chainCount; i++) {
+					mcmc.addStep(evenSwapStep);
+					mcmc.addStep(oddSwapStep);
+				}
+				mcmc.addStep(verificationStep);
+				mcmc.addStep(sampOutStep);
+				mcmc.addStep(mlOutStep);
+				mcmc.addStep(plOutStep);
+			}
+
+			// Run the thing until checkpointEvery steps at a time;
+			// write the checkpoint file in between.
+			// The runFor call automatically parallelizes chains.
+			while(mcmc.getIterationCount() < config.iterationCount) {
+				mcmc.runFor(config.checkpointEvery);
+				mcmc.writeToFile(config.checkpointFilename);
+			}
+
+			// Tells the MCMC to stop the thread pool so this program will exit
+			mcmc.shutdown();
+		}
+		catch(Throwable e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
 
 	@Test
 	public void testModelDegeneracy() throws IOException, ImportException {
@@ -279,7 +363,7 @@ public class SeasonalMigrationTest {
 		testFile.createNewFile();
 		PrintStream testStream = new PrintStream(testFile);
 		System.out.println("Calculating tree likelihood using degenerate models:");				
-        double[] results = new double[((TestData) data).testModels.size()];
+		double[] results = new double[((TestData) data).testModels.size()];
 
 		for (int i=0;i<((TestData) data).testModels.size();i++) {
 			System.out.println("SEASONALITY "+((TestData) data).testModels.get(i).getModelName());						
@@ -297,10 +381,10 @@ public class SeasonalMigrationTest {
 			long duration= System.currentTimeMillis()-startTime;
 			System.out.println("duration: "+duration+"ms");
 		}
-		
+
 		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");
 		testStream.close();
-				
+
 		for (int i=1;i<results.length;i++) {
 			assertEquals(results[i],results[i-1], 1E-3);			
 		}
@@ -372,5 +456,5 @@ public class SeasonalMigrationTest {
 
 	}
 
-	
+
 }
