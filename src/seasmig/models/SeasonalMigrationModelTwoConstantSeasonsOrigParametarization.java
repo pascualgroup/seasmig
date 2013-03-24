@@ -24,7 +24,9 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 	LikelihoodVariable likeVar;
 	private int nTrees;
 	private boolean fixPhase;
-	private double seasonalPhaseRealization;	
+	private double seasonalPhaseRealization;
+	private DoubleVariable rateHyperPrior;
+	private ExponentialDistribution ratePriorDist;	
 
 	protected SeasonalMigrationModelTwoConstantSeasonsOrigParametarization() { }
 
@@ -47,13 +49,16 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
 		else
 			seasonalPhaseRealization = config.fixedPhase;
-		DoubleDistribution ratePrior = new ExponentialDistribution(this,1.0);
-
+		
+		rateHyperPrior = new DoubleVariable(this,"rateHyperPrior",new ExponentialDistribution(this));
+		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
+		ratePriorDist.setRate(rateHyperPrior);
+		
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
-				rates1[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), ratePrior);
-				rates2[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), ratePrior);
+				rates1[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), ratePriorDist);
+				rates2[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), ratePriorDist);
 			}
 		}
 

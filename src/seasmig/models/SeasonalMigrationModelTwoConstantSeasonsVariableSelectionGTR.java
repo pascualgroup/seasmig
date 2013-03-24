@@ -33,6 +33,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 
 	boolean fixedPhase;
 	boolean fixedPhaseLength;
+	private DoubleVariable rateHyperPrior;
+	private ExponentialDistribution ratePriorDist;
 
 	protected SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR() { }
 
@@ -72,8 +74,9 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,minSeasonalWindowLength,0.5));			
 		}
 		
-		DoubleDistribution ratePriorDist = new ExponentialDistribution(this,1.0);
-		DoubleDistribution popPriorDist = new ExponentialDistribution(this,1.0);
+		rateHyperPrior = new DoubleVariable(this,"rateHyperPrior",new ExponentialDistribution(this));
+		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
+		ratePriorDist.setRate(rateHyperPrior);
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 		BinaryDistribution diffIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
 		
@@ -87,8 +90,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 		}
 
 		for (int i=0; i<numLocations; i++) {
-			locationPopSize1[i] = new DoubleVariable(this, "locationPopSize1."+Integer.toString(i),popPriorDist);
-			locationPopSize2[i] = new DoubleVariable(this, "locationPopSize2."+Integer.toString(i),popPriorDist);
+			locationPopSize1[i] = new DoubleVariable(this, "locationPopSize1."+Integer.toString(i),new ExponentialDistribution(this,1.0));
+			locationPopSize2[i] = new DoubleVariable(this, "locationPopSize2."+Integer.toString(i),new ExponentialDistribution(this,1.0));
 		}
 		
 		// Custom likelihood variable

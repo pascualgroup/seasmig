@@ -41,6 +41,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 
 	boolean fixedPhase;
 	boolean fixedPhaseLength;
+	private DoubleVariable rateHyperPrior;
+	private ExponentialDistribution ratePriorDist;
 
 	protected SeasonalMigrationModelTwoConstantSeasonsVariableSelection() { }
 
@@ -64,6 +66,10 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 
 		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
 
+		rateHyperPrior = new DoubleVariable(this,"rateHyperPrior",new ExponentialDistribution(this));
+		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
+		ratePriorDist.setRate(rateHyperPrior);
+		
 		if (fixedPhase && fixedPhaseLength) {
 			seasonStart=config.fixedPhase;			
 		}
@@ -79,7 +85,6 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,minSeasonalWindowLength,0.5));			
 		}
 		
-		DoubleDistribution ratePriorDist = new ExponentialDistribution(this,1.0);
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 		BinaryDistribution diffIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
 		

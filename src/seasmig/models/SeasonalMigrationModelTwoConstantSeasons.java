@@ -30,6 +30,8 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 	boolean fixSome;
 	boolean fixSomeTo;
 	boolean fixSomeFrom;
+	private DoubleVariable rateHyperPrior;
+	private ExponentialDistribution ratePriorDist;
 
 	protected SeasonalMigrationModelTwoConstantSeasons() { }
 
@@ -64,7 +66,9 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 			seasonalPhaseRealization=config.fixedPhase;
 		}
 
-		DoubleDistribution ratePriorDist = new ExponentialDistribution(this,1.0);
+		rateHyperPrior = new DoubleVariable(this,"rateHyperPrior",new ExponentialDistribution(this));
+		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
+		ratePriorDist.setRate(rateHyperPrior);
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 
 		for (int i=0; i< numLocations; i++) {
