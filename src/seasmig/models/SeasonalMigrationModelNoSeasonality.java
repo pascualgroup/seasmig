@@ -36,7 +36,8 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 		
 		beginConstruction();
 		
-		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
+		if (nTrees>1)
+			treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
 
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
 		
@@ -64,7 +65,8 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 			super(m, "likeVar", true);
 
 			// Add dependencies between likelihood variable and parameters
-			m.addEdge(this, m.treeIndex);
+			if (nTrees>1)
+				m.addEdge(this, m.treeIndex);
 
 			for(int i = 0; i < numLocations; i++) {
 				for(int j = 0; j < numLocations; j++) {
@@ -108,8 +110,11 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 
 			// TODO: add update to migration model instead of reconstructing...
 			MigrationBaseModel migrationBaseModel = new ConstantMigrationBaseModel(ratesdoubleForm);
-
-			LikelihoodTree workingCopy = data.getTrees().get(treeIndex.getValue()).copy(); 
+			LikelihoodTree workingCopy;
+			if (nTrees>1)
+				workingCopy = data.getTrees().get((int)treeIndex.getValue()).copy(); 
+			else
+				workingCopy = data.getTrees().get(0).copy();
 			workingCopy.setLikelihoodModel(migrationBaseModel);
 			logP=workingCopy.logLikelihood();
 			
