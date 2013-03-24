@@ -22,9 +22,9 @@ import mc3kit.proposal.UnivariateProposalStep;
 
 import org.junit.Test;
 
-import seasmig.data.TestData;
-import seasmig.data.TestData.TestType;
-import seasmig.models.SeasonalMigrationFactory;
+import seasmig.data.DataForTests;
+import seasmig.data.DataForTests.TestType;
+import seasmig.models.SeasonalMigrationModelFactory;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
@@ -48,7 +48,7 @@ public class SeasonalMigrationTest {
 		System.out.println("Testing matrix exponentiation:");
 
 		for (int i=1;i<100;i++) {
-			double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
 			MatrixExponentiator test1 = new MolerMatrixExp(testMatrix);
 			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);
 			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);
@@ -99,7 +99,7 @@ public class SeasonalMigrationTest {
 
 		long startTime1= System.currentTimeMillis();		
 		for (int i=1;i<50;i++) {
-			double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
 			MatrixExponentiator test1 = new MolerMatrixExp(testMatrix);
 			for (int j=0;j<1200;j++) {
 				double[][] res1=test1.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
@@ -110,7 +110,7 @@ public class SeasonalMigrationTest {
 
 		long startTime2= System.currentTimeMillis();		
 		for (int i=1;i<50;i++) {
-			double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
 			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);
 			for (int j=0;j<1200;j++) {
 				double[][] res2=test2.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
@@ -121,7 +121,7 @@ public class SeasonalMigrationTest {
 
 		long startTime3= System.currentTimeMillis();		
 		for (int i=1;i<50;i++) {
-			double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
 			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);;
 			for (int j=0;j<1200;j++) {
 				double[][] res3=test3.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
@@ -132,7 +132,7 @@ public class SeasonalMigrationTest {
 
 		long startTime4= System.currentTimeMillis();		
 		for (int i=1;i<50;i++) {
-			double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
 			MatrixExponentiator test4 = new JamaMolerMatrixExp(testMatrix);;
 			for (int j=0;j<1200;j++) {
 				double[][] res4=test4.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
@@ -143,7 +143,7 @@ public class SeasonalMigrationTest {
 
 		long startTime5= System.currentTimeMillis();		
 		for (int i=1;i<50;i++) {
-			double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
 			MatrixExponentiator test5 = new JblasMatrixExp(testMatrix);;
 			for (int j=0;j<1200;j++) {
 				double[][] res5=test5.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
@@ -156,7 +156,7 @@ public class SeasonalMigrationTest {
 		if (numLocations==3) {
 			long startTime6= System.currentTimeMillis();		
 			for (int i=1;i<50;i++) {
-				double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+				double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
 				MatrixExponentiator test6 = new AnalyticMatrixExp3(testMatrix);;
 				for (int j=0;j<1200;j++) {
 					double[][] res6=test6.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
@@ -168,7 +168,7 @@ public class SeasonalMigrationTest {
 		if (numLocations==2) {
 			long startTime6= System.currentTimeMillis();		
 			for (int i=1;i<50;i++) {
-				double[][] testMatrix = TestData.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+				double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
 				MatrixExponentiator test6 = new AnalyticMatrixExp2(testMatrix);;
 				for (int j=0;j<1200;j++) {
 					double[][] res6=test6.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
@@ -226,14 +226,14 @@ public class SeasonalMigrationTest {
 
 				// Load data files and prepare data....			
 				//Data data = new DataFromFiles(config);
-				Data data = new TestData(config,TestType.TEST_USING_INPUT_TREES,1,3,3);
+				Data data = new DataForTests(config,TestType.TEST_USING_INPUT_TREES,1,3,3);
 				mcmc = new MCMC(); 
 
 				if (config.randomSeed!=null)
 					mcmc.setRandomSeed(config.randomSeed);
 
 				// Object that will be asked to create model objects for each chain
-				mcmc.setModelFactory(new SeasonalMigrationFactory(config,data));
+				mcmc.setModelFactory(new SeasonalMigrationModelFactory(config,data));
 
 				// Number of chains
 				mcmc.setChainCount(config.chainCount);
@@ -356,7 +356,7 @@ public class SeasonalMigrationTest {
 		System.out.println(" done");
 
 		// Load data files and prepare data....			
-		Data data = new TestData(config,TestType.TEST_MODEL_DEGENERACY,3,3,10);
+		Data data = new DataForTests(config,TestType.TEST_MODEL_DEGENERACY,3,3,10);
 
 		// Creating test file 
 		File testFile = new File("out.test");
@@ -364,16 +364,16 @@ public class SeasonalMigrationTest {
 		testFile.createNewFile();
 		PrintStream testStream = new PrintStream(testFile);
 		System.out.println("Calculating tree likelihood using degenerate models:");				
-		double[] results = new double[((TestData) data).testModels.size()];
+		double[] results = new double[((DataForTests) data).testModels.size()];
 
-		for (int i=0;i<((TestData) data).testModels.size();i++) {
-			System.out.println("SEASONALITY "+((TestData) data).testModels.get(i).getModelName());						
+		for (int i=0;i<((DataForTests) data).testModels.size();i++) {
+			System.out.println("SEASONALITY "+((DataForTests) data).testModels.get(i).getModelName());						
 			long startTime= System.currentTimeMillis();	
 			double testLikelihood = 0;
 			for (LikelihoodTree tree : data.getTrees()) {
 				System.out.print(".");
 				LikelihoodTree workingCopy = tree.copy();
-				workingCopy.setLikelihoodModel(((TestData) data).testModels.get(i));
+				workingCopy.setLikelihoodModel(((DataForTests) data).testModels.get(i));
 				testLikelihood+=workingCopy.logLikelihood();
 			}
 			testLikelihood=testLikelihood/data.getTrees().size();
@@ -414,7 +414,7 @@ public class SeasonalMigrationTest {
 		System.out.println(" done");
 
 		// Load data files and prepare data....			
-		Data data = new TestData(config,TestType.TEST_USING_GENERATED_TREES,10,3,5);
+		Data data = new DataForTests(config,TestType.TEST_USING_GENERATED_TREES,10,3,5);
 
 		// Creating test file 
 		File testFile = new File("out.test");
@@ -423,30 +423,30 @@ public class SeasonalMigrationTest {
 		PrintStream testStream = new PrintStream(testFile);
 		System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality+",");				
 		testStream.print("{\""+config.migrationSeasonality+"\",");
-		testStream.print(((TestData)data).createModel.parse());
-		System.out.println(((TestData)data).createModel.print());
+		testStream.print(((DataForTests)data).createModel.parse());
+		System.out.println(((DataForTests)data).createModel.print());
 		double createLikelihood = 0;
 		for (LikelihoodTree tree : data.getTrees()) {
 			System.out.print(".");
 			// TODO: maybe get likelihood to not require copy...
 			LikelihoodTree workingCopy = tree.copy();
-			workingCopy.setLikelihoodModel(((TestData)data).createModel);
+			workingCopy.setLikelihoodModel(((DataForTests)data).createModel);
 			createLikelihood+=workingCopy.logLikelihood();
 		}
 		createLikelihood=createLikelihood/data.getTrees().size();
 		System.out.println(createLikelihood);
 
 		System.out.println("\nCalculating tree likelihood using test models with increasing noise:");
-		for (int i=0;i<((TestData)data).testModels.size();i++) {
+		for (int i=0;i<((DataForTests)data).testModels.size();i++) {
 			if (i%numTestRepeats ==0) {						
-				System.out.println("SEASONALITY "+((TestData)data).testModels.get(i).getModelName());						
+				System.out.println("SEASONALITY "+((DataForTests)data).testModels.get(i).getModelName());						
 			}
 
 			double testLikelihood = 0;
 			for (LikelihoodTree tree : data.getTrees()) {
 				System.out.print(".");
 				LikelihoodTree workingCopy = tree.copy();
-				workingCopy.setLikelihoodModel(((TestData)data).testModels.get(i));
+				workingCopy.setLikelihoodModel(((DataForTests)data).testModels.get(i));
 				testLikelihood+=workingCopy.logLikelihood();
 			}
 			testLikelihood=testLikelihood/data.getTrees().size();

@@ -26,7 +26,7 @@ import jebl.evolution.trees.SimpleRootedTree;
 import jebl.math.Random;
 
 @SuppressWarnings("serial")
-public class TestData implements Data {
+public class DataForTests implements Data {
 	// TODO: This...
 	public Vector<LikelihoodTree> trees = new Vector<LikelihoodTree>();
 	Config config = null;
@@ -39,9 +39,9 @@ public class TestData implements Data {
 	private int numLocations;
 	private int disturbanceScale;
 
-	protected TestData() {};
+	protected DataForTests() {};
 	
-	public TestData(Config config_, TestType testType, int numTestRepeats, int numTestLocations, int numTestTrees) throws IOException, ImportException 	{
+	public DataForTests(Config config_, TestType testType, int numTestRepeats, int numTestLocations, int numTestTrees) throws IOException, ImportException 	{
 
 		config = config_;		
 

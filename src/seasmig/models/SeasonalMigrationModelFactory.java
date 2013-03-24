@@ -9,14 +9,14 @@ import mc3kit.Model;
 import mc3kit.ModelFactory;
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationFactory implements ModelFactory
+public class SeasonalMigrationModelFactory implements ModelFactory
 {
 	Config config;
 	Data data;
 
-	protected SeasonalMigrationFactory() {};
+	protected SeasonalMigrationModelFactory() {};
 
-	public SeasonalMigrationFactory(Config config, Data data)
+	public SeasonalMigrationModelFactory(Config config, Data data)
 	{
 		this.config = config;
 		this.data = data;

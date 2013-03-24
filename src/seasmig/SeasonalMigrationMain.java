@@ -3,7 +3,7 @@ package seasmig;
 import java.io.File;
 import java.io.FileReader;
 import seasmig.data.DataFromFiles;
-import seasmig.models.SeasonalMigrationFactory;
+import seasmig.models.SeasonalMigrationModelFactory;
 
 import mc3kit.ChainParity;
 import mc3kit.MCMC;
@@ -64,7 +64,7 @@ public class SeasonalMigrationMain
 					mcmc.setRandomSeed(config.randomSeed);
 
 				// Object that will be asked to create model objects for each chain
-				mcmc.setModelFactory(new SeasonalMigrationFactory(config,data));
+				mcmc.setModelFactory(new SeasonalMigrationModelFactory(config,data));
 
 				// Number of chains
 				mcmc.setChainCount(config.chainCount);
