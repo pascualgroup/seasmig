@@ -25,7 +25,6 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 	private int nTrees;
 	private boolean fixPhase;
 	private double seasonalPhaseRealization;
-	private DoubleVariable rateHyperPrior;
 	private ExponentialDistribution ratePriorDist;	
 
 	protected SeasonalMigrationModelTwoConstantSeasonsOrigParametarization() { }
@@ -50,9 +49,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 		else
 			seasonalPhaseRealization = config.fixedPhase;
 		
-		rateHyperPrior = new DoubleVariable(this,"rateHyperPrior",new ExponentialDistribution(this));
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
-		ratePriorDist.setRate(rateHyperPrior);
 		
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
