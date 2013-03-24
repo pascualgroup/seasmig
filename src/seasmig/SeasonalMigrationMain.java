@@ -53,9 +53,11 @@ public class SeasonalMigrationMain
 			// Otherwise, construct a new MCMC
 			else {
 				
+				System.out.println("Loading data from files...");
 				// Load data files and prepare data....			
 				Data data = new DataFromFiles(config);
 
+				System.out.println("Running MCMC");
 				mcmc = new MCMC(); 
 
 				if (config.randomSeed!=null)

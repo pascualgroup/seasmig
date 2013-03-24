@@ -194,7 +194,7 @@ public class SeasonalMigrationTest {
 	@Test
 	public void testMain() {
 
-		System.out.println("Running main test!");
+		System.out.println("Running testMain!");
 		// Load config   
 		System.out.print("Loading config file... ");
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();

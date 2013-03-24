@@ -20,7 +20,9 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 	DoubleVariable[][] rates;	
 	IntVariable treeIndex;
 	LikelihoodVariable likeVar;
-	private int nTrees;	
+	private int nTrees;
+	private DoubleVariable rateHyperPrior;
+	private ExponentialDistribution ratePrior;	
 
 	protected SeasonalMigrationModelNoSeasonality() { }
 
@@ -37,12 +39,14 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 		
 		treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
 
-		DoubleDistribution ratePrior = new ExponentialDistribution(this,1.0);
-
+		rateHyperPrior = new DoubleVariable(this,"rateHyperPrior",new ExponentialDistribution(this));
+		ratePrior = new ExponentialDistribution(this);
+		ratePrior.setRate(rateHyperPrior);
+		
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
-				rates[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j), ratePrior);
+				rates[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j),ratePrior);
 			}
 		}
 

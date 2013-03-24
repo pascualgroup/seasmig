@@ -105,7 +105,7 @@ public class TestData implements Data {
 			// Generate test data and trees
 
 			// For constant model...
-			double[][] Q = makeRandomMigrationMatrix(numTestLocations,2); 
+			double[][] Q = makeRandomMigrationMatrix(numTestLocations,5); 
 
 			// For two seasonal model...
 			double[][] QW = myMatrixCopy(Q);
@@ -214,7 +214,7 @@ public class TestData implements Data {
 				trees.add(testTree);				
 			}
 
-			System.out.println("Generated "+trees.size()+" trees with random tip annotations and input tree topology");
+			System.out.println("Generated "+trees.size()+" trees with model generated random tip annotations and input tree topology");
 
 		}
 		break;
@@ -315,6 +315,7 @@ public class TestData implements Data {
 		}
 		
 		// Creating test file 
+		System.out.print("Writing test model to out.test ...");
 		File testFile = new File("out.test");
 		testFile.delete();
 		testFile.createNewFile();
@@ -323,6 +324,7 @@ public class TestData implements Data {
 		testStream.println();
 		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");
 		testStream.close();
+		System.out.println("done");
 
 	}
 
