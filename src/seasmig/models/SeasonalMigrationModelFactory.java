@@ -32,7 +32,6 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 			boolean fixPhase = false;
 			boolean fixLength = false;
 			switch (config.twoSeasonPhase) {
-			// TODO: test this
 			case FIXED_PHASE_FIXED_LENGTH:
 				fixPhase=true;
 				fixLength=true;
@@ -58,8 +57,8 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION_GTR)
 				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR(initialChain,config,data,fixPhase,fixLength);
 			
-			boolean fixTo = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF;
-			boolean fixFrom = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF;
+			boolean fixTo = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_TO_DIFF;
+			boolean fixFrom = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_TO_DIFF;
 		
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIRECT_ALL_FREE) {
 				return new SeasonalMigrationModelTwoConstantSeasonsOrigParametarization(initialChain, config, data,fixPhase);

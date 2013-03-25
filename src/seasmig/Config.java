@@ -20,10 +20,9 @@ public class Config implements Serializable
 	   						  // (1+-DiffMult[i])*rate[i][j] is used for season1/2 
 	   FIX_TO_DIFF,    	      // Same as above, but each col uses the same DiffMult
 	   						  // (1+-DiffMult[j])*rate[i][j] is used for season1/2
-	   VARIABLE_SELECTION,     // (1-DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season1 
+	   FIX_FROM_TO_DIFF,      // Both rows and columns...
+	   VARIABLE_SELECTION,    // (1-DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season1 
 		  					  // (1+DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season2};
-	   VARIABLE_SELECTION_TO,
-	   VARIABLE_SELECTION_FROM, 
 	   VARIABLE_SELECTION_GTR	   
 	}
 	public static enum TwoConstantSeasonsPhase { FIXED_PHASE_FIXED_LENGTH, FREE_PHASE_FREE_LENGTH, FIXED_PHASE_FREE_LENGTH, FREE_PHASE_FIXED_LENGTH };
