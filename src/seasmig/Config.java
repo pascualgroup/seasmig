@@ -17,15 +17,10 @@ public class Config implements Serializable
 	{  DIRECT_ALL_FREE, 	  // Separate rates for two matrices
 	   DIFF_PARAMETERIZATION, // (1-DiffMult[i][j])*rate[i][j] is used for season1 
 	   						  // (1+DiffMult[i][j])*rate[i][j] is used for season2
-	   FIX_SOME,	   	  	  // Same as above, but only a partial set (define by fixSome)  
-	   						  // of DiffMults is used   
 	   FIX_FROM_DIFF,  		  // Same as above, but each rows uses the same DiffMult:
 	   						  // (1+-DiffMult[i])*rate[i][j] is used for season1/2 
 	   FIX_TO_DIFF,    	      // Same as above, but each col uses the same DiffMult
 	   						  // (1+-DiffMult[j])*rate[i][j] is used for season1/2
-	   FIX_SOME_FROM,		  // Same as above, but only a partial set (defined by fixSomeFromTo
-	   						  // of DiffMults is used 
-	   FIX_SOME_TO,
 	   VARIABLE_SELECTION,     // (1-DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season1 
 		  					  // (1+DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season2};
 	   VARIABLE_SELECTION_TO,
@@ -67,8 +62,6 @@ public class Config implements Serializable
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.FIX_TO_DIFF;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION...
 	public double fixedPhase = 0.12;
-	public int[][] fixSome = {{0,1},{1,0},{2,0},{2,1}};
-	public int[] fixSomeFromTo = {0,1};
 	
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	

@@ -27,14 +27,11 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 	boolean fixedPhase;
 	boolean fixTo;
 	boolean fixFrom;
-	boolean fixSome;
-	boolean fixSomeTo;
-	boolean fixSomeFrom;
 	private ExponentialDistribution ratePriorDist;
 
 	protected SeasonalMigrationModelTwoConstantSeasons() { }
 
-	public SeasonalMigrationModelTwoConstantSeasons(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixFrom, boolean fixTo, boolean fixSome, boolean fixSomeFrom, boolean fixSomeTo) throws MC3KitException
+	public SeasonalMigrationModelTwoConstantSeasons(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixFrom, boolean fixTo) throws MC3KitException
 	{
 		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
@@ -44,9 +41,6 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		this.fixedPhase=fixedPhase;
 		this.fixTo=fixTo;
 		this.fixFrom=fixFrom;
-		this.fixSome=fixSome;
-		this.fixSomeFrom=fixSomeFrom;
-		this.fixSomeTo=fixSomeTo;
 		numLocations=data.getNumLocations();
 		nTrees=data.getTrees().size();		
 		rates = new DoubleVariable[numLocations][numLocations];
@@ -74,7 +68,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
 				rates[i][j] = new DoubleVariable(this, "meanRates."+Integer.toString(i)+"."+Integer.toString(j), ratePriorDist);
-				if (!fixFrom && !fixTo && !fixSome && !fixSomeTo && !fixSomeFrom) 
+				if (!fixFrom && !fixTo) 
 					diffMultipliers[i][j] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i)+"."+Integer.toString(j), diffMultiplierPriorDist);
 			}		
 		}
@@ -84,21 +78,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 				diffMultipliersRowCol[i] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i), diffMultiplierPriorDist);
 			}		
 		}
-		if (fixSomeFrom || fixSomeTo) {
-			for(int k = 0; k < config.fixSomeFromTo.length; k++) {
-				int i=config.fixSomeFromTo[k];
-				diffMultipliersRowCol[i] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i), diffMultiplierPriorDist);
-			}
-		}
-
-		if (fixSome) {
-			for (int k=0;k<config.fixSome.length;k++) {
-				int i = config.fixSome[k][0];
-				int j = config.fixSome[k][1];
-				diffMultipliers[i][j] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i)+"."+Integer.toString(j), diffMultiplierPriorDist);
-			}
-		}
-
+	
 		// Custom likelihood variable
 		likeVar = new LikelihoodVariable(this);
 
@@ -165,11 +145,11 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
 							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
 						}
-						else if (diffMultipliersRowCol[j]!=null && (fixTo || fixSomeTo)) {
+						else if (diffMultipliersRowCol[j]!=null && (fixTo)) {
 							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliersRowCol[j].getValue());
 							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliersRowCol[j].getValue());
 						}
-						else if (diffMultipliersRowCol[i]!=null && (fixFrom || fixSomeFrom)) {
+						else if (diffMultipliersRowCol[i]!=null && (fixFrom)) {
 							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliersRowCol[i].getValue());
 							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliersRowCol[i].getValue());
 						}
