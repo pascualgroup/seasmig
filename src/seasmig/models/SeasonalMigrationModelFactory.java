@@ -63,7 +63,10 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIRECT_ALL_FREE) {
 				return new SeasonalMigrationModelTwoConstantSeasonsOrigParametarization(initialChain, config, data,fixPhase);
 			}
-			else if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF) {
+			else if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION ||
+					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || 
+					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF ||
+					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_TO_DIFF) {
 				return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,fixPhase, fixFrom, fixTo);
 			}
 			else {
