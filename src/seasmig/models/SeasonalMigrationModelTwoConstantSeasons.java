@@ -17,7 +17,8 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] diffMultipliers;
-	DoubleVariable[] diffMultipliersRowCol;
+	DoubleVariable[] diffMultipliersFrom;
+	DoubleVariable[] diffMultipliersTo;
 	DoubleVariable seasonalPhase;
 	double seasonalPhaseRealization;
 	IntVariable treeIndex;
@@ -45,7 +46,8 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 		nTrees=data.getTrees().size();		
 		rates = new DoubleVariable[numLocations][numLocations];
 
-		diffMultipliersRowCol = new DoubleVariable[numLocations];
+		diffMultipliersFrom = new DoubleVariable[numLocations];
+		diffMultipliersTo = new DoubleVariable[numLocations];
 		diffMultipliers = new DoubleVariable[numLocations][numLocations];
 
 		beginConstruction();
@@ -73,9 +75,14 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 			}		
 		}
 
-		if (fixFrom || fixTo) {
+		if (fixFrom) {
 			for(int i = 0; i < numLocations; i++) {
-				diffMultipliersRowCol[i] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i), diffMultiplierPriorDist);
+				diffMultipliersFrom[i] = new DoubleVariable(this, "diffMultipliersFrom."+Integer.toString(i), diffMultiplierPriorDist);
+			}		
+		}
+		if (fixTo) {
+			for(int i = 0; i < numLocations; i++) {
+				diffMultipliersTo[i] = new DoubleVariable(this, "diffMultipliersTo."+Integer.toString(i), diffMultiplierPriorDist);
 			}		
 		}
 	
@@ -102,8 +109,10 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 				m.addEdge(this, m.seasonalPhase);
 
 			for(int i = 0; i < numLocations; i++) {
-				if (diffMultipliersRowCol[i]!=null ) 
-					m.addEdge(this, diffMultipliersRowCol[i]);				
+				if (diffMultipliersFrom[i]!=null ) 
+					m.addEdge(this, diffMultipliersFrom[i]);				
+				if (diffMultipliersTo[i]!=null ) 
+					m.addEdge(this, diffMultipliersTo[i]);				
 				for(int j = 0; j < numLocations; j++) {
 					if (i==j) continue;
 					m.addEdge(this,rates[i][j]);
@@ -141,29 +150,26 @@ public class SeasonalMigrationModelTwoConstantSeasons extends Model {
 				double rowsum2=0;
 				for (int j=0;j<numLocations;j++) {
 					if (i!=j) {
+						rates1doubleForm[i][j]=rates[i][j].getValue();
+						rates2doubleForm[i][j]=rates[i][j].getValue();
 						if (diffMultipliers[i][j]!=null) {
-							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
-							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
+							rates1doubleForm[i][j]*=(1-diffMultipliers[i][j].getValue());
+							rates2doubleForm[i][j]*=(1+diffMultipliers[i][j].getValue());
 						}
-						else if (diffMultipliersRowCol[j]!=null && (fixTo)) {
-							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliersRowCol[j].getValue());
-							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliersRowCol[j].getValue());
+						else if (diffMultipliersTo[j]!=null && (fixTo)) {
+							rates1doubleForm[i][j]*=(1-diffMultipliersTo[j].getValue());
+							rates2doubleForm[i][j]*=(1+diffMultipliersTo[j].getValue());
 						}
-						else if (diffMultipliersRowCol[i]!=null && (fixFrom)) {
-							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliersRowCol[i].getValue());
-							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliersRowCol[i].getValue());
+						else if (diffMultipliersFrom[i]!=null && (fixFrom)) {
+							rates1doubleForm[i][j]*=(1-diffMultipliersFrom[i].getValue());
+							rates2doubleForm[i][j]*=(1+diffMultipliersFrom[i].getValue());
 						}
-						else {
-							rates1doubleForm[i][j]=rates[i][j].getValue();
-							rates2doubleForm[i][j]=rates[i][j].getValue();{
-							}
-						}
-						rowsum1-=rates1doubleForm[i][j];
-						rowsum2-=rates2doubleForm[i][j];
+						rowsum1+=rates1doubleForm[i][j];
+						rowsum2+=rates2doubleForm[i][j];
 					}
 				}
-				rates1doubleForm[i][i]=rowsum1;
-				rates2doubleForm[i][i]=rowsum2;		
+				rates1doubleForm[i][i]=-rowsum1;
+				rates2doubleForm[i][i]=-rowsum2;		
 			}
 
 			// TODO: add update to migration model instead of reconstructing...

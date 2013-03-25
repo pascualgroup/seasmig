@@ -13,7 +13,6 @@ public class Config implements Serializable
 {
 	public static enum Seasonality { NONE, TWO_CONSTANT_SEASONS, SINUSOIDAL};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
 	public static enum TwoConstantSeasonsParameterization 
-	// TODO: check from to corresponds correctly to from to...
 	{  DIRECT_ALL_FREE, 	  // Separate rates for two matrices
 	   DIFF_PARAMETERIZATION, // (1-DiffMult[i][j])*rate[i][j] is used for season1 
 	   						  // (1+DiffMult[i][j])*rate[i][j] is used for season2
