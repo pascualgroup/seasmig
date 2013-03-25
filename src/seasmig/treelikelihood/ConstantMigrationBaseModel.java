@@ -48,7 +48,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			matrixExponentiator=new Matlab7MatrixExp(Q);	
 		}
 		// TODO: Maybe use other method to get s.s. freq 
-		basefreq=matrixExponentiator.expm(veryLongTime)[1];	
+		//basefreq=matrixExponentiator.expm(veryLongTime)[1];	
 	}
 
 	// Methods
