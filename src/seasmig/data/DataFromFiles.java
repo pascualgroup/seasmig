@@ -17,8 +17,8 @@ import com.google.gson.JsonSyntaxException;
 
 import seasmig.Config;
 import seasmig.Data;
-import seasmig.LikelihoodTree;
 import seasmig.treelikelihood.AttributeLoader;
+import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.SimpleAttributeLoader;
 import seasmig.treelikelihood.TreeWithLocations;
 import jebl.evolution.io.ImportException;

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import seasmig.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.util.Util;
 

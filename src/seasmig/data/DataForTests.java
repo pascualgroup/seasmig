@@ -14,7 +14,7 @@ import seasmig.treelikelihood.AttributeLoader;
 import seasmig.treelikelihood.ConstantMigrationBaseModel;
 import seasmig.Config;
 import seasmig.Data;
-import seasmig.LikelihoodTree;
+import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.SimpleAttributeLoader;
 import seasmig.treelikelihood.SinusoidialSeasonalMigrationBaseModel;

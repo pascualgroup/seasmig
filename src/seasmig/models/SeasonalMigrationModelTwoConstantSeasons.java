@@ -2,7 +2,7 @@ package seasmig.models;
 
 import seasmig.Config;
 import seasmig.Data;
-import seasmig.LikelihoodTree;
+import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
 import mc3kit.*;

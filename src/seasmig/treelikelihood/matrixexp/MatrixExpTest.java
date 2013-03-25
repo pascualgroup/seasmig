@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import seasmig.Config;
 import seasmig.Data;
-import seasmig.LikelihoodTree;
 import seasmig.data.DataForTests;
 import seasmig.data.DataForTests.TestType;
 import seasmig.treelikelihood.*;

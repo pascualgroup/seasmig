@@ -25,6 +25,7 @@ import org.junit.Test;
 import seasmig.data.DataForTests;
 import seasmig.data.DataForTests.TestType;
 import seasmig.models.SeasonalMigrationModelFactory;
+import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;

@@ -2,8 +2,8 @@ package seasmig.models;
 
 import seasmig.Config;
 import seasmig.Data;
-import seasmig.LikelihoodTree;
 import seasmig.treelikelihood.ConstantMigrationBaseModel;
+import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import mc3kit.*;
 import mc3kit.distributions.*;
