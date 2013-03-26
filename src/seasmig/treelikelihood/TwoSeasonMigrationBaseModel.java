@@ -80,11 +80,11 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 				n=n+1;
 				if (isInSeason1(step_start_time)) {
 					step_end_time = Math.min(to_time,step_start_time+season1Length);
-					result = DoubleFactory2D.dense.make(season1MigrationModel.transitionMatrix(step_start_time, step_end_time)).zMult(result,null);	
+					result = result.zMult(DoubleFactory2D.dense.make(season1MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
 					step_start_time=step_end_time;				
 				} else {
 					step_end_time = Math.min(to_time,step_start_time+season2Length);
-					result = DoubleFactory2D.dense.make(season2MigrationModel.transitionMatrix(step_start_time, step_end_time)).zMult(result,null);	
+					result = result.zMult(DoubleFactory2D.dense.make(season2MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
 					step_start_time=step_end_time;			
 				}
 
