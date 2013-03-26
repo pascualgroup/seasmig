@@ -153,10 +153,29 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 			double logLikelihood = 0.0;
 
 			double[][] rates1doubleForm = new double[numLocations][numLocations];
-			double[][] rates2doubleForm = new double[numLocations][numLocations];
-			double rate = 1;
+			double[][] rates2doubleForm = new double[numLocations][numLocations];			
 
-			// Get the overall rate of the two matrices to be equal... 
+			for (int i=0;i<numLocations;i++) {
+				double rowsum1=0;
+				double rowsum2=0;
+				for (int j=0;j<numLocations;j++) {
+					if (i!=j) {
+						if (diffIndicators[i][j].getValue()==true) {
+							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
+							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
+						}
+						else {
+							rates1doubleForm[i][j]=rates[i][j].getValue();
+							rates2doubleForm[i][j]=rates[i][j].getValue();
+						}
+						rowsum1-=rates1doubleForm[i][j];
+						rowsum2-=rates2doubleForm[i][j];
+					}
+				}
+				rates1doubleForm[i][i]=rowsum1;
+				rates2doubleForm[i][i]=rowsum2;
+			}
+
 			if (fixRate) {
 				double[][] ratesdoubleForm = new double[numLocations][numLocations];
 				
@@ -168,33 +187,9 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 						rowsum-=ratesdoubleForm[i][j];
 					}
 					ratesdoubleForm[i][i]=rowsum;
-				}					
-				rate=getRate(ratesdoubleForm);								
-			}
-			else {
-				for (int i=0;i<numLocations;i++) {
-					double rowsum1=0;
-					double rowsum2=0;
-					for (int j=0;j<numLocations;j++) {
-						if (i!=j) {
-							if (diffIndicators[i][j].getValue()==true) {
-								rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
-								rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
-							}
-							else {
-								rates1doubleForm[i][j]=rates[i][j].getValue();
-								rates2doubleForm[i][j]=rates[i][j].getValue();
-							}
-							rowsum1-=rates1doubleForm[i][j];
-							rowsum2-=rates2doubleForm[i][j];
-						}
-					}
-					rates1doubleForm[i][i]=rowsum1;
-					rates2doubleForm[i][i]=rowsum2;
 				}
-			}
-			
-			if (fixRate) {
+				
+				double rate=getRate(ratesdoubleForm);	
 				adjustRate(rates1doubleForm, rate);
 				adjustRate(rates2doubleForm, rate);
 			}
