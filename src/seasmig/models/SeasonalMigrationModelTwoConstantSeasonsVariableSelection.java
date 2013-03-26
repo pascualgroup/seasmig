@@ -16,8 +16,10 @@ import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
+import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
+import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends Model {
@@ -29,7 +31,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] diffMultipliers;
 	BinaryVariable[][] diffIndicators;
-	
+
 	DoubleVariable seasonalPhase;
 	DoubleVariable seasonalLength;
 	double seasonStart;
@@ -40,11 +42,12 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 
 	boolean fixedPhase;
 	boolean fixedPhaseLength;
+	boolean fixRate;
 	private ExponentialDistribution ratePriorDist;
 
 	protected SeasonalMigrationModelTwoConstantSeasonsVariableSelection() { }
 
-	public SeasonalMigrationModelTwoConstantSeasonsVariableSelection(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixedPhaseLength) throws MC3KitException
+	public SeasonalMigrationModelTwoConstantSeasonsVariableSelection(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixedPhaseLength, boolean fixRate) throws MC3KitException
 	{
 		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
@@ -53,20 +56,21 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 		this.data = data;
 		this.fixedPhase=fixedPhase;
 		this.fixedPhaseLength=fixedPhaseLength;
+		this.fixRate=fixRate;
 		numLocations=data.getNumLocations();
 		nTrees=data.getTrees().size();		
 		rates = new DoubleVariable[numLocations][numLocations];
 
 		diffMultipliers = new DoubleVariable[numLocations][numLocations];
 		diffIndicators = new BinaryVariable[numLocations][numLocations];
-		
+
 		beginConstruction();
 
 		if (nTrees>1)
 			treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
 
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
-		
+
 		if (fixedPhase && fixedPhaseLength) {
 			seasonStart=config.fixedPhase;			
 		}
@@ -81,10 +85,10 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 			seasonStart=config.fixedPhase;
 			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,config.minSeasonLength,0.5));			
 		}
-		
+
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 		BinaryDistribution diffIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
-		
+
 		for (int i=0; i< numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
@@ -147,31 +151,54 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 		public boolean update() {
 
 			double logLikelihood = 0.0;
-			//double logPrior = 0.0;
 
 			double[][] rates1doubleForm = new double[numLocations][numLocations];
 			double[][] rates2doubleForm = new double[numLocations][numLocations];
-			for (int i=0;i<numLocations;i++) {
-				double rowsum1=0;
-				double rowsum2=0;
-				for (int j=0;j<numLocations;j++) {
-					if (i!=j) {
-						if (diffIndicators[i][j].getValue()==true) {
-							rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
-							rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
-						}
-						else {
-							rates1doubleForm[i][j]=rates[i][j].getValue();
-							rates2doubleForm[i][j]=rates[i][j].getValue();
-						}
-						rowsum1-=rates1doubleForm[i][j];
-						rowsum2-=rates2doubleForm[i][j];
+			double rate = 1;
+
+			// Get the overall rate of the two matrices to be equal... 
+			if (fixRate) {
+				double[][] ratesdoubleForm = new double[numLocations][numLocations];
+				
+				for (int i=0;i<numLocations;i++) {
+					double rowsum=0;
+					for (int j=0;j<numLocations;j++) {
+						if (i!=j) 
+							ratesdoubleForm[i][j]=rates[i][j].getValue();						
+						rowsum-=ratesdoubleForm[i][j];
 					}
+					ratesdoubleForm[i][i]=rowsum;
+				}					
+				rate=getRate(ratesdoubleForm);								
+			}
+			else {
+				for (int i=0;i<numLocations;i++) {
+					double rowsum1=0;
+					double rowsum2=0;
+					for (int j=0;j<numLocations;j++) {
+						if (i!=j) {
+							if (diffIndicators[i][j].getValue()==true) {
+								rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
+								rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
+							}
+							else {
+								rates1doubleForm[i][j]=rates[i][j].getValue();
+								rates2doubleForm[i][j]=rates[i][j].getValue();
+							}
+							rowsum1-=rates1doubleForm[i][j];
+							rowsum2-=rates2doubleForm[i][j];
+						}
+					}
+					rates1doubleForm[i][i]=rowsum1;
+					rates2doubleForm[i][i]=rowsum2;
 				}
-				rates1doubleForm[i][i]=rowsum1;
-				rates2doubleForm[i][i]=rowsum2;
 			}
 			
+			if (fixRate) {
+				adjustRate(rates1doubleForm, rate);
+				adjustRate(rates2doubleForm, rate);
+			}
+
 			// TODO: add update to migration model instead of reconstructing...
 			if (fixedPhase && fixedPhaseLength) {
 				seasonStart=config.fixedPhase;	
@@ -201,7 +228,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 					seasonEnd=config.fixedPhase;
 				}			
 			}			
-			
+
 			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonStart,seasonEnd);
 			LikelihoodTree workingCopy;
 			if (nTrees>1)
@@ -213,13 +240,32 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends M
 			logLikelihood=workingCopy.logLikelihood();								
 
 			// TODO: think about how to integrate over more than one tree
-			
+
 			setLogP(logLikelihood);			
 			oldLogLikelihood=logLikelihood;
 			if (logLikelihood>logMaxLikelihood) {
 				logMaxLikelihood=logLikelihood;
 			}
 			return true;
+		}
+
+		private void adjustRate(double[][] Q, double adjustedRate) {
+			double inputRate = getRate(Q);
+			for (int i=0;i<Q.length;i++) {
+				for (int j=0;j<Q.length;j++) {
+					Q[i][j]=Q[i][j]/inputRate*adjustedRate;
+				}
+			}
+		}
+
+		private double getRate(double[][] ratesdoubleForm) {
+			MatrixExponentiator matrixExp = new Matlab7MatrixExp(ratesdoubleForm);
+			double[] pi = matrixExp.expm(config.veryLongTime)[1];	
+			double rate=0;
+			for (int i=0;i<numLocations;i++) {
+				rate-=pi[i]*ratesdoubleForm[i][i];
+			}
+			return rate;
 		}
 
 		/*

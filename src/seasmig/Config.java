@@ -61,6 +61,8 @@ public class Config implements Serializable
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION...
 	public double fixedPhase = 0.12;
 	public double minSeasonLength = 0.3333333;
+	public double veryLongTime = 1000;
+	public boolean fixRate = false;
 	
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	

@@ -10,7 +10,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Precision Parameter
 	static final double timePrecision = 1.0E-5;
-	static final double veryLongTime = 1000;
+	static final double veryLongTime = 1000; // TODO: move to config...
 
 	// Rate Matrix  
 	double[][] Q;
