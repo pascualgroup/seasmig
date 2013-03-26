@@ -15,7 +15,6 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 	Config config;
 	Data data;
 	int numLocations;
-	final static double minSeasonalWindowLength = 0.083333333333333*2.0; // 2 month 	
 
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] diffMultipliers;
@@ -67,11 +66,11 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 		}
 		else if (!fixedPhase && !fixedPhaseLength) {	
 			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,1));
-			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,minSeasonalWindowLength,0.5));			
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,config.minSeasonLength,0.5));			
 		}
 		else /* fixedPhase && !fixedLength */ {
 			seasonStart=config.fixedPhase;
-			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,minSeasonalWindowLength,0.5));			
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,config.minSeasonLength,0.5));			
 		}
 		
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
