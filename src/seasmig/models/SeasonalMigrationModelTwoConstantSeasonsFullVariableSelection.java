@@ -113,6 +113,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 	private class LikelihoodVariable extends Variable {
 		private double oldLogLikelihood;
 		private double logMaxLikelihood = Double.NEGATIVE_INFINITY;
+		private double infinitesimalRate = 1E-20;
 
 		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
@@ -176,8 +177,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 							}
 						}
 						else {
-							rates1doubleForm[i][j]=0;
-							rates2doubleForm[i][j]=0;
+							rates1doubleForm[i][j]=infinitesimalRate;
+							rates2doubleForm[i][j]=infinitesimalRate;
 						}
 						rowsum1-=rates1doubleForm[i][j];
 						rowsum2-=rates2doubleForm[i][j];
