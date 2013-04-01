@@ -1,5 +1,8 @@
 package seasmig.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.ConstantMigrationBaseModel;
@@ -18,9 +21,9 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 	int numLocations;
 
 	DoubleVariable[][] rates;	
-	IntVariable treeIndex;
+	IntVariable treeIndices[];
 	LikelihoodVariable likeVar;
-	private int nTrees;
+	private int nTrees[];
 	private ExponentialDistribution ratePriorDist;	
 
 	protected SeasonalMigrationModelNoSeasonality() { }
@@ -31,14 +34,20 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 		this.config = config;
 		this.data = data;		
 		numLocations=data.getNumLocations();
-		nTrees=data.getTrees().size();		
+		List<ArrayList<LikelihoodTree>> trees = data.getTrees();		
+		nTrees = new int[trees.size()];
+		for (int i=0;i<trees.size();i++) {
+			nTrees[i]=trees.get(i).size();
+		}
 		rates = new DoubleVariable[numLocations][numLocations];
 		
 		beginConstruction();
-		
-		if (nTrees>1)
-			treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
-
+		treeIndices = new IntVariable[trees.size()];
+		for (int i=0;i<trees.size();i++) {
+			if (nTrees[i]>1) {
+				treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
+			}
+		}
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
 		
 		for(int i = 0; i < numLocations; i++) {
@@ -65,8 +74,11 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 			super(m, "likeVar", true);
 
 			// Add dependencies between likelihood variable and parameters
-			if (nTrees>1)
-				m.addEdge(this, m.treeIndex);
+			for (int i=0;i<nTrees.length;i++) {
+				if (nTrees[i]>1) {
+					m.addEdge(this, m.treeIndices[i]);
+				}
+			}
 
 			for(int i = 0; i < numLocations; i++) {
 				for(int j = 0; j < numLocations; j++) {
@@ -111,13 +123,15 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 			// TODO: add update to migration model instead of reconstructing...
 			MigrationBaseModel migrationBaseModel = new ConstantMigrationBaseModel(ratesdoubleForm);
 			LikelihoodTree workingCopy;
-			if (nTrees>1)
-				workingCopy = data.getTrees().get((int)treeIndex.getValue()).copy(); 
-			else
-				workingCopy = data.getTrees().get(0).copy();
-			workingCopy.setLikelihoodModel(migrationBaseModel);
-			logP=workingCopy.logLikelihood();
-			
+			for (int i=0;i<nTrees.length;i++) {
+				if (nTrees[i]>1)
+					workingCopy = data.getTrees().get(i).get((int)treeIndices[i].getValue()).copy(); 
+				else
+					workingCopy = data.getTrees().get(i).get(0).copy();
+				workingCopy.setLikelihoodModel(migrationBaseModel);
+				logP+=workingCopy.logLikelihood();
+			}
+						
 			setLogP(logP);
 			oldLogP=logP;
 			return true;

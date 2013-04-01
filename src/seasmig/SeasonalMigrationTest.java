@@ -371,7 +371,7 @@ public class SeasonalMigrationTest {
 			System.out.println("SEASONALITY "+((DataForTests) data).testModels.get(i).getModelName());						
 			long startTime= System.currentTimeMillis();	
 			double testLikelihood = 0;
-			for (LikelihoodTree tree : data.getTrees()) {
+			for (LikelihoodTree tree : data.getTrees().get(0)) {
 				System.out.print(".");
 				LikelihoodTree workingCopy = tree.copy();
 				workingCopy.setLikelihoodModel(((DataForTests) data).testModels.get(i));
@@ -427,7 +427,7 @@ public class SeasonalMigrationTest {
 		testStream.print(((DataForTests)data).createModel.parse());
 		System.out.println(((DataForTests)data).createModel.print());
 		double createLikelihood = 0;
-		for (LikelihoodTree tree : data.getTrees()) {
+		for (LikelihoodTree tree : data.getTrees().get(0)) {
 			System.out.print(".");
 			// TODO: maybe get likelihood to not require copy...
 			LikelihoodTree workingCopy = tree.copy();
@@ -444,7 +444,7 @@ public class SeasonalMigrationTest {
 			}
 
 			double testLikelihood = 0;
-			for (LikelihoodTree tree : data.getTrees()) {
+			for (LikelihoodTree tree : data.getTrees().get(0)) {
 				System.out.print(".");
 				LikelihoodTree workingCopy = tree.copy();
 				workingCopy.setLikelihoodModel(((DataForTests)data).testModels.get(i));

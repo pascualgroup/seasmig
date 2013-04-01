@@ -1,5 +1,8 @@
 package seasmig.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
@@ -20,9 +23,9 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 	DoubleVariable[][] rates1;	
 	DoubleVariable[][] rates2;
 	DoubleVariable seasonalPhase;
-	IntVariable treeIndex;
+	IntVariable treeIndices[];
 	LikelihoodVariable likeVar;
-	private int nTrees;
+	private int nTrees[];
 	private boolean fixPhase;
 	private double seasonalPhaseRealization;
 	private ExponentialDistribution ratePriorDist;	
@@ -36,15 +39,22 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 		this.data = data;		
 		this.fixPhase = fixPhase;
 		numLocations=data.getNumLocations();
-		nTrees=data.getTrees().size();		
+		List<ArrayList<LikelihoodTree>> trees = data.getTrees();		
+		nTrees = new int[trees.size()];
+		for (int i=0;i<trees.size();i++) {
+			nTrees[i]=trees.get(i).size();
+		}
 		rates1 = new DoubleVariable[numLocations][numLocations];
 		rates2 = new DoubleVariable[numLocations][numLocations];
 		
 		beginConstruction();
 		
-		if (nTrees>1)
-			treeIndex = new IntVariable(this, "treeIndex", new UniformIntDistribution(this, 0, nTrees-1));
-		
+		treeIndices = new IntVariable[trees.size()];
+		for (int i=0;i<trees.size();i++) {
+			if (nTrees[i]>1) {
+				treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
+			}
+		}
 		if (!fixPhase)
 			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
 		else
@@ -77,9 +87,11 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 			super(m, "likeVar", true);
 
 			// Add dependencies between likelihood variable and parameters
-			if (nTrees>1)
-				m.addEdge(this, m.treeIndex);
-			
+			for (int i=0;i<nTrees.length;i++) {
+				if (nTrees[i]>1) {
+					m.addEdge(this, m.treeIndices[i]);
+				}
+			}
 			if (!fixPhase) {
 				m.addEdge(this, m.seasonalPhase);
 			}
@@ -137,16 +149,17 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 			else 
 				migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhaseRealization,seasonalPhaseRealization+0.5);
 			
-			LikelihoodTree workingCopy;
-			if (nTrees>1)
-				workingCopy = data.getTrees().get((int)treeIndex.getValue()).copy(); 
-			else
-				workingCopy = data.getTrees().get(0).copy();
+			LikelihoodTree workingCopy;		
+			for (int i=0;i<nTrees.length;i++) {
+				if (nTrees[i]>1)
+					workingCopy = data.getTrees().get(i).get((int)treeIndices[i].getValue()).copy(); 
+				else
+					workingCopy = data.getTrees().get(i).get(0).copy();
+				workingCopy.setLikelihoodModel(migrationBaseModel);
+				logP+=workingCopy.logLikelihood();
+			}						
 
-			workingCopy.setLikelihoodModel(migrationBaseModel);
-			logP=workingCopy.logLikelihood();
-			
-			setLogP(logP);
+			setLogP(logP);	
 			oldLogP=logP;
 			return true;
 		}
