@@ -28,7 +28,7 @@ import jebl.evolution.trees.SimpleRootedTree;
 @SuppressWarnings("serial")
 public class DataFromFiles implements Data
 {
-	public Vector<LikelihoodTree> trees;
+	public List<ArrayList<LikelihoodTree>> trees;
 	Config config = null;
 	int numLocations;
 
@@ -82,63 +82,70 @@ public class DataFromFiles implements Data
 
 	private void loadDataFromFiles(Config config_) throws IOException, ImportException {
 		config = config_;
-		trees = new Vector<LikelihoodTree>();
+		trees = new ArrayList<ArrayList<LikelihoodTree>>();
 		numLocations=0;
 
 		// Load trees
-		System.out.print("Loading trees... ");			
-		File treeFile = new File(config.treeFilename);
-		FileReader reader = new FileReader(treeFile);
-		NexusImporter nexusImporter = new NexusImporter(reader);
-		List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
-		System.out.println("loaded "+nexsusTrees.size()+" trees");
+		System.out.print("Loading trees... ");
+		for (int h=0;h<config.treeFilenames.length;h++) {
+			trees.add(new ArrayList<LikelihoodTree>());
+			String treeFilename = config.treeFilenames[h];				
+			System.out.println("Loading tree file: "+treeFilename);
 
-		System.out.print("Keeping tail... ");
-		double meanNumTaxa=0;
-		List<jebl.evolution.trees.Tree> nexsusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
-		for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
-			nexsusTreeTail.add(nexsusTrees.get(i));
-			meanNumTaxa+=nexsusTrees.get(i).getTaxa().size();
-		}
-		meanNumTaxa/=nexsusTreeTail.size();
-		System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");
-		System.out.println(meanNumTaxa+" taxa on average per tree");
+			File treeFile = new File(treeFilename);
+			FileReader reader = new FileReader(treeFile);
+			NexusImporter nexusImporter = new NexusImporter(reader);
+			List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
+			System.out.println("loaded "+nexsusTrees.size()+" trees");
 
-		// TODO: add states....
-		// Convert trees to internal tree representation
-		if (config.locationFilename!=null) {
-			System.out.print("Loading traits... ");
-			AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilename, config.stateFilename);	
-			HashMap<String,Object> attributes = attributeLoader.getAttributes();
-			HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
-			HashMap<String,Double> stateMap = (HashMap<String,Double>) attributes.get("states");
-			numLocations = (Integer) attributes.get("numLocations");
-			System.out.println("loaded "+locationMap.size()+" taxon traits");
+			System.out.print("Keeping tail... ");
+			double meanNumTaxa=0;
+			List<jebl.evolution.trees.Tree> nexsusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
+			for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
+				nexsusTreeTail.add(nexsusTrees.get(i));
+				meanNumTaxa+=nexsusTrees.get(i).getTaxa().size();
+			}
+			meanNumTaxa/=nexsusTreeTail.size();
+			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");
+			System.out.println(meanNumTaxa+" taxa on average per tree");
 
-			System.out.print("Reparsing trees... ");
-			if (stateMap==null) {
-				double numIdentifiedLocations=0;
-				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
-					numIdentifiedLocations+=((TreeWithLocations)trees.get(trees.size()-1)).getNumIdentifiedLocations();
+			// TODO: add states....
+			// Convert trees to internal tree representation
+			if (config.locationFilenames[h]!=null) {
+				System.out.print("Loading traits... ");
+				String locationFilename = config.locationFilenames[h];
+				AttributeLoader attributeLoader= new SimpleAttributeLoader(locationFilename, config.stateFilename);	
+				HashMap<String,Object> attributes = attributeLoader.getAttributes();
+				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
+				HashMap<String,Double> stateMap = (HashMap<String,Double>) attributes.get("states");
+				numLocations = (Integer) attributes.get("numLocations");
+				System.out.println("loaded "+locationMap.size()+" taxon traits");
+
+				System.out.print("Reparsing trees... ");
+				if (stateMap==null) {
+					double numIdentifiedLocations=0;
+					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
+						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
+						numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.size()-1)).getNumIdentifiedLocations();
+					}
+					numIdentifiedLocations=numIdentifiedLocations/trees.size();
+					System.out.print("identified "+numIdentifiedLocations+" tip locations on average per tree");
 				}
-				numIdentifiedLocations=numIdentifiedLocations/trees.size();
-				System.out.print("identified "+numIdentifiedLocations+" tip locations on average per tree");
+				else {
+					// TODO: this...
+				}
+				System.out.println(" reparsed "+trees.size()+" trees");
 			}
 			else {
-				// TODO: this...
-			}
-			System.out.println(" reparsed "+trees.size()+" trees");
+				// TODO: add load states from trees...
+				numLocations=config.numLocations; // TODO: get this to be automatically loaded from trees
+				System.out.print("Reparsing trees... ");
+				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
+					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
+				}		
+				System.out.println(" reparsed "+trees.size()+" trees");
+			}	
 		}
-		else {
-			// TODO: add load states from trees...
-			numLocations=config.numLocations; // TODO: get this to be automatically loaded from trees
-			System.out.print("Reparsing trees... ");
-			for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-				trees.add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
-			}		
-			System.out.println(" reparsed "+trees.size()+" trees");
-		}	
 
 	}
 
@@ -148,7 +155,7 @@ public class DataFromFiles implements Data
 	}
 
 	@Override
-	public List<LikelihoodTree> getTrees() {
+	public List<ArrayList<LikelihoodTree>> getTrees() {
 		return trees;
 	}
 
