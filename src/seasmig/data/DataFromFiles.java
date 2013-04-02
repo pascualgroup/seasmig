@@ -86,7 +86,7 @@ public class DataFromFiles implements Data
 		numLocations=0;
 
 		// Load trees
-		System.out.print("Loading trees... ");
+		System.out.println("Loading trees... ");
 		for (int h=0;h<config.treeFilenames.length;h++) {
 			trees.add(new ArrayList<LikelihoodTree>());
 			String treeFilename = config.treeFilenames[h];				
@@ -126,15 +126,15 @@ public class DataFromFiles implements Data
 					double numIdentifiedLocations=0;
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
 						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
-						numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.size()-1)).getNumIdentifiedLocations();
+						numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 					}
-					numIdentifiedLocations=numIdentifiedLocations/trees.size();
+					numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
 					System.out.print("identified "+numIdentifiedLocations+" tip locations on average per tree");
 				}
 				else {
 					// TODO: this...
 				}
-				System.out.println(" reparsed "+trees.size()+" trees");
+				System.out.println(" reparsed "+trees.get(h).size()+" trees");
 			}
 			else {
 				// TODO: add load states from trees...
@@ -143,7 +143,7 @@ public class DataFromFiles implements Data
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
 					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
 				}		
-				System.out.println(" reparsed "+trees.size()+" trees");
+				System.out.println(" reparsed "+trees.get(h).size()+" trees");
 			}	
 		}
 
