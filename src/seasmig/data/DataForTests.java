@@ -145,7 +145,7 @@ public class DataForTests implements Data {
 			}
 
 			trees.add(new ArrayList<LikelihoodTree>());
-			for (int i=0;i<numTestTrees;i++) {
+			for (int i=0;i<=numTestTrees;i++) {
 				TreeWithLocations testTree = new TreeWithLocations(createModel,numTestTips);
 				testTree.removeInternalLocations();
 				trees.get(0).add(testTree);
