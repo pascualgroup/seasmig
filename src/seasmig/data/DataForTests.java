@@ -22,7 +22,7 @@ import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.SimpleAttributeLoader;
 import seasmig.treelikelihood.SinusoidialSeasonalMigrationBaseModel;
-import seasmig.treelikelihood.TreeWithLocations;
+import seasmig.treelikelihood.TreeWithLocationsAlternative;
 import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
 
 @SuppressWarnings("serial")
@@ -86,7 +86,7 @@ public class DataForTests implements Data {
 					System.out.print("Reparsing trees... ");
 					if (stateMap==null) {
 						for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-							trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
+							trees.get(h).add(new TreeWithLocationsAlternative((SimpleRootedTree) tree,locationMap,numLocations));
 						}
 					}
 					else {
@@ -99,7 +99,7 @@ public class DataForTests implements Data {
 					numLocations=config.numLocations;
 					System.out.print("Reparsing trees... ");
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
+						trees.get(h).add(new TreeWithLocationsAlternative((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
 					}		
 					System.out.println(" reparsed "+trees.size()+" trees");
 				}	
@@ -145,7 +145,7 @@ public class DataForTests implements Data {
 
 			trees.add(new ArrayList<LikelihoodTree>());
 			for (int i=0;i<=numTestTrees;i++) {
-				TreeWithLocations testTree = new TreeWithLocations(createModel,numTestTips);
+				TreeWithLocationsAlternative testTree = new TreeWithLocationsAlternative(createModel,numTestTips);
 				testTree.removeInternalLocations();
 				trees.get(0).add(testTree);
 			}
@@ -223,7 +223,7 @@ public class DataForTests implements Data {
 				}
 				System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
 				for (int i=0; i<numTestTrees;i++) {				
-					TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree) nexsusTreeTail.get(Random.nextInt(nexsusTreeTail.size())));
+					TreeWithLocationsAlternative testTree = new TreeWithLocationsAlternative(createModel,(SimpleRootedTree) nexsusTreeTail.get(Random.nextInt(nexsusTreeTail.size())));
 					testTree.fillRandomTraits();
 					testTree.removeInternalLocations();
 					trees.get(h).add(testTree);				
@@ -303,7 +303,7 @@ public class DataForTests implements Data {
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
+						trees.get(0).add(new TreeWithLocationsAlternative((SimpleRootedTree) tree,locationMap,numLocations));
 					}
 				}
 				else {
@@ -315,7 +315,7 @@ public class DataForTests implements Data {
 				// TODO: add load states from trees...
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
+					trees.get(0).add(new TreeWithLocationsAlternative((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}				

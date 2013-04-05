@@ -11,7 +11,7 @@ import java.util.List;
 public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode> {	
 
 	public static final int UNKNOWN_LOCATION = -1;
-	public double[] probs;
+	public double[] logprobs;
 	LocationTreeNode parent = null;
 	List<LocationTreeNode> children = new ArrayList<LocationTreeNode>();
 	BitSet cladeTaxaIndices = new BitSet(); // Stores the taxa indices of all children  

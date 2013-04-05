@@ -2,6 +2,8 @@ package seasmig.treelikelihood;
 
 import java.util.HashMap;
 
+import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 
@@ -10,7 +12,7 @@ import jebl.evolution.trees.SimpleRootedTree;
 public class TreeWithLocationsAlternative implements LikelihoodTree {
 
 	// TODO: this..
-	double[] UNKNOWN_LOCATION_PROBS;
+	double[] ZERO_LOG_PROBS;
 
 	// Tree generate parameters for test purpose
 	static final private double testBranchLengthMean = 0.1;
@@ -26,9 +28,9 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocationsAlternative(MigrationBaseModel createTreeModel, int numNodes) {		
 		numLocations=createTreeModel.getNumLocations();
-		UNKNOWN_LOCATION_PROBS = new double[numLocations];
+		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
-			UNKNOWN_LOCATION_PROBS[i]=1.0;
+			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
 		double p=createTreeModel.rootfreq(0)[0];
 		int rootLocation =0;
@@ -48,9 +50,9 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 	// Generate random tree states based on input tree topology and model .... 
 	public TreeWithLocationsAlternative(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree) {
 		numLocations=createTreeModel.getNumLocations();
-		UNKNOWN_LOCATION_PROBS = new double[numLocations];
+		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
-			UNKNOWN_LOCATION_PROBS[i]=1.0;
+			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
 		likelihoodModel=createTreeModel;
 		double p=likelihoodModel.rootfreq(0)[0];
@@ -96,9 +98,9 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 	// locations are loaded from nexsus tree trait location_attribute name
 	public TreeWithLocationsAlternative(jebl.evolution.trees.SimpleRootedTree tree, String locationAttributeName, int num_locations_) {
 		numLocations=num_locations_;
-		UNKNOWN_LOCATION_PROBS = new double[numLocations];
+		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
-			UNKNOWN_LOCATION_PROBS[i]=1.0;
+			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
 		root = new LocationTreeNode(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,0,null);
 		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
@@ -108,9 +110,9 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 	// locations are loaded from a hashmap	
 	public TreeWithLocationsAlternative(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
 		numLocations=num_locations_;
-		UNKNOWN_LOCATION_PROBS = new double[numLocations];
+		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
-			UNKNOWN_LOCATION_PROBS[i]=1.0;
+			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
 		Integer location = locationMap.get(tree.getTaxon(tree.getRootNode()));
 		if (location==null) 
@@ -134,32 +136,40 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 
 		// Calculate tree likelihood for site
 		double tempRetLike = 0;
+		int testnumnodesi=0;
 		for (LocationTreeNode node : root) {
+			testnumnodesi+=1;
+			System.err.println(testnumnodesi);
 			if (node.children.size()!=0) { // this is an internal node\
 				// this doesn't assume no information in internal nodes...
 				if (node.loc==LocationTreeNode.UNKNOWN_LOCATION) {
-					node.probs = UNKNOWN_LOCATION_PROBS.clone();
+					node.logprobs = ZERO_LOG_PROBS.clone();
 				}
 				else {
-					node.probs=new double[numLocations];
-					node.probs[node.loc]=1.0;
+					node.logprobs= ZERO_LOG_PROBS.clone();
+					node.logprobs[node.loc]=0;
 				}
 				
 				for (int from = 0; from < numLocations; from++) {
 					for (LocationTreeNode child : node.children ) {
 						// for now caching is done inside likelihood model...
-						double[][] p = likelihoodModel.transitionMatrix(node.time, child.time);
-						double tempLike = 0; 
+						double[][] p = likelihoodModel.transitionMatrix(node.time, child.time); 
+						double[] alphas = new double[numLocations]; 
 						for (int to = 0; to < numLocations; to++) {
-							tempLike += (p[from][to] * child.probs[to]);
+							alphas[to]=(Math.log(p[from][to]) + child.logprobs[to]);
 						}
-						node.probs[from] *= tempLike;
+						// TODO: Implement logSumExp...
+						double tempLike=0;
+						for (int to = 0; to < numLocations; to++) {
+							tempLike+=Math.exp(alphas[to]);
+						}
+						node.logprobs[from] += Math.log(tempLike);
 					}
 				}
 			}
 			else { // this is a tip
-				node.probs = new double[numLocations];
-				node.probs[node.loc]=1.0;
+				node.logprobs = ZERO_LOG_PROBS.clone();
+				node.logprobs[node.loc]=0;
 			}
 		}
 
@@ -167,10 +177,9 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		tempRetLike = 0;
 		double[] rootFreq = likelihoodModel.rootfreq(root.time).clone();
 		for(int i = 0; i < numLocations; i++) {
-			tempRetLike += root.probs[i]*rootFreq[i];
+			tempRetLike += Math.exp(root.logprobs[i])*rootFreq[i];
 		}
 		logLike += Math.log(tempRetLike);
-
 
 		return logLike;		
 	}
@@ -273,24 +282,6 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 
 	}
 
-//	private void removeInternalLocations(Node node) {
-//		if (node.children.size()!=0) {
-//			node.location=UNKNOWN_LOCATION;
-//			for (Node child : node.children) {
-//				removeInternalLocations(child);				
-//			}
-//		}				
-//	}
-
-//	private void clearCachedLikelihood(Node node) {	
-//		node.cachedConditionalLogLikelihood=new double[numLocations];
-//		if (node.children.size()!=0) {			
-//			for (Node child : node.children) {
-//				clearCachedLikelihood(child);				
-//			}
-//		}				
-//	}
-
 	@Override
 	public int getNumLocations() {		
 		return numLocations;
@@ -301,10 +292,9 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		return numIdentifiedLocations;
 	}
 
-	@Override
-	public void setLikelihoodModel(Object likelihoodModel) {
-		// TODO Auto-generated method stub
-		
+	@Override 
+	public void setLikelihoodModel(Object likelihoodModel_) {
+		likelihoodModel = (MigrationBaseModel) likelihoodModel_;
 	}
 
 }
