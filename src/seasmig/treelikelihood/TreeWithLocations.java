@@ -40,7 +40,18 @@ public class TreeWithLocations implements LikelihoodTree {
 		num_locations=createTreeModel.getNumLocations();
 		UNKNOWN_LOCATION=num_locations;
 		likelihoodModel=createTreeModel;
-		root = new Node(0,0,num_locations);
+		double p=likelihoodModel.rootfreq(0)[0];
+		int rootLocation =0;
+		for (int i=0;i<num_locations;i++) {
+			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
+				rootLocation=i;
+				break;
+			}
+			else {
+				p=p+likelihoodModel.rootfreq(0)[i];
+			}
+		}
+		root = new Node(rootLocation,0,num_locations);
 		makeSubTree(tree,(String)null, root,tree.getRootNode());
 	}
 

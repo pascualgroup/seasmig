@@ -227,7 +227,7 @@ public class SeasonalMigrationTest {
 
 				// Load data files and prepare data....			
 				//Data data = new DataFromFiles(config);
-				Data data = new DataForTests(config,TestType.TEST_USING_INPUT_TREES,1,3,3);
+				Data data = new DataForTests(config,TestType.TEST_USING_INPUT_TREES,1,3,10);
 				System.out.println("Running MCMC...");
 				mcmc = new MCMC(); 
 

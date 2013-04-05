@@ -231,7 +231,7 @@ public class DataForTests implements Data {
 				}
 			}
 
-			System.out.println("Generated "+trees.size()+" trees with model generated random tip annotations and input tree topology");
+			System.out.println("Generated "+trees.get(0).size()*trees.size()+" trees with model generated random tip annotations and input tree topology");
 
 		}
 		break;
