@@ -56,14 +56,20 @@ public class ExponentialDistribution extends DoubleDistribution {
     return new MHMultiplierProposer(varName);
   }
   
-  public <T extends ModelNode & DoubleValued> void setRate(T rateNode) throws MC3KitException {
+  public ExponentialDistribution setRate(DoubleValued rateNode) throws MC3KitException {
     scaleEdge = updateEdge(scaleEdge, null);
-    rateEdge = updateEdge(rateEdge, rateNode);
+    rateEdge = updateEdge(rateEdge, (ModelNode)rateNode);
+    return this;
   }
   
-  public <T extends ModelNode & DoubleValued> void setScale(T scaleNode) throws MC3KitException {
+  public DoubleValued getRateNode() {
+    return (DoubleValued)rateEdge.getHead();
+  }
+  
+  public ExponentialDistribution setScale(DoubleValued scaleNode) throws MC3KitException {
     rateEdge = updateEdge(rateEdge, null);
-    scaleEdge = updateEdge(scaleEdge, scaleNode);
+    scaleEdge = updateEdge(scaleEdge, (ModelNode)scaleNode);
+    return this;
   }
 
   @Override

@@ -75,13 +75,6 @@ public class BinaryVariable extends Variable implements BinaryValued {
   }
 
   @Override
-  public boolean update() {
-    BinaryDistribution dist = (BinaryDistribution)getDistribution();
-    setLogP(dist.getLogP(this));
-    return false;
-  }
-
-  @Override
   public Object makeOutputObject() {
     return value ? 1 : 0;
   }

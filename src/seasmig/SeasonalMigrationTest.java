@@ -39,7 +39,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class SeasonalMigrationTest {
-	// TODO: Implement this...	
+	// TODO: Organize and add more tests...
+	// TODO: Cope with checkpoint....
 
 	private static int numTestRepeats = 100;
 	private static int numLocations = 3;

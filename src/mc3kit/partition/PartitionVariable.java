@@ -25,6 +25,8 @@ import mc3kit.util.*;
 import java.io.Serializable;
 import java.util.*;
 
+import com.google.gson.Gson;
+
 import cern.jet.random.Uniform;
 
 @SuppressWarnings("serial")
@@ -32,6 +34,10 @@ public class PartitionVariable extends Variable
 {
 	int n;
 	int k;
+  
+  boolean allowsEmptyGroups;
+  boolean useGibbs;
+  
 	int[] assignment;
 	IterableBitSet[] groups;
 	
@@ -40,12 +46,22 @@ public class PartitionVariable extends Variable
 	
 	protected PartitionVariable() { }
 	
-	public PartitionVariable(Model model, String name, int n, int k) throws MC3KitException
+	public PartitionVariable(Model model, String name, int n, int k) throws MC3KitException {
+	  this(model, name, n, k, false);
+	}
+	
+	public PartitionVariable(Model model, String name, int n, int k, boolean allowsEmptyGroups) throws MC3KitException{
+	  this(model, name, n, k, allowsEmptyGroups, false);
+  }
+	
+	public PartitionVariable(Model model, String name, int n, int k, boolean allowsEmptyGroups, boolean useGibbs) throws MC3KitException
 	{
 		super(model, name, false);
 		
 		this.n = n;
 		this.k = k;
+		this.allowsEmptyGroups = allowsEmptyGroups;
+		this.useGibbs = useGibbs;
 		
 		assignment = new int[n];
 		groups = new IterableBitSet[k];
@@ -84,6 +100,41 @@ public class PartitionVariable extends Variable
 		return assignment[i];
 	}
 	
+	public void setGroups(int[] gs) throws MC3KitException {
+	  assert gs.length == n;
+	  
+    // Reset group bitsets
+    for(int i = 0; i < k; i++)
+    {
+      groups[i].clear();
+    }
+	  
+    for(int i = 0; i < gs.length; i++) {
+      int gi = gs[i];
+      assert gi < k;
+      assignment[i] = gi;
+      groups[gi].set(i);
+    }
+    
+    // Call index associators
+    for(IndexAssociator asr : indexAssociators) {
+      for(int i = 0; i < n; i++) {
+        asr.associate(i, assignment[i]);
+      }
+    }
+    
+    // Associate vars and priors
+    for(Association asn : associations)
+    {
+      for(int i = 0; i < n; i++)
+      {
+        asn.setGroup(i, assignment[i]);
+      }
+    }
+    setChanged();
+    notifyObservers();
+	}
+	
 	public void setGroup(int i, int g) throws MC3KitException
 	{
 		groups[assignment[i]].clear(i);
@@ -113,56 +164,40 @@ public class PartitionVariable extends Variable
 			// Choose group numbers uniformly randomly
 			// conditioned on all groups having at least one member
 			boolean done;
+			int[] gs = new int[n];
 			do
 			{
-				// Reset group bitsets
-				for(int i = 0; i < k; i++)
-				{
-					groups[i].clear();
-				}
+			  int[] groupCounts = new int[k];
 				
 				// Just choose group number uniformly randomly
 				for(int i = 0; i < n; i++)
 				{
-					int g = unif.nextIntFromTo(0, k - 1);
-					assignment[i] = g;
-					groups[g].set(i);
+					gs[i] = unif.nextIntFromTo(0, k - 1);
+					groupCounts[gs[i]]++;
 				}
-				
 				done = true;
 				
-				for(int i = 0; i < k; i++)
+				for(int g = 0; g < k; g++)
 				{
-					if(groups[i].cardinality() == 0)
+					if(groupCounts[g] == 0)
 					{
 						done = false;
 						break;
 					}
 				}
 			} while(!done);
+			
+			setGroups(gs);
 		}
 		else
 		{
 			getDistribution().sample(this);
 		}
-		
-		// Call index associators
-		for(IndexAssociator asr : indexAssociators) {
-		  for(int i = 0; i < n; i++) {
-		    asr.associate(i, assignment[i]);
-		  }
-		}
-		
-		// Associate vars and priors
-		for(Association asn : associations)
-		{
-			for(int i = 0; i < n; i++)
-			{
-				asn.setGroup(i, assignment[i]);
-			}
-		}
-    setChanged();
-    notifyObservers();
+	}
+	
+	@Override
+	public boolean canManipulateGraph() {
+	  return true;
 	}
 	
 	public int getElementCount()
@@ -222,5 +257,10 @@ public class PartitionVariable extends Variable
       return null;
     }
     return assignment.clone();
+  }
+  
+  @Override
+  public String makeOutputString() { 
+    return new Gson().toJson(assignment);
   }
 }

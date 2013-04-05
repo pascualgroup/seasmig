@@ -68,7 +68,7 @@ public class DEMCProposalStepTest {
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
     mcmc.addStep(uniStep);
     
-    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 2, 2, true, false, false);
+    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 0, 2, 2, true, false, false);
     mcmc.addStep(demcStep);
     
     // Run, collect statistics, and check moments against expected distribution
@@ -130,7 +130,7 @@ public class DEMCProposalStepTest {
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
     mcmc.addStep(uniStep);
     
-    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 2, 2, true, true, false);
+    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 0, 2, 2, true, true, false);
     mcmc.addStep(demcStep);
     
     // Run, collect statistics, and check moments against expected distribution
@@ -192,7 +192,7 @@ public class DEMCProposalStepTest {
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
     mcmc.addStep(uniStep);
     
-    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 2, 2, false, false, true);
+    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 0, 2, 2, false, false, true);
     mcmc.addStep(demcStep);
     
     // Run, collect statistics, and check moments against expected distribution
@@ -256,7 +256,7 @@ public class DEMCProposalStepTest {
     mcmc.setModelFactory(mf);
     
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
-    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 2, 2, false, false, true);
+    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 0, 2, 2, false, false, true);
     SwapStep evenStep = new SwapStep(ChainParity.EVEN, 100 * chainCount);
     SwapStep oddStep = new SwapStep(ChainParity.ODD, 100 * chainCount);
     
@@ -327,7 +327,7 @@ public class DEMCProposalStepTest {
     mcmc.setModelFactory(mf);
     
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
-    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 2, 2, false, false, true);
+    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 0, 2, 2, false, false, true);
     SwapStep evenStep = new SwapStep(ChainParity.EVEN, 100 * chainCount);
     SwapStep oddStep = new SwapStep(ChainParity.ODD, 100 * chainCount);
     
@@ -402,7 +402,7 @@ public class DEMCProposalStepTest {
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
     mcmc.addStep(uniStep);
     
-    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 2, varCount, true, false, false);
+    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 0, 2, varCount, true, false, false);
     mcmc.addStep(demcStep);
     
     // Run, collect statistics, and check moments against expected distribution
@@ -469,7 +469,7 @@ public class DEMCProposalStepTest {
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, burnIn, 100);
     mcmc.addStep(uniStep);
     
-    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, burnIn, 200, 10, 100, 2, varCount, false, false, true);
+    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, burnIn, 200, 10, 100, 0, 2, varCount, false, false, true);
     mcmc.addStep(demcStep);
     
     // Run, collect statistics, and check moments against expected distribution
@@ -541,7 +541,7 @@ public class DEMCProposalStepTest {
     mcmc.setModelFactory(mf);
     
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
-    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, varCount/4, varCount, true, false, false);
+    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 0, varCount/4, varCount, true, false, false);
     SwapStep evenStep = new SwapStep(ChainParity.EVEN, 100 * chainCount);
     SwapStep oddStep = new SwapStep(ChainParity.ODD, 100 * chainCount);
     
@@ -621,7 +621,7 @@ public class DEMCProposalStepTest {
     mcmc.setModelFactory(mf);
     
     UnivariateProposalStep uniStep = new UnivariateProposalStep(0.25, 100, burnIn);
-    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, varCount/4, varCount, false, false, true);
+    DEMCProposalStep demcStep = new DEMCProposalStep(0.25, 100, burnIn, 10, 100, 0, varCount/4, varCount, false, false, true);
     SwapStep evenStep = new SwapStep(ChainParity.EVEN, 100 * chainCount);
     SwapStep oddStep = new SwapStep(ChainParity.ODD, 100 * chainCount);
     

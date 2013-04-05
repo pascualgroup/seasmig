@@ -33,18 +33,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cern.colt.*;
-import cern.colt.function.IntComparator;
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-//import cern.colt.function.*;
-//import cern.colt.matrix.tdouble.DoubleFactory2D;
-//import cern.colt.matrix.tdouble.DoubleMatrix1D;
-//import cern.colt.matrix.tdouble.DoubleMatrix2D;
-//import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
-
-//import cern.colt.function.tint.IntComparator;
-//import cern.colt.matrix.*;
-//import cern.colt.matrix.impl.*;
+import cern.colt.function.*;
+import cern.colt.matrix.*;
+import cern.colt.matrix.impl.*;
 import cern.jet.random.*;
 import cern.jet.random.engine.*;
 
@@ -62,6 +53,7 @@ public class DEMCProposalStep implements Step {
   long tuneEvery;
   long historyThin;
   long initialHistoryCount;
+  long recordHistoryAfter;
   int minBlockSize;
   int maxBlockSize;
   boolean useParallel;
@@ -69,6 +61,21 @@ public class DEMCProposalStep implements Step {
   boolean useSnooker;
   
   protected DEMCProposalStep() { }
+  
+  public DEMCProposalStep(
+      double targetAcceptanceRate,
+      long tuneFor,
+      long tuneEvery,
+      long historyThin,
+      long initialHistoryCount,
+      int minBlockSize,
+      int maxBlockSize,
+      boolean useParallel,
+      boolean useLarge,
+      boolean useSnooker
+  ) {
+    this(targetAcceptanceRate, tuneFor, tuneEvery, historyThin, initialHistoryCount, 0, minBlockSize, maxBlockSize, useParallel, useLarge, useSnooker);
+  }
   
   /**
    * Constructor for a differential evolution MCMC (DEMC) step.
@@ -110,6 +117,7 @@ public class DEMCProposalStep implements Step {
       long tuneEvery,
       long historyThin,
       long initialHistoryCount,
+      long recordHistoryAfter,
       int minBlockSize,
       int maxBlockSize,
       boolean useParallel,
@@ -122,6 +130,7 @@ public class DEMCProposalStep implements Step {
     this.tuneEvery = tuneEvery;
     this.historyThin = historyThin;
     this.initialHistoryCount = initialHistoryCount;
+    this.recordHistoryAfter = recordHistoryAfter;
     this.minBlockSize = minBlockSize;
     this.maxBlockSize = maxBlockSize;
     this.useParallel = useParallel;
@@ -190,7 +199,7 @@ public class DEMCProposalStep implements Step {
       }
       
       // Record history
-      if(iterationCount % historyThin == 0) {
+      if(iterationCount >= recordHistoryAfter && iterationCount % historyThin == 0) {
         recordHistory(model);
       }
     }
@@ -445,7 +454,7 @@ public class DEMCProposalStep implements Step {
         
         // Get order of entries in a way that makes covarying/anti-covarying
         // entries tend to get lumped together
-        int[] entryOrder = getEntryOrder(refVec);
+        int[] entryOrder = getEntryOrder(refVec, logger);
         
         if(logger.isLoggable(Level.FINER)) {
           logger.finer(format("Entry order %d: %s", blockSize, Arrays.toString(entryOrder)));
@@ -571,23 +580,24 @@ public class DEMCProposalStep implements Step {
         double oldLogLike = xModel.getLogLikelihood();
         
         // Calculate final norm of difference, make sure it's not zero
-        boolean impossible = false;
+        boolean invalidValues = false;
         double xMinusZNormNew = 0.0;
         if(isSnooker) { 
           DoubleMatrix1D xMinusZNew = subtract(xNew, z);
           xMinusZNormNew = norm2(xMinusZNew);
           
           if(xMinusZNormNew == 0.0) {
-            impossible = true;
+            invalidValues = true;
           }
         }
-        if(!impossible) {
-          impossible = !vectorIsValid(xModel, block, xNew);
+        if(!invalidValues) {
+          invalidValues = !vectorIsValid(xModel, block, xNew);
         }
         
+        boolean invalidPriorLike = false;
         double newLogPrior = Double.NEGATIVE_INFINITY;
         double newLogLike = Double.NEGATIVE_INFINITY;
-        if(!impossible)
+        if(!invalidValues)
         {
           xModel.beginProposal();
           setVector(xModel, block, xNew);
@@ -595,18 +605,16 @@ public class DEMCProposalStep implements Step {
           newLogPrior = xModel.getLogPrior();
           newLogLike = xModel.getLogLikelihood();
           
-          assert(!Double.isInfinite(newLogPrior));
-          assert(!Double.isInfinite(newLogLike));
+          invalidPriorLike = Double.isInfinite(newLogPrior) || Double.isInfinite(newLogLike)
+              || Double.isNaN(newLogPrior) || Double.isNaN(newLogLike);
         }
         
         // Acceptance/rejection
         boolean accepted;
-        if(impossible)
-        {
+        if(invalidValues || invalidPriorLike) {
           accepted = false;
         }
-        else
-        {
+        else {
           double logProposalRatio;
           if(isSnooker) {
             logProposalRatio = (d - 1) * (log(xMinusZNormNew) - log(xMinusZNormOld));
@@ -632,7 +640,7 @@ public class DEMCProposalStep implements Step {
           xModel.acceptProposal();
           counter.record(CounterType.ACCEPTANCE);
         }
-        else if(impossible)
+        else if(invalidValues)
         {
           logger.fine("Impossible");
           counter.record(CounterType.REJECTION, CounterType.IMPOSSIBLE);
@@ -651,7 +659,7 @@ public class DEMCProposalStep implements Step {
       // Sort entries by abs(std dev-normalized distance from mean)
       // so that covarying or anti-covarying quantities will tend to
       // cluster together
-      int[] getEntryOrder(DoubleMatrix1D x)
+      int[] getEntryOrder(DoubleMatrix1D x, Logger logger)
       {
         final double[] xRel = new double[x.size()];
         final int[] order = new int[x.size()];
@@ -664,8 +672,13 @@ public class DEMCProposalStep implements Step {
             xRel[i] = 0;
           else
             xRel[i] = abs((x.getQuick(i) - historyMeans[i]) / historyStdDevs[i]);
-          assert(!Double.isInfinite(xRel[i]));
-          assert(!Double.isNaN(xRel[i]));
+          
+          if(Double.isInfinite(xRel[i]) || Double.isNaN(xRel[i])) {
+            logger.warning(format("Got infinite or NaN xRel for entry %d: (%f - %f)/%f",
+              x.getQuick(i), historyMeans[i], historyStdDevs[i]
+            ));
+            xRel[i] = 0;
+          }
         }
         
         IntComparator comparator = new IntComparator()

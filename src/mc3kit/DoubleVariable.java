@@ -126,13 +126,6 @@ public class DoubleVariable extends Variable implements DoubleValued {
   }
 
   @Override
-  public boolean update() {
-    DoubleDistribution dist = (DoubleDistribution)getDistribution();
-    setLogP(dist.getLogP(this));
-    return false;
-  }
-
-  @Override
   public Object makeOutputObject() {
     return value;
   }

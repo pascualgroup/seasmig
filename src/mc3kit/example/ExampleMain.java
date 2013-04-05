@@ -128,6 +128,7 @@ public class ExampleMain {
             tuneEvery,
             thin, // Thin historical samples for DEMC in memory
             initialHistoryCount, // Collect this many samples before starting DEMC proposals
+            0, // How many samples to wait before recording history (to prevent initial transients from being involved)
             8, // Minimum number of variables to propose at a time
             128, // Maximum number of variables to propose at a time
             true, // Use standard "parallel" DEMC proposals (no projection)

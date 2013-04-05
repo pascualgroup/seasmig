@@ -51,24 +51,24 @@ public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode
 		return this.children.size()==0;
 	}
 
-	public class postOrderIter implements Iterator<LocationTreeNode> {
+	public class postOrderIter implements Iterator<LocationTreeNode>,  Serializable {
 
-		LocationTreeNode current;
-		int currentIndex = 0;
+		LocationTreeNode next;
+		int nextIndex = 0;
 
 		public postOrderIter(LocationTreeNode root) {
 			// Start at left most leaf
 			if (root.parent!=null)
-				currentIndex=position(root, root.parent.children);
-			current=root;
-			while (current.children.size()>0) {
-				current=current.children.get(0);
+				nextIndex=position(root, root.parent.children);
+			next=root;
+			while (next.children.size()>0) {
+				next=next.children.get(0);
 			}
 		}
 
 		@Override
 		public boolean hasNext() { 
-			return (current!=null); 
+			return (next!=null); 
 		}
 
 		private int position(LocationTreeNode node, List<LocationTreeNode> list) {
@@ -82,62 +82,42 @@ public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode
 
 		@Override
 		public LocationTreeNode next() {
-			LocationTreeNode returnValue=current;
+			LocationTreeNode returnValue=next;
 			// If more children after this one reach leftmost child of next child
-			if (current.parent!=null) {
-				if ((currentIndex+1)<current.parent.children.size()){
-					currentIndex+=1;
-					current=current.parent.children.get(currentIndex);
-					while (current.children.size()>0) {
-						current=current.children.get(0);
-						currentIndex=0;
+			if (next.parent!=null) {
+				if ((nextIndex+1)<next.parent.children.size()){
+					nextIndex+=1;
+					next=next.parent.children.get(nextIndex);
+					while (next.children.size()>0) {
+						next=next.children.get(0);
+						nextIndex=0;
 					}
 				}
 				else {
-					current=current.parent;
-					if (current!=null) {
-						if (current.parent!=null)
-							currentIndex=position(current, current.parent.children);
+					next=next.parent;
+					if (next!=null) {
+						if (next.parent!=null)
+							nextIndex=position(next, next.parent.children);
 						else
-							currentIndex=0;
+							nextIndex=0;
 					}
 				}
 			}
 			else {
-				current=null;
+				next=null;
 			}
 			return returnValue;
 		}
 
 		@Override
 		public void remove() {
-			// TODO Test This!!!!
-			LocationTreeNode toRemove=current;
-			// If more children after this one reach leftmost child of next child
-			if (current.parent!=null) {				
-				if ((currentIndex+1)<current.parent.children.size()){
-					currentIndex+=1;
-					current=current.parent.children.get(currentIndex);
-					while (current.children.size()>0) {
-						current=current.children.get(0);
-						currentIndex=0;
-					}
+			if (next!=null) {		
+				if (next.parent!=null) {
+					next.parent.children.remove(position(next,next.parent.children));
+					nextIndex-=1;
 				}
-				else {
-					current=current.parent;
-					if (current!=null) {
-						if (current.parent!=null)
-							currentIndex=position(current, current.parent.children);
-						else
-							currentIndex=0;						
-					}
-
-				}
-				toRemove.parent.children.remove(position(toRemove,toRemove.parent.children));
-			}
-			else {
-				current=null;
-			}		
+			}				
 		}
 	}
+	
 }

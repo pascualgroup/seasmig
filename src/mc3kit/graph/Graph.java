@@ -218,6 +218,37 @@ public class Graph extends Observable implements Serializable {
     return orderNodeMap.values();
   }
   
+  public Collection<Node> orderedNodesHeadToTails(Collection<? extends Node> tails) {
+    List<Node> visitedNodes = new ArrayList<Node>();
+    Set<Node> visitedNodeSet = new HashSet<Node>();
+    SortedMap<Integer, Node> updateQueue = new TreeMap<Integer, Node>();
+    for(Node tail : tails) {
+      updateQueue.put(nodeOrderMap.get(tail), tail);
+    }
+    while(!updateQueue.isEmpty()) {
+      int order = updateQueue.lastKey();
+      Node node = updateQueue.remove(order);
+      visitedNodeSet.add(node);
+      visitedNodes.add(node);
+      for(Edge edge : tailNodeMap.get(node)) {
+        Node head = edge.getHead();
+        if(!visitedNodeSet.contains(head)) {
+          updateQueue.put(nodeOrderMap.get(head), head);
+        }
+      }
+    }
+    
+    Collections.reverse(visitedNodes);
+    int lastVisited = Integer.MIN_VALUE;
+    for(Node node : visitedNodes) {
+      int order = nodeOrderMap.get(node);
+      assert order > lastVisited;
+      lastVisited = order;
+    }
+    
+    return visitedNodes;
+  }
+  
   public int getOrder(Node node) {
     return nodeOrderMap.get(node);
   }

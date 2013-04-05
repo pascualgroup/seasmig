@@ -66,7 +66,12 @@ public abstract class Variable extends ModelNode {
   }
   
   public void sample() throws MC3KitException {
-    getDistribution().sample(this);
+    Distribution dist = getDistribution();
+    if(dist == null) {
+      throw new MC3KitException(format("Distribution for %s is null", getName()));
+    }
+    
+    dist.sample(this);
     setChanged();
     notifyObservers();
   }
@@ -89,10 +94,20 @@ public abstract class Variable extends ModelNode {
   }
   
   public Object makeOutputObject() {
-    throw new UnsupportedOperationException("This variable doesn't support output.");
+    throw new UnsupportedOperationException(format("Variable %s doesn't support output.", this));
   }
   
   public String makeOutputString() {
-    throw new UnsupportedOperationException("This variable doesn't support output as string.");
+    throw new UnsupportedOperationException(format("Variable %s doesn't support output as string.", this));
+  }
+  
+  public boolean canManipulateGraph() {
+    return false;
+  }
+
+  @Override
+  public boolean update() {
+    setLogP(getDistribution().getLogP(this));
+    return false;
   }
 }

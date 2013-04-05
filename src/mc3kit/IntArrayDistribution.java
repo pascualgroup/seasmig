@@ -19,27 +19,19 @@
 
 package mc3kit;
 
-
 @SuppressWarnings("serial")
-public abstract class Distribution extends ModelNode {
+public abstract class IntArrayDistribution extends Distribution {
 
-  protected Distribution() { }
+  protected IntArrayDistribution() { }
   
-  public Distribution(Model model) {
+  public IntArrayDistribution(Model model) {
     this(model, null);
   }
   
-  public Distribution(Model model, String name) {
-    super(name);
-    
-    if(model != null) {
-      model.addDistribution(this);
-    }
+  public IntArrayDistribution(Model model, String name) {
+    super(model, name);
   }
-  
-  public abstract double getLogP(Variable var);
-  
+
+  @Override
   public abstract VariableProposer makeVariableProposer(String varName);
-  
-  public abstract void sample(Variable var) throws MC3KitException;
 }

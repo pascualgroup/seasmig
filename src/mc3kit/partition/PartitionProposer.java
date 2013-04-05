@@ -45,76 +45,186 @@ public class PartitionProposer extends VariableProposer
 	  Chain chain = model.getChain();
 	  RandomEngine rng = chain.getRng();
 	  PartitionVariable var = (PartitionVariable)model.get(getName());
-
-//	  Logger logger = chain.getLogger();
-	  
-		if(var.getGroupCount() == 1)
-			return;
-		
-		Uniform unif = new Uniform(rng);
-		
-		int n = var.getElementCount();
-		int k = var.getGroupCount();
-		
-		for(int a = 0; a < n; a++)
-		{
-			// Get a random item i in a group of size >= 2
-			BitSet movable = getMovableItems(var, n, k);
-			int i = getRandomSetBit(unif, movable);
-			int iGroup = var.getGroupId(i);
-			int iGroupSize = var.getGroupSize(iGroup);
-			assert(iGroupSize >= 2);
-			
-			// Get a random item j whose group will be destination for i
-			int j;
-			int jGroup;
-			do
-			{
-				j = nextIntFromToExcept(unif, 0, n - 1, i);
-				jGroup = var.getGroupId(j);
-			} while(jGroup == iGroup);
-			int jGroupSize = var.getGroupSize(jGroup);
-			
-			// Log-probability of moving i to j's group
-			double logForwardProposal = -log(movable.cardinality())
-				+ log(jGroupSize) - log(n - iGroupSize);
-			
-			double oldLogPrior = model.getLogPrior();
-			double oldLogLikelihood = model.getLogLikelihood();
-			
-			model.beginProposal();
-			var.setGroup(i, jGroup);
-			model.endProposal();
-			
-			double newLogPrior = model.getLogPrior();
-			double newLogLikelihood = model.getLogLikelihood();
-			
-			movable = getMovableItems(var, n, k);
-			double logReverseProposal = -log(movable.cardinality())
-				+ log(jGroupSize + 1) - log(n - (iGroupSize - 1));
-			
-			boolean accepted = shouldAcceptMetropolisHastings(rng,
-			  chain.getPriorHeatExponent(), chain.getLikelihoodHeatExponent(),
-				oldLogPrior, oldLogLikelihood, newLogPrior, newLogLikelihood,
-				logReverseProposal - logForwardProposal);
-			
-			if(accepted)
-			{
-			  model.acceptProposal();
-				recordAcceptance();
-			}
-			else
-			{
-				model.beginRejection();
-				var.setGroup(i, iGroup);
-				model.endRejection();
-				recordRejection();
-			}
-		}
+    
+    if(var.getGroupCount() == 1)
+      return;
+    
+    if(var.allowsEmptyGroups) {
+      if(var.useGibbs) {
+        stepGibbsAllowingEmpty(model, chain, rng, var);
+      }
+      else {
+        stepAllowingEmpty(model, chain, rng, var);
+      }
+	  }
+	  else {
+	    if(var.useGibbs) {
+        stepGibbsNoEmpty(model, chain, rng, var);
+	    }
+	    else {
+        stepNoEmpty(model, chain, rng, var);
+	    }
+	  }
 	}
+  
+  private void stepGibbsAllowingEmpty(Model model, Chain chain, RandomEngine rng, PartitionVariable var) throws MC3KitException {
+    Uniform unif = new Uniform(rng);
+    
+    int n = var.getElementCount();
+    int k = var.getGroupCount();
+    
+    double priorExp = chain.getPriorHeatExponent();
+    double likeExp = chain.getLikelihoodHeatExponent();
+    
+    // Propose new group for every item in random order
+    int[] order = getRandomPermutation(n, unif);
+    for(int i : order) {
+      int gi = var.getGroupId(i);
+      double[] logRelPs = new double[k];
+      
+      // Record the log-pdf for the initial configuration
+      logRelPs[gi] = priorExp * model.getLogPrior() + likeExp * model.getLogLikelihood();
+      double maxLogP = logRelPs[gi];
+      
+      // Find out the log-pdf for all other configurations
+      for(int g = 0; g < k; g++) {
+        if(g == gi) continue;
+        
+        // Try putting i into group g
+        model.beginProposal();
+        var.setGroup(i, g);
+        model.endProposal();
+        model.acceptProposal();
+        
+        // Record the log-pdf for this configuration
+        logRelPs[g] = priorExp * model.getLogPrior() + likeExp * model.getLogLikelihood();
+        if(logRelPs[g] > maxLogP) {
+          maxLogP = logRelPs[g];
+        }
+      }
+      
+      // Calculate exponentiated relative weights of configurations
+      double[] relPs = new double[k];
+      for(int g = 0; g < k; g++) {
+        relPs[g] = exp(logRelPs[g] - maxLogP);
+      }
+      
+      int giNew = nextDiscreteLinearSearch(rng, relPs);
+      if(giNew != k - 1) {
+        model.beginProposal();
+        var.setGroup(i, giNew);
+        model.endProposal();
+        model.acceptProposal();
+      }
+      recordAcceptance();
+    }
+  }
+  
+  private void stepAllowingEmpty(Model model, Chain chain, RandomEngine rng, PartitionVariable var) throws MC3KitException {
+    Uniform unif = new Uniform(rng);
+    
+    int n = var.getElementCount();
+    int k = var.getGroupCount();
+    
+    // Propose new group for every item in random order
+    int[] order = getRandomPermutation(n, unif);
+    for(int i : order) {
+      int gi = var.getGroupId(i);
+      int giNew = nextIntFromToExcept(unif, 0, k - 1, gi);
+      
+      double oldLogPrior = model.getLogPrior();
+      double oldLogLikelihood = model.getLogLikelihood();
+      
+      model.beginProposal();
+      var.setGroup(i, giNew);
+      model.endProposal();
+      
+      double newLogPrior = model.getLogPrior();
+      double newLogLikelihood = model.getLogLikelihood();
+      
+      boolean accepted = shouldAcceptMetropolisHastings(rng,
+        chain.getPriorHeatExponent(), chain.getLikelihoodHeatExponent(),
+        oldLogPrior, oldLogLikelihood, newLogPrior, newLogLikelihood,
+        0.0
+      );
+          
+      if(accepted) {
+        model.acceptProposal();
+        recordAcceptance();
+      }
+      else {
+        model.beginRejection();
+        var.setGroup(i, gi);
+        model.endRejection();
+        recordRejection();
+      }
+    }
+  }
+  
+  private void stepNoEmpty(Model model, Chain chain, RandomEngine rng, PartitionVariable var) throws MC3KitException {
+    
+    Uniform unif = new Uniform(rng);
+    
+    int n = var.getElementCount();
+    int k = var.getGroupCount();
+    
+    for(int a = 0; a < n; a++) {
+      // Get a random item i in a group of size >= 2
+      BitSet movable = getMovableItems(var, n, k);
+      int i = getRandomSetBit(unif, movable);
+      int iGroup = var.getGroupId(i);
+      int iGroupSize = var.getGroupSize(iGroup);
+      assert(iGroupSize >= 2);
+      
+      // Get a random item j whose group will be destination for i
+      int j;
+      int jGroup;
+      do {
+        j = nextIntFromToExcept(unif, 0, n - 1, i);
+        jGroup = var.getGroupId(j);
+      } while(jGroup == iGroup);
+      int jGroupSize = var.getGroupSize(jGroup);
+      
+      // Log-probability of moving i to j's group
+      double logForwardProposal = -log(movable.cardinality())
+        + log(jGroupSize) - log(n - iGroupSize);
+      
+      double oldLogPrior = model.getLogPrior();
+      double oldLogLikelihood = model.getLogLikelihood();
+      
+      model.beginProposal();
+      var.setGroup(i, jGroup);
+      model.endProposal();
+      
+      double newLogPrior = model.getLogPrior();
+      double newLogLikelihood = model.getLogLikelihood();
+      
+      movable = getMovableItems(var, n, k);
+      double logReverseProposal = -log(movable.cardinality())
+        + log(jGroupSize + 1) - log(n - (iGroupSize - 1));
+      
+      boolean accepted = shouldAcceptMetropolisHastings(rng,
+        chain.getPriorHeatExponent(), chain.getLikelihoodHeatExponent(),
+        oldLogPrior, oldLogLikelihood, newLogPrior, newLogLikelihood,
+        logReverseProposal - logForwardProposal);
+      
+      if(accepted) {
+        model.acceptProposal();
+        recordAcceptance();
+      }
+      else {
+        model.beginRejection();
+        var.setGroup(i, iGroup);
+        model.endRejection();
+        recordRejection();
+      }
+    }
+  }
+  
+  private void stepGibbsNoEmpty(Model model, Chain chain, RandomEngine rng, PartitionVariable var) throws MC3KitException {
+    
+  }
 	
-  
-  
 	@Override
   public void tune(double targetRate) throws MC3KitException {
     super.tune(targetRate);

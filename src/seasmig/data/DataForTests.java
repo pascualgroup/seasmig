@@ -40,6 +40,10 @@ public class DataForTests implements Data {
 	private int disturbanceScale;
 
 	protected DataForTests() {};
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException {	
+		System.err.println("here\n");
+	}
 
 	public DataForTests(Config config_, TestType testType, int numTestRepeats, int numTestLocations, int numTestTrees) throws IOException, ImportException 	{				
 

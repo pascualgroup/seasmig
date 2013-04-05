@@ -72,6 +72,10 @@ public class NormalDistribution extends DoubleDistribution {
     return this;
   }
   
+  public DoubleValued getMeanNode() {
+    return (DoubleValued)meanEdge.getHead();
+  }
+  
   public NormalDistribution setVariance(DoubleValued varNode) throws MC3KitException {
     precEdge = updateEdge(precEdge, null);
     stdDevEdge = updateEdge(stdDevEdge, null);
@@ -91,6 +95,10 @@ public class NormalDistribution extends DoubleDistribution {
     stdDevEdge = updateEdge(stdDevEdge, null);
     precEdge = updateEdge(precEdge, (ModelNode)precNode);
     return this;
+  }
+  
+  public DoubleValued getPrecisionNode() {
+    return (DoubleValued)precEdge.getHead();
   }
 
   @Override

@@ -138,7 +138,7 @@ public class PartitionRecombinationStep implements Step {
       Uniform unif = new Uniform(rng);
       int[] oldAssign0 = var0.assignment.clone();
       int[] oldAssign1 = var1.assignment.clone();
-      int[][] newAssign = generateNewAssignments(rng, unif, var0.getGroupCount(), oldAssign0, oldAssign1);
+      int[][] newAssign = generateNewAssignments(rng, unif, var0.getGroupCount(), oldAssign0, oldAssign1, var0.allowsEmptyGroups);
       
       
       // Make proposals
@@ -186,7 +186,7 @@ public class PartitionRecombinationStep implements Step {
     }
     
     private int[][] generateNewAssignments(RandomEngine rng, Uniform unif, int groupCount,
-        int[] oldAssign0, int[] oldAssign1) {
+        int[] oldAssign0, int[] oldAssign1, boolean allowEmptyGroups) {
       int n = oldAssign0.length;
       
       int[] newAssign0 = new int[n];
@@ -218,14 +218,16 @@ public class PartitionRecombinationStep implements Step {
         }
         
         hasEmptyGroups = false;
-        for(int i = 0; i < groupCount; i++) {
-          if(newCount0[i] == 0 || newCount1[i] == 0) {
-            hasEmptyGroups = true;
-            break;
+        if(!allowEmptyGroups) {
+          for(int i = 0; i < groupCount; i++) {
+            if(newCount0[i] == 0 || newCount1[i] == 0) {
+              hasEmptyGroups = true;
+              break;
+            }
           }
         }
         
-      } while(hasEmptyGroups);
+      } while(!allowEmptyGroups && hasEmptyGroups);
       
       return new int[][] {newAssign0, newAssign1};
     }

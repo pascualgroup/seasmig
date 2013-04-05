@@ -32,8 +32,8 @@ public class ConstantHeatFunction implements HeatFunction, Serializable
   }
   
   public ConstantHeatFunction(double priorHeatExponent, double likelihoodHeatExponent) {
-    this.priorHeatExponent = 1.0;
-    this.likelihoodHeatExponent = 1.0;
+    this.priorHeatExponent = priorHeatExponent;
+    this.likelihoodHeatExponent = likelihoodHeatExponent;
   }
   
 	@Override
@@ -48,6 +48,8 @@ public class ConstantHeatFunction implements HeatFunction, Serializable
 	@Override
 	public double[] getLikelihoodHeatExponents(int chainCount)
 	{
+	  System.err.printf("likelihoodheatexpnoent: %f\n", likelihoodHeatExponent);
+	  
     double[] heatExponents = new double[chainCount];
     for(int i = 0; i < chainCount; i++)
       heatExponents[i] = likelihoodHeatExponent;

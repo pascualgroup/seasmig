@@ -44,6 +44,7 @@ public class Model implements Observer, Serializable {
   Chain chain;
   Graph graph;
   
+  List<Variable> metaVariables;
   List<Variable> unobservedVariables;
   
   private double logPrior;
@@ -61,6 +62,7 @@ public class Model implements Observer, Serializable {
   public Model(Chain initialChain) {
     this.chain = initialChain;
     graph = new Graph();
+    metaVariables = new ArrayList<Variable>();
     unobservedVariables = new ArrayList<Variable>();
     state = State.UNINITIALIZED;
     changedValueVars = new HashSet<Variable>();
@@ -122,35 +124,19 @@ public class Model implements Observer, Serializable {
     
     assert graph.verifyOrder();
     
+    // Sample from meta-graph: variables that can manipulate the graph and variables they depend on
+    logger.fine("Sampling from meta-graph...");
+    Collection<Node> metaGraphNodes = graph.orderedNodesHeadToTails(metaVariables);
+    Set<Node> metaGraphNodeSet = new HashSet<Node>(metaGraphNodes);
+    for(Node node : metaGraphNodes) {
+      sampleNode(node);
+    }
+    
+    // Sample from full graph, ignoring nodes in meta-graph
+    logger.fine("Sampling from rest of graph...");
     for(Node node : graph.orderedNodesHeadToTail()) {
-      if(node instanceof Variable) {
-        Variable var = (Variable)node;
-        if(!var.isObserved() && !changedValueVars.contains(var)) {
-          var.sample();
-          if(logger.isLoggable(Level.FINE)) {
-            logger.fine(format("Sampling %s: %s", var, var.makeOutputString()));
-          }
-        }
-        else if(!var.isObserved()) {
-          if(logger.isLoggable(Level.FINE)) {
-            logger.fine(format("Not sampling %s", var));
-          }
-        }
-      }
-      
-      ((ModelNode)node).update();
-      if(logger.isLoggable(Level.FINE)) {
-        logger.fine(format("Updating %s", node));
-      }
-      
-      if(node instanceof Variable) {
-        Variable var = (Variable)node;
-        if(var.isObserved()) {
-          logLikelihood += var.getLogP();
-        }
-        else {
-          logPrior += var.getLogP();
-        }
+      if(!metaGraphNodeSet.contains(node)) {
+        sampleNode(node);
       }
     }
     
@@ -158,6 +144,40 @@ public class Model implements Observer, Serializable {
     newEdgeHeads.clear();
     
     state = State.READY;
+  }
+  
+  private void sampleNode(Node node) throws MC3KitException {
+    Logger logger = getLogger();
+    
+    if(node instanceof Variable) {
+      Variable var = (Variable)node;
+      if(!var.isObserved() && !changedValueVars.contains(var)) {
+        var.sample();
+        if(logger.isLoggable(Level.FINE)) {
+          logger.fine(format("Sampling %s: %s", var, var.makeOutputString()));
+        }
+      }
+      else if(!var.isObserved()) {
+        if(logger.isLoggable(Level.FINE)) {
+          logger.fine(format("Not sampling %s", var));
+        }
+      }
+    }
+    
+    ((ModelNode)node).update();
+    if(logger.isLoggable(Level.FINE)) {
+      logger.fine(format("Updating %s", node));
+    }
+    
+    if(node instanceof Variable) {
+      Variable var = (Variable)node;
+      if(var.isObserved()) {
+        logLikelihood += var.getLogP();
+      }
+      else {
+        logPrior += var.getLogP();
+      }
+    }
   }
   
   public void recalculate(double tol) throws MC3KitException {
@@ -258,7 +278,7 @@ public class Model implements Observer, Serializable {
     
     // Traverse graph in topological order
     int lastOrder = Integer.MIN_VALUE;
-    while (!updateQueue.isEmpty()) {
+    while(!updateQueue.isEmpty()) {
       int order = updateQueue.firstKey();
       assert order > lastOrder;
       lastOrder = order;
@@ -349,6 +369,10 @@ public class Model implements Observer, Serializable {
       }
       unobservedVariables.add(var);
       var.addObserver(this);
+      
+      if(var.canManipulateGraph()) {
+        metaVariables.add(var);
+      }
     }
     
     return var;
@@ -388,6 +412,11 @@ public class Model implements Observer, Serializable {
   public void addEdge(ModelEdge edge) throws MC3KitException {
     if(!(state == State.IN_CONSTRUCTION || state == State.IN_PROPOSAL || state == State.IN_REJECTION)) {
       throw new MC3KitException("Adding edge in wrong state");
+    }
+    
+    ModelNode head = edge.getHead();
+    if(head instanceof Variable) {
+      assert !(((Variable)head).canManipulateGraph());
     }
     
     graph.addEdge(edge);
