@@ -8,22 +8,21 @@ import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
-
+import jebl.evolution.io.ImportException;
+import jebl.evolution.io.NexusImporter;
+import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.AttributeLoader;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.SimpleAttributeLoader;
 import seasmig.treelikelihood.TreeWithLocations;
-import jebl.evolution.io.ImportException;
-import jebl.evolution.io.NexusImporter;
-import jebl.evolution.trees.SimpleRootedTree;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 
 @SuppressWarnings("serial")
 public class DataFromFiles implements Data

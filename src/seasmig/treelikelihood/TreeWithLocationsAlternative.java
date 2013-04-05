@@ -48,6 +48,10 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 	// Generate random tree states based on input tree topology and model .... 
 	public TreeWithLocationsAlternative(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree) {
 		numLocations=createTreeModel.getNumLocations();
+		UNKNOWN_LOCATION_PROBS = new double[numLocations];
+		for (int i=0;i<numLocations;i++){
+			UNKNOWN_LOCATION_PROBS[i]=1.0;
+		}
 		likelihoodModel=createTreeModel;
 		double p=likelihoodModel.rootfreq(0)[0];
 		int rootLocation =0;
@@ -92,6 +96,10 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 	// locations are loaded from nexsus tree trait location_attribute name
 	public TreeWithLocationsAlternative(jebl.evolution.trees.SimpleRootedTree tree, String locationAttributeName, int num_locations_) {
 		numLocations=num_locations_;
+		UNKNOWN_LOCATION_PROBS = new double[numLocations];
+		for (int i=0;i<numLocations;i++){
+			UNKNOWN_LOCATION_PROBS[i]=1.0;
+		}
 		root = new LocationTreeNode(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,0,null);
 		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
 	}
@@ -100,6 +108,10 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 	// locations are loaded from a hashmap	
 	public TreeWithLocationsAlternative(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
 		numLocations=num_locations_;
+		UNKNOWN_LOCATION_PROBS = new double[numLocations];
+		for (int i=0;i<numLocations;i++){
+			UNKNOWN_LOCATION_PROBS[i]=1.0;
+		}
 		Integer location = locationMap.get(tree.getTaxon(tree.getRootNode()));
 		if (location==null) 
 			location=LocationTreeNode.UNKNOWN_LOCATION;
@@ -126,19 +138,19 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 			if (node.children.size()!=0) { // this is an internal node\
 				// this doesn't assume no information in internal nodes...
 				if (node.loc==LocationTreeNode.UNKNOWN_LOCATION) {
-					node.probs = UNKNOWN_LOCATION_PROBS;
+					node.probs = UNKNOWN_LOCATION_PROBS.clone();
 				}
 				else {
 					node.probs=new double[numLocations];
 					node.probs[node.loc]=1.0;
 				}
 				
-				for (int from = 0; from < 4; from++) {
+				for (int from = 0; from < numLocations; from++) {
 					for (LocationTreeNode child : node.children ) {
 						// for now caching is done inside likelihood model...
 						double[][] p = likelihoodModel.transitionMatrix(node.time, child.time);
 						double tempLike = 0; 
-						for (int to = 0; to < 4; to++) {
+						for (int to = 0; to < numLocations; to++) {
 							tempLike += (p[from][to] * child.probs[to]);
 						}
 						node.probs[from] *= tempLike;
@@ -153,8 +165,8 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 
 		// Calculate root base frequency contribution... 
 		tempRetLike = 0;
-		double[] rootFreq =likelihoodModel.rootfreq(root.time);
-		for(int i = 0; i < 4; i++) {
+		double[] rootFreq = likelihoodModel.rootfreq(root.time).clone();
+		for(int i = 0; i < numLocations; i++) {
 			tempRetLike += root.probs[i]*rootFreq[i];
 		}
 		logLike += Math.log(tempRetLike);

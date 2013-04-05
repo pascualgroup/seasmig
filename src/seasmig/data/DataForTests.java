@@ -8,23 +8,22 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
-import seasmig.treelikelihood.AttributeLoader;
-import seasmig.treelikelihood.ConstantMigrationBaseModel;
+import jebl.evolution.io.ImportException;
+import jebl.evolution.io.NexusImporter;
+import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.Tree;
+import jebl.math.Random;
 import seasmig.Config;
 import seasmig.Data;
+import seasmig.treelikelihood.AttributeLoader;
+import seasmig.treelikelihood.ConstantMigrationBaseModel;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.SimpleAttributeLoader;
 import seasmig.treelikelihood.SinusoidialSeasonalMigrationBaseModel;
 import seasmig.treelikelihood.TreeWithLocations;
 import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
-import jebl.evolution.io.ImportException;
-import jebl.evolution.io.NexusImporter;
-import jebl.evolution.trees.SimpleRootedTree;
-import jebl.evolution.trees.Tree;
-import jebl.math.Random;
 
 @SuppressWarnings("serial")
 public class DataForTests implements Data {
