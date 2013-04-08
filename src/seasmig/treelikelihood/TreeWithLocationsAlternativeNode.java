@@ -8,26 +8,26 @@ import java.util.List;
 
 //Nodes in this tree...
 @SuppressWarnings("serial")
-public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode> {	
+public class TreeWithLocationsAlternativeNode implements Serializable, Iterable<TreeWithLocationsAlternativeNode> {	
 
 	public static final int UNKNOWN_LOCATION = -1;
 	public double[] logprobs;
-	LocationTreeNode parent = null;
-	List<LocationTreeNode> children = new ArrayList<LocationTreeNode>();
+	TreeWithLocationsAlternativeNode parent = null;
+	List<TreeWithLocationsAlternativeNode> children = new ArrayList<TreeWithLocationsAlternativeNode>();
 	int loc = UNKNOWN_LOCATION; 
 	double time = 0;
 
-	protected LocationTreeNode() {};
+	protected TreeWithLocationsAlternativeNode() {};
 
 	// Internal Node constructor
-	public LocationTreeNode(int loc_, double time_, LocationTreeNode parent_) {
+	public TreeWithLocationsAlternativeNode(int loc_, double time_, TreeWithLocationsAlternativeNode parent_) {
 		loc=loc_;
 		time=time_;
 		parent=parent_;	
 	}
 
 	@Override
-	public Iterator<LocationTreeNode> iterator() {
+	public Iterator<TreeWithLocationsAlternativeNode> iterator() {
 		return new postOrderIter(this);
 	}
 	
@@ -35,12 +35,12 @@ public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode
 		return this.children.size()==0;
 	}
 
-	public class postOrderIter implements Iterator<LocationTreeNode>,  Serializable {
+	public class postOrderIter implements Iterator<TreeWithLocationsAlternativeNode>,  Serializable {
 
-		LocationTreeNode next;
+		TreeWithLocationsAlternativeNode next;
 		int nextIndex = 0;
 
-		public postOrderIter(LocationTreeNode root) {
+		public postOrderIter(TreeWithLocationsAlternativeNode root) {
 			// Start at left most leaf
 			if (root.parent!=null)
 				nextIndex=position(root, root.parent.children);
@@ -55,7 +55,7 @@ public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode
 			return (next!=null); 
 		}
 
-		private int position(LocationTreeNode node, List<LocationTreeNode> list) {
+		private int position(TreeWithLocationsAlternativeNode node, List<TreeWithLocationsAlternativeNode> list) {
 			for (int i=0;i<list.size();i++) {
 				if (list.get(i)==node) {
 					return i;
@@ -65,8 +65,8 @@ public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode
 		}
 
 		@Override
-		public LocationTreeNode next() {
-			LocationTreeNode returnValue=next;
+		public TreeWithLocationsAlternativeNode next() {
+			TreeWithLocationsAlternativeNode returnValue=next;
 			// If more children after this one reach leftmost child of next child
 			if (next.parent!=null) {
 				if ((nextIndex+1)<next.parent.children.size()){
@@ -102,6 +102,12 @@ public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode
 				}
 			}				
 		}
+	}
+
+	public void addChild(TreeWithLocationsAlternativeNode locationTreeNode) {
+		this.children.add(locationTreeNode);
+		locationTreeNode.parent=this;
+		
 	}
 	
 }

@@ -22,7 +22,7 @@ import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.SimpleAttributeLoader;
 import seasmig.treelikelihood.SinusoidialSeasonalMigrationBaseModel;
-import seasmig.treelikelihood.TreeWithLocationsAlternative;
+import seasmig.treelikelihood.TreeWithLocations;
 import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
 
 @SuppressWarnings("serial")
@@ -30,12 +30,12 @@ public class DataForTests implements Data {
 	// TODO: This...
 	public List<ArrayList<LikelihoodTree>> trees = new ArrayList<ArrayList<LikelihoodTree>>();
 	Config config = null;
-	public enum TestType {NORMAL, TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY};
+	public enum TestType {TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY};
 
 	// TEST MODELS
 	public MigrationBaseModel createModel = null;
 	public List<MigrationBaseModel> testModels = null;
-	private SimpleRootedTree numTestTips;
+	private int numTestTips=2000;
 	private int numLocations;
 	private int disturbanceScale;
 
@@ -55,60 +55,6 @@ public class DataForTests implements Data {
 		List<Tree> nexsusTrees;
 		ArrayList<Tree> nexsusTreeTail;
 		switch (testType) {
-		case NORMAL:
-			// Load trees
-			System.out.print("Loading trees... ");			
-
-			for (int h=0;h<config.treeFilenames.length;h++) {
-				trees.add(new ArrayList<LikelihoodTree>());
-				String treeFilename = config.treeFilenames[h];				
-				System.out.println("Loading tree file: "+treeFilename);
-				treeFile = new File(treeFilename);
-				reader = new FileReader(treeFile);
-				nexusImporter = new NexusImporter(reader);
-				nexsusTrees = nexusImporter.importTrees();
-				System.out.println("loaded "+nexsusTrees.size()+" trees");
-
-				System.out.print("Keeping tail... ");		
-				nexsusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
-				for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
-					nexsusTreeTail.add(nexsusTrees.get(i));
-				}
-				System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
-
-				// TODO: add states....
-				// Convert trees to internal tree representation
-				if (config.locationFilenames[h]!=null) {
-					System.out.print("Loading traits... ");
-					AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilenames[h], config.stateFilename);	
-					HashMap<String,Object> attributes = attributeLoader.getAttributes();
-					HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
-					HashMap<String,Double> stateMap = (HashMap<String,Double>) attributes.get("states");
-					int numLocations = (Integer) attributes.get("numLocations");
-					System.out.println("loaded "+locationMap.size()+" taxon traits");
-
-					System.out.print("Reparsing trees... ");
-					if (stateMap==null) {
-						for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-							trees.get(h).add(new TreeWithLocationsAlternative((SimpleRootedTree) tree,locationMap,numLocations));
-						}
-					}
-					else {
-						// TODO: this...
-					}
-					System.out.println(" reparsed "+trees.size()+" trees");
-				}
-				else {
-					// TODO: add load states from trees...
-					numLocations=config.numLocations;
-					System.out.print("Reparsing trees... ");
-					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(h).add(new TreeWithLocationsAlternative((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
-					}		
-					System.out.println(" reparsed "+trees.size()+" trees");
-				}	
-			}
-			break;
 
 		case TEST_USING_GENERATED_TREES:
 
@@ -121,6 +67,10 @@ public class DataForTests implements Data {
 
 			// For constant model...
 			double[][] Q = makeRandomMigrationMatrix(numTestLocations,5); 
+			Q = new double[][]{{-1,0.333333,0.333333,0.333333},
+					 { 0.333333,-1,0.333333,0.333333},
+					 { 0.333333,0.333333,-1,0.333333},
+					 { 0.333333,0.333333,0.333333,-1}};
 
 			// For two seasonal model...
 			double[][] QW = myMatrixCopy(Q);
@@ -149,12 +99,12 @@ public class DataForTests implements Data {
 
 			trees.add(new ArrayList<LikelihoodTree>());
 			for (int i=0;i<=numTestTrees;i++) {
-				TreeWithLocationsAlternative testTree = new TreeWithLocationsAlternative(createModel,numTestTips);
+				TreeWithLocations testTree = new TreeWithLocations(createModel,numTestTips);
 				testTree.removeInternalLocations();
 				trees.get(0).add(testTree);
 			}
 
-			System.out.println(" generated "+trees.size()+" trees");
+			System.out.println(" generated "+trees.get(0).size()+" trees");
 			System.out.print("Generating test models... ");
 
 			testModels = new ArrayList<MigrationBaseModel>();
@@ -184,7 +134,7 @@ public class DataForTests implements Data {
 
 			// For constant model...
 			Q = makeRandomMigrationMatrix(numTestLocations,2); 
-
+			
 			// For two seasonal model...
 			QW = myMatrixCopy(Q);
 			QS = makeRandomMigrationMatrix(numTestLocations,3); 
@@ -227,7 +177,7 @@ public class DataForTests implements Data {
 				}
 				System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
 				for (int i=0; i<numTestTrees;i++) {				
-					TreeWithLocationsAlternative testTree = new TreeWithLocationsAlternative(createModel,(SimpleRootedTree) nexsusTreeTail.get(Random.nextInt(nexsusTreeTail.size())));
+					TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree) nexsusTreeTail.get(Random.nextInt(nexsusTreeTail.size())));
 					testTree.fillRandomTraits();
 					testTree.removeInternalLocations();
 					trees.get(h).add(testTree);				
@@ -307,7 +257,7 @@ public class DataForTests implements Data {
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(0).add(new TreeWithLocationsAlternative((SimpleRootedTree) tree,locationMap,numLocations));
+						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
 					}
 				}
 				else {
@@ -319,7 +269,7 @@ public class DataForTests implements Data {
 				// TODO: add load states from trees...
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.get(0).add(new TreeWithLocationsAlternative((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
+					trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}				

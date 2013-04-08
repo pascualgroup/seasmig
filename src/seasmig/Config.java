@@ -57,7 +57,7 @@ public class Config implements Serializable
 	public double targetAcceptanceRate = 0.25;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
+	public Seasonality migrationSeasonality = Seasonality.NONE;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION...
 	public double fixedPhase = 0.12;

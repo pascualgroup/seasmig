@@ -2,7 +2,6 @@ package seasmig.treelikelihood;
 
 import java.util.HashMap;
 
-import seasmig.treelikelihood.TreeWithLocations.Node;
 import seasmig.util.Util;
 
 import jebl.evolution.taxa.Taxon;
@@ -20,7 +19,7 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 	static final private double testBranchLengthVariance = 3.0;
 
 	// Tree & Model
-	LocationTreeNode root = null;		
+	TreeWithLocationsAlternativeNode root = null;		
 	private MigrationBaseModel likelihoodModel = null;
 
 	int numLocations = 0;
@@ -44,7 +43,7 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 				p=p+createTreeModel.rootfreq(0)[i];
 			}
 		}
-		root = new LocationTreeNode(rootLocation,0,null);
+		root = new TreeWithLocationsAlternativeNode(rootLocation,0,null);
 		makeRandomTree(createTreeModel, root, numNodes);		
 	}
 
@@ -67,13 +66,13 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 				p=p+likelihoodModel.rootfreq(0)[i];
 			}
 		}
-		root = new LocationTreeNode(rootLocation,0,null);
+		root = new TreeWithLocationsAlternativeNode(rootLocation,0,null);
 		makeSubTree(tree,(String)null, root,tree.getRootNode());
 	}
 
-	private void fillRandomTraits(LocationTreeNode root) {
+	private void fillRandomTraits(TreeWithLocationsAlternativeNode root) {
 		if (root.children!=null) {
-			for (LocationTreeNode child : root.children) {	
+			for (TreeWithLocationsAlternativeNode child : root.children) {	
 				double d = cern.jet.random.Uniform.staticNextDouble();
 				double p=0;
 				for (int location=0;location<numLocations;location++) {
@@ -84,7 +83,7 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 					}
 				}			
 			}
-			for (LocationTreeNode child : root.children) {
+			for (TreeWithLocationsAlternativeNode child : root.children) {
 				fillRandomTraits(child);
 			}
 		}
@@ -103,7 +102,7 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
-		root = new LocationTreeNode(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,0,null);
+		root = new TreeWithLocationsAlternativeNode(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,0,null);
 		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
 	}
 
@@ -117,16 +116,21 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		}
 		Integer location = locationMap.get(tree.getTaxon(tree.getRootNode()));
 		if (location==null) 
-			location=LocationTreeNode.UNKNOWN_LOCATION;
+			location=TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION;
 		else
 			numIdentifiedLocations+=1;
-		root = new LocationTreeNode(location,0,null);
+		root = new TreeWithLocationsAlternativeNode(location,0,null);
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 	}
 
-	public TreeWithLocationsAlternative(LocationTreeNode root_, MigrationBaseModel likelihoodModel_) {
+	public TreeWithLocationsAlternative(TreeWithLocationsAlternativeNode root_, MigrationBaseModel likelihoodModel_) {
 		root = root_;
 		likelihoodModel=likelihoodModel_;
+		numLocations=likelihoodModel.getNumLocations();
+		ZERO_LOG_PROBS = new double[numLocations];
+		for (int i=0;i<numLocations;i++){
+			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
+		}
 	}
 
 	@Override
@@ -134,12 +138,9 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		// TODO: check from/to nomenclature...
 
 		double logLike = 0;
-
-		// Calculate tree likelihood for site
-		double tempRetLike = 0;
-
-		for (LocationTreeNode node : root) {
-			if (node.loc==LocationTreeNode.UNKNOWN_LOCATION) {
+		
+		for (TreeWithLocationsAlternativeNode node : root) {
+			if (node.loc==TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION) {
 				node.logprobs =new double[numLocations];
 			}
 			else {
@@ -149,7 +150,7 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 
 			if (node.children.size()!=0) { // this is an internal node			
 				for (int from = 0; from < numLocations; from++) {
-					for (LocationTreeNode child : node.children ) {
+					for (TreeWithLocationsAlternativeNode child : node.children ) {
 						// for now caching is done inside likelihood model...
 						double[][] p = likelihoodModel.transitionMatrix(node.time, child.time); 
 						double[] alphas = new double[numLocations];						
@@ -164,7 +165,6 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		}
 
 		// Calculate root base frequency contribution... 
-		tempRetLike = 0;
 		double[] rootFreq = likelihoodModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
@@ -175,10 +175,10 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		return logLike;		
 	}
 
-	private void removeInternalLocations(LocationTreeNode node) {
+	private void removeInternalLocations(TreeWithLocationsAlternativeNode node) {
 		if (node.children.size()!=0) {
-			node.loc=LocationTreeNode.UNKNOWN_LOCATION;
-			for (LocationTreeNode child : node.children) {
+			node.loc=TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION;
+			for (TreeWithLocationsAlternativeNode child : node.children) {
 				removeInternalLocations(child);				
 			}
 		}				
@@ -192,14 +192,14 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
 		copyTree.numLocations=this.numLocations;		
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
-		copyTree.root = new LocationTreeNode(root.loc,root.time,null);		
+		copyTree.root = new TreeWithLocationsAlternativeNode(root.loc,root.time,null);		
 		treeCopy(this.root, copyTree.root);  
 		return copyTree;
 	}
 
-	private void treeCopy(LocationTreeNode from, LocationTreeNode to) {
-		for (LocationTreeNode child : from.children) {
-			LocationTreeNode newChild = new LocationTreeNode(child.loc,child.time, to);
+	private void treeCopy(TreeWithLocationsAlternativeNode from, TreeWithLocationsAlternativeNode to) {
+		for (TreeWithLocationsAlternativeNode child : from.children) {
+			TreeWithLocationsAlternativeNode newChild = new TreeWithLocationsAlternativeNode(child.loc,child.time, to);
 			to.children.add(newChild);			
 			treeCopy(child, newChild);
 		}		
@@ -211,7 +211,7 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		return print(root);
 	}
 
-	public String print(LocationTreeNode treePart) {
+	public String print(TreeWithLocationsAlternativeNode treePart) {
 		String returnValue = Integer.toString(treePart.loc);
 		if (treePart.children.size()>0) {
 			returnValue+=" (";
@@ -236,36 +236,36 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 	}
 
 	private void makeSubTree(SimpleRootedTree inputTree,
-			HashMap<String, Integer> locationMap, LocationTreeNode root,
+			HashMap<String, Integer> locationMap, TreeWithLocationsAlternativeNode root,
 			jebl.evolution.graphs.Node inputSubTree) {
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {	
 			Taxon taxon = inputTree.getTaxon(node);
-			Integer location = LocationTreeNode.UNKNOWN_LOCATION;
+			Integer location = TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION;
 			if (taxon!=null) {
 				location = locationMap.get(inputTree.getTaxon(node).toString());
 				if (location==null) 
-					location=LocationTreeNode.UNKNOWN_LOCATION;
+					location=TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION;
 				else
 					numIdentifiedLocations+=1;
 			}			
-			root.children.add(new LocationTreeNode(location,root.time+inputTree.getLength(node)/*+jitter*(cern.jet.random.Uniform.staticNextDouble()-0.5)*/,root));
+			root.children.add(new TreeWithLocationsAlternativeNode(location,root.time+inputTree.getLength(node)/*+jitter*(cern.jet.random.Uniform.staticNextDouble()-0.5)*/,root));
 			makeSubTree(inputTree,locationMap, root.children.get(root.children.size()-1), node);			
 		}
 	}
 
-	public void makeSubTree(jebl.evolution.trees.SimpleRootedTree inputTree, String locationAttributeName, LocationTreeNode outputSubTree, jebl.evolution.graphs.Node inputSubTree) {
+	public void makeSubTree(jebl.evolution.trees.SimpleRootedTree inputTree, String locationAttributeName, TreeWithLocationsAlternativeNode outputSubTree, jebl.evolution.graphs.Node inputSubTree) {
 		// Null attribute means 0 location tree
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {
 			if (locationAttributeName!=null)
-				outputSubTree.children.add(new LocationTreeNode(Integer.parseInt((String)node.getAttribute(locationAttributeName))-1,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+				outputSubTree.children.add(new TreeWithLocationsAlternativeNode(Integer.parseInt((String)node.getAttribute(locationAttributeName))-1,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 			else 
-				outputSubTree.children.add(new LocationTreeNode(0,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+				outputSubTree.children.add(new TreeWithLocationsAlternativeNode(0,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 			makeSubTree(inputTree, locationAttributeName, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
 		}
 
 	}
 
-	public void makeRandomTree(MigrationBaseModel m, LocationTreeNode root, int nNodes) {		
+	public void makeRandomTree(MigrationBaseModel m, TreeWithLocationsAlternativeNode root, int nNodes) {		
 		if (nNodes>1) {
 			for (int child=0;child<2;child++) {
 				double d = cern.jet.random.Uniform.staticNextDouble();
@@ -276,13 +276,13 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 				for (int location=0;location<numLocations;location++) {
 					p=p+Math.exp(m.logprobability(root.loc, location, root.time, to_time));
 					if (d<=p) {
-						root.children.add(new LocationTreeNode(location,to_time,root));
+						root.children.add(new TreeWithLocationsAlternativeNode(location,to_time,root));
 						break;
 					}
 				}			
 			}
 
-			for (LocationTreeNode child : root.children) {
+			for (TreeWithLocationsAlternativeNode child : root.children) {
 				makeRandomTree(m,child,(int) Math.round(nNodes/2.0));
 			}
 		}
