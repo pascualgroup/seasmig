@@ -14,7 +14,6 @@ public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode
 	public double[] logprobs;
 	LocationTreeNode parent = null;
 	List<LocationTreeNode> children = new ArrayList<LocationTreeNode>();
-	BitSet cladeTaxaIndices = new BitSet(); // Stores the taxa indices of all children  
 	int loc = UNKNOWN_LOCATION; 
 	double time = 0;
 
@@ -25,21 +24,6 @@ public class LocationTreeNode implements Serializable, Iterable<LocationTreeNode
 		loc=loc_;
 		time=time_;
 		parent=parent_;	
-	}
-
-	// Tip Constructor
-	public LocationTreeNode(int loc_, int taxaIndex, double time_, LocationTreeNode parent_) {
-		loc=loc_;
-		time=time_;
-		parent=parent_;	
-		cladeTaxaIndices.set(taxaIndex);
-	}
-	
-	public BitSet fillCladeTaxaIndices() {
-		for (LocationTreeNode child : children) {
-			cladeTaxaIndices.or(child.fillCladeTaxaIndices());
-		}
-		return cladeTaxaIndices;
 	}
 
 	@Override

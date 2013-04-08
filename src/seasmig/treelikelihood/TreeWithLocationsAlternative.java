@@ -2,6 +2,9 @@ package seasmig.treelikelihood;
 
 import java.util.HashMap;
 
+import seasmig.treelikelihood.TreeWithLocations.Node;
+import seasmig.util.Util;
+
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 
@@ -134,7 +137,7 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 
 		// Calculate tree likelihood for site
 		double tempRetLike = 0;
-		
+
 		for (LocationTreeNode node : root) {
 			if (node.loc==LocationTreeNode.UNKNOWN_LOCATION) {
 				node.logprobs =new double[numLocations];
@@ -143,65 +146,31 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 				node.logprobs= ZERO_LOG_PROBS.clone();
 				node.logprobs[node.loc]=0;
 			}
-			
-			boolean isInf = true;
-			for (int i=0;i<node.logprobs.length;i++) {
-				isInf=(isInf && Double.isInfinite(node.logprobs[i]));
-			}
-			if (isInf) {
-				System.err.println("Infinite Likelihood Encountered!!!");
-			}
-			
+
 			if (node.children.size()!=0) { // this is an internal node			
-				// TEST
-				isInf = true;
-				for (int i=0;i<node.logprobs.length;i++) {
-					isInf=(isInf && Double.isInfinite(node.logprobs[i]));
-				}
-				if (isInf) {
-					System.err.println("Infinite Likelihood Encountered!!!");
-				}
-				
-				
 				for (int from = 0; from < numLocations; from++) {
 					for (LocationTreeNode child : node.children ) {
 						// for now caching is done inside likelihood model...
 						double[][] p = likelihoodModel.transitionMatrix(node.time, child.time); 
-						double[] alphas = new double[numLocations]; 
+						double[] alphas = new double[numLocations];						
 						for (int to = 0; to < numLocations; to++) {
 							alphas[to]=(Math.log(p[from][to]) + child.logprobs[to]);
-						}
-						// TODO: Implement logSumExp...
-						double tempLike=0;
-						for (int to = 0; to < numLocations; to++) {
-							tempLike+=Math.exp(alphas[to]);
-						}
-						node.logprobs[from] += Math.log(tempLike);
-						
-						isInf = true;
-						for (int i=0;i<node.logprobs.length;i++) {
-							isInf=(isInf && Double.isInfinite(node.logprobs[i]));
-						}
-						if (isInf) {
-							System.err.println("Infinite Likelihood Encountered!!!");
-						}
-					}
-					
-					
+						}						
+						node.logprobs[from] += Util.logSumExp(alphas);
+					}								
 				}
-								
 			}		
-			
-			
+
 		}
 
 		// Calculate root base frequency contribution... 
 		tempRetLike = 0;
-		double[] rootFreq = likelihoodModel.rootfreq(root.time).clone();
-		for(int i = 0; i < numLocations; i++) {
-			tempRetLike += Math.exp(root.logprobs[i])*rootFreq[i];
-		}
-		logLike += Math.log(tempRetLike);
+		double[] rootFreq = likelihoodModel.rootfreq(root.time);
+		double[] alphas = new double[numLocations];	
+		for (int i = 0; i < numLocations; i++) {
+			alphas[i]=root.logprobs[i] + Math.log(rootFreq[i]);
+		}			
+		logLike += Util.logSumExp(alphas);
 
 		return logLike;		
 	}
@@ -221,11 +190,21 @@ public class TreeWithLocationsAlternative implements LikelihoodTree {
 		TreeWithLocationsAlternative copyTree = new TreeWithLocationsAlternative();
 		copyTree.likelihoodModel=this.likelihoodModel;
 		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
-		copyTree.numLocations=this.numLocations;
-		copyTree.root=this.root;
-		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;		
+		copyTree.numLocations=this.numLocations;		
+		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
+		copyTree.root = new LocationTreeNode(root.loc,root.time,null);		
+		treeCopy(this.root, copyTree.root);  
 		return copyTree;
 	}
+
+	private void treeCopy(LocationTreeNode from, LocationTreeNode to) {
+		for (LocationTreeNode child : from.children) {
+			LocationTreeNode newChild = new LocationTreeNode(child.loc,child.time, to);
+			to.children.add(newChild);			
+			treeCopy(child, newChild);
+		}		
+	}
+
 
 	@Override
 	public String print() {

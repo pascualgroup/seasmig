@@ -21,6 +21,26 @@ public class Util {
 		return returnValue;
 
 	}
+	
+	public static double logSumExp(double[] alphas) {
+		double sumExp = 0;
+		double minWithoutNegInf = 0;
+		for (int i=0;i<alphas.length;i++) {
+			if (!Double.isInfinite(alphas[i])) {
+				if (alphas[i]<minWithoutNegInf) {
+					minWithoutNegInf = alphas[i];
+				}
+			}
+		}
+		for (int i=0;i<alphas.length;i++) {			
+			sumExp=sumExp+Math.exp(alphas[i]-minWithoutNegInf);
+		}
+		double returnValue=minWithoutNegInf+Math.log(sumExp);
+		if (Double.isNaN(returnValue) ){
+			return minNegative;
+		}
+		return returnValue;
+	}
 
 	static public String print(double[][] Q) {		
 		String returnValue = "{";
