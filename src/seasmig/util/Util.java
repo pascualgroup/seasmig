@@ -22,7 +22,7 @@ public class Util {
 
 	}
 	
-	public static double logSumExp(double[] alphas) {
+	public static final double logSumExp(double[] alphas) {
 		double sumExp = 0;
 		double minWithoutNegInf = 0;
 		for (int i=0;i<alphas.length;i++) {

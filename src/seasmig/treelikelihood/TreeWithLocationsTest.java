@@ -51,16 +51,16 @@ public class TreeWithLocationsTest {
 		
 		double expectedResult = -4.2023210731;
 		
-		TreeWithLocationsAlternativeNode root = new TreeWithLocationsAlternativeNode(TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION,0.0,null);		
-		root.addChild(new TreeWithLocationsAlternativeNode(0,1.0,root));
-		root.addChild(new TreeWithLocationsAlternativeNode(TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION,1.0,null));
-		root.children.get(1).addChild(new TreeWithLocationsAlternativeNode(1,2.0,null));
-		root.children.get(1).addChild(new TreeWithLocationsAlternativeNode(0,2.0,null));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(0,1.0,root));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(1,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(0,2.0,null));
 		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
 																 { 0.333333,0.333333,0.333333,-1}});
-		TreeWithLocationsAlternative locTree = new TreeWithLocationsAlternative(root,equalModel);
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
 		assertEquals(expectedResult, locTree.logLikelihood(),0.01);
 			
@@ -100,24 +100,24 @@ public class TreeWithLocationsTest {
 		
 		// Tree Likelihood Method 1
 		
-		TreeWithLocationsAlternativeNode root = new TreeWithLocationsAlternativeNode(TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION,0.0,null);		
-		root.addChild(new TreeWithLocationsAlternativeNode(0,1.0,root));
-		root.addChild(new TreeWithLocationsAlternativeNode(TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION,1.0,root));
-		root.children.get(1).addChild(new TreeWithLocationsAlternativeNode(1,2.0,root.children.get(1)));
-		root.children.get(1).addChild(new TreeWithLocationsAlternativeNode(0,2.0,root.children.get(1)));
-		TreeWithLocationsAlternative locTree = new TreeWithLocationsAlternative(root,equalModel);
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(0,1.0,root));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,1.0,root));
+		root.children.get(1).addChild(new TreeWithLocationsNode(1,2.0,root.children.get(1)));
+		root.children.get(1).addChild(new TreeWithLocationsNode(0,2.0,root.children.get(1)));
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
 		// Tree Likelihood Method 2
 
 		int UNKNOWN_LOCATION = equalModel.getNumLocations();
 		int NUM_LOCATIONS= equalModel.getNumLocations();
-		TreeWithLocationsNode root2 = new TreeWithLocationsNode(UNKNOWN_LOCATION,0.0, NUM_LOCATIONS);		
-		root2.children.add(new TreeWithLocationsNode(0,1.0,NUM_LOCATIONS));
-		root2.children.add(new TreeWithLocationsNode(UNKNOWN_LOCATION,1.0, NUM_LOCATIONS));
-		root2.children.get(1).children.add(new TreeWithLocationsNode(1,2.0, NUM_LOCATIONS));
-		root2.children.get(1).children.add(new  TreeWithLocationsNode(0,2.0, NUM_LOCATIONS));
+		TreeWithLocationsNode2 root2 = new TreeWithLocationsNode2(UNKNOWN_LOCATION,0.0, NUM_LOCATIONS);		
+		root2.children.add(new TreeWithLocationsNode2(0,1.0,NUM_LOCATIONS));
+		root2.children.add(new TreeWithLocationsNode2(UNKNOWN_LOCATION,1.0, NUM_LOCATIONS));
+		root2.children.get(1).children.add(new TreeWithLocationsNode2(1,2.0, NUM_LOCATIONS));
+		root2.children.get(1).children.add(new  TreeWithLocationsNode2(0,2.0, NUM_LOCATIONS));
 
-		TreeWithLocations locTree2 = new TreeWithLocations(equalModel,root2);
+		TreeWithLocations2 locTree2 = new TreeWithLocations2(equalModel,root2);
 		
 		
 		// Test
@@ -129,7 +129,7 @@ public class TreeWithLocationsTest {
 	@Test
 	public void testLikelihoodAsymetric() throws Exception {
 		
-		// TODO: this...
+		// TODO: calculate likelihood for this...
 		/*
 		 
 		   --
@@ -169,16 +169,16 @@ public class TreeWithLocationsTest {
 		
 		double expectedResult = -1234567890;
 		
-		TreeWithLocationsAlternativeNode root = new TreeWithLocationsAlternativeNode(TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION,0.0,null);		
-		root.addChild(new TreeWithLocationsAlternativeNode(0,1.0,root));
-		root.addChild(new TreeWithLocationsAlternativeNode(TreeWithLocationsAlternativeNode.UNKNOWN_LOCATION,1.0,null));
-		root.children.get(1).addChild(new TreeWithLocationsAlternativeNode(1,2.0,null));
-		root.children.get(1).addChild(new TreeWithLocationsAlternativeNode(0,2.0,null));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(0,1.0,root));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(1,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(0,2.0,null));
 		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
 																 { 0.333333,0.333333,0.333333,-1}});
-		TreeWithLocationsAlternative locTree = new TreeWithLocationsAlternative(root,equalModel);
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
 		assertEquals(expectedResult, locTree.logLikelihood(),0.01);
 			

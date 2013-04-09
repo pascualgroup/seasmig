@@ -2,21 +2,121 @@ package seasmig.treelikelihood;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Iterator;
 import java.util.List;
 
 //Nodes in this tree...
-	public class TreeWithLocationsNode implements Serializable {	
-		//Node parent = null;
-		List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
-		int location = 0; // Locations are translated to a discrete integer index 0...num_locations
-		double time = 0;
-		double[] cachedConditionalLogLikelihood = null;
+@SuppressWarnings("serial")
+public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLocationsNode> {	
 
-		protected TreeWithLocationsNode() {};
+	public static final int UNKNOWN_LOCATION = -1;
+	public double[] logprobs;
+	TreeWithLocationsNode parent = null;
+	List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
+	int loc = UNKNOWN_LOCATION; 
+	double time = 0;
 
-		public TreeWithLocationsNode(int location_, double time_, int num_locations_) {
-			location=location_;
-			time=time_;
-			cachedConditionalLogLikelihood = new double[num_locations_+1];
+	protected TreeWithLocationsNode() {};
+
+	// Internal Node constructor
+	public TreeWithLocationsNode(int loc_, double time_, TreeWithLocationsNode parent_) {
+		loc=loc_;
+		time=time_;
+		parent=parent_;	
+	}
+
+	@Override
+	public Iterator<TreeWithLocationsNode> iterator() {
+		return new postOrderIter(this);
+	}
+	
+	public boolean isTip() {
+		return this.children.size()==0;
+	}
+
+	public class postOrderIter implements Iterator<TreeWithLocationsNode>,  Serializable {
+
+		TreeWithLocationsNode next;
+		int nextIndex = 0;
+
+		public postOrderIter(TreeWithLocationsNode root) {
+			// Start at left most leaf
+			if (root.parent!=null) {
+				nextIndex=(root.parent.children.get(0)==root ? 0 : 1);
+				//nextIndex=positionBinaryTree(root, root.parent.children);
+			}
+			next=root;
+			while (next.children.size()>0) {
+				next=next.children.get(0);
+			}
+		}
+
+		@Override
+		public boolean hasNext() { 
+			return (next!=null); 
+		}
+
+//		private int positionBinaryTree(TreeWithLocationsAlternativeNode node, List<TreeWithLocationsAlternativeNode> list) {
+//			if (list.get(0)==node) {
+//				return 0;
+//			}
+//			else 
+//				return 1;
+//			
+////			for (int i=0;i<list.size();i++) {
+////				if (list.get(i)==node) {
+////					return i;
+////				}
+////			}
+////			return list.size();
+//		}
+
+		@Override
+		public TreeWithLocationsNode next() {
+			TreeWithLocationsNode returnValue=next;
+			// If more children after this one reach leftmost child of next child
+			if (next.parent!=null) {
+				if ((nextIndex+1)<next.parent.children.size()){
+					nextIndex+=1;
+					next=next.parent.children.get(nextIndex);
+					while (next.children.size()>0) {
+						next=next.children.get(0);
+						nextIndex=0;
+					}
+				}
+				else {
+					next=next.parent;
+					if (next!=null) {
+						if (next.parent!=null)
+							nextIndex = (next.parent.children.get(0)==next ? 0 : 1);
+							//nextIndex=positionBinaryTree(next, next.parent.children);
+						else
+							nextIndex=0;
+					}
+				}
+			}
+			else {
+				next=null;
+			}
+			return returnValue;
+		}
+
+		@Override
+		public void remove() {
+			if (next!=null) {		
+				if (next.parent!=null) {
+					next.parent.children.remove((next.parent.children.get(0)==next ? 0 : 1)/*positionBinaryTree(next,next.parent.children)*/);
+					nextIndex-=1;
+				}
+			}				
 		}
 	}
+
+	public void addChild(TreeWithLocationsNode locationTreeNode) {
+		this.children.add(locationTreeNode);
+		locationTreeNode.parent=this;
+		
+	}
+	
+}

@@ -31,6 +31,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSele
 	private ExponentialDistribution ratePriorDist;	
 	private BinaryVariable[][] rateIndicators1;
 	private BinaryVariable[][] rateIndicators2;
+	private BernoulliDistribution rateIndicatorPriorDist;
 
 	protected SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSelection() { }
 
@@ -48,6 +49,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSele
 		}
 		rates1 = new DoubleVariable[numLocations][numLocations];
 		rates2 = new DoubleVariable[numLocations][numLocations];
+		rateIndicators1 = new BinaryVariable[numLocations][numLocations];
+		rateIndicators2 = new BinaryVariable[numLocations][numLocations];
 		
 		beginConstruction();
 		
@@ -63,7 +66,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSele
 			seasonalPhaseRealization = config.fixedPhase;
 		
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
-		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
+		rateIndicatorPriorDist = new BernoulliDistribution(this, "rateIndicatorPriorDist",0.5);
 		
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
