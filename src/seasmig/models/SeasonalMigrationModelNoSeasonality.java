@@ -3,6 +3,8 @@ package seasmig.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
+
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.ConstantMigrationBaseModel;
@@ -40,7 +42,7 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 			nTrees[i]=trees.get(i).size();
 		}
 		rates = new DoubleVariable[numLocations][numLocations];
-		
+
 		beginConstruction();
 		treeIndices = new IntVariable[trees.size()];
 		for (int i=0;i<trees.size();i++) {
@@ -49,7 +51,7 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 			}
 		}
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
-		
+
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
@@ -66,13 +68,14 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 
 	private class LikelihoodVariable extends Variable {
 		private double oldLogP;
-
+		private LikelihoodTree[] trees;
 
 		LikelihoodVariable(SeasonalMigrationModelNoSeasonality m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true);
 
+			trees = new LikelihoodTree[nTrees.length];
 			// Add dependencies between likelihood variable and parameters
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1) {
@@ -130,8 +133,9 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 					workingCopy = data.getTrees().get(i).get(0).copy();
 				workingCopy.setLikelihoodModel(migrationBaseModel);
 				logP+=workingCopy.logLikelihood();
+				trees[i]=workingCopy;
 			}
-						
+
 			setLogP(logP);
 			oldLogP=logP;
 			return true;
@@ -148,6 +152,7 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 			setLogP(oldLogP);
 			return true;
 		}
+
 
 	}
 }

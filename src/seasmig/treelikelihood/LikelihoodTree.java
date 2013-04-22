@@ -8,4 +8,5 @@ public interface LikelihoodTree extends Serializable {
 	String print();
 	public LikelihoodTree copy(); 
 	public int getNumLocations();
+	public Object newick();
 }

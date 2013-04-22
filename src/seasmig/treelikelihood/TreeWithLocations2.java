@@ -314,6 +314,12 @@ public class TreeWithLocations2 implements LikelihoodTree {
 		return numIdentifiedLocations;
 	}
 
+	@Override
+	public Object newick() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
 
 
