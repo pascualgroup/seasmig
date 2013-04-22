@@ -1,6 +1,8 @@
 package seasmig.treelikelihood;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import seasmig.util.Util;
 
@@ -18,12 +20,17 @@ public class TreeWithLocations implements LikelihoodTree {
 	static final private double testBranchLengthMean = 0.1;
 	static final private double testBranchLengthVariance = 3.0;
 
+	public static final int UNKNOWN_TAXA = -1;
+
 	// Tree & Model
 	TreeWithLocationsNode root = null;		
 	private MigrationBaseModel likelihoodModel = null;
 
 	int numLocations = 0;
 	private int numIdentifiedLocations;
+	
+	// Taxa
+	List<Taxon> taxa = new ArrayList<Taxon>();
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
@@ -43,7 +50,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				p=p+createTreeModel.rootfreq(0)[i];
 			}
 		}
-		root = new TreeWithLocationsNode(rootLocation,0,null);
+		root = new TreeWithLocationsNode(rootLocation,TreeWithLocations.UNKNOWN_TAXA,0,null);
 		makeRandomTree(createTreeModel, root, numNodes);		
 	}
 
@@ -66,10 +73,11 @@ public class TreeWithLocations implements LikelihoodTree {
 				p=p+likelihoodModel.rootfreq(0)[i];
 			}
 		}
-		root = new TreeWithLocationsNode(rootLocation,0,null);
+		int taxonIndex = taxa.indexOf(tree.getTaxon(tree.getRootNode()));
+		root = new TreeWithLocationsNode(rootLocation,taxonIndex,0,null);
 		makeSubTree(tree,(String)null, root,tree.getRootNode());
 	}
-
+	
 	private void fillRandomTraits(TreeWithLocationsNode root) {
 		if (root.children!=null) {
 			for (TreeWithLocationsNode child : root.children) {	
@@ -96,19 +104,22 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from nexsus tree trait location_attribute name
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, String locationAttributeName, int num_locations_) {
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, List<Taxon> taxa_, String locationAttributeName, int num_locations_) {
+		taxa = taxa_;
 		numLocations=num_locations_;
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
-		root = new TreeWithLocationsNode(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,0,null);
+		int taxonIndex = taxa.indexOf(tree.getTaxon(tree.getRootNode()));
+		root = new TreeWithLocationsNode(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,taxonIndex,0,null);
 		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
 	}
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,List<Taxon> taxa_, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
+		taxa = taxa_;
 		numLocations=num_locations_;
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
@@ -119,7 +130,8 @@ public class TreeWithLocations implements LikelihoodTree {
 			location=TreeWithLocationsNode.UNKNOWN_LOCATION;
 		else
 			numIdentifiedLocations+=1;
-		root = new TreeWithLocationsNode(location,0,null);
+		int taxonIndex = taxa.indexOf(tree.getTaxon(tree.getRootNode()));
+		root = new TreeWithLocationsNode(location,taxonIndex,0,null);
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 	}
 
@@ -135,8 +147,6 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public double logLikelihood() {
-		// TODO: check from/to nomenclature...
-
 		double logLike = 0;
 		
 		for (TreeWithLocationsNode node : root) {
@@ -192,14 +202,15 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
 		copyTree.numLocations=this.numLocations;		
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
-		copyTree.root = new TreeWithLocationsNode(root.loc,root.time,null);		
+		copyTree.root = new TreeWithLocationsNode(root.loc,root.taxonIndex,root.time,null);
+		copyTree.taxa = taxa;
 		treeCopy(this.root, copyTree.root);  
 		return copyTree;
 	}
 
 	private void treeCopy(TreeWithLocationsNode from, TreeWithLocationsNode to) {
 		for (TreeWithLocationsNode child : from.children) {
-			TreeWithLocationsNode newChild = new TreeWithLocationsNode(child.loc,child.time, to);
+			TreeWithLocationsNode newChild = new TreeWithLocationsNode(child.loc,child.taxonIndex,child.time, to);
 			to.children.add(newChild);			
 			treeCopy(child, newChild);
 		}		
@@ -248,17 +259,20 @@ public class TreeWithLocations implements LikelihoodTree {
 				else
 					numIdentifiedLocations+=1;
 			}			
-			root.children.add(new TreeWithLocationsNode(location,root.time+inputTree.getLength(node)/*+jitter*(cern.jet.random.Uniform.staticNextDouble()-0.5)*/,root));
+			int taxonIndex = taxa.indexOf(inputTree.getTaxon(node));			
+			root.children.add(new TreeWithLocationsNode(location,taxonIndex,root.time+inputTree.getLength(node),root));
 			makeSubTree(inputTree,locationMap, root.children.get(root.children.size()-1), node);			
 		}
 	}
 
 	public void makeSubTree(jebl.evolution.trees.SimpleRootedTree inputTree, String locationAttributeName, TreeWithLocationsNode outputSubTree, jebl.evolution.graphs.Node inputSubTree) {
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {
+			int taxonIndex = taxa.indexOf(inputTree.getTaxon(node));
+			
 			if (locationAttributeName!=null)
-				outputSubTree.children.add(new TreeWithLocationsNode(Integer.parseInt((String)node.getAttribute(locationAttributeName))-1,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+				outputSubTree.children.add(new TreeWithLocationsNode(Integer.parseInt((String)node.getAttribute(locationAttributeName))-1,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 			else 
-				outputSubTree.children.add(new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+				outputSubTree.children.add(new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 			makeSubTree(inputTree, locationAttributeName, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
 		}
 
@@ -275,7 +289,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int location=0;location<numLocations;location++) {
 					p=p+Math.exp(m.logprobability(root.loc, location, root.time, to_time));
 					if (d<=p) {
-						root.children.add(new TreeWithLocationsNode(location,to_time,root));
+						root.children.add(new TreeWithLocationsNode(location,TreeWithLocationsNode.UNKNOWN_LOCATION,to_time,root));
 						break;
 					}
 				}			
@@ -301,6 +315,37 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override 
 	public void setLikelihoodModel(Object likelihoodModel_) {
 		likelihoodModel = (MigrationBaseModel) likelihoodModel_;
+	}
+	
+	public String newick() {
+		return "(" + newick(root) + ")";
+	}
+
+	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....
+	private String newick(TreeWithLocationsNode treePart) {
+		String returnValue = new String();
+
+		if (treePart.isTip()) {
+			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);
+			returnValue+=(treePart.getTaxonIndex()+treePart.parseTraits()+":"+branchLength);
+		}
+		else if (treePart.children.size()>0) {
+			returnValue+="(";
+			returnValue+=newick(treePart.children.get(0));
+			for (int i = 1; i < treePart.children.size(); i++){
+				returnValue+=",";
+				returnValue+=newick(treePart.children.get(i));	
+			}
+			returnValue+=")";
+			double parentTime=0;
+			if (treePart.parent!=null) {
+				parentTime=treePart.parent.time;
+			}
+			String branchLength = String.format("%.3f", treePart.time-parentTime);
+			returnValue+=":"+branchLength;
+		}
+
+		return returnValue;
 	}
 
 }

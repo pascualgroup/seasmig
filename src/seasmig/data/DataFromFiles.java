@@ -11,6 +11,7 @@ import java.util.List;
 
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
+import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.Config;
 import seasmig.Data;
@@ -94,18 +95,19 @@ public class DataFromFiles implements Data
 			File treeFile = new File(treeFilename);
 			FileReader reader = new FileReader(treeFile);
 			NexusImporter nexusImporter = new NexusImporter(reader);
-			List<jebl.evolution.trees.Tree> nexsusTrees = nexusImporter.importTrees();
-			System.out.println("loaded "+nexsusTrees.size()+" trees");
+			List<Taxon> taxa = nexusImporter.parseTaxaBlock();		
+			List<jebl.evolution.trees.Tree> NexusTrees = nexusImporter.importTrees();			
+			System.out.println("loaded "+NexusTrees.size()+" trees");
 
 			System.out.print("Keeping tail... ");
 			double meanNumTaxa=0;
-			List<jebl.evolution.trees.Tree> nexsusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
-			for (int i=Math.max(0,nexsusTrees.size()-config.numTreesFromTail);i<nexsusTrees.size();i++) {
-				nexsusTreeTail.add(nexsusTrees.get(i));
-				meanNumTaxa+=nexsusTrees.get(i).getTaxa().size();
+			List<jebl.evolution.trees.Tree> NexusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
+			for (int i=Math.max(0,NexusTrees.size()-config.numTreesFromTail);i<NexusTrees.size();i++) {
+				NexusTreeTail.add(NexusTrees.get(i));
+				meanNumTaxa+=NexusTrees.get(i).getTaxa().size();
 			}
-			meanNumTaxa/=nexsusTreeTail.size();
-			System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");
+			meanNumTaxa/=NexusTreeTail.size();
+			System.out.println(" keeping last "+NexusTreeTail.size()+ " trees");
 			System.out.println(meanNumTaxa+" taxa on average per tree");
 
 			// TODO: add states....
@@ -123,8 +125,8 @@ public class DataFromFiles implements Data
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					double numIdentifiedLocations=0;
-					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
+					for (jebl.evolution.trees.Tree tree : NexusTreeTail) {
+						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxa, locationMap,numLocations));
 						numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 					}
 					numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
@@ -139,8 +141,8 @@ public class DataFromFiles implements Data
 				// TODO: add load states from trees...
 				numLocations=config.numLocations; // TODO: get this to be automatically loaded from trees
 				System.out.print("Reparsing trees... ");
-				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
+				for (jebl.evolution.trees.Tree tree : NexusTreeTail) {
+					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,taxa, config.locationAttributeNameInTree, numLocations));
 				}		
 				System.out.println(" reparsed "+trees.get(h).size()+" trees");
 			}	

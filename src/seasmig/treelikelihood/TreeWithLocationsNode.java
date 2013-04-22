@@ -16,14 +16,16 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
 	int loc = UNKNOWN_LOCATION; 
 	double time = 0;
+	int taxonIndex = 0;
 
 	protected TreeWithLocationsNode() {};
 
 	// Internal Node constructor
-	public TreeWithLocationsNode(int loc_, double time_, TreeWithLocationsNode parent_) {
+	public TreeWithLocationsNode(int loc_, int taxonIndex_, double time_, TreeWithLocationsNode parent_) {
 		loc=loc_;
 		time=time_;
 		parent=parent_;	
+		taxonIndex=taxonIndex_;
 	}
 
 	@Override
@@ -44,7 +46,6 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 			// Start at left most leaf
 			if (root.parent!=null) {
 				nextIndex=(root.parent.children.get(0)==root ? 0 : 1);
-				//nextIndex=positionBinaryTree(root, root.parent.children);
 			}
 			next=root;
 			while (next.children.size()>0) {
@@ -56,21 +57,6 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		public boolean hasNext() { 
 			return (next!=null); 
 		}
-
-//		private int positionBinaryTree(TreeWithLocationsAlternativeNode node, List<TreeWithLocationsAlternativeNode> list) {
-//			if (list.get(0)==node) {
-//				return 0;
-//			}
-//			else 
-//				return 1;
-//			
-////			for (int i=0;i<list.size();i++) {
-////				if (list.get(i)==node) {
-////					return i;
-////				}
-////			}
-////			return list.size();
-//		}
 
 		@Override
 		public TreeWithLocationsNode next() {
@@ -90,7 +76,6 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 					if (next!=null) {
 						if (next.parent!=null)
 							nextIndex = (next.parent.children.get(0)==next ? 0 : 1);
-							//nextIndex=positionBinaryTree(next, next.parent.children);
 						else
 							nextIndex=0;
 					}
@@ -118,5 +103,15 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		locationTreeNode.parent=this;
 		
 	}
-	
+
+	public int getTaxonIndex() {		
+		return taxonIndex;
+	}
+
+	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....
+	public String parseTraits() {		
+		return "[&prob={"+logprobs+"}]";
+	}
+
+
 }

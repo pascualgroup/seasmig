@@ -11,6 +11,7 @@ import java.util.List;
 
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
+import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.math.Random;
@@ -235,6 +236,7 @@ public class DataForTests implements Data {
 			treeFile = new File(config.treeFilenames[0]);
 			reader = new FileReader(treeFile);
 			nexusImporter = new NexusImporter(reader);
+			List<Taxon> taxa = nexusImporter.parseTaxaBlock();
 			nexsusTrees = nexusImporter.importTrees();
 			System.out.println("loaded "+nexsusTrees.size()+" trees");
 
@@ -257,7 +259,7 @@ public class DataForTests implements Data {
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,locationMap,numLocations));
+						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxa,locationMap,numLocations));
 					}
 				}
 				else {
@@ -269,7 +271,7 @@ public class DataForTests implements Data {
 				// TODO: add load states from trees...
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,config.locationAttributeNameInTree, numLocations));
+					trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxa,config.locationAttributeNameInTree, numLocations));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}				
