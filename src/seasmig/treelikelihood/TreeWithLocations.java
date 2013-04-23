@@ -151,11 +151,11 @@ public class TreeWithLocations implements LikelihoodTree {
 		
 		for (TreeWithLocationsNode node : root) {
 			if (node.loc==TreeWithLocationsNode.UNKNOWN_LOCATION) {
-				node.logprobs =new double[numLocations];
+				node.logProbs =new double[numLocations];
 			}
 			else {
-				node.logprobs= ZERO_LOG_PROBS.clone();
-				node.logprobs[node.loc]=0;
+				node.logProbs= ZERO_LOG_PROBS.clone();
+				node.logProbs[node.loc]=0;
 			}
 
 			if (node.children.size()!=0) { // this is an internal node			
@@ -165,9 +165,9 @@ public class TreeWithLocations implements LikelihoodTree {
 						double[][] p = likelihoodModel.transitionMatrix(node.time, child.time); 
 						double[] alphas = new double[numLocations];						
 						for (int to = 0; to < numLocations; to++) {
-							alphas[to]=(Math.log(p[from][to]) + child.logprobs[to]);
+							alphas[to]=(Math.log(p[from][to]) + child.logProbs[to]);
 						}						
-						node.logprobs[from] += Util.logSumExp(alphas);
+						node.logProbs[from] += Util.logSumExp(alphas);
 					}								
 				}
 			}		
@@ -178,7 +178,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		double[] rootFreq = likelihoodModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
-			alphas[i]=root.logprobs[i] + Math.log(rootFreq[i]);
+			alphas[i]=root.logProbs[i] + Math.log(rootFreq[i]);
 		}			
 		logLike += Util.logSumExp(alphas);
 
@@ -319,23 +319,23 @@ public class TreeWithLocations implements LikelihoodTree {
 	
 	public String newick() {
 		logLikelihood();
-		return "(" + newick(root) + ")\n";
+		return "(" + newick(root,likelihoodModel.rootfreq(root.time)) + ")\n";
 	}
 
 	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....
-	private String newick(TreeWithLocationsNode treePart) {
+	private String newick(TreeWithLocationsNode treePart, double[] rootFreq) {
 		String returnValue = new String();
 
 		if (treePart.isTip()) {
 			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);
-			returnValue+=(Integer.toString(treePart.getTaxonIndex())+treePart.parseTraits()+":"+branchLength);
+			returnValue+=(Integer.toString(treePart.getTaxonIndex())+treePart.parseAncestralStates(rootFreq)+":"+branchLength);
 		}
 		else if (treePart.children.size()>0) {
 			returnValue+="(";
-			returnValue+=newick(treePart.children.get(0));
+			returnValue+=newick(treePart.children.get(0),rootFreq);
 			for (int i = 1; i < treePart.children.size(); i++){
 				returnValue+=",";
-				returnValue+=newick(treePart.children.get(i));	
+				returnValue+=newick(treePart.children.get(i),rootFreq);	
 			}
 			returnValue+=")";
 			double parentTime=0;
@@ -343,7 +343,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				parentTime=treePart.parent.time;
 			}
 			String branchLength = String.format("%.3f", treePart.time-parentTime);
-			returnValue+=treePart.parseTraits()+":"+branchLength;
+			returnValue+=treePart.parseAncestralStates(rootFreq)+":"+branchLength;
 		}		
 		return returnValue;
 	}

@@ -6,12 +6,14 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
+import seasmig.util.Util;
+
 //Nodes in this tree...
 @SuppressWarnings("serial")
 public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLocationsNode> {	
 
 	public static final int UNKNOWN_LOCATION = -1;
-	public double[] logprobs;
+	public double[] logProbs;
 	TreeWithLocationsNode parent = null;
 	List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
 	int loc = UNKNOWN_LOCATION; 
@@ -32,7 +34,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	public Iterator<TreeWithLocationsNode> iterator() {
 		return new postOrderIter(this);
 	}
-	
+
 	public boolean isTip() {
 		return this.children.size()==0;
 	}
@@ -101,7 +103,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	public void addChild(TreeWithLocationsNode locationTreeNode) {
 		this.children.add(locationTreeNode);
 		locationTreeNode.parent=this;
-		
+
 	}
 
 	public int getTaxonIndex() {		
@@ -109,12 +111,35 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	}
 
 	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....
-	public String parseTraits() {			
-		String returnValue = "[&prob={";
-		for (int i=0;i<logprobs.length;i++) {
-			String prob = String.format("%.3f",Math.exp(logprobs[i]));
+	public String parseAncestralStates(double[] rootfreq) {			
+		String returnValue = "[&prob={";		
+
+		double[] logAncStateProbs = new double[logProbs.length];
+		double[] logAncProbs = new double[logProbs.length];
+			
+		for (int i=0;i<logProbs.length;i++) {	
+			if (parent!=null)
+				logAncStateProbs[i] = logProbs[i]+parent.logProbs[i];
+			else
+				logAncStateProbs[i] = logProbs[i]+rootfreq[i];					
+		}
+
+		double logTotalProb = Util.logSumExp(logAncStateProbs);
+		for (int i=0;i<logProbs.length;i++) {
+			logAncStateProbs[i]=logAncStateProbs[i]-logTotalProb;
+		}
+		
+		// Deal with numeric issues of not summing up to 1.0
+		double totalProb = 0;
+		for (int i=0;i<logProbs.length;i++) {			
+			logAncProbs[i]=Math.exp(logAncStateProbs[i]);
+			totalProb+=logAncProbs[i];
+		}
+		
+		for (int i=0;i<logProbs.length;i++) {
+			String prob = String.format("%.3f",logAncProbs[i]/totalProb);
 			returnValue+=prob;
-			if (i!=(logprobs.length-1)) 
+			if (i!=(logProbs.length-1)) 
 				returnValue+=",";
 		}
 		returnValue+="}]";
