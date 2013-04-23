@@ -1,26 +1,21 @@
 package seasmig.treelikelihood;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import seasmig.util.Util;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
+import seasmig.util.Util;
 
 
 @SuppressWarnings("serial")
 public class TreeWithLocations implements LikelihoodTree {
-
-	// TODO: this..
-	double[] ZERO_LOG_PROBS;
 
 	// Tree generate parameters for test purpose
 	static final private double testBranchLengthMean = 0.1;
 	static final private double testBranchLengthVariance = 3.0;
 
 	public static final int UNKNOWN_TAXA = -1;
+	public static final int UNKNOWN_LOCATION = -1;
 
 	// Tree & Model
 	TreeWithLocationsNode root = null;		
@@ -30,7 +25,10 @@ public class TreeWithLocations implements LikelihoodTree {
 	private int numIdentifiedLocations;
 	
 	// Taxa
-	List<Taxon> taxa = new ArrayList<Taxon>();
+	HashMap<String, Integer> taxaIndices = new HashMap<String,Integer>();
+	
+	// TODO: this..
+	double[] ZERO_LOG_PROBS;
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
@@ -73,8 +71,14 @@ public class TreeWithLocations implements LikelihoodTree {
 				p=p+likelihoodModel.rootfreq(0)[i];
 			}
 		}
-		int taxonIndex = taxa.indexOf(tree.getTaxon(tree.getRootNode()));
-		root = new TreeWithLocationsNode(rootLocation,taxonIndex,0,null);
+		Integer rootTaxonIndex = UNKNOWN_TAXA;
+		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
+		if (rootTaxon!=null) {
+			rootTaxonIndex = taxaIndices.get(rootTaxon.getName());
+		}
+		if (rootTaxonIndex==null)
+			rootTaxonIndex = UNKNOWN_TAXA;
+		root = new TreeWithLocationsNode(rootLocation,rootTaxonIndex,0,null);
 		makeSubTree(tree,(String)null, root,tree.getRootNode());
 	}
 	
@@ -104,22 +108,28 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from nexsus tree trait location_attribute name
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, List<Taxon> taxa_, String locationAttributeName, int num_locations_) {
-		taxa = taxa_;
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String,Integer> taxaIndices_, String locationAttributeName, int num_locations_) {
+		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
-		int taxonIndex = taxa.indexOf(tree.getTaxon(tree.getRootNode()));
-		root = new TreeWithLocationsNode(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,taxonIndex,0,null);
+		Integer rootTaxonIndex = UNKNOWN_TAXA;
+		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
+		if (rootTaxon!=null) {
+			rootTaxonIndex = taxaIndices.get(rootTaxon.getName());
+		}
+		if (rootTaxonIndex==null)
+			rootTaxonIndex = UNKNOWN_TAXA;
+		root = new TreeWithLocationsNode(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,rootTaxonIndex,0,null);
 		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
 	}
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,List<Taxon> taxa_, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
-		taxa = taxa_;
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
+		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
@@ -127,11 +137,18 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		Integer location = locationMap.get(tree.getTaxon(tree.getRootNode()));
 		if (location==null) 
-			location=TreeWithLocationsNode.UNKNOWN_LOCATION;
+			location=TreeWithLocations.UNKNOWN_LOCATION;
 		else
-			numIdentifiedLocations+=1;
-		int taxonIndex = taxa.indexOf(tree.getTaxon(tree.getRootNode()));
-		root = new TreeWithLocationsNode(location,taxonIndex,0,null);
+			numIdentifiedLocations+=1;		
+		
+		Integer rootTaxonIndex = UNKNOWN_TAXA;
+		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
+		if (rootTaxon!=null) {
+			rootTaxonIndex = taxaIndices.get(rootTaxon.getName());
+		}
+		if (rootTaxonIndex==null)
+			rootTaxonIndex= UNKNOWN_TAXA;
+		root = new TreeWithLocationsNode(location,rootTaxonIndex,0,null);
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 	}
 
@@ -150,7 +167,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		double logLike = 0;
 		
 		for (TreeWithLocationsNode node : root) {
-			if (node.loc==TreeWithLocationsNode.UNKNOWN_LOCATION) {
+			if (node.loc==TreeWithLocations.UNKNOWN_LOCATION) {
 				node.logProbs =new double[numLocations];
 			}
 			else {
@@ -187,7 +204,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private void removeInternalLocations(TreeWithLocationsNode node) {
 		if (node.children.size()!=0) {
-			node.loc=TreeWithLocationsNode.UNKNOWN_LOCATION;
+			node.loc=TreeWithLocations.UNKNOWN_LOCATION;
 			for (TreeWithLocationsNode child : node.children) {
 				removeInternalLocations(child);				
 			}
@@ -203,7 +220,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.numLocations=this.numLocations;		
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
 		copyTree.root = new TreeWithLocationsNode(root.loc,root.taxonIndex,root.time,null);
-		copyTree.taxa = taxa;
+		copyTree.taxaIndices = taxaIndices;
 		treeCopy(this.root, copyTree.root);  
 		return copyTree;
 	}
@@ -251,15 +268,20 @@ public class TreeWithLocations implements LikelihoodTree {
 			jebl.evolution.graphs.Node inputSubTree) {
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {	
 			Taxon taxon = inputTree.getTaxon(node);
-			Integer location = TreeWithLocationsNode.UNKNOWN_LOCATION;
+			Integer location = TreeWithLocations.UNKNOWN_LOCATION;
+			Integer taxonIndex = TreeWithLocations.UNKNOWN_TAXA;			
 			if (taxon!=null) {
-				location = locationMap.get(inputTree.getTaxon(node).toString());
+				location = locationMap.get(taxon.toString());				
 				if (location==null) 
-					location=TreeWithLocationsNode.UNKNOWN_LOCATION;
+					location=TreeWithLocations.UNKNOWN_LOCATION;
 				else
 					numIdentifiedLocations+=1;
+				taxonIndex = taxaIndices.get(taxon.toString());
+				if (taxonIndex==null) 
+					taxonIndex = TreeWithLocations.UNKNOWN_LOCATION;
+				
 			}			
-			int taxonIndex = taxa.indexOf(inputTree.getTaxon(node));			
+			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
 			root.children.add(new TreeWithLocationsNode(location,taxonIndex,root.time+inputTree.getLength(node),root));
 			makeSubTree(inputTree,locationMap, root.children.get(root.children.size()-1), node);			
 		}
@@ -267,12 +289,15 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	public void makeSubTree(jebl.evolution.trees.SimpleRootedTree inputTree, String locationAttributeName, TreeWithLocationsNode outputSubTree, jebl.evolution.graphs.Node inputSubTree) {
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {
-			int taxonIndex = taxa.indexOf(inputTree.getTaxon(node));
-			
+			Taxon taxon = inputTree.getTaxon(node);
+			Integer taxonIndex = UNKNOWN_TAXA;
+			if (taxon!=null)
+				taxonIndex = taxaIndices.get(taxon.getName());			
+			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
 			if (locationAttributeName!=null)
 				outputSubTree.children.add(new TreeWithLocationsNode(Integer.parseInt((String)node.getAttribute(locationAttributeName))-1,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 			else 
-				outputSubTree.children.add(new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+				outputSubTree.children.add(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 			makeSubTree(inputTree, locationAttributeName, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
 		}
 
@@ -289,7 +314,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int location=0;location<numLocations;location++) {
 					p=p+Math.exp(m.logprobability(root.loc, location, root.time, to_time));
 					if (d<=p) {
-						root.children.add(new TreeWithLocationsNode(location,TreeWithLocationsNode.UNKNOWN_LOCATION,to_time,root));
+						root.children.add(new TreeWithLocationsNode(location,TreeWithLocations.UNKNOWN_LOCATION,to_time,root));
 						break;
 					}
 				}			

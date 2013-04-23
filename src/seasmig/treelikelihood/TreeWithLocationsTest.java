@@ -51,9 +51,9 @@ public class TreeWithLocationsTest {
 		
 		double expectedResult = -4.2023210731;
 		
-		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
 		root.addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
-		root.addChild(new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
@@ -103,9 +103,9 @@ public class TreeWithLocationsTest {
 		
 		// Tree Likelihood Method 1
 		
-		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
 		root.addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
-		root.addChild(new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,root.children.get(1)));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,root.children.get(1)));
 		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
@@ -174,9 +174,9 @@ public class TreeWithLocationsTest {
 		
 		double expectedResult = -1234567890;
 		
-		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
 		root.addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
-		root.addChild(new TreeWithLocationsNode(TreeWithLocationsNode.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},

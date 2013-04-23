@@ -237,6 +237,10 @@ public class DataForTests implements Data {
 			reader = new FileReader(treeFile);
 			nexusImporter = new NexusImporter(reader);
 			List<Taxon> taxa = nexusImporter.parseTaxaBlock();
+			HashMap<String,Integer> taxaIndices = new HashMap<String,Integer>();			
+			for (int i=0;i<taxa.size();i++) {
+				taxaIndices.put(taxa.get(i).getName(), i);
+			}
 			nexsusTrees = nexusImporter.importTrees();
 			System.out.println("loaded "+nexsusTrees.size()+" trees");
 
@@ -259,7 +263,7 @@ public class DataForTests implements Data {
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxa,locationMap,numLocations));
+						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,locationMap,numLocations));
 					}
 				}
 				else {
@@ -271,7 +275,7 @@ public class DataForTests implements Data {
 				// TODO: add load states from trees...
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxa,config.locationAttributeNameInTree, numLocations));
+					trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,config.locationAttributeNameInTree, numLocations));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}				

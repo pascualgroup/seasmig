@@ -1,21 +1,20 @@
 package seasmig.models;
 
-import static mc3kit.util.Utils.makeHierarchicalMap;
-
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.google.gson.Gson;
-
+import mc3kit.Chain;
+import mc3kit.DoubleVariable;
+import mc3kit.IntVariable;
+import mc3kit.MC3KitException;
+import mc3kit.Variable;
+import mc3kit.distributions.ExponentialDistribution;
+import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.ConstantMigrationBaseModel;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
-import mc3kit.*;
-import mc3kit.distributions.*;
 
 
 @SuppressWarnings("serial")

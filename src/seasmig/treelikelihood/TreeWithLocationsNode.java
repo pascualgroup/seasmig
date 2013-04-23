@@ -11,12 +11,11 @@ import seasmig.util.Util;
 //Nodes in this tree...
 @SuppressWarnings("serial")
 public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLocationsNode> {	
-
-	public static final int UNKNOWN_LOCATION = -1;
+	
 	public double[] logProbs;
 	TreeWithLocationsNode parent = null;
 	List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
-	int loc = UNKNOWN_LOCATION; 
+	int loc = TreeWithLocations.UNKNOWN_LOCATION; 
 	double time = 0;
 	int taxonIndex = 0;
 
