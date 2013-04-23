@@ -19,7 +19,7 @@ public class TreesLikelihoodVariable extends Variable {
 	public Object makeOutputObject() {
 		String[] returnValue=new String[trees.length];
 		for (int i=0;i<trees.length;i++) {
-			Model model = this.getModel();			
+			Model model = this.getModel();		 	
 			// "tree STATE_50850000 [&lnP=-34291.617355973016,posterior=-34291.617355973016] = [&R]"
 			String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
 			returnValue[i]=(header + (trees[i].newick()+String.format("\n")));

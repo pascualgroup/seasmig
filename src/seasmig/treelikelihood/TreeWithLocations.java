@@ -342,8 +342,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		likelihoodModel = (MigrationBaseModel) likelihoodModel_;
 	}
 	
-	public String newick() {
-		//logLikelihood(); // TODO: avoid recalculating likelihood...  	
+	public String newick() {	 
 		return "(" + newick(root,likelihoodModel.rootfreq(root.time)) + ")\n";
 	}
 
