@@ -85,14 +85,12 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSele
 
 	} 
 
-	private class LikelihoodVariable extends Variable {
-		private double oldLogP;
-
-
+	private class LikelihoodVariable extends TreesLikelihoodVariable {
+	
 		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSelection m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
-			super(m, "likeVar", true);
+			super(m, "likeVar", true,nTrees.length);
 
 			// Add dependencies between likelihood variable and parameters
 			for (int i=0;i<nTrees.length;i++) {
@@ -167,6 +165,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSele
 					workingCopy = data.getTrees().get(i).get(0).copy();
 				workingCopy.setLikelihoodModel(migrationBaseModel);
 				logP+=workingCopy.logLikelihood();
+				trees[i]=workingCopy;
 			}						
 
 			setLogP(logP);	

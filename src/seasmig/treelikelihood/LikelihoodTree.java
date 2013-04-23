@@ -9,4 +9,5 @@ public interface LikelihoodTree extends Serializable {
 	public LikelihoodTree copy(); 
 	public int getNumLocations();
 	public Object newick();
+	public double cachedLogLikelihood();
 }

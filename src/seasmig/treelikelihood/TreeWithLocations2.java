@@ -20,7 +20,8 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	private MigrationBaseModel likelihoodModel = null;
 	private int UNKNOWN_LOCATION;
 	private int numIdentifiedLocations;
-	private double[] basefreq; 
+	private double[] basefreq;
+	private double logLike = 0; 
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations2(MigrationBaseModel createTreeModel, int numNodes) {		
@@ -124,6 +125,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 
 	@Override
 	public double logLikelihood() {
+		logLike = 0;
 		double[] alphas=new double[num_locations];
 		double min = Double.POSITIVE_INFINITY;
 		if (root.location==UNKNOWN_LOCATION) {
@@ -136,10 +138,12 @@ public class TreeWithLocations2 implements LikelihoodTree {
 				alphas[rootLocation]=alpha;	
 				if (alpha<min) min=alpha;				
 			}
-			return seasmig.util.Util.logSumExp(alphas,min);
+			logLike = seasmig.util.Util.logSumExp(alphas,min); 
+			return logLike;
 		}
 		else {
-			return conditionalLogLikelihood(root,root.location);					
+			logLike = conditionalLogLikelihood(root,root.location);
+			return logLike;					
 		}		
 	}
 
@@ -318,6 +322,11 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	public Object newick() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public double cachedLogLikelihood() {		
+		return logLike;
 	}
 
 }

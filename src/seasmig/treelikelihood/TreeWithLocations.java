@@ -10,10 +10,6 @@ import seasmig.util.Util;
 @SuppressWarnings("serial")
 public class TreeWithLocations implements LikelihoodTree {
 
-	// Tree generate parameters for test purpose
-	static final private double testBranchLengthMean = 0.1;
-	static final private double testBranchLengthVariance = 3.0;
-
 	public static final int UNKNOWN_TAXA = -1;
 	public static final int UNKNOWN_LOCATION = -1;
 
@@ -29,6 +25,11 @@ public class TreeWithLocations implements LikelihoodTree {
 	
 	// TODO: this..
 	double[] ZERO_LOG_PROBS;
+	private double logLike = 0;
+	
+	// Tree generate parameters for test purpose
+	static final private double testBranchLengthMean = 0.1;
+	static final private double testBranchLengthVariance = 3.0;
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
@@ -164,8 +165,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public double logLikelihood() {
-		double logLike = 0;
-		
+		logLike  = 0;
 		for (TreeWithLocationsNode node : root) {
 			if (node.loc==TreeWithLocations.UNKNOWN_LOCATION) {
 				node.logProbs =new double[numLocations];
@@ -343,7 +343,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 	
 	public String newick() {
-		logLikelihood();
+		//logLikelihood(); // TODO: avoid recalculating likelihood...  	
 		return "(" + newick(root,likelihoodModel.rootfreq(root.time)) + ")\n";
 	}
 
@@ -371,6 +371,11 @@ public class TreeWithLocations implements LikelihoodTree {
 			returnValue+=treePart.parseAncestralStates(rootFreq)+":"+branchLength;
 		}		
 		return returnValue;
+	}
+
+	@Override
+	public double cachedLogLikelihood() {		
+		return logLike;
 	}
 
 }

@@ -69,16 +69,14 @@ public class SeasonalMigrationModelNoSeasonality extends SeasonalMigrationModel 
 
 	} 	
 
-	private class LikelihoodVariable extends Variable {
-		private double oldLogP;
-		private LikelihoodTree[] trees;
+	private class LikelihoodVariable extends TreesLikelihoodVariable {
+	
 
 		LikelihoodVariable(SeasonalMigrationModelNoSeasonality m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
-			super(m, "likeVar", true);
+			super(m, "likeVar", true, nTrees.length);
 
-			trees = new LikelihoodTree[nTrees.length];
 			// Add dependencies between likelihood variable and parameters
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1) {
@@ -156,14 +154,7 @@ public class SeasonalMigrationModelNoSeasonality extends SeasonalMigrationModel 
 			return true;
 		}
 		
-		@Override
-		public Object makeOutputObject() {
-			String returnValue="";
-			for (int i=0;i<trees.length;i++) {
-				returnValue+=trees[i].newick()+"\n";
-			}			
-			return returnValue;
-		}
+		
 		
 	}
 }
