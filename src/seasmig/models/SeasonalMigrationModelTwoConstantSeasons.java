@@ -12,7 +12,7 @@ import mc3kit.*;
 import mc3kit.distributions.*;
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelTwoConstantSeasons extends Model {
+public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationModel {
 
 	Config config;
 	Data data;

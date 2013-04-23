@@ -318,7 +318,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 	
 	public String newick() {
-		return "(" + newick(root) + ")";
+		logLikelihood();
+		return "(" + newick(root) + ")\n";
 	}
 
 	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....
@@ -327,7 +328,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		if (treePart.isTip()) {
 			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);
-			returnValue+=(treePart.getTaxonIndex()+treePart.parseTraits()+":"+branchLength);
+			returnValue+=(Integer.toString(treePart.getTaxonIndex())+treePart.parseTraits()+":"+branchLength);
 		}
 		else if (treePart.children.size()>0) {
 			returnValue+="(";
@@ -342,9 +343,8 @@ public class TreeWithLocations implements LikelihoodTree {
 				parentTime=treePart.parent.time;
 			}
 			String branchLength = String.format("%.3f", treePart.time-parentTime);
-			returnValue+=":"+branchLength;
-		}
-
+			returnValue+=treePart.parseTraits()+":"+branchLength;
+		}		
 		return returnValue;
 	}
 

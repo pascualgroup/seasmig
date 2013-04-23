@@ -25,7 +25,7 @@ import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection extends Model {
+public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection extends SeasonalMigrationModel {
 
 	Config config;
 	Data data;

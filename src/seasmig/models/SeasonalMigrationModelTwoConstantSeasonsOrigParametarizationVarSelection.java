@@ -13,7 +13,7 @@ import mc3kit.distributions.*;
 
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSelection extends Model {
+public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSelection extends SeasonalMigrationModel {
 
 
 	Config config;

@@ -1,7 +1,11 @@
 package seasmig.models;
 
+import static mc3kit.util.Utils.makeHierarchicalMap;
+
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.Gson;
 
@@ -15,7 +19,7 @@ import mc3kit.distributions.*;
 
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelNoSeasonality extends Model {
+public class SeasonalMigrationModelNoSeasonality extends SeasonalMigrationModel {
 
 
 	Config config;
@@ -64,7 +68,7 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 
 		endConstruction();
 
-	} 
+	} 	
 
 	private class LikelihoodVariable extends Variable {
 		private double oldLogP;
@@ -152,7 +156,15 @@ public class SeasonalMigrationModelNoSeasonality extends Model {
 			setLogP(oldLogP);
 			return true;
 		}
-
-
+		
+		@Override
+		public Object makeOutputObject() {
+			String returnValue="";
+			for (int i=0;i<trees.length;i++) {
+				returnValue+=trees[i].newick()+"\n";
+			}			
+			return returnValue;
+		}
+		
 	}
 }

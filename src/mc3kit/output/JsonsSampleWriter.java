@@ -44,6 +44,7 @@ public class JsonsSampleWriter implements SampleWriter
     this.gson = new GsonBuilder()
     .serializeSpecialFloatingPointValues()
     .setPrettyPrinting()
+    .disableHtmlEscaping()
     .create();
     this.writer = new PrintWriter(new FileOutputStream(filename, append));
 	}
