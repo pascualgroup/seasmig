@@ -267,7 +267,12 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR extend
 		 */
 		@Override
 		public boolean updateAfterRejection() {
-			setLogP(oldLogLikelihood);
+			if (!firstCall)
+				setLogP(oldLogP);
+			else {
+				super.updateAfterRejection();
+				firstCall=false;
+			}
 			return true;
 		}
 

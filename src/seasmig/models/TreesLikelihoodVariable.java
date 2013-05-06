@@ -7,12 +7,14 @@ import mc3kit.Variable;
 @SuppressWarnings("serial")
 public class TreesLikelihoodVariable extends Variable {
 	protected double oldLogP;
+	protected boolean firstCall;
 	protected LikelihoodTree[] trees;
 	
 	public TreesLikelihoodVariable(Model m,
 			String name, boolean observable, int numTrees) {
 		super(m,name,observable);
 		trees = new LikelihoodTree[numTrees];
+		firstCall = true;
 	}
 
 	@Override

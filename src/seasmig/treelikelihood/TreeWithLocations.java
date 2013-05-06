@@ -188,7 +188,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					}								
 				}
 			}		
-
+		
 		}
 
 		// Calculate root base frequency contribution... 
@@ -343,7 +343,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 	
 	public String newick() {	 
-		return "(" + newick(root,likelihoodModel.rootfreq(root.time)) + ")\n";
+		return newick(root,likelihoodModel.rootfreq(root.time)) + "\n";
 	}
 
 	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....

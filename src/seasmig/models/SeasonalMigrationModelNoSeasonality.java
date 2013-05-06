@@ -150,7 +150,12 @@ public class SeasonalMigrationModelNoSeasonality extends SeasonalMigrationModel 
 		 */
 		@Override
 		public boolean updateAfterRejection() {
-			setLogP(oldLogP);
+			if (!firstCall)
+				setLogP(oldLogP);
+			else {
+				super.updateAfterRejection();
+				firstCall=false;
+			}
 			return true;
 		}
 		
