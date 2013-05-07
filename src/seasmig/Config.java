@@ -38,16 +38,16 @@ public class Config implements Serializable
 	public String checkpointFilename = "checkpoint.bin";
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String mlFilename = "ml.txt";
-	public long checkpointEvery = 10;
-	public long thin = 10;
+	public long checkpointEvery = 1000;
+	public long thin = 100;
 	
 	// MCMC RELATED PARAMETERS
-	public long burnIn = 200; 	// in iterations	
+	public long burnIn = 2000; 	// in iterations	
 	public long iterationCount = 100000000L;
 	
-	public long tuneEvery = 50; 
-	public long tuneFor = 200;
-	public long mlthin = 10;
+	public long tuneEvery = 500; 
+	public long tuneFor = 5000;
+	public long mlthin = 100;
 	
 	public long initialHistoryCount = 50;
 
