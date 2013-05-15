@@ -23,13 +23,15 @@ public class ConstantMigrationWithObservationBaseModel implements MigrationBaseM
 	// Matrix Exponentiation
 	MatrixExponentiator matrixExponentiator;
 
-	private double[] basefreq;	
+	private double[] basefreq;
+	private ObserverModel observer;	
 
 	protected ConstantMigrationWithObservationBaseModel() {};
 	
 	// Constructor	
-	public ConstantMigrationWithObservationBaseModel(double[][] Q_) {	
+	public ConstantMigrationWithObservationBaseModel(double[][] Q_, ObserverModel observer_) {		
 		Q = Q_;
+		observer = observer_;
 		num_locations=Q_.length;
 		switch (num_locations) {
 		case 2:
@@ -59,12 +61,11 @@ public class ConstantMigrationWithObservationBaseModel implements MigrationBaseM
 		double[][] cached = cachedTransitionMatrices.get(dt);
 
 		if (cached!=null)  
-			return Math.log(cached[from_location][to_location]);		
+			return observer.logObservationProbability(from_location, from_time)+observer.logObservationProbability(to_location, to_time)+Math.log(cached[from_location][to_location]);		
 		else 		
-			return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);		
+			return observer.logObservationProbability(from_location, from_time)+observer.logObservationProbability(to_location, to_time)+Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);		
 	}
 
-	@Override
 	public double[][] transitionMatrix(double from_time, double to_time) {		
 		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
 		
