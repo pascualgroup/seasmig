@@ -10,8 +10,6 @@ import mc3kit.DoubleDistribution;
 import mc3kit.DoubleVariable;
 import mc3kit.IntVariable;
 import mc3kit.MC3KitException;
-import mc3kit.Model;
-import mc3kit.Variable;
 import mc3kit.distributions.BernoulliDistribution;
 import mc3kit.distributions.ExponentialDistribution;
 import mc3kit.distributions.UniformDistribution;
