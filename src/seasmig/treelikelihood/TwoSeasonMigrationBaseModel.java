@@ -78,15 +78,19 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 			DoubleMatrix2D result = F.identity(num_states);
 
 			while (step_end_time<to_time) {
-				double step_start_time_div = step_start_time - (step_start_time%1.0);
+				double step_start_time_reminder=step_start_time%1.0;
+				double step_start_time_div=step_start_time - step_start_time_reminder;
 				if (isInSeason1(step_start_time)) {					
 					step_end_time = Math.min(to_time,step_start_time_div+season1Start+season1Length);
-					assert (!isInSeason1(step_start_time_div+season1Start+season1Length));
 					result = result.zMult(DoubleFactory2D.dense.make(season1MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
 					step_start_time=step_end_time;				
-				} else {					
-					step_end_time = Math.min(to_time,step_start_time_div+season1Start+season1Length+season2Length);
-					assert (isInSeason1(step_start_time_div+season1Start+season1Length+season2Length));
+				} else { // In Season 2 		
+					if (step_start_time_reminder<season1Start) {
+						step_end_time = Math.min(to_time,step_start_time_div+season1Start);
+					}
+					else {
+						step_end_time = Math.min(to_time,step_start_time_div+1.0+season1Start);
+					}
 					result = result.zMult(DoubleFactory2D.dense.make(season2MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
 					step_start_time=step_end_time;			
 				}
