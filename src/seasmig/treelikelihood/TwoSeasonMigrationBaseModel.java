@@ -28,6 +28,8 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	double season1Start = 0;
 	double season1Length = 0;
 	double season2Length = 0;
+	
+	final static double infitesimalTimeInterval = 1E-6;
 
 	// Caching
 	DoubleFactory2D F = DoubleFactory2D.dense;
@@ -81,15 +83,15 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 				double step_start_time_reminder=step_start_time%1.0;
 				double step_start_time_div=step_start_time - step_start_time_reminder;
 				if (isInSeason1(step_start_time)) {					
-					step_end_time = Math.min(to_time,step_start_time_div+season1Start+season1Length);
+					step_end_time = Math.min(to_time,step_start_time_div+season1Start+season1Length+ infitesimalTimeInterval);
 					result = result.zMult(DoubleFactory2D.dense.make(season1MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
 					step_start_time=step_end_time;				
 				} else { // In Season 2 		
 					if (step_start_time_reminder<season1Start) {
-						step_end_time = Math.min(to_time,step_start_time_div+season1Start);
+						step_end_time = Math.min(to_time,step_start_time_div+season1Start+ infitesimalTimeInterval);
 					}
 					else {
-						step_end_time = Math.min(to_time,step_start_time_div+1.0+season1Start);
+						step_end_time = Math.min(to_time,step_start_time_div+1.0+season1Start+ infitesimalTimeInterval);
 					}
 					result = result.zMult(DoubleFactory2D.dense.make(season2MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
 					step_start_time=step_end_time;			
