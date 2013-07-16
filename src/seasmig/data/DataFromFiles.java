@@ -31,10 +31,16 @@ public class DataFromFiles implements Data
 	public List<ArrayList<LikelihoodTree>> trees;
 	Config config = null;
 	int numLocations;
+	long iteration = 0;
 
 	protected DataFromFiles() {};
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException {		 
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+		// Data from files isn't serialized it is reloaded...
+		
+		// TODO: move report of iteration to somewhere else...
+		iteration += config.checkpointEvery;
+		System.out.print("\riteration: "+iteration);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {

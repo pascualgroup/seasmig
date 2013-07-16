@@ -51,13 +51,13 @@ public class Config implements Serializable
 	
 	public long initialHistoryCount = 50;
 
-	public int chainCount = 4;
+	public int chainCount = 8;
 	public double heatPower = 3.0;
 	
 	public double targetAcceptanceRate = 0.25;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
+	public Seasonality migrationSeasonality = Seasonality.NONE;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION...
 	public double fixedPhase = 0.12;

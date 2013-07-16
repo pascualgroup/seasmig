@@ -31,19 +31,23 @@ public class DataForTests implements Data {
 	// TODO: This...
 	public List<ArrayList<LikelihoodTree>> trees = new ArrayList<ArrayList<LikelihoodTree>>();
 	Config config = null;
+	long iteration = 0;
 	public enum TestType {TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY};
 
 	// TEST MODELS
 	public MigrationBaseModel createModel = null;
 	public List<MigrationBaseModel> testModels = null;
-	private int numTestTips=2000;
+	private int numTestTips=3000;
 	private int numLocations;
 	private int disturbanceScale;
 
 	protected DataForTests() {};
 	
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException {	
-		System.err.println("here\n");
+		// TODO: Support Serialization of Test Data...
+		// TODO: move report of iteration to somewhere else...
+		iteration += config.checkpointEvery;
+		System.out.print("\riteration: "+iteration);
 	}
 
 	public DataForTests(Config config_, TestType testType, int numTestRepeats, int numTestLocations, int numTestTrees) throws IOException, ImportException 	{				
@@ -68,10 +72,10 @@ public class DataForTests implements Data {
 
 			// For constant model...
 			double[][] Q = makeRandomMigrationMatrix(numTestLocations,5); 
-			Q = new double[][]{{-1,0.333333,0.333333,0.333333},
-					 { 0.333333,-1,0.333333,0.333333},
-					 { 0.333333,0.333333,-1,0.333333},
-					 { 0.333333,0.333333,0.333333,-1}};
+//			Q = new double[][]{{-1,0.333333,0.333333,0.333333},
+//					 { 0.333333,-1,0.333333,0.333333},
+//					 { 0.333333,0.333333,-1,0.333333},
+//					 { 0.333333,0.333333,0.333333,-1}};
 
 			// For two seasonal model...
 			double[][] QW = myMatrixCopy(Q);

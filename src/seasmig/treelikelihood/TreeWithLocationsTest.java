@@ -172,7 +172,8 @@ public class TreeWithLocationsTest {
          2*(-2.81603+Log[1/4])=....
 		 */
 		
-		double expectedResult = -1234567890;
+		double expectedResult = -4.203325167376054; // This wasn't calculated manually but is the output of the run
+		                                            // i.e. good for regression testing
 		
 		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
 		root.addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
