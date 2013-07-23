@@ -39,7 +39,7 @@ public class Config implements Serializable
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String mlFilename = "ml.txt";
 	public long checkpointEvery = 1000;
-	public long thin = 100;
+	public long thin = 50;
 	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 2000; 	// in iterations	
@@ -57,21 +57,21 @@ public class Config implements Serializable
 	public double targetAcceptanceRate = 0.25;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.NONE;
+	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION...
 	public double fixedPhase = 0.12;
 	public double minSeasonLength = 0.3333333;
 	public double veryLongTime = 1000;
-	public boolean fixRate = true;
+	public boolean fixRate = false;
 	
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add statese & combine files 
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
-	public String[] locationFilenames ={"out.regions"}; // null if locations are loaded from tree
-	public String[] treeFilenames = {"out.tree"}; // null for test generated data 
+	public String[] locationFilenames ={"regionsHA.regions"}; // null if locations are loaded from tree
+	public String[] treeFilenames = {"beastInputHA.trees"}; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail

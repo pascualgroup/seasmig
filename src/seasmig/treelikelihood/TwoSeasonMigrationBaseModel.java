@@ -79,29 +79,31 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 			double step_end_time = step_start_time;
 			DoubleMatrix2D result = F.identity(num_states);
 
-			while (step_end_time<to_time) {
+			while (step_start_time<to_time) {
 				double step_start_time_reminder=step_start_time%1.0;
 				double step_start_time_div=step_start_time - step_start_time_reminder;
 				if (isInSeason1(step_start_time)) {					
 					step_end_time = Math.min(to_time,step_start_time_div+season1Start+season1Length+ infitesimalTimeInterval);
-					result = result.zMult(DoubleFactory2D.dense.make(season1MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
-					step_start_time=step_end_time;				
-				} else { // In Season 2 		
+					result = result.zMult(DoubleFactory2D.dense.make(season1MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);									
+				} 
+				else { // In Season 2 		
 					if (step_start_time_reminder<season1Start) {
 						step_end_time = Math.min(to_time,step_start_time_div+season1Start+ infitesimalTimeInterval);
 					}
 					else {
 						step_end_time = Math.min(to_time,step_start_time_div+1.0+season1Start+ infitesimalTimeInterval);
 					}
-					result = result.zMult(DoubleFactory2D.dense.make(season2MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);	
-					step_start_time=step_end_time;			
+					result = result.zMult(DoubleFactory2D.dense.make(season2MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);								
 				}
+				step_start_time=step_end_time;	
 
 			}
 
 			// cache result
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
-				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
+				for (int i=0;i<cachedTransitionMatrices.size()/2;i++) {
+					cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
+				}
 			}			
 			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),result);
 			

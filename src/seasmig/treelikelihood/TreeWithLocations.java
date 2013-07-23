@@ -28,7 +28,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private double logLike = 0;
 	
 	// Tree generate parameters for test purpose
-	static final private double testBranchLengthMean = 1.0;
+	static final private double testBranchLengthMean = 0.5;
 	static final private double testBranchLengthVariance = 1.0;
 
 	// Generate a random tree based on createTreeModel .... 
