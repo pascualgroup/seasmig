@@ -42,14 +42,19 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 	public SinusoidialSeasonalMigrationBaseModel(double[][] rates, double[][] amp, double[][] phase){
 		num_states=rates.length;
 		DoubleFunction seasonalRates[][] = new DoubleFunction[rates.length][rates.length];
+		// TODO: calculate rootFreq ?
+		DoubleFunction[] rootFreq = new DoubleFunction[rates.length];
+		
 		for (int i=0;i<rates.length;i++) {
+			rootFreq[i] = cern.jet.math.Functions.constant(1.0/rates.length);
 			for (int j=0;j<rates.length;j++) {
 				if (i!=j) {
 					seasonalRates[i][j]=new SeasonalRatePlusSineFunction(rates[i][j],amp[i][j],phase[i][j]);
 				}
 			}
 		}
-		baseModel = new GeneralSeasonalMigrationBaseModel(seasonalRates);
+					
+		baseModel = new GeneralSeasonalMigrationBaseModel(seasonalRates, rootFreq,24);
 	}
 
 	// Methods

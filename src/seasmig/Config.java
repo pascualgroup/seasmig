@@ -13,17 +13,19 @@ public class Config implements Serializable
 {
 	public static enum Seasonality { NONE, TWO_CONSTANT_SEASONS, SINUSOIDAL};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
 	public static enum TwoConstantSeasonsParameterization 
-	{  RATES12_PARAMETERZIATION,  // Separate rates for the two parts of the years rates1[i][j], rates2[i][j]
-	   RATES12_VARIABLE_SELECTION, // rate1[i][j]*indicators1[i][j], rate2[i][j]*indicators2[i][j]
-	   DIFF_PARAMETERIZATION, // (1-DiffMult[i][j])*rate[i][j] is used for season1 
-	   						  // (1+DiffMult[i][j])*rate[i][j] is used for season2
-	   FIX_FROM_DIFF,  		  // Same as above, but each rows uses the same DiffMult:
-	   						  // (1+-DiffMult[i])*rate[i][j] is used for season1/2 
-	   FIX_TO_DIFF,    	      // Same as above, but each col uses the same DiffMult
-	   						  // (1+-DiffMult[j])*rate[i][j] is used for season1/2
-	   FIX_FROM_TO_DIFF,      // Both rows and columns...
-	   VARIABLE_SELECTION,    // (1-DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season1 
-		  					  // (1+DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season2};
+	{  RATES12_PARAMETERZIATION,    // Separate rates for the two parts of the years rates1[i][j], rates2[i][j]
+	   RATES12_VARIABLE_SELECTION,  // rate1[i][j]*indicators1[i][j], rate2[i][j]*indicators2[i][j]
+	   DIFF_PARAMETERIZATION,       // (1-DiffMult[i][j])*rate[i][j] is used for season1 
+	   						   		// (1+DiffMult[i][j])*rate[i][j] is used for season2
+	   FIX_FROM_DIFF,  		   		// Same as above, but each rows uses the same DiffMult:
+	   						   		// (1+-DiffMult[i])*rate[i][j] is used for season1/2 
+	   FIX_TO_DIFF,    	       		// Same as above, but each col uses the same DiffMult
+	   						   		// (1+-DiffMult[j])*rate[i][j] is used for season1/2
+	   FIX_FROM_TO_DIFF,       		// Both rows and columns...
+	   VARIABLE_SELECTION,     		// (1-DiffMult[i][j]*Indicator[i][j])*rate[i][j]*rateIndicator[i][j] is used for season1 
+		  					   		// (1+DiffMult[i][j]*Indicator[i][j])*rate[i][j]*rateIndicator[i][j] is used for season2};
+	   VARIABLE_SELECTION_DIFF,		// (1-DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season1 
+	   								// (1+DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season2};
 	   VARIABLE_SELECTION_GTR	   
 	}
 	public static enum TwoConstantSeasonsPhase { FIXED_PHASE_FIXED_LENGTH, FREE_PHASE_FREE_LENGTH, FIXED_PHASE_FREE_LENGTH, FREE_PHASE_FIXED_LENGTH };
@@ -58,7 +60,7 @@ public class Config implements Serializable
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
-	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION;
+	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION...
 	public double fixedPhase = 0.12;
 	public double minSeasonLength = 0.3333333;
@@ -70,8 +72,8 @@ public class Config implements Serializable
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add statese & combine files 
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
-	public String[] locationFilenames ={"regionsHA.regions"}; // null if locations are loaded from tree
-	public String[] treeFilenames = {"beastInputHA.trees"}; // null for test generated data 
+	public String[] locationFilenames ={"out.regions"}; // null if locations are loaded from tree
+	public String[] treeFilenames = {"out.tree"}; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail

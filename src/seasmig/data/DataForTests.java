@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
+import cern.colt.function.DoubleFunction;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.taxa.Taxon;
@@ -19,6 +20,7 @@ import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.AttributeLoader;
 import seasmig.treelikelihood.ConstantMigrationBaseModel;
+import seasmig.treelikelihood.GeneralSeasonalMigrationBaseModel;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.SimpleAttributeLoader;
@@ -121,8 +123,18 @@ public class DataForTests implements Data {
 				double phase = Math.max(0,Math.min(1,0.3+i/3*(Random.nextDouble()-0.5))); double length = 0.5;
 				testModels.add(new TwoSeasonMigrationBaseModel(disturbMigrationMatrix(QW,disturbanceScale*i/3,99999),disturbMigrationMatrix(QS,disturbanceScale*i/3,99999),phase, phase+length));
 			}
+			
+			DoubleFunction[] rootFreqFunction = new DoubleFunction[Q.length]; 
+			DoubleFunction[][] generalMigrationFunction = new DoubleFunction[Q.length][Q[0].length]; 
+			for (int i=0;i<Q.length;i++) {
+				rootFreqFunction[i]=cern.jet.math.Functions.constant(1.0/Q.length);
+				for (int j=0;j<Q[0].length;j++) {
+					generalMigrationFunction[i][j]=cern.jet.math.Functions.constant(Q[i][j]);
+				}
+			}
+								
 			for (int i=0; i<numTestRepeats; i++) {
-				testModels.add(new SinusoidialSeasonalMigrationBaseModel(disturbMigrationMatrix(rates,disturbanceScale*i/3,999999),disturbMigrationMatrix(amps,disturbanceScale*i/3,1),disturbMigrationMatrix(phases,disturbanceScale*i/3,1)));
+				testModels.add(new GeneralSeasonalMigrationBaseModel(generalMigrationFunction,rootFreqFunction,2));
 			}
 			break;
 
@@ -288,8 +300,24 @@ public class DataForTests implements Data {
 
 			testModels.add(new ConstantMigrationBaseModel(Q));
 			testModels.add(new TwoSeasonMigrationBaseModel(QW,QS,phase, phase+length));
-			testModels.add(new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases));
-
+			
+			generalMigrationFunction = new DoubleFunction[Q.length][Q[0].length]; 
+			for (int i=0;i<Q.length;i++) {
+				for (int j=0;j<Q[0].length;j++) {
+					generalMigrationFunction[i][j]=cern.jet.math.Functions.constant(Q[i][j]);
+				}
+			}
+			
+			rootFreqFunction = new DoubleFunction[Q.length]; 
+			for (int i=0;i<Q.length;i++) {
+				rootFreqFunction[i]=cern.jet.math.Functions.constant(1.0/Q.length);
+				for (int j=0;j<Q[0].length;j++) {
+					generalMigrationFunction[i][j]=cern.jet.math.Functions.constant(Q[i][j]);
+				}
+			}
+			
+			testModels.add(new GeneralSeasonalMigrationBaseModel(generalMigrationFunction, rootFreqFunction,25));
+		
 			System.out.println(" generated "+testModels.size()+" test models");
 
 		}

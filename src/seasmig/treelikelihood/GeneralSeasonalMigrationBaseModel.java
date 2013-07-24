@@ -1,8 +1,6 @@
 package seasmig.treelikelihood;
 
 import java.util.HashMap;
-import java.util.Vector;
-
 import org.javatuples.Pair;
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.DoubleFactory2D;
@@ -15,24 +13,23 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check zMult order... sould be ok for Q where rows sum to 1...
 	
 	// Precision Parameter
-	static final double timePrecision = 1E-5;
+	static final double infinitesimalTime = 1E-5;
 	
 	// Cache Parameters 
-	static final int maxCachedTransitionMatrices = 16000;
+	static final int maxCachedTransitionMatrices = 1600;
 
 	// Precision Parameters
-	static final int nYearParts = 3;
-	// Figure out reason why changing nYearParts can generate an error...
-	
+	int nYearParts;
+
 	// Origin Model
-	DoubleFunction[][] seasonalRates;
+	DoubleFunction[][] seasonalRates;	
+	DoubleFunction[] rootFreq;
 	
 	// Constant Migration Models
-	MigrationBaseModel constantModels[] = new ConstantMigrationBaseModel[nYearParts];
+	MigrationBaseModel constantModels[];
 
 	// Caching
 	DoubleFactory2D F = DoubleFactory2D.dense;
-	Vector<double[][]> cachedMatrixPower = new Vector<double[][]>();	
 	HashMap<Pair<Double,Double>, double[][]> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, double[][]>();
 
 	private int num_locations = 0;
@@ -41,12 +38,14 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	protected GeneralSeasonalMigrationBaseModel() {};
 	
 	// Constructor	
-	public GeneralSeasonalMigrationBaseModel(DoubleFunction[][] seasonalRates_) {	
+	public GeneralSeasonalMigrationBaseModel(DoubleFunction[][] seasonalRates_, DoubleFunction[] rootFreq_, int nYearParts_) {	
 		// TODO: Check this...
-		// diagonal rates are calculated on row sums and are ignored...
+		// diagonal rates functions are calculated through row sums and are ignored...
 		num_locations=seasonalRates_.length;	
 		seasonalRates=seasonalRates_;
+		nYearParts = nYearParts_;
 		dt = 1.0/(double)nYearParts;
+		constantModels = new ConstantMigrationBaseModel[nYearParts];
 		double t=dt/2.0;
 		for (int i=0;i<nYearParts;i++) {
 			double[][] migrationMatrix = new double[num_locations][num_locations];
@@ -62,7 +61,8 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 			}
 			constantModels[i]=new ConstantMigrationBaseModel(migrationMatrix);
 			t+=dt;
-		}
+		}		
+		rootFreq = rootFreq_;
 	}
 
 	// Methods
@@ -81,27 +81,24 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	public double[][] transitionMatrix(double from_time, double to_time) {
 		// TODO: organize this...
 		double from_time_reminder = from_time % 1.0;
-		double from_time_div = from_time - from_time_reminder;
+		double from_time_div = from_time - from_time_reminder;		
 		double to_time_reminder = to_time - from_time_div;
-		double from_time_reminder_round = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(from_time_reminder));
-		double to_time_reminder_round = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time_reminder));
-		double[][] cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder_round,to_time_reminder_round));
+		double[][] cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder,to_time_reminder));
 		if (cached!=null) {
 			return cached;
 		}
 		else {			
 			// first step: 
-			double step_start_time = from_time_reminder_round;
-			double to_time_round = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time));
-			double step_end_time = Math.min(to_time_round, Math.max(0,Math.ceil(step_start_time/dt)*dt));
+			double step_start_time = from_time_reminder;
+			double step_end_time = Math.min(to_time_reminder, Math.floor(step_start_time/dt)*dt+dt);
 			DoubleMatrix2D result = F.identity(num_locations);	 
 			
-			while (step_end_time<to_time_round) {
+			while (step_start_time<to_time_reminder) {
 				int yearPartIndex = (int) Math.floor(step_start_time%1.0/dt);
 				// TODO: replace with other matrix mult
 				result = result.zMult(DoubleFactory2D.dense.make(constantModels[yearPartIndex].transitionMatrix(step_start_time, step_end_time)),null);	
 				step_start_time = step_end_time;
-				step_end_time = Math.min(to_time_round, step_start_time+dt);
+				step_end_time = Math.min(to_time_reminder, Math.floor((step_start_time+infinitesimalTime)/dt)*dt+dt);
 			}
 
 			// cache result
@@ -109,7 +106,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
 			}			
 			double[][] returnValue=result.toArray();
-			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder_round, to_time_reminder_round),returnValue);
+			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),returnValue);
 
 			// TODO: replace with no conversion step
 			return returnValue;
@@ -156,8 +153,11 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public double[] rootfreq(double when) {
-		// TODO Auto-generated method stub
-		return null;
+		double[] returnValue = new double[num_locations];
+		for (int i=0;i<num_locations;i++) {
+			returnValue[i]=rootFreq[i].apply(when);
+		}
+		return returnValue;
 	}
 
 

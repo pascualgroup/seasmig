@@ -54,6 +54,9 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION)
 				return new SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection(initialChain,config,data,fixPhase,fixLength,config.fixRate);
 			
+			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF)
+				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelection(initialChain,config,data,fixPhase,fixLength,config.fixRate);
+			
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION_GTR)
 				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR(initialChain,config,data,fixPhase,fixLength);
 			
