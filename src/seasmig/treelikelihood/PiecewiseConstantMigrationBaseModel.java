@@ -7,23 +7,13 @@ import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
 
 @SuppressWarnings("serial")
-public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
+public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check this...
-	// TODO: Check zMult order... sould be ok for Q where rows sum to 1...
-	
-	// Precision Parameter
-	static final double infinitesimalTime = 1E-5;
-	
-	// Cache Parameters 
-	static final int maxCachedTransitionMatrices = 1600;
-
-	// Precision Parameters
-	int nYearParts;
 
 	// Origin Model
 	DoubleFunction[][] seasonalRates;	
 	DoubleFunction[] rootFreq;
-	
+
 	// Constant Migration Models
 	MigrationBaseModel constantModels[];
 
@@ -32,15 +22,14 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	HashMap<Pair<Double,Double>, double[][]> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, double[][]>();
 
 	private int num_locations = 0;
-	private double dt = 1.0/(double)nYearParts; 
 
-	protected GeneralSeasonalMigrationBaseModel() {};
-	
+	protected PiecewiseConstantMigrationBaseModel() {};
+
 	// Constructor	
-	public GeneralSeasonalMigrationBaseModel(DoubleFunction[][] seasonalRates_, DoubleFunction[] rootFreq_, int nYearParts_) {	
+	public PiecewiseConstantMigrationBaseModel(double[][][] rates, double[][] rootFreq) {	
 		// TODO: Check this...
 		// diagonal rates functions are calculated through row sums and are ignored...
-		num_locations=seasonalRates_.length;	
+		num_locations=rates[0].length;	
 		seasonalRates=seasonalRates_;
 		nYearParts = nYearParts_;
 		dt = 1.0/(double)nYearParts;
@@ -64,12 +53,25 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 		rootFreq = rootFreq_;
 	}
 
+	// Constructor	
+	public PiecewiseConstantMigrationBaseModel(double[][][] rates) {	
+		int numLocations=rates[0].length;	
+		double[][] rootFreq = new double[rates.length][num_locations];
+		for (int i=0;i<rootFreq.length;i++) {
+			for (int j=0;j<numLocations;j++) {
+				rootFreq[i][j]=1.0/(double)numLocations;
+			}
+		}
+	
+		
+	}
+
 	// Methods
 	@Override
 	public double logprobability(int from_location, int to_location, double from_time, double to_time) {		
 		return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);
 	}
-	
+
 	// Methods
 	@Override
 	public double[] probability(int from_state,  double from_time, double to_time) {		
@@ -91,7 +93,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 			double step_start_time = from_time_reminder;
 			double step_end_time = Math.min(to_time_reminder, Math.floor(step_start_time/dt)*dt+dt);
 			DoubleMatrix2D result = F.identity(num_locations);	 
-			
+
 			while (step_start_time<to_time_reminder) {
 				int yearPartIndex = (int) Math.floor(step_start_time%1.0/dt);
 				// TODO: replace with other matrix mult
