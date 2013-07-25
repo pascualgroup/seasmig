@@ -40,7 +40,7 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 	public PiecewiseConstantMigrationBaseModel(double[][][] seasonalRates_, DoubleFunction[] rootFreq_, int nYearParts_) {	
 		// TODO: Check this...
 		// diagonal rates functions are calculated through row sums and are ignored...
-		num_locations=seasonalRates_.length;	
+		num_locations=seasonalRates_[0].length;	
 		seasonalRates=seasonalRates_;
 		nYearParts = nYearParts_;
 		dt = 1.0/(double)nYearParts;
@@ -52,7 +52,7 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 				double row_sum = 0;
 				for (int k=0; k<num_locations; k++) {
 					if (j!=k) {
-						migrationMatrix[j][k]=seasonalRates[j][k][i];
+						migrationMatrix[j][k]=seasonalRates[i][j][k];
 						row_sum+=migrationMatrix[j][k];
 					}
 				}
