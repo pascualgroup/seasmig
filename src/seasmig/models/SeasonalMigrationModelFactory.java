@@ -28,6 +28,8 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 		case NONE:			
 			return new SeasonalMigrationModelNoSeasonality(initialChain, config, data);			
 
+		case N_CONSTANT_SEASONS: 	
+			return new SeasonalMigrationModelNConstantSeasons(initialChain,config,data,config.nSeasonalParts);
 		case TWO_CONSTANT_SEASONS: 
 			boolean fixPhase = false;
 			boolean fixLength = false;

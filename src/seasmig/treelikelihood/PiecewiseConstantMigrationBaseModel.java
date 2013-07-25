@@ -9,9 +9,19 @@ import cern.colt.matrix.DoubleMatrix2D;
 @SuppressWarnings("serial")
 public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 	// TODO: Check this...
+	// TODO: Check zMult order... sould be ok for Q where rows sum to 1...
+
+	// Precision Parameter
+	static final double infinitesimalTime = 1E-5;
+
+	// Cache Parameters 
+	static final int maxCachedTransitionMatrices = 1600;
+
+	// Precision Parameters
+	int nYearParts;
 
 	// Origin Model
-	DoubleFunction[][] seasonalRates;	
+	double[][][] seasonalRates;	
 	DoubleFunction[] rootFreq;
 
 	// Constant Migration Models
@@ -22,48 +32,40 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 	HashMap<Pair<Double,Double>, double[][]> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, double[][]>();
 
 	private int num_locations = 0;
+	private double dt = 1.0/(double)nYearParts; 
 
 	protected PiecewiseConstantMigrationBaseModel() {};
 
 	// Constructor	
-	public PiecewiseConstantMigrationBaseModel(double[][][] rates, double[][] rootFreq) {	
+	public PiecewiseConstantMigrationBaseModel(double[][][] seasonalRates_, DoubleFunction[] rootFreq_, int nYearParts_) {	
 		// TODO: Check this...
 		// diagonal rates functions are calculated through row sums and are ignored...
-		num_locations=rates[0].length;	
+		num_locations=seasonalRates_.length;	
 		seasonalRates=seasonalRates_;
 		nYearParts = nYearParts_;
 		dt = 1.0/(double)nYearParts;
 		constantModels = new ConstantMigrationBaseModel[nYearParts];
-		double t=dt/2.0;
+
 		for (int i=0;i<nYearParts;i++) {
 			double[][] migrationMatrix = new double[num_locations][num_locations];
 			for (int j=0; j<num_locations; j++) {
 				double row_sum = 0;
 				for (int k=0; k<num_locations; k++) {
 					if (j!=k) {
-						migrationMatrix[j][k]=seasonalRates[j][k].apply(t);
+						migrationMatrix[j][k]=seasonalRates[j][k][i];
 						row_sum+=migrationMatrix[j][k];
 					}
 				}
 				migrationMatrix[j][j]=-row_sum;
 			}
 			constantModels[i]=new ConstantMigrationBaseModel(migrationMatrix);
-			t+=dt;
 		}		
 		rootFreq = rootFreq_;
 	}
 
 	// Constructor	
-	public PiecewiseConstantMigrationBaseModel(double[][][] rates) {	
-		int numLocations=rates[0].length;	
-		double[][] rootFreq = new double[rates.length][num_locations];
-		for (int i=0;i<rootFreq.length;i++) {
-			for (int j=0;j<numLocations;j++) {
-				rootFreq[i][j]=1.0/(double)numLocations;
-			}
-		}
-	
-		
+	public PiecewiseConstantMigrationBaseModel(double[][][] seasonalRates_, int nYearParts_) {	
+		this(seasonalRates_,null,nYearParts_);
 	}
 
 	// Methods
@@ -116,7 +118,7 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public String print() {
-		String returnValue = "General Seasonal Migration Model:\n";
+		String returnValue = "Picewise Constant Migration Model:\n";
 		returnValue+="[";
 		for (int i=0;i<seasonalRates.length;i++) {
 			if (i!=0) returnValue+=" ";
@@ -156,7 +158,10 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 	public double[] rootfreq(double when) {
 		double[] returnValue = new double[num_locations];
 		for (int i=0;i<num_locations;i++) {
-			returnValue[i]=rootFreq[i].apply(when);
+			if (rootFreq!=null) 
+				returnValue[i]=rootFreq[i].apply(when);		
+			else 
+				returnValue[i]=1.0/num_locations;
 		}
 		return returnValue;
 	}
@@ -164,3 +169,4 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 
 
 }
+
