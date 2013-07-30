@@ -32,7 +32,7 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 	HashMap<Pair<Double,Double>, double[][]> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, double[][]>();
 
 	private int num_locations = 0;
-	private double dt = 1.0/(double)nYearParts; 
+	private double dt; 
 
 	protected PiecewiseConstantMigrationBaseModel() {};
 
@@ -97,7 +97,8 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 			DoubleMatrix2D result = F.identity(num_locations);	 
 
 			while (step_start_time<to_time_reminder) {
-				int yearPartIndex = (int) Math.floor(step_start_time%1.0/dt);
+				int yearPartIndex = Math.max(Math.min(0,(int) Math.floor(step_start_time%1.0/dt)),nYearParts-1);
+				//assert yearPartIndex<nYearParts;
 				// TODO: replace with other matrix mult
 				result = result.zMult(DoubleFactory2D.dense.make(constantModels[yearPartIndex].transitionMatrix(step_start_time, step_end_time)),null);	
 				step_start_time = step_end_time;

@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 @SuppressWarnings("serial")
 public class Config implements Serializable
 {
-	public static enum Seasonality { NONE, TWO_CONSTANT_SEASONS, SINUSOIDAL, N_CONSTANT_SEASONS};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
+	public static enum Seasonality { NONE, TWO_CONSTANT_SEASONS, SINUSOIDAL, N_CONSTANT_SEASONS, N_CONSTANT_SEASONS_VAR_SELECT};  //TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL 
 	public static enum TwoConstantSeasonsParameterization 
 	{  RATES12_PARAMETERZIATION,    // Separate rates for the two parts of the years rates1[i][j], rates2[i][j]
 	   RATES12_VARIABLE_SELECTION,  // rate1[i][j]*indicators1[i][j], rate2[i][j]*indicators2[i][j]
@@ -59,7 +59,7 @@ public class Config implements Serializable
 	public double targetAcceptanceRate = 0.25;
 
 	// MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.N_CONSTANT_SEASONS;
+	public Seasonality migrationSeasonality = Seasonality.N_CONSTANT_SEASONS_VAR_SELECT;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION...
 	public double fixedPhase = 0.12;
