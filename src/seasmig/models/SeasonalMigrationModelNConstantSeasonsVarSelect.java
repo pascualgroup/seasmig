@@ -27,7 +27,7 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends SeasonalMig
 	private ExponentialDistribution ratePriorDist;
 	private int nParts;
 	private BernoulliDistribution indicatorPriorDist;
-	private DoubleVariable indicatorHyperprior;
+	//private DoubleVariable indicatorHyperprior;
 	
 	protected SeasonalMigrationModelNConstantSeasonsVarSelect() { }
 
@@ -59,8 +59,8 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends SeasonalMig
 		}		
 
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
-		indicatorHyperprior = new DoubleVariable(this, "indicatorHyperprior", new UniformDistribution(this));
-		indicatorPriorDist = new BernoulliDistribution(this, "indicatorPrior",indicatorHyperprior.getValue());
+		//indicatorHyperprior = new DoubleVariable(this, "indicatorHyperprior", new UniformDistribution(this));
+		indicatorPriorDist = new BernoulliDistribution(this, "indicatorPrior",0.5);
 
 		for (int i=0; i<nParts; i++) {
 			for (int j=0; j<numLocations; j++) {
