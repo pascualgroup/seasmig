@@ -67,7 +67,7 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends SeasonalMig
 				for(int k=0; k<numLocations; k++) {
 					if(j == k) continue; // rateParams[i,i] remains null			
 					rates[i][j][k] = new DoubleVariable(this, "rates."+Integer.toString(i)+"."+Integer.toString(j)+"."+Integer.toString(k), ratePriorDist);
-					sameIndicators[i][j][k] = new BinaryVariable(this, "indicators."+Integer.toString(i)+"."+Integer.toString(j)+"."+Integer.toString(k), indicatorPriorDist);
+					if (i>=1) sameIndicators[i][j][k] = new BinaryVariable(this, "indicators."+Integer.toString(i)+"."+Integer.toString(j)+"."+Integer.toString(k), indicatorPriorDist);
 				}
 			}
 		}
@@ -99,7 +99,7 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends SeasonalMig
 					for(int k=0; k<numLocations; k++) {
 						if(j == k) continue; // rateParams[i,i] remains null			
 						m.addEdge(this,rates[i][j][k]);
-						m.addEdge(this,sameIndicators[i][j][k]);
+						if (i>=1) m.addEdge(this,sameIndicators[i][j][k]);
 					}
 				}
 			}
@@ -132,7 +132,12 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends SeasonalMig
 				for (int j=0;j<numLocations;j++) {					
 					for (int k=0;k<numLocations;k++) {
 						if (j!=k) {
-							ratesDoubleForm[i][j][k]=(sameIndicators[i][j][k].getValue() ? ratesDoubleForm[(i+nParts-1)%nParts][j][k] : rates[i][j][k].getValue());								
+							if (i>=1) {
+								ratesDoubleForm[i][j][k]=(sameIndicators[i][j][k].getValue() ? ratesDoubleForm[i-1][j][k] : rates[i][j][k].getValue());
+							}
+							else {
+								ratesDoubleForm[i][j][k]=rates[i][j][k].getValue();
+							}
 						}
 					}
 				}
