@@ -7,7 +7,6 @@ import mc3kit.Chain;
 import mc3kit.DoubleVariable;
 import mc3kit.IntVariable;
 import mc3kit.MC3KitException;
-import mc3kit.Variable;
 import mc3kit.distributions.ExponentialDistribution;
 import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;

@@ -115,7 +115,6 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends S
 	} 
 
 	private class LikelihoodVariable extends TreesLikelihoodVariable {
-		private double oldLogLikelihood;
 		private double logMaxLikelihood = Double.NEGATIVE_INFINITY;
 
 		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasonsVariableSelection m) throws MC3KitException {
@@ -247,8 +246,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends S
 				trees[i]=workingCopy;
 			}						
 
-			setLogP(logLikelihood);			
-			oldLogLikelihood=logLikelihood;
+			setLogP(logLikelihood);		
+			oldLogP=logLikelihood;
 			if (logLikelihood>logMaxLikelihood) {
 				logMaxLikelihood=logLikelihood;
 			}
