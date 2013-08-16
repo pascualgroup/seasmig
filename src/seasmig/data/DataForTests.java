@@ -158,7 +158,7 @@ public class DataForTests implements Data {
 
 			// For sinusoidal model...
 			rates = myMatrixCopy(Q);
-			amps = makeRandomMigrationMatrix(numTestLocations,1);
+			amps = makeRandomMigrationMatrix(numTestLocations,2);
 			phases = makeRandomMigrationMatrix(numTestLocations,1);
 
 			switch (config.migrationSeasonality) {

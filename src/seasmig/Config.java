@@ -62,7 +62,7 @@ public class Config implements Serializable
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION TWO SEASONS...
-	public double fixedPhase = 0.12;
+	public double fixedPhase = 0.3;
 	public double minSeasonLength = 0.3333333;
 	public double veryLongTime = 1000;
 	public boolean fixRate = false;
@@ -75,7 +75,7 @@ public class Config implements Serializable
 	// TODO: add statese & combine files 
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
 	public String[] locationFilenames ={"out.regions"}; // null if locations are loaded from tree
-	public String[] treeFilenames = {"out.tree"}; // null for test generated data 
+	public String[] treeFilenames = {"beastInputHA.trees"}; // null for test generated data 
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail

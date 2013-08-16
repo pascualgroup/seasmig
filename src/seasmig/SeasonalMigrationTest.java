@@ -44,6 +44,8 @@ public class SeasonalMigrationTest {
 
 	private static int numTestRepeats = 100;
 	private static int numLocations = 3;
+	int numTestTrees=1;
+	TestType testType = TestType.TEST_USING_INPUT_TREES;
 
 	@Test
 	public void testMatrixExponentiation() {
@@ -226,8 +228,9 @@ public class SeasonalMigrationTest {
 			// Otherwise, construct a new MCMC
 			else {
 
-				// Load data files and prepare data....						
-				Data data = new DataForTests(config,TestType.TEST_USING_INPUT_TREES,1,numLocations,1);
+				// Load data files and prepare data....										
+			
+				Data data = new DataForTests(config,testType,1,numLocations,numTestTrees);
 				System.out.println("Running MCMC...");
 				mcmc = new MCMC(); 
 
