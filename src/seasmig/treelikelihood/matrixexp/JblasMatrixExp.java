@@ -26,6 +26,15 @@ public class JblasMatrixExp implements MatrixExponentiator {
 		return true;
 	}
 
+	@Override
+	public String getMethodName() {		
+		Class<?> enclosingClass = getClass().getEnclosingClass();
+		if (enclosingClass != null) 
+		    return enclosingClass.getName();
+		else 
+		    return getClass().getName();
+		
+	}
 }
 
 	

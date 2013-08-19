@@ -4,7 +4,6 @@ import java.util.Vector; //
 
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
-
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.util.Util;
 
@@ -84,8 +83,20 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	
 	@Override
 	public boolean checkMethod() {
-		// TODO: this....
-		return true;
+		// TODO: this
+		if (Q.size()>8) 
+			return false;
+		else 
+			return true;
 	}
 
+	@Override
+	public String getMethodName() {		
+		Class<?> enclosingClass = getClass().getEnclosingClass();
+		if (enclosingClass != null) 
+		    return enclosingClass.getName();
+		else 
+		    return getClass().getName();
+		
+	}
 }

@@ -33,7 +33,6 @@ import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 import seasmig.treelikelihood.matrixexp.JamaMolerMatrixExp;
 import seasmig.treelikelihood.matrixexp.JblasMatrixExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
-import seasmig.treelikelihood.matrixexp.MolerMatrixExp;
 import seasmig.treelikelihood.matrixexp.TaylorMatrixExp;
 
 import com.google.gson.Gson;

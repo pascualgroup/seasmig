@@ -13,42 +13,47 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 	double Lambda;
 	double Delta; 
 	double Epsilon;
-	
+
 	boolean methodOK;
 	private double denum1;
 	private double denum3;
 
 	protected AnalyticMatrixExp3() {};
-	
+
 	public AnalyticMatrixExp3(double[][] Q) {
-		for (int i=0;i<Q.length;i++) {
-			for (int j=0;j<Q.length;j++) {
-				this.Q[i][j]=Q[i][j];
+
+		methodOK = (Q.length==3);
+		if (methodOK) 
+			methodOK = (Q[0].length==3);
+
+		if (methodOK) {
+			for (int i=0;i<Q.length;i++) {
+				for (int j=0;j<Q.length;j++) {
+					this.Q[i][j]=Q[i][j];
+				}
 			}
+
+			Lambda = Q[0][1]+Q[0][2]+Q[1][0]+Q[1][2]+Q[2][0]+Q[2][1];
+
+			Delta = Q[0][2]*Q[1][0]+Q[0][1]*Q[1][2]+Q[0][2]*Q[1][2]+
+					Q[0][1]*Q[2][0]+Q[1][0]*Q[2][0]+Q[1][2]*Q[2][0]+
+					Q[0][1]*Q[2][1]+Q[0][2]*Q[2][1]+Q[1][0]*Q[2][1];
+
+			Epsilon = Math.sqrt(-4*Delta+Lambda*Lambda);
+
+			denum1=4*Delta+(Epsilon-Lambda)*Lambda;
+			denum3=-4*Delta+(Epsilon+Lambda)*Lambda;
+
+			methodOK = (denum1>0) && (denum3>0) && !Double.isNaN(Epsilon);
 		}
-
-		Lambda = Q[0][1]+Q[0][2]+Q[1][0]+Q[1][2]+Q[2][0]+Q[2][1];
-
-		Delta = Q[0][2]*Q[1][0]+Q[0][1]*Q[1][2]+Q[0][2]*Q[1][2]+
-				Q[0][1]*Q[2][0]+Q[1][0]*Q[2][0]+Q[1][2]*Q[2][0]+
-				Q[0][1]*Q[2][1]+Q[0][2]*Q[2][1]+Q[1][0]*Q[2][1];
-		
-		Epsilon = Math.sqrt(-4*Delta+Lambda*Lambda);
-		
-		denum1=4*Delta+(Epsilon-Lambda)*Lambda;
-		denum3=-4*Delta+(Epsilon+Lambda)*Lambda;
-		
-		methodOK = (denum1>0) && (denum3>0) && !Double.isNaN(Epsilon);
 
 	}
 
 	@Override
 	public double[][] expm(double t) {
-		// TODO: This
-
 		double[][] returnValue = new double[3][3];
 
-		
+
 		if (denum1!=0 && denum3!=0 && Delta!=0) {
 			double exp1 = Math.exp(0.5*t*(Epsilon-Lambda));			
 			double exp3 = Math.exp(-0.5*t*(Epsilon+Lambda));
@@ -65,10 +70,10 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 					if (i==j) continue;
 					int notij=3-(i|j);					
 					returnValue[i][j]=
-						-exp1*(Q[i][j]*(Epsilon+Lambda-2*Q[i][j]-2*Q[j][i]-2*Q[j][notij]-2*Q[i][notij])+2*Q[i][notij]*Q[notij][j])/denum1+
-						(Q[i][notij]*Q[notij][j]+Q[i][j]*(Lambda-Q[i][notij]-Q[i][j]-Q[j][i]-Q[j][notij]))/Delta+
-						-exp3*(Q[i][j]*(Epsilon-Lambda+2*Q[i][j]+2*Q[j][i]+2*Q[j][notij]+2*Q[i][notij])-2*Q[i][notij]*Q[notij][j])/denum3;
-							
+							-exp1*(Q[i][j]*(Epsilon+Lambda-2*Q[i][j]-2*Q[j][i]-2*Q[j][notij]-2*Q[i][notij])+2*Q[i][notij]*Q[notij][j])/denum1+
+							(Q[i][notij]*Q[notij][j]+Q[i][j]*(Lambda-Q[i][notij]-Q[i][j]-Q[j][i]-Q[j][notij]))/Delta+
+							-exp3*(Q[i][j]*(Epsilon-Lambda+2*Q[i][j]+2*Q[j][i]+2*Q[j][notij]+2*Q[i][notij])-2*Q[i][notij]*Q[notij][j])/denum3;
+
 				}
 			}
 
@@ -125,5 +130,15 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 	@Override
 	public boolean checkMethod() {		
 		return methodOK;
+	}
+
+	@Override
+	public String getMethodName() {		
+		Class<?> enclosingClass = getClass().getEnclosingClass();
+		if (enclosingClass != null) 
+			return enclosingClass.getName();
+		else 
+			return getClass().getName();
+
 	}
 }

@@ -270,4 +270,14 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		return true;
 	}
 
+	@Override
+	public String getMethodName() {		
+		Class<?> enclosingClass = getClass().getEnclosingClass();
+		if (enclosingClass != null) 
+		    return enclosingClass.getName();
+		else 
+		    return getClass().getName();
+		
+	}
+
 }
