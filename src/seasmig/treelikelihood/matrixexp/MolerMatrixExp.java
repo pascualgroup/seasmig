@@ -7,6 +7,44 @@ import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.util.Util;
 import seasmig.util.Util.FRexpResult;
 
+// TODO: Failes Matrix Exp Test !!!
+//Matrix exponentiation results fail to match!
+//t=51.00000000000001 
+//Q=
+//{{ -0.01,  0.01,  0.00},
+//{  0.01, -0.02,  0.01},
+//{  0.00,  0.00, -0.01}}
+//
+//MolerMatrixExp - checkMethod: true
+//{{  0.37,  0.28,  0.35},
+//{  0.34,  0.27,  0.38},
+//{  0.30,  0.25,  0.46}}
+//
+//Matlab7MatrixExp - checkMethod: true
+//{{  0.63,  0.23,  0.14},
+//{  0.27,  0.49,  0.24},
+//{  0.13,  0.14,  0.73}}
+//
+//TaylorMatrixExp - checkMethod: true
+//{{  0.63,  0.23,  0.14},
+//{  0.27,  0.49,  0.24},
+//{  0.13,  0.14,  0.73}}
+//
+//JamaMolerMatrixExp: - checkMethod: true
+//{{  0.63,  0.23,  0.14},
+//{  0.27,  0.49,  0.24},
+//{  0.13,  0.14,  0.73}}
+//
+//JblasMatrixExp: - checkMethod: true
+//{{  0.63,  0.23,  0.14},
+//{  0.27,  0.49,  0.24},
+//{  0.13,  0.14,  0.73}}
+//
+//AnalyticMatrixExp3: - checkMethod: true
+//{{  0.63,  0.23,  0.14},
+//{  0.27,  0.49,  0.24},
+//{  0.13,  0.14,  0.73}}
+
 @SuppressWarnings("serial")
 public class MolerMatrixExp implements MatrixExponentiator {
 
@@ -21,7 +59,7 @@ public class MolerMatrixExp implements MatrixExponentiator {
 	public MolerMatrixExp(double[][] testMatrix) {
 		Q = testMatrix;	
 		eye = DoubleFactory2D.dense.identity(Q.length);
-		normInfQ=norm_inf();
+		normInfQ=norm_inf();		
 	}
 	
 	public DoubleMatrix2D eye() {
@@ -118,13 +156,15 @@ public class MolerMatrixExp implements MatrixExponentiator {
 		E=algebra.inverse(D).zMult(E, null); // E = D \ E;
 		for (int k=1;k<=s;k++) 
 			E=E.zMult(E, null); // E = E*E 
+		System.err.println("Method Failes MatrixExp Test... Exiting\n");
+		System.exit(-1); 
 		return E.toArray();
 	}
 
 	@Override
 	public boolean checkMethod() {
 		// TODO: this....
-		return true;
+		return false;
 	}
 
 }
