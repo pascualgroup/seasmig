@@ -9,8 +9,7 @@ public class TreeWithLocationsTest {
 
 	@Test
 	public void testLikelihood() throws Exception {
-		/*
-		 
+		/* 
 		   --
 		  /  \
 		 0   --
@@ -65,8 +64,89 @@ public class TreeWithLocationsTest {
 		locTree.logLikelihood();
 		System.out.println(locTree.newick());
 		
-		assertEquals(expectedResult, locTree.logLikelihood(),0.01);
-			
+		assertEquals(expectedResult, locTree.logLikelihood(),0.01);			
+	}
+	
+	@Test
+	public void testLikelihoodTwoSeasons() throws Exception {
+		/* 
+		   --
+		  /  \
+		 0   --
+		    /  \
+		   1    0
+		 
+		 For the JC model 
+		 for no-change we have p=1/4 E^(-4 t/3) (3 + E^(4 t/3)), 
+		 for a change we have p=1/4 E^(-4 t/3) (-1 + E^(4 t/3))
+		 
+		 branch length is 1....
+		 First site:
+		         changes, no changes
+		 2,2 --> 3, 1 ;;; 		 2,0 --> 3, 1 ;;; 		 2,3 --> 4 ;;; 		 2,1 --> 3, 1
+		 ---
+         0,2 --> 3, 1 ;;;        0,0 --> 1, 3 ;;;        0,3 --> 3, 1 ;;;    0,1 --> 2, 2
+         ---
+         3,2 --> 4 ;;;           3,0 --> 3, 1 ;;;        3,3 --> 3, 1 ;;;    3,1 --> 3, 1
+         ---
+         1,2 --> 4 ;;;           1,0 --> 3, 1 ;;;        1,3 --> 4 ;;;       1,1 --> 2, 2
+         
+         Total: Log[9*(c^3*nc^1)+4*(c^4)+1*(c^1*nc^3)+2*(c^2*nc^2)]=-2.81603
+         plus Log[1/4] for root freq =  
+         2*(-2.81603+Log[1/4])=-4.2023210731
+		 */
+		
+		double expectedResult = -4.2023210731;
+		
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		MigrationBaseModel equalModel = new TwoSeasonMigrationBaseModel(
+				new double[][]{{-1*2.0/3.0,0.333333*2.0/3.0,0.333333*2.0/3.0,0.333333*2.0/3.0},
+						 	   { 0.333333*2.0/3.0,-1*2.0/3.0,0.333333*2.0/3.0,0.333333*2.0/3.0},
+						       { 0.333333*2.0/3.0,0.333333*2.0/3.0,-1*2.0/3.0,0.333333*2.0/3.0},
+						       { 0.333333*2.0/3.0,0.333333*2.0/3.0,0.333333*2.0/3.0,-1*2.0/3.0}},
+				new double[][]{{-1*4.0/3.0,0.333333*4.0/3.0,0.333333*4.0/3.0,0.333333*4.0/3.0},
+				  			   { 0.333333*4.0/3.0,-1*4.0/3.0,0.333333*4.0/3.0,0.333333*4.0/3.0},
+							   { 0.333333*4.0/3.0,0.333333*4.0/3.0,-1*4.0/3.0,0.333333*4.0/3.0},
+							   { 0.333333*4.0/3.0,0.333333*4.0/3.0,0.333333*4.0/3.0,-1*4.0/3.0}},
+				  	 		   0.3,0.8);
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
+		
+		locTree.logLikelihood();
+		System.out.println(locTree.newick());
+		
+		assertEquals(expectedResult, locTree.logLikelihood(),0.01);			
+	}
+	
+	@Test
+	public void testLikelihoodTwoSeasons2() throws Exception {		
+		
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+
+		double[][] singleMatrix = makeRandomMigrationMatrix(cern.jet.random.Uniform.staticNextIntFromTo(2, 10),				
+				                                            10*cern.jet.random.Uniform.staticNextDouble());
+		double[][] matrixSeas1 = singleMatrix.clone();
+		double[][] matrixSeas2 = singleMatrix.clone();
+		for (int i=0;i<matrixSeas1.length;i++) {
+			for (int j=0;j<matrixSeas1[0].length;j++) {
+				matrixSeas1[i][j]=matrixSeas1[i][j]*2.0/3.0;
+				matrixSeas2[i][j]=matrixSeas2[i][j]*4.0/3.0;
+			}
+		}
+		double seasonalPhase = cern.jet.random.Uniform.staticNextDouble()*0.5;
+		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(singleMatrix);		
+		MigrationBaseModel twoSeasonModel = new TwoSeasonMigrationBaseModel(matrixSeas1 ,matrixSeas2 , seasonalPhase, seasonalPhase+0.5);
+		TreeWithLocations locTreeEqual = new TreeWithLocations(root,equalModel);
+		TreeWithLocations locTreeTwoSeasons = new TreeWithLocations(root,twoSeasonModel);
+		
+		assertEquals(locTreeEqual.logLikelihood(), locTreeTwoSeasons.logLikelihood(),1E-10);			
 	}
 	
 	public static double[][] makeRandomMigrationMatrix(int size, double scale) {
@@ -99,7 +179,10 @@ public class TreeWithLocationsTest {
 		 */
 		
 		// Model
-		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(makeRandomMigrationMatrix(cern.jet.random.Uniform.staticNextIntFromTo(2, 10), 10*cern.jet.random.Uniform.staticNextDouble()));
+		MigrationBaseModel equalModel = 
+				new 
+				ConstantMigrationBaseModel(makeRandomMigrationMatrix(cern.jet.random.Uniform.staticNextIntFromTo(2, 10), 
+				10*cern.jet.random.Uniform.staticNextDouble()));
 		
 		// Tree Likelihood Method 1
 		
