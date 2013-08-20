@@ -14,32 +14,39 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	// Precision Parameters...	
 	static final double precision = Util.minValue;
 	static int nTaylor = 500; // Maximum number of Taylor series terms
-	
+
 	// Cache 
 	Vector<DoubleMatrix2D> cachedQnDivFactorialN = new Vector<DoubleMatrix2D>();
 	Vector<Double> cachedScale = new Vector<Double>();
 	DoubleMatrix2D Q;
 	DoubleMatrix2D zeroMatrix;
-	
-	
-	DoubleFactory2D F = DoubleFactory2D.dense; 
-	
-	protected TaylorMatrixExp() {};
-	
-	public TaylorMatrixExp(double[][] testMatrix) {
-		Q = DoubleFactory2D.dense.make(testMatrix);
-		zeroMatrix = F.make(Q.rows(),Q.rows(),0);
-		DoubleMatrix2D next = F.identity(Q.rows()); // Q^0/0! = I
-		double scale = getScale(next);		
+	boolean checkMethod = true;
 
-		for (int i=0;i<nTaylor;i++) { // Q^N/N! = Q^(N-1)/(N-1)!*Q/N
-			cachedQnDivFactorialN.add(i,next);
-			cachedScale.add(i,scale);
-			next = next.zMult(Q,null,scale/(i+1.0),0,false,false);
-			scale = getScale(next);
-			next.assign(cern.jet.math.Functions.div(scale));	
-			if (scale<precision) {
-				nTaylor = i-1;
+	DoubleFactory2D F = DoubleFactory2D.dense; 
+
+	protected TaylorMatrixExp() {};
+
+	public TaylorMatrixExp(double[][] testMatrix) {		
+
+		// TODO: this
+		if (testMatrix.length>40) 
+			checkMethod=false;
+		else {
+			Q = DoubleFactory2D.dense.make(testMatrix);
+
+			zeroMatrix = F.make(Q.rows(),Q.rows(),0);
+			DoubleMatrix2D next = F.identity(Q.rows()); // Q^0/0! = I
+			double scale = getScale(next);		
+
+			for (int i=0;i<nTaylor;i++) { // Q^N/N! = Q^(N-1)/(N-1)!*Q/N
+				cachedQnDivFactorialN.add(i,next);
+				cachedScale.add(i,scale);
+				next = next.zMult(Q,null,scale/(i+1.0),0,false,false);
+				scale = getScale(next);
+				next.assign(cern.jet.math.Functions.div(scale));	
+				if (scale<precision) {
+					nTaylor = i-1;
+				}
 			}
 		}
 	}
@@ -61,11 +68,11 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	public double[][] expm(double t) {
 		// TODO: remove extra construction steps...
 		// TODO: deal with different scales of t
-		if (t>0.5) {
+		if (t>0.1) {
 			DoubleMatrix2D halfProb = DoubleFactory2D.dense.make(expm(t/2.0));
 			return halfProb.zMult(halfProb, null).toArray();
 		}
-		
+
 		DoubleMatrix2D result = zeroMatrix.copy();
 
 		for (int i=nTaylor-1;i>=0;i=i-2) {
@@ -76,27 +83,23 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 			DoubleMatrix2D taylorn = cachedQnDivFactorialN.get(i).copy().assign(cern.jet.math.Functions.mult(cachedScale.get(i)*Math.pow(t, i)));
 			result.assign(taylorn, cern.jet.math.Functions.plus);
 		}
-		
+
 		return result.toArray(); 	
-		
+
 	}
-	
+
 	@Override
 	public boolean checkMethod() {
-		// TODO: this
-		if (Q.size()>8) 
-			return false;
-		else 
-			return true;
+		return checkMethod;
 	}
 
 	@Override
 	public String getMethodName() {		
 		Class<?> enclosingClass = getClass().getEnclosingClass();
 		if (enclosingClass != null) 
-		    return enclosingClass.getName();
+			return enclosingClass.getName();
 		else 
-		    return getClass().getName();
-		
+			return getClass().getName();
+
 	}
 }
