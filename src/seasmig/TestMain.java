@@ -26,7 +26,7 @@ public class TestMain {
 	
 	@Test
 	public void testMain() {
-		final int numLocations = 3;
+		final int numLocations = 8;
 		final int numTestTrees=1;
 		TestType testType = TestType.TEST_USING_INPUT_TREES;
 		
