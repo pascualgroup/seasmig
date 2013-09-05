@@ -26,13 +26,15 @@ public class TreeWithLocations implements LikelihoodTree {
 	// TODO: this..
 	double[] ZERO_LOG_PROBS;
 	private double logLike = 0;
+	private boolean reverseTime;
 	
 	// Tree generate parameters for test purpose
 	static final private double testBranchLengthMean = 0.5;
 	static final private double testBranchLengthVariance = 1.0;
 
 	// Generate a random tree based on createTreeModel .... 
-	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
+	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {	
+		reverseTime=false;
 		numLocations=createTreeModel.getNumLocations();
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
@@ -55,6 +57,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Generate random tree states based on input tree topology and model .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree) {
+		reverseTime=false;
 		numLocations=createTreeModel.getNumLocations();
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
@@ -110,6 +113,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	// Load a tree from a basic jebl tree
 	// locations are loaded from nexsus tree trait location_attribute name
 	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String,Integer> taxaIndices_, String locationAttributeName, int num_locations_) {
+		reverseTime=false;
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		ZERO_LOG_PROBS = new double[numLocations];
@@ -129,7 +133,8 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, boolean reverseTime_/*, HashMap<String, Double> stateMap*/) {
+		reverseTime = reverseTime_;
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		ZERO_LOG_PROBS = new double[numLocations];
@@ -154,6 +159,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	public TreeWithLocations(TreeWithLocationsNode root_, MigrationBaseModel likelihoodModel_) {
+		reverseTime=false;
 		root = root_;
 		likelihoodModel=likelihoodModel_;
 		numLocations=likelihoodModel.getNumLocations();
@@ -179,7 +185,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int from = 0; from < numLocations; from++) {
 					for (TreeWithLocationsNode child : node.children ) {
 						// for now caching is done inside likelihood model...
-						double[][] p = likelihoodModel.transitionMatrix(node.time, child.time); 
+						double[][] p = likelihoodModel.transitionMatrix(node.time, child.time,reverseTime); 
 						double[] alphas = new double[numLocations];						
 						for (int to = 0; to < numLocations; to++) {
 							alphas[to]=(Math.log(p[from][to]) + child.logProbs[to]);
@@ -215,6 +221,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public LikelihoodTree copy() {
 		// TOOD: test this...
 		TreeWithLocations copyTree = new TreeWithLocations();
+		copyTree.reverseTime=this.reverseTime;
 		copyTree.likelihoodModel=this.likelihoodModel;
 		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
 		copyTree.numLocations=this.numLocations;		

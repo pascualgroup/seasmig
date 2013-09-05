@@ -136,7 +136,7 @@ public class DataFromFiles implements Data
 				if (stateMap==null) {
 					double numIdentifiedLocations=0;
 					for (jebl.evolution.trees.Tree tree : NexusTreeTail) {
-						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations));
+						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations,config.reverseTime));
 						numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 					}
 					numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();

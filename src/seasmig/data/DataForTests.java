@@ -279,7 +279,7 @@ public class DataForTests implements Data {
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,locationMap,numLocations));
+						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,locationMap,numLocations, config.reverseTime));
 					}
 				}
 				else {
