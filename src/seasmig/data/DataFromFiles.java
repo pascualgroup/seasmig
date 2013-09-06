@@ -152,7 +152,7 @@ public class DataFromFiles implements Data
 				numLocations=config.numLocations; // TODO: get this to be automatically loaded from trees
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : NexusTreeTail) {
-					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices, config.locationAttributeNameInTree, numLocations));
+					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices, config.locationAttributeNameInTree, numLocations, config.reverseTime));
 				}		
 				System.out.println(" reparsed "+trees.get(h).size()+" trees");
 			}	

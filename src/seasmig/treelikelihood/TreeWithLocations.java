@@ -112,8 +112,8 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from nexsus tree trait location_attribute name
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String,Integer> taxaIndices_, String locationAttributeName, int num_locations_) {
-		reverseTime=false;
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String,Integer> taxaIndices_, String locationAttributeName, int num_locations_, boolean reverseTime_) {
+		reverseTime=reverseTime_;
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		ZERO_LOG_PROBS = new double[numLocations];
