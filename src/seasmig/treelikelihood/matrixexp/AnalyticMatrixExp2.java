@@ -32,20 +32,33 @@ public class AnalyticMatrixExp2 implements MatrixExponentiator {
 	}
 
 	@Override
-	public double[][] expm(double t) {
+	public double[][] expm(double t, boolean transpose) {
 
 		double[][] returnValue = new double[2][2];
 
 		if (denum!=0) {
-			double exp = Math.exp(t*(-Q[0][1]-Q[1][0]));			
-			returnValue[0][0]=(exp*Q[0][1]+Q[1][0])/denum;
-			returnValue[0][1]=(1-exp)*Q[0][1]/denum;
-			returnValue[1][0]=(1-exp)*Q[1][0]/denum;
-			returnValue[1][1]=(exp*Q[1][0]+Q[0][1])/denum;
+			double exp = Math.exp(t*(-Q[0][1]-Q[1][0]));
+			if (transpose) {
+				returnValue[1][1]=(exp*Q[0][1]+Q[1][0])/denum;
+				returnValue[1][0]=(1-exp)*Q[0][1]/denum;
+				returnValue[0][1]=(1-exp)*Q[1][0]/denum;
+				returnValue[0][0]=(exp*Q[1][0]+Q[0][1])/denum;
+			}
+			else {
+				returnValue[0][0]=(exp*Q[0][1]+Q[1][0])/denum;
+				returnValue[0][1]=(1-exp)*Q[0][1]/denum;
+				returnValue[1][0]=(1-exp)*Q[1][0]/denum;
+				returnValue[1][1]=(exp*Q[1][0]+Q[0][1])/denum;
+			}
 			return returnValue;
 		} 
 
 		return returnValue;		
+	}
+	
+	@Override
+	public double[][] expm(double t) {
+		return expm(t, false);
 	}
 
 	@Test

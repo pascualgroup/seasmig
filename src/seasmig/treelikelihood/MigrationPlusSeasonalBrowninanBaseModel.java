@@ -59,8 +59,10 @@ public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusCon
 	// Methods
 	@Override
 	public double logprobability(int from_location, int to_location, double from_time, double to_time, double from_state, double to_state) {
-		double returnValue = migrationBaseModel.logprobability(from_location, to_location, from_time, to_time);
+		// TODO: add reverse time
+		double returnValue = migrationBaseModel.logprobability(from_location, to_location, from_time, to_time, false);
 		if (from_location==to_location) {
+			// TODO: add reverse time
 			returnValue+=logSeasonalStatesTransitionProbabilities[from_location].apply(from_time, to_time, from_state, to_state); 
 		}
 		return returnValue; 

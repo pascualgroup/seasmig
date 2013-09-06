@@ -273,6 +273,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private void makeSubTree(SimpleRootedTree inputTree,
 			HashMap<String, Integer> locationMap, TreeWithLocationsNode root,
 			jebl.evolution.graphs.Node inputSubTree) {
+		
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {	
 			Taxon taxon = inputTree.getTaxon(node);
 			Integer location = TreeWithLocations.UNKNOWN_LOCATION;

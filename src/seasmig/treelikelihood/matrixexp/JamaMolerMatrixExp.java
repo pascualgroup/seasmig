@@ -71,7 +71,7 @@ public class JamaMolerMatrixExp implements MatrixExponentiator {
 			end
 	 */
 	@Override
-	public double[][] expm(double t) {
+	public double[][] expm(double t, boolean transpose) {
 		
 		Matrix A = new Matrix(Q).times(t);
 		FRexpResult fe = Util.log2(A.normInf()); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
@@ -97,8 +97,12 @@ public class JamaMolerMatrixExp implements MatrixExponentiator {
 		}	
 		E=D.inverse().times(E); // E = D \ E;
 		for (int k=1;k<=s;k++) 
-			E=E.times(E); // E = E*E 
-		return E.getArray();
+			E=E.times(E); // E = E*E
+		
+		if (transpose)
+			return E.transpose().getArray();
+		else
+			return E.getArray();
 	}
 
 	@Override
@@ -115,6 +119,11 @@ public class JamaMolerMatrixExp implements MatrixExponentiator {
 		else 
 		    return getClass().getName();
 		
+	}
+
+	@Override
+	public double[][] expm(double t) {		
+		return expm(t, false);
 	}
 
 }

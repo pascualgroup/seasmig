@@ -50,7 +50,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 	}
 
 	@Override
-	public double[][] expm(double t) {
+	public double[][] expm(double t, boolean reverseTime) {
 		double[][] returnValue = new double[3][3];
 
 
@@ -65,15 +65,30 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 						exp3*(2*Q[i][(i+1)%3]*Q[i][(i+1)%3]+Q[i][(i+1)%3]*(Epsilon-Lambda+4*Q[i][(i+2)%3]+2*Q[(i+1)%3][i])+Q[i][(i+2)%3]*(Epsilon-Lambda+2*Q[i][(i+2)%3]+2*Q[(i+2)%3][i]))/denum3;
 			}
 
-			for (int i=0;i<3;i++) {	
-				for (int j=0;j<3;j++) {
-					if (i==j) continue;
-					int notij=3-(i|j);					
-					returnValue[i][j]=
-							-exp1*(Q[i][j]*(Epsilon+Lambda-2*Q[i][j]-2*Q[j][i]-2*Q[j][notij]-2*Q[i][notij])+2*Q[i][notij]*Q[notij][j])/denum1+
-							(Q[i][notij]*Q[notij][j]+Q[i][j]*(Lambda-Q[i][notij]-Q[i][j]-Q[j][i]-Q[j][notij]))/Delta+
-							-exp3*(Q[i][j]*(Epsilon-Lambda+2*Q[i][j]+2*Q[j][i]+2*Q[j][notij]+2*Q[i][notij])-2*Q[i][notij]*Q[notij][j])/denum3;
+			if (reverseTime) {
+				for (int i=0;i<3;i++) {	
+					for (int j=0;j<3;j++) {
+						if (i==j) continue;
+						int notij=3-(i|j);					
+						returnValue[i][j]=
+								-exp1*(Q[i][j]*(Epsilon+Lambda-2*Q[i][j]-2*Q[j][i]-2*Q[j][notij]-2*Q[i][notij])+2*Q[i][notij]*Q[notij][j])/denum1+
+								(Q[i][notij]*Q[notij][j]+Q[i][j]*(Lambda-Q[i][notij]-Q[i][j]-Q[j][i]-Q[j][notij]))/Delta+
+								-exp3*(Q[i][j]*(Epsilon-Lambda+2*Q[i][j]+2*Q[j][i]+2*Q[j][notij]+2*Q[i][notij])-2*Q[i][notij]*Q[notij][j])/denum3;
 
+					}
+				}
+			}
+			else {
+				for (int i=0;i<3;i++) {	
+					for (int j=0;j<3;j++) {
+						if (i==j) continue;
+						int notij=3-(i|j);					
+						returnValue[i][j]=
+								-exp1*(Q[i][j]*(Epsilon+Lambda-2*Q[i][j]-2*Q[j][i]-2*Q[j][notij]-2*Q[i][notij])+2*Q[i][notij]*Q[notij][j])/denum1+
+								(Q[i][notij]*Q[notij][j]+Q[i][j]*(Lambda-Q[i][notij]-Q[i][j]-Q[j][i]-Q[j][notij]))/Delta+
+								-exp3*(Q[i][j]*(Epsilon-Lambda+2*Q[i][j]+2*Q[j][i]+2*Q[j][notij]+2*Q[i][notij])-2*Q[i][notij]*Q[notij][j])/denum3;
+
+					}
 				}
 			}
 
@@ -140,5 +155,10 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 		else 
 			return getClass().getName();
 
+	}
+
+	@Override
+	public double[][] expm(double t) {		
+		return expm(t, false);
 	}
 }

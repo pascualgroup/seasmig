@@ -67,7 +67,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// Methods
 	@Override
 	public double logprobability(int from_location, int to_location, double from_time, double to_time, boolean reverseTime) {		
-		return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);
+		return Math.log(transitionMatrix(from_time, to_time, reverseTime)[from_location][to_location]);
 	}
 
 	@Override
@@ -154,6 +154,12 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 			returnValue[i]=rootFreq[i].apply(when);
 		}
 		return returnValue;
+	}
+
+	@Override
+	public double logprobability(int from_location, int to_location,
+			double from_time, double to_time) {
+		return logprobability(from_location, to_location, from_time, to_time, false);
 	}
 
 
