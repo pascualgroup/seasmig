@@ -85,7 +85,7 @@ public class Config implements Serializable
 
 	public boolean restoreFromDatabase = false;
 
-	public boolean reverseTime = false; // TODO: check reverse time
+	
 		
 	public Config() {};
 	

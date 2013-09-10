@@ -236,7 +236,32 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 
 	@Override
 	public double[][] expm(double tt) {
-		return expm(tt,false);	
+
+		//	Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
+		DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(cern.jet.math.Functions.mult(tt));
+		double normA = algebra.norm1(A);
+		DoubleMatrix2D F=null;
+
+		if (normA <= theta[theta.length-1]) { //		if normA <= theta(end)
+			//	no scaling and squaring is required.
+			for (int i=0;i<m_vals.length;i++) {
+				if (normA <= theta[i]) {
+					F = padeApproximantOfDegree(m_vals[i],A);
+					break;
+				}
+			}
+		}
+		else {
+			FRexpResult ts = Util.log2(normA/theta[theta.length-1]); 	// [t s] = log2(normA/theta(end));
+			int s = ts.e;
+			double t = ts.f;
+			if (t==0.5) s = s - 1; // s = s - (t == 0.5); % adjust s if normA/theta(end) is a power of 2.
+			A.assign(cern.jet.math.Functions.div(1L<<s)); // A = A/2^s;    % Scaling
+			F = padeApproximantOfDegree(m_vals[m_vals.length-1],A);
+			for (int i=0;i<s;i++) 
+				F=F.zMult(F, null); // F = F*F;  % Squaring
+		}
+		return F.toArray();
 	}
 	
 	@Override
@@ -253,39 +278,6 @@ public class Matlab7MatrixExp implements MatrixExponentiator {
 		else 
 		    return getClass().getName();
 		
-	}
-
-	@Override
-	public double[][] expm(double tt, boolean transpose) {
-//		Initialization is in constructor [m_vals, theta, classA=='double'] = expmchk;
-			DoubleMatrix2D A = DoubleFactory2D.dense.make(Q).assign(cern.jet.math.Functions.mult(tt));
-			double normA = algebra.norm1(A);
-			DoubleMatrix2D F=null;
-
-			if (normA <= theta[theta.length-1]) { //		if normA <= theta(end)
-				//	no scaling and squaring is required.
-				for (int i=0;i<m_vals.length;i++) {
-					if (normA <= theta[i]) {
-						F = padeApproximantOfDegree(m_vals[i],A);
-						break;
-					}
-				}
-			}
-			else {
-				FRexpResult ts = Util.log2(normA/theta[theta.length-1]); 	// [t s] = log2(normA/theta(end));
-				int s = ts.e;
-				double t = ts.f;
-				if (t==0.5) s = s - 1; // s = s - (t == 0.5); % adjust s if normA/theta(end) is a power of 2.
-				A.assign(cern.jet.math.Functions.div(1L<<s)); // A = A/2^s;    % Scaling
-				F = padeApproximantOfDegree(m_vals[m_vals.length-1],A);
-				for (int i=0;i<s;i++) 
-					F=F.zMult(F, null); // F = F*F;  % Squaring
-			}
-			
-			if (transpose)
-				return 	F.viewDice().toArray();
-			else
-				return F.toArray();
 	}
 
 }

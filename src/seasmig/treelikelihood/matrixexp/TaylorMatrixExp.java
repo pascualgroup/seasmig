@@ -65,7 +65,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	}
 
 	@Override
-	public double[][] expm(double t, boolean transpose) {
+	public double[][] expm(double t) {
 		// TODO: remove extra construction steps...
 		// TODO: deal with different scales of t
 		if (t>0.1) {
@@ -84,10 +84,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 			result.assign(taylorn, cern.jet.math.Functions.plus);
 		}
 
-		if (transpose)
-			return result.viewDice().toArray();
-		else
-			return result.toArray();
+		return result.toArray(); 	
 
 	}
 
@@ -105,10 +102,4 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 			return getClass().getName();
 
 	}
-
-	@Override
-	public double[][] expm(double t) {
-		return expm(t, false);
-	}
-
 }

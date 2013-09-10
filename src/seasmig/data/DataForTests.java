@@ -279,7 +279,7 @@ public class DataForTests implements Data {
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,locationMap,numLocations, config.reverseTime));
+						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,locationMap,numLocations));
 					}
 				}
 				else {
@@ -291,7 +291,7 @@ public class DataForTests implements Data {
 				// TODO: add load states from trees...
 				System.out.print("Reparsing trees... ");
 				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,config.locationAttributeNameInTree, numLocations, config.reverseTime));
+					trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,config.locationAttributeNameInTree, numLocations));
 				}		
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}				

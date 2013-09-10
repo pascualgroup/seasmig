@@ -166,6 +166,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 			double loglikelihood=0;
 			for (TreeWithLocationsNode2 child : node.children) {
 				if (child.location!=UNKNOWN_LOCATION) {
+
 					loglikelihood=loglikelihood+conditionalLogLikelihood(child,child.location)+likelihoodModel.logprobability(nodeLocation, child.location, node.time, child.time);
 				}
 				else {

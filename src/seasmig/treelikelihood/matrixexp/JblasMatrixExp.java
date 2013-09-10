@@ -21,14 +21,6 @@ public class JblasMatrixExp implements MatrixExponentiator {
 	}
 	
 	@Override
-	public double[][] expm(double t, boolean transpose) {
-		if (transpose)
-			return MatrixFunctions.expm(Q.mul(t)).transpose().toArray2();
-		else
-			return MatrixFunctions.expm(Q.mul(t)).toArray2();
-	}
-	
-	@Override
 	public boolean checkMethod() {
 		// TODO: this....
 		return true;

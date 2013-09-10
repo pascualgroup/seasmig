@@ -58,20 +58,19 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Methods
 	@Override
-	public double logprobability(int from_location, int to_location, double from_time, double to_time, boolean reverseTime) {
-		// TODO: note: can't mix reverseTime and no reverseTime in same instance because of current cache implementation
+	public double logprobability(int from_location, int to_location, double from_time, double to_time) {
+
 		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
 		double[][] cached = cachedTransitionMatrices.get(dt);
 
 		if (cached!=null)  
 			return Math.log(cached[from_location][to_location]);		
 		else 		
-			return Math.log(transitionMatrix(from_time, to_time,reverseTime)[from_location][to_location]);		
+			return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);		
 	}
 
 	@Override
-	public double[][] transitionMatrix(double from_time, double to_time, boolean reverseTime) {	
-		// TODO: note: can't mix reverseTime and no reverseTime in same instance because of current cache implementation
+	public double[][] transitionMatrix(double from_time, double to_time) {		
 		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
 		
 		double[][] cached = cachedTransitionMatrices.get(dt);
@@ -79,7 +78,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			return cached;
 		}
 		else {
-			double[][] result = matrixExponentiator.expm(dt, reverseTime);
+			double[][] result = matrixExponentiator.expm(dt);
 			// cache result
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
@@ -144,14 +143,19 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	@Override
-	public double[] rootfreq(double when) {
-		return basefreq;
+	public double[] probability(int from_location, double from_time,	double to_time) {
+		double dt = Math.max(timePrecision,cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
+		double[][] cached = cachedTransitionMatrices.get(dt);
+
+		if (cached!=null)  
+			return cached[from_location];		
+		else 		
+			return transitionMatrix(from_time, to_time)[from_location];	
 	}
 
 	@Override
-	public double logprobability(int from_location, int to_location,
-			double from_time, double to_time) {		
-		return logprobability(from_location, to_location, from_time, to_time, false);
+	public double[] rootfreq(double when) {
+		return basefreq;
 	}
 
 }

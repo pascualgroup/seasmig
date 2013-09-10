@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import seasmig.util.Util;
-
 
 public class TreeWithLocationsTest {
 
@@ -61,7 +59,7 @@ public class TreeWithLocationsTest {
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
 																 { 0.333333,0.333333,0.333333,-1}});
-		TreeWithLocations locTree = new TreeWithLocations(root,equalModel, false);
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
 		locTree.logLikelihood();
 		System.out.println(locTree.newick());
@@ -115,7 +113,7 @@ public class TreeWithLocationsTest {
 							   { 0.333333*4.0/3.0,0.333333*4.0/3.0,-1*4.0/3.0,0.333333*4.0/3.0},
 							   { 0.333333*4.0/3.0,0.333333*4.0/3.0,0.333333*4.0/3.0,-1*4.0/3.0}},
 				  	 		   0.3,0.8);
-		TreeWithLocations locTree = new TreeWithLocations(root,equalModel, false);
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
 		locTree.logLikelihood();
 		System.out.println(locTree.newick());
@@ -145,8 +143,8 @@ public class TreeWithLocationsTest {
 		double seasonalPhase = cern.jet.random.Uniform.staticNextDouble()*0.5;
 		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(singleMatrix);		
 		MigrationBaseModel twoSeasonModel = new TwoSeasonMigrationBaseModel(matrixSeas1 ,matrixSeas2 , seasonalPhase, seasonalPhase+0.5);
-		TreeWithLocations locTreeEqual = new TreeWithLocations(root,equalModel, false);
-		TreeWithLocations locTreeTwoSeasons = new TreeWithLocations(root,twoSeasonModel, false);
+		TreeWithLocations locTreeEqual = new TreeWithLocations(root,equalModel);
+		TreeWithLocations locTreeTwoSeasons = new TreeWithLocations(root,twoSeasonModel);
 		
 		assertEquals(locTreeEqual.logLikelihood(), locTreeTwoSeasons.logLikelihood(),1E-10);			
 	}
@@ -193,7 +191,7 @@ public class TreeWithLocationsTest {
 		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,root.children.get(1)));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,root.children.get(1)));
-		TreeWithLocations locTree = new TreeWithLocations(root,equalModel, false);
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
 		// Tree Likelihood Method 2
 
@@ -211,7 +209,7 @@ public class TreeWithLocationsTest {
 		// Test
 		locTree.logLikelihood();
 		System.out.println(locTree.newick());
-		assertEquals(locTree.logLikelihood(), locTree2.logLikelihood(),0.001);
+		assertEquals(locTree.logLikelihood(), locTree2.logLikelihood(),0.01);
 	
 			
 	}
@@ -226,11 +224,38 @@ public class TreeWithLocationsTest {
 		  /  \
 		 0   --
 		    /  \
-		   1    0		 		
-                  
-		*/
+		   1    0
+		 
 		
-		double expectedResult = -3.8750816002817228; // This wasn't calculated manually but is the output of the run
+		 branch length is 1....
+		 First site:
+		         changes, no changes
+		 2,2 --> 3, 1
+		 2,0 --> 3, 1
+		 2,3 --> 4
+		 2,1 --> 3, 1
+		 ---
+         0,2 --> 3, 1
+         0,0 --> 1, 3
+         0,3 --> 3, 1
+         0,1 --> 2, 2
+         ---
+         3,2 --> 4
+         3,0 --> 3, 1
+         3,3 --> 3, 1
+         3,1 --> 3, 1
+         ---
+         1,2 --> 4
+         1,0 --> 3, 1
+         1,3 --> 4
+         1,1 --> 2, 2
+         
+         Total: ...... Log[9*(c^3*nc^1)+4*(c^4)+1*(c^1*nc^3)+2*(c^2*nc^2)]=.....
+         plus ..... Log[1/4] for root freq =  
+         2*(-2.81603+Log[1/4])=....
+		 */
+		
+		double expectedResult = -4.203325167376054; // This wasn't calculated manually but is the output of the run
 		                                            // i.e. good for regression testing
 		
 		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
@@ -238,55 +263,13 @@ public class TreeWithLocationsTest {
 		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
-		MigrationBaseModel asymModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
-																 { 0.3,-0.5,0.1,0.1},
-																 { 0.2,2.0,-2.5,0.3},
-																 { 0.1,0.2,0.7,-1.0}});
+		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+																 { 0.333333,-1,0.333333,0.333333},
+																 { 0.333333,0.333333,-1,0.333333},
+																 { 0.333333,0.333333,0.333333,-1}});
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
-		TreeWithLocations locTree = new TreeWithLocations(root,asymModel, false);
-		System.out.println(Util.print(asymModel.transitionMatrix(0, 1, false)));
-		System.out.println(Util.print(asymModel.transitionMatrix(0, 1, true)));
-		assertEquals(expectedResult, locTree.logLikelihood(),0.001);
+		assertEquals(expectedResult, locTree.logLikelihood(),0.01);
 			
 	}
-	
-	@Test
-	public void testLikelihoodTwoSeasonsAsymetric() throws Exception {
-		/* 
-		   --
-		  /  \
-		 0   --
-		    /  \
-		   1    0
-		 
-		 // TODO: calculate likelihood, this is for regression testing
-		 */
-		
-		double expectedResult = -3.870767774926328;
-		
-		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
-		root.addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
-		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
-		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
-		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
-		MigrationBaseModel asymModel = new TwoSeasonMigrationBaseModel(
-				new double[][]{{-6.0,3.0,2.0,1.0},
-						 	   { 0.1,-0.6,0.2,0.3},
-						       { 0.2,2.0,-2.4,0.2},
-						       { 0.5,0.5,0.5,-1.5}},
-				new double[][]{{-2.3,0.3,0.5,1.5},
-				 	   { 0.1,-1.6,0.2,1.3},
-				       { 0.2,2.0,-3.4,1.2},
-				       { 5.5,0.5,0.5,-6.5}},
-				  	 		   0.3,0.8);
-		TreeWithLocations locTree = new TreeWithLocations(root,asymModel, true);
-		System.out.println(Util.print(asymModel.transitionMatrix(0, 1, false)));
-		System.out.println(Util.print(asymModel.transitionMatrix(0, 1, true)));
-		
-		locTree.logLikelihood();
-		System.out.println(locTree.newick());
-		
-		assertEquals(expectedResult, locTree.logLikelihood(),0.001);			
-	}
-	
 }

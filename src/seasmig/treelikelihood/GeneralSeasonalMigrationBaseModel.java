@@ -66,12 +66,18 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 
 	// Methods
 	@Override
-	public double logprobability(int from_location, int to_location, double from_time, double to_time, boolean reverseTime) {		
-		return Math.log(transitionMatrix(from_time, to_time, reverseTime)[from_location][to_location]);
+	public double logprobability(int from_location, int to_location, double from_time, double to_time) {		
+		return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);
+	}
+	
+	// Methods
+	@Override
+	public double[] probability(int from_state,  double from_time, double to_time) {		
+		return transitionMatrix(from_time, to_time)[from_state];
 	}
 
 	@Override
-	public double[][] transitionMatrix(double from_time, double to_time, boolean reverseTime) {
+	public double[][] transitionMatrix(double from_time, double to_time) {
 		// TODO: organize this...
 		double from_time_reminder = from_time % 1.0;
 		double from_time_div = from_time - from_time_reminder;		
@@ -89,10 +95,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 			while (step_start_time<to_time_reminder) {
 				int yearPartIndex = (int) Math.floor(step_start_time%1.0/dt);
 				// TODO: replace with other matrix mult
-				if (reverseTime) 
-					result = DoubleFactory2D.dense.make(constantModels[yearPartIndex].transitionMatrix(step_start_time, step_end_time,reverseTime)).zMult(result,null);
-				else
-					result = result.zMult(DoubleFactory2D.dense.make(constantModels[yearPartIndex].transitionMatrix(step_start_time, step_end_time,reverseTime)),null);	
+				result = result.zMult(DoubleFactory2D.dense.make(constantModels[yearPartIndex].transitionMatrix(step_start_time, step_end_time)),null);	
 				step_start_time = step_end_time;
 				step_end_time = Math.min(to_time_reminder, Math.floor((step_start_time+infinitesimalTime)/dt)*dt+dt);
 			}
@@ -154,12 +157,6 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 			returnValue[i]=rootFreq[i].apply(when);
 		}
 		return returnValue;
-	}
-
-	@Override
-	public double logprobability(int from_location, int to_location,
-			double from_time, double to_time) {
-		return logprobability(from_location, to_location, from_time, to_time, false);
 	}
 
 
