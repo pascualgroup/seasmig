@@ -62,7 +62,7 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	public double[][] transitionMatrix(double from_time, double to_time, boolean reverseTime) {
 		// TODO: reverse time
 		// TODO: remove make
-		// TODO: note: can only use a single time direction for an instance beacause of cache...
+		// TODO: note: can only use a single time direction for an instance because of cache...
 		double from_time_reminder = from_time % 1.0;
 		double from_time_div = from_time - from_time_reminder;
 		double to_time_reminder = to_time - from_time_div;

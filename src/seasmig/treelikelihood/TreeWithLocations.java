@@ -158,8 +158,8 @@ public class TreeWithLocations implements LikelihoodTree {
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 	}
 
-	public TreeWithLocations(TreeWithLocationsNode root_, MigrationBaseModel likelihoodModel_) {
-		reverseTime=false;
+	public TreeWithLocations(TreeWithLocationsNode root_, MigrationBaseModel likelihoodModel_, boolean reverseTime_) {
+		reverseTime=reverseTime_;
 		root = root_;
 		likelihoodModel=likelihoodModel_;
 		numLocations=likelihoodModel.getNumLocations();
