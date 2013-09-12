@@ -81,7 +81,7 @@ public class Config implements Serializable
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
-	public Integer numLocations = null; // needs to be specified if locations are loaded from trees....
+	public int numLocations = 3; // needs to be specified if locations are loaded from trees....
 
 	public boolean restoreFromDatabase = false;
 

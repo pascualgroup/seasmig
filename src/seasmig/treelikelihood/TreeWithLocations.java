@@ -123,7 +123,14 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		if (rootTaxonIndex==null)
 			rootTaxonIndex = UNKNOWN_TAXA;
-		root = new TreeWithLocationsNode(Integer.parseInt((String)tree.getRootNode().getAttribute(locationAttributeName))-1,rootTaxonIndex,0,null);
+		if (tree.getRootNode().getAttribute(locationAttributeName)!=null) {
+			root = new TreeWithLocationsNode((int) tree.getRootNode().getAttribute(locationAttributeName),rootTaxonIndex,0,null);
+			numIdentifiedLocations+=1;
+		}
+		else {
+			root = new TreeWithLocationsNode(UNKNOWN_TAXA,rootTaxonIndex,0,null);
+		}
+		
 		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
 	}
 
@@ -294,8 +301,10 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (taxon!=null)
 				taxonIndex = taxaIndices.get(taxon.getName());			
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			if (locationAttributeName!=null)
-				outputSubTree.children.add(new TreeWithLocationsNode(Integer.parseInt((String)node.getAttribute(locationAttributeName))-1,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+			if (locationAttributeName!=null) {
+				outputSubTree.children.add(new TreeWithLocationsNode((int)node.getAttribute(locationAttributeName),taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+				numIdentifiedLocations+=1;
+			}
 			else 
 				outputSubTree.children.add(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 			makeSubTree(inputTree, locationAttributeName, outputSubTree.children.get(outputSubTree.children.size()-1), node);			

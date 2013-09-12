@@ -122,7 +122,13 @@ public class DataFromFiles implements Data
 
 			// TODO: add states....
 			// Convert trees to internal tree representation
+			boolean locationFilenameExists = false;
 			if (config.locationFilenames[h]!=null) {
+				if (config.locationFilenames[h].length()>0) {
+					locationFilenameExists = true;
+				}
+			}
+			if (locationFilenameExists) {
 				System.out.print("Loading traits... ");
 				String locationFilename = config.locationFilenames[h];
 				AttributeLoader attributeLoader= new SimpleAttributeLoader(locationFilename, config.stateFilename);	
@@ -151,10 +157,14 @@ public class DataFromFiles implements Data
 				// TODO: add load states from trees...
 				numLocations=config.numLocations; // TODO: get this to be automatically loaded from trees
 				System.out.print("Reparsing trees... ");
+				double numIdentifiedLocations=0;
 				for (jebl.evolution.trees.Tree tree : NexusTreeTail) {
 					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices, config.locationAttributeNameInTree, numLocations));
+					numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 				}		
 				System.out.println(" reparsed "+trees.get(h).size()+" trees");
+				numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
+				System.out.print("identified "+numIdentifiedLocations+" tip locations on average per tree");
 			}	
 		}
 

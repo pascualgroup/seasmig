@@ -228,34 +228,10 @@ public class TreeWithLocationsTest {
 		 
 		
 		 branch length is 1....
-		 First site:
-		         changes, no changes
-		 2,2 --> 3, 1
-		 2,0 --> 3, 1
-		 2,3 --> 4
-		 2,1 --> 3, 1
-		 ---
-         0,2 --> 3, 1
-         0,0 --> 1, 3
-         0,3 --> 3, 1
-         0,1 --> 2, 2
-         ---
-         3,2 --> 4
-         3,0 --> 3, 1
-         3,3 --> 3, 1
-         3,1 --> 3, 1
-         ---
-         1,2 --> 4
-         1,0 --> 3, 1
-         1,3 --> 4
-         1,1 --> 2, 2
-         
-         Total: ...... Log[9*(c^3*nc^1)+4*(c^4)+1*(c^1*nc^3)+2*(c^2*nc^2)]=.....
-         plus ..... Log[1/4] for root freq =  
-         2*(-2.81603+Log[1/4])=....
+		
 		 */
 		
-		double expectedResult = -4.203325167376054; // This wasn't calculated manually but is the output of the run
+		double expectedResult = -3.5715396865307345; // This wasn't calculated manually but is the output of the run
 		                                            // i.e. good for regression testing
 		
 		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
@@ -263,10 +239,10 @@ public class TreeWithLocationsTest {
 		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
-		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.2,0.3,0.5},
 																 { 0.333333,-1,0.333333,0.333333},
-																 { 0.333333,0.333333,-1,0.333333},
-																 { 0.333333,0.333333,0.333333,-1}});
+																 { 1.333333,0.333333,-4,2.333333},
+																 { 0.333333,0.666666,1.0,-2}});
 		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
 		assertEquals(expectedResult, locTree.logLikelihood(),0.01);
