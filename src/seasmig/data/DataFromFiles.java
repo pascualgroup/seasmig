@@ -146,7 +146,7 @@ public class DataFromFiles implements Data
 						numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 					}
 					numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
-					System.out.print("identified "+numIdentifiedLocations+" tip locations on average per tree");
+					System.out.println("identified "+numIdentifiedLocations+" tip locations on average per tree");
 				}
 				else {
 					// TODO: this...

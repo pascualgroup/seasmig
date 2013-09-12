@@ -302,8 +302,13 @@ public class TreeWithLocations implements LikelihoodTree {
 				taxonIndex = taxaIndices.get(taxon.getName());			
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
 			if (locationAttributeName!=null) {
-				outputSubTree.children.add(new TreeWithLocationsNode((int)node.getAttribute(locationAttributeName),taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
-				numIdentifiedLocations+=1;
+				if (node.getAttribute(locationAttributeName)!=null) {
+					outputSubTree.children.add(new TreeWithLocationsNode((int)node.getAttribute(locationAttributeName),taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+					numIdentifiedLocations+=1;
+				}
+				else {
+					outputSubTree.children.add(new TreeWithLocationsNode(UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+				}
 			}
 			else 
 				outputSubTree.children.add(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
