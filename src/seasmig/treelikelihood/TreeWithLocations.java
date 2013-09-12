@@ -186,10 +186,14 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int from = 0; from < numLocations; from++) {
 					for (TreeWithLocationsNode child : node.children ) {
 						// for now caching is done inside likelihood model...
-						double[][] p = likelihoodModel.transitionMatrix(node.time, child.time); 
+						double[][] p;
+						if (node.time!=child.time && node.loc==child.loc) 												
+							p = likelihoodModel.transitionMatrix(node.time, child.time);
+						else
+							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
 						double[] alphas = new double[numLocations];						
 						for (int to = 0; to < numLocations; to++) {
-							alphas[to]=(Math.log(p[from][to]) + child.logProbs[to]);
+							alphas[to]=(Math.log(p[from][to]) + child.logProbs[to]);							
 						}						
 						node.logProbs[from] += Util.logSumExp(alphas);
 					}								
@@ -307,7 +311,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					numIdentifiedLocations+=1;
 				}
 				else {
-					outputSubTree.children.add(new TreeWithLocationsNode(UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+					outputSubTree.children.add(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 				}
 			}
 			else 
