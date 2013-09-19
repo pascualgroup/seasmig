@@ -146,7 +146,7 @@ public class DataFromFiles implements Data
 						numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 					}
 					numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
-					System.out.println("identified "+numIdentifiedLocations+" tip locations on average per tree");
+					System.out.println("identified "+numIdentifiedLocations+" locations on average per tree");
 				}
 				else {
 					// TODO: this...
@@ -164,7 +164,7 @@ public class DataFromFiles implements Data
 				}		
 				System.out.println(" reparsed "+trees.get(h).size()+" trees");
 				numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
-				System.out.println("identified "+numIdentifiedLocations+" tip locations on average per tree");
+				System.out.println("identified "+numIdentifiedLocations+" locations on average per tree");
 			}	
 		}
 
