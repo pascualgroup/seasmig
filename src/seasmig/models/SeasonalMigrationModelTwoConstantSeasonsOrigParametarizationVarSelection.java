@@ -164,7 +164,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSele
 				else
 					workingCopy = data.getTrees().get(i).get(0).copy();
 				workingCopy.setLikelihoodModel(migrationBaseModel);
-				logP+=workingCopy.logLikelihood();
+				logP+=config.treeWeights[i]*workingCopy.logLikelihood();
 				trees[i]=workingCopy;
 			}						
 

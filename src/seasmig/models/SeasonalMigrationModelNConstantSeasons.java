@@ -138,7 +138,7 @@ public class SeasonalMigrationModelNConstantSeasons extends SeasonalMigrationMod
 				else
 					workingCopy = data.getTrees().get(i).get(0).copy();
 				workingCopy.setLikelihoodModel(migrationBaseModel);
-				logLikelihood+=workingCopy.logLikelihood();
+				logLikelihood+=config.treeWeights[i]*workingCopy.logLikelihood();
 				trees[i]=workingCopy;
 			}						
 

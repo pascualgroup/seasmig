@@ -78,6 +78,7 @@ public class Config implements Serializable
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
 	public String[] locationFilenames ={"out.regions"}; // null if locations are loaded from tree
 	public String[] treeFilenames = {"beastInputHA.trees"}; // null for test generated data 
+	public double[] treeWeights = {1.0};
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
