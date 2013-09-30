@@ -36,7 +36,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	static final private double testBranchLengthMean = 0.5;
 	static final private double testBranchLengthVariance = 1.0;
 	
-	double weightBeastPosterior = 0.5; 
+	double weightBeastPosterior = 0.0;
+	double logLikeWeight = 1.0; 
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
@@ -237,7 +238,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		}			
 		logLike += Util.logSumExp(alphas);
 		
-		logLike=logLike*(1-weightBeastPosterior)+weightBeastPosterior*beastPosterior;
+		logLike=logLike*logLikeWeight+weightBeastPosterior*beastPosterior;
 		return logLike;		
 	}
 
