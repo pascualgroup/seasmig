@@ -86,8 +86,8 @@ public class Config implements Serializable
 
 	public boolean restoreFromDatabase = false;
 
-	
-		
+	public long swapInterval = 10;
+			
 	public Config() {};
 	
 	// OUTPUT CONFIG TO FILE
