@@ -125,7 +125,7 @@ public class SeasonalMigrationModelNoSeasonalityVarSelect extends SeasonalMigrat
 				double rowsum=0;
 				for (int j=0;j<numLocations;j++) {
 					if (i!=j) {
-						ratesdoubleForm[i][j]=(rateIndicators[i][j].getValue() ? rates[i][j].getValue() : 0.0);
+						ratesdoubleForm[i][j]=(rateIndicators[i][j].getValue() ? rates[i][j].getValue() : 0.000001);
 						rowsum-=ratesdoubleForm[i][j];
 					}
 				}
