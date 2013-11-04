@@ -81,13 +81,13 @@ public class Config implements Serializable
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add statese & combine files 
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
-	public String[] locationFilenames ={"out.regions"}; // null if locations are loaded from tree
-	public String[] treeFilenames = {"beastInputHA.trees"}; // null for test generated data 
+	public String[] locationFilenames ={"locationss.txt"}; // null if locations are loaded from tree
+	public String[] treeFilenames = {"h3n2.trees"}; // null for test generated data 
 	public double[] treeWeights = {1.0};
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
-	public int numLocations = 3; // needs to be specified if locations are loaded from trees....
+	public int numLocations = 8; // needs to be specified if locations are loaded from trees....
 
 	public boolean restoreFromDatabase = false;
 

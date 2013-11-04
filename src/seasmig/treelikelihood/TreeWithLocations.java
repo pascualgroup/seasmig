@@ -66,7 +66,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		numLocations=createTreeModel.getNumLocations();
 		ZERO_LOG_PROBS = new double[numLocations];
 		try {
-			beastPosterior=(double) tree.getAttribute("posterior");
+			beastPosterior=(Double) tree.getAttribute("posterior");
 			System.err.println(beastPosterior);
 		}
 		catch (Exception e){
@@ -128,7 +128,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		try {
-			beastPosterior=(double) tree.getAttribute("posterior");
+			beastPosterior=(Double) tree.getAttribute("posterior");
 			System.err.println(beastPosterior);
 		}
 		catch (Exception e){
@@ -146,7 +146,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		if (rootTaxonIndex==null)
 			rootTaxonIndex = UNKNOWN_TAXA;
 		if (tree.getRootNode().getAttribute(locationAttributeName)!=null) {
-			root = new TreeWithLocationsNode((int) tree.getRootNode().getAttribute(locationAttributeName),rootTaxonIndex,0,null);
+			root = new TreeWithLocationsNode((Integer) tree.getRootNode().getAttribute(locationAttributeName),rootTaxonIndex,0,null);
 			numIdentifiedLocations+=1;
 		}
 		else {
@@ -162,7 +162,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		try {
-			beastPosterior=(double) tree.getAttribute("posterior");
+			beastPosterior=(Double) tree.getAttribute("posterior");
 		}
 		catch (Exception e){
 			beastPosterior=0;
@@ -337,7 +337,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
 			if (locationAttributeName!=null) {
 				if (node.getAttribute(locationAttributeName)!=null) {
-					outputSubTree.children.add(new TreeWithLocationsNode((int)node.getAttribute(locationAttributeName),taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+					outputSubTree.children.add(new TreeWithLocationsNode((Integer)node.getAttribute(locationAttributeName),taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 					numIdentifiedLocations+=1;
 				}
 				else {

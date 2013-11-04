@@ -8,7 +8,6 @@ import seasmig.models.SeasonalMigrationModelFactory;
 import mc3kit.ChainParity;
 import mc3kit.MCMC;
 import mc3kit.Step;
-import mc3kit.SwapStep;
 import mc3kit.VerificationStep;
 import mc3kit.monitoring.MarginalLikelihoodStep;
 import mc3kit.output.PriorLikelihoodOutputStep;

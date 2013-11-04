@@ -10,6 +10,7 @@ import seasmig.data.DataForTests;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
+import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
 import seasmig.treelikelihood.matrixexp.JamaMolerMatrixExp;
 import seasmig.treelikelihood.matrixexp.JblasMatrixExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
@@ -47,6 +48,7 @@ public class TestMatrixExponentiation {
 				tests.add(new JblasMatrixExp(testMatrix));
 				tests.add(new AnalyticMatrixExp3(testMatrix));
 				tests.add(new AnalyticMatrixExp2(testMatrix));
+				tests.add(new EigenDecomposionExp(testMatrix));
 
 				for (double t=minTime;t<maxTime;t+=(maxTime-minTime)/numTimeSteps) {
 					dotIter++;
