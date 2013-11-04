@@ -191,103 +191,117 @@ public class TestMatrixExponentiation {
 //	}	
 
 	
-	@Test
-	public void testMatrixExpTiming() {
-		
-		final int[] testDimensions = {2,3,4,5,6,7,8,9,10,20,40};
-		
-		// TODO: this....
-		//		long startTime1= System.currentTimeMillis();		
-		//		for (int i=1;i<50;i++) {
-		//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
-		//			MatrixExponentiator test1 = new MolerMatrixExp(testMatrix);
-		//			for (int j=0;j<1200;j++) {
-		//				double[][] res1=test1.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
-		//				if (Math.random()<0.0000000000001) System.out.println(res1);
-		//			}
-		//		}
-		//		long time1= System.currentTimeMillis()-startTime1;
-		//
-		//		long startTime2= System.currentTimeMillis();		
-		//		for (int i=1;i<50;i++) {
-		//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
-		//			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);
-		//			for (int j=0;j<1200;j++) {
-		//				double[][] res2=test2.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
-		//				if (Math.random()<0.0000000000001) System.out.println(res2);
-		//			}
-		//		}
-		//		long time2= System.currentTimeMillis()-startTime2;
-		//
-		//		long startTime3= System.currentTimeMillis();		
-		//		for (int i=1;i<50;i++) {
-		//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
-		//			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);;
-		//			for (int j=0;j<1200;j++) {
-		//				double[][] res3=test3.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
-		//				if (Math.random()<0.0000000000001) System.out.println(res3);
-		//			}
-		//		}
-		//		long time3= System.currentTimeMillis()-startTime3;
-		//
-		//		long startTime4= System.currentTimeMillis();		
-		//		for (int i=1;i<50;i++) {
-		//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
-		//			MatrixExponentiator test4 = new JamaMolerMatrixExp(testMatrix);;
-		//			for (int j=0;j<1200;j++) {
-		//				double[][] res4=test4.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
-		//				if (Math.random()<0.0000000000001) System.out.println(res4);
-		//			}
-		//		}
-		//		long time4= System.currentTimeMillis()-startTime4;
-		//
-		//		long startTime5= System.currentTimeMillis();		
-		//		for (int i=1;i<50;i++) {
-		//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
-		//			MatrixExponentiator test5 = new JblasMatrixExp(testMatrix);;
-		//			for (int j=0;j<1200;j++) {
-		//				double[][] res5=test5.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
-		//				if (Math.random()<0.0000000000001) System.out.println(res5);
-		//			}
-		//		}
-		//		long time5= System.currentTimeMillis()-startTime5;
-		//
-		//		long time6 = 0;
-		//		if (numLocations==3) {
-		//			long startTime6= System.currentTimeMillis();		
-		//			for (int i=1;i<50;i++) {
-		//				double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
-		//				MatrixExponentiator test6 = new AnalyticMatrixExp3(testMatrix);;
-		//				for (int j=0;j<1200;j++) {
-		//					double[][] res6=test6.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
-		//					if (Math.random()<0.0000000000001) System.out.println(res6);
-		//				}
-		//			}
-		//			time6= System.currentTimeMillis()-startTime6;
-		//		}
-		//		if (numLocations==2) {
-		//			long startTime6= System.currentTimeMillis();		
-		//			for (int i=1;i<50;i++) {
-		//				double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
-		//				MatrixExponentiator test6 = new AnalyticMatrixExp2(testMatrix);;
-		//				for (int j=0;j<1200;j++) {
-		//					double[][] res6=test6.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
-		//					if (Math.random()<0.0000000000001) System.out.println(res6);
-		//				}
-		//			}
-		//			time6= System.currentTimeMillis()-startTime6;
-		//		}
-		//
-		//
-		//		System.out.println("\nMolerMatrixExp: "+time1+"ms");
-		//		System.out.println("Matlab7MatrixExp: "+time2+"ms");
-		//		System.out.println("TaylorMatrixExp: "+time3+"ms");
-		//		System.out.println("JamaMolerMatrixExp: "+time4+"ms");
-		//		System.out.println("JblasMatrixExp: "+time5+"ms");
-		//		if (numLocations==3) System.out.println("AnalyticMatrixExp3: "+time6+"ms");
-		//		if (numLocations==2) System.out.println("AnalyticMatrixExp2: "+time6+"ms");
-		//
-		//
-	}
+//	@Test
+//	public void testMatrixExpTiming() {
+//		
+//		final int[] testDimensions = {2,3,4,5,6,7,8,9,10,20,40};
+//		
+//		for (int numLocations : testDimensions) {	
+//			System.out.println("\nnumDimensions: "+numLocations);
+//			for (int scaleIter=0;scaleIter<numScaleSteps;scaleIter++) {				
+//				double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) scaleIter*(maxMatrixScale-minMatrixScale)/(double)numScaleSteps+minMatrixScale);
+//		
+//		Vector<MatrixExponentiator> tests = new Vector<MatrixExponentiator>();
+//		tests.add(new Matlab7MatrixExp(testMatrix));
+//		tests.add(new TaylorMatrixExp(testMatrix));
+//		tests.add(new JamaMolerMatrixExp(testMatrix));
+//		tests.add(new JblasMatrixExp(testMatrix));
+//		tests.add(new AnalyticMatrixExp3(testMatrix));
+//		tests.add(new AnalyticMatrixExp2(testMatrix));
+//		tests.add(new EigenDecomposionExp(testMatrix));
+//		
+//		// TODO: this....
+//		long startTime1= System.currentTimeMillis();		
+//		for (int i=1;i<50;i++) {
+//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+//			MatrixExponentiator test1 = new MolerMatrixExp(testMatrix);
+//			for (int j=0;j<1200;j++) {
+//				double[][] res1=test1.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+//				if (Math.random()<0.0000000000001) System.out.println(res1);
+//			}
+//		}
+//		long time1= System.currentTimeMillis()-startTime1;
+//
+//		long startTime2= System.currentTimeMillis();		
+//		for (int i=1;i<50;i++) {
+//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+//			MatrixExponentiator test2 = new Matlab7MatrixExp(testMatrix);
+//			for (int j=0;j<1200;j++) {
+//				double[][] res2=test2.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+//				if (Math.random()<0.0000000000001) System.out.println(res2);
+//			}
+//		}
+//		long time2= System.currentTimeMillis()-startTime2;
+//
+//		long startTime3= System.currentTimeMillis();		
+//		for (int i=1;i<50;i++) {
+//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+//			MatrixExponentiator test3 = new TaylorMatrixExp(testMatrix);;
+//			for (int j=0;j<1200;j++) {
+//				double[][] res3=test3.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+//				if (Math.random()<0.0000000000001) System.out.println(res3);
+//			}
+//		}
+//		long time3= System.currentTimeMillis()-startTime3;
+//
+//		long startTime4= System.currentTimeMillis();		
+//		for (int i=1;i<50;i++) {
+//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+//			MatrixExponentiator test4 = new JamaMolerMatrixExp(testMatrix);;
+//			for (int j=0;j<1200;j++) {
+//				double[][] res4=test4.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+//				if (Math.random()<0.0000000000001) System.out.println(res4);
+//			}
+//		}
+//		long time4= System.currentTimeMillis()-startTime4;
+//
+//		long startTime5= System.currentTimeMillis();		
+//		for (int i=1;i<50;i++) {
+//			double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+//			MatrixExponentiator test5 = new JblasMatrixExp(testMatrix);;
+//			for (int j=0;j<1200;j++) {
+//				double[][] res5=test5.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+//				if (Math.random()<0.0000000000001) System.out.println(res5);
+//			}
+//		}
+//		long time5= System.currentTimeMillis()-startTime5;
+//
+//		long time6 = 0;
+//		if (numLocations==3) {
+//			long startTime6= System.currentTimeMillis();		
+//			for (int i=1;i<50;i++) {
+//				double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+//				MatrixExponentiator test6 = new AnalyticMatrixExp3(testMatrix);;
+//				for (int j=0;j<1200;j++) {
+//					double[][] res6=test6.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+//					if (Math.random()<0.0000000000001) System.out.println(res6);
+//				}
+//			}
+//			time6= System.currentTimeMillis()-startTime6;
+//		}
+//		if (numLocations==2) {
+//			long startTime6= System.currentTimeMillis();		
+//			for (int i=1;i<50;i++) {
+//				double[][] testMatrix = DataForTests.makeRandomMigrationMatrix(numLocations,(double) i/100.0);
+//				MatrixExponentiator test6 = new AnalyticMatrixExp2(testMatrix);;
+//				for (int j=0;j<1200;j++) {
+//					double[][] res6=test6.expm(cern.jet.random.Uniform.staticNextDoubleFromTo(0, 5));
+//					if (Math.random()<0.0000000000001) System.out.println(res6);
+//				}
+//			}
+//			time6= System.currentTimeMillis()-startTime6;
+//		}
+//
+//
+//		System.out.println("\nMolerMatrixExp: "+time1+"ms");
+//		System.out.println("Matlab7MatrixExp: "+time2+"ms");
+//		System.out.println("TaylorMatrixExp: "+time3+"ms");
+//		System.out.println("JamaMolerMatrixExp: "+time4+"ms");
+//		System.out.println("JblasMatrixExp: "+time5+"ms");
+//		if (numLocations==3) System.out.println("AnalyticMatrixExp3: "+time6+"ms");
+//		if (numLocations==2) System.out.println("AnalyticMatrixExp2: "+time6+"ms");
+//
+//
+//	}
 
 }

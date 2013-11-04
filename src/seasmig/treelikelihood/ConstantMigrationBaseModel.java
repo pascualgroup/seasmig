@@ -3,6 +3,7 @@ import java.util.HashMap;
 
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
+import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 
 @SuppressWarnings("serial")
@@ -44,8 +45,11 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 				matrixExponentiator=new Matlab7MatrixExp(Q);
 			}
 			break;			
-		default:
-			matrixExponentiator=new Matlab7MatrixExp(Q);	
+		default:			
+			matrixExponentiator=new EigenDecomposionExp(Q);
+			if (!matrixExponentiator.checkMethod()) {
+				matrixExponentiator=new Matlab7MatrixExp(Q);
+			}
 		}
 		// TODO: Maybe use other method to get s.s. freq 
 		basefreq=matrixExponentiator.expm(veryLongTime)[1];
