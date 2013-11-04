@@ -10,6 +10,7 @@ public class Util {
 	protected Util() {};
 
 	public static double logSumExp(double[] alphas, double min) {
+		// TODO: improve this
 		double sumExp = 0;		
 		for (int i=0;i<alphas.length;i++) {			
 			sumExp=sumExp+Math.exp(alphas[i]-min);
@@ -23,6 +24,7 @@ public class Util {
 	}
 	
 	public static final double logSumExp(double[] alphas) {
+		// TODO: improve this
 		double sumExp = 0;
 		double minWithoutNegInf = 0;
 		for (int i=0;i<alphas.length;i++) {
@@ -33,9 +35,9 @@ public class Util {
 			}
 		}
 		for (int i=0;i<alphas.length;i++) {			
-			sumExp=sumExp+Math.exp(alphas[i]-minWithoutNegInf);
+			sumExp=sumExp+cern.jet.math.Functions.exp.apply(alphas[i]-minWithoutNegInf);
 		}
-		double returnValue=minWithoutNegInf+Math.log(sumExp);
+		double returnValue=minWithoutNegInf+cern.jet.math.Functions.log.apply(sumExp);
 		if (Double.isNaN(returnValue) ){
 			return minNegative;
 		}
