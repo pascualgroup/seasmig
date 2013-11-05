@@ -82,6 +82,7 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF ||
 					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_TO_DIFF) {
 				return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,fixPhase, fixFrom, fixTo);
+				// TODO: TREAT LENGTH
 			}
 			else {
 				System.err.println("twoSeasonParameterization: "+config.twoSeasonParameterization+" not implemented!");
