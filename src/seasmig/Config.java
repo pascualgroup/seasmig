@@ -63,6 +63,8 @@ public class Config implements Serializable
 	public double heatPower = 3.0;
 	
 	public double targetAcceptanceRate = 0.25;
+	
+	public boolean verificationStep = false; // Added to allow for "hot swaps" of tree files, when resuming from checkpoint.bin
 
 	// MODEL RELATED PARAMETERS
 	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
