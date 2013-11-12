@@ -204,7 +204,6 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends S
 				adjustRate(rates2doubleForm, rate);
 			}
 
-			// TODO: add update to migration model instead of reconstructing...
 			if (fixedPhase && fixedPhaseLength) {
 				seasonStart=config.fixedPhase;	
 				seasonEnd = seasonStart+0.5;

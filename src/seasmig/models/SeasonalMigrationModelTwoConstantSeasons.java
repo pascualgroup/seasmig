@@ -23,7 +23,6 @@ public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationM
 	DoubleVariable[] diffMultipliersFrom;
 	DoubleVariable[] diffMultipliersTo;
 	DoubleVariable seasonalPhase;
-	double seasonalPhaseRealization;
 	IntVariable treeIndices[];
 	LikelihoodVariable likeVar;
 	private int nTrees[];	
@@ -32,10 +31,13 @@ public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationM
 	boolean fixTo;
 	boolean fixFrom;
 	private ExponentialDistribution ratePriorDist;
+	private double seasonStart;
+	private DoubleVariable seasonalLength;
+	private boolean fixedPhaseLength;
 
 	protected SeasonalMigrationModelTwoConstantSeasons() { }
 
-	public SeasonalMigrationModelTwoConstantSeasons(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixFrom, boolean fixTo) throws MC3KitException
+	public SeasonalMigrationModelTwoConstantSeasons(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixedPhaseLength, boolean fixFrom, boolean fixTo) throws MC3KitException
 	{
 		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
@@ -45,6 +47,7 @@ public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationM
 		this.fixedPhase=fixedPhase;
 		this.fixTo=fixTo;
 		this.fixFrom=fixFrom;
+		this.fixedPhaseLength=fixedPhaseLength;
 		numLocations=data.getNumLocations();
 		List<ArrayList<LikelihoodTree>> trees = data.getTrees();		
 		nTrees = new int[trees.size()];
@@ -67,11 +70,19 @@ public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationM
 			}
 		}		
 
-		if (!fixedPhase) {
-			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));
+		if (fixedPhase && fixedPhaseLength) {
+			seasonStart=config.fixedPhase;			
 		}
-		else {
-			seasonalPhaseRealization=config.fixedPhase;
+		else if (!fixedPhase && fixedPhaseLength) {
+			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,0.5));			
+		}
+		else if (!fixedPhase && !fixedPhaseLength) {	
+			seasonalPhase = new DoubleVariable(this,"seasonalPhase", new UniformDistribution(this,0,1));
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,config.minSeasonLength,0.5));			
+		}
+		else /* fixedPhase && !fixedLength */ {
+			seasonStart=config.fixedPhase;
+			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,config.minSeasonLength,0.5));			
 		}
 
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
@@ -107,6 +118,8 @@ public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationM
 	private class LikelihoodVariable extends TreesLikelihoodVariable {
 
 
+		private double seasonEnd;
+
 		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasons m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
@@ -121,6 +134,8 @@ public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationM
 
 			if (!fixedPhase)
 				m.addEdge(this, m.seasonalPhase);
+			if (!fixedPhaseLength)
+				m.addEdge(this, m.seasonalLength);
 
 			for(int i = 0; i < numLocations; i++) {
 				if (diffMultipliersFrom[i]!=null ) 
@@ -186,10 +201,36 @@ public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationM
 				rates2doubleForm[i][i]=-rowsum2;		
 			}
 
-			// TODO: add update to migration model instead of reconstructing...
-			if (!fixedPhase)
-				seasonalPhaseRealization=seasonalPhase.getValue();
-			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhaseRealization,seasonalPhaseRealization+0.5);
+			if (fixedPhase && fixedPhaseLength) {
+				seasonStart=config.fixedPhase;	
+				seasonEnd = seasonStart+0.5;
+			}
+			else if (!fixedPhase && fixedPhaseLength) {
+				seasonStart=seasonalPhase.getValue();
+				seasonEnd=seasonalPhase.getValue()+0.5;			
+			}
+			else if (!fixedPhase && !fixedPhaseLength) {
+				if (seasonalPhase.getValue()+seasonalLength.getValue()<1) {
+					seasonStart=seasonalPhase.getValue();
+					seasonEnd=seasonalPhase.getValue()+seasonalLength.getValue();
+				} 
+				else {
+					seasonStart=seasonalPhase.getValue()+seasonalLength.getValue()-1.0;
+					seasonEnd=seasonalPhase.getValue();
+				}						
+			}
+			else /* fixedPhase && !fixedLength */ {					
+				if (config.fixedPhase+seasonalLength.getValue()<1) {
+					seasonStart=config.fixedPhase;
+					seasonEnd=seasonStart+seasonalLength.getValue();
+				} 
+				else {
+					seasonStart=config.fixedPhase+seasonalLength.getValue()-1.0;
+					seasonEnd=config.fixedPhase;
+				}			
+			}	
+			
+			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonStart,seasonEnd);
 			LikelihoodTree workingCopy;		
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1)

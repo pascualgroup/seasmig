@@ -58,6 +58,8 @@ public class SimpleAttributeLoader implements AttributeLoader{
 			}
 						
 		}
+		
+		locationReader.close();
 
 		attributes.put("locations",locationMap);
 		attributes.put("numLocations",locations.size());
@@ -79,7 +81,8 @@ public class SimpleAttributeLoader implements AttributeLoader{
 			Double state = Double.parseDouble(stateReader.readLine());
 			stateMap.put(taxa, state);
 		}
-
+		
+		stateReader.close();
 		attributes.put("states",stateMap);
 	}
 

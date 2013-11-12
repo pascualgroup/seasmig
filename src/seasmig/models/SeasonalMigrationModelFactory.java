@@ -31,6 +31,10 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 				return new SeasonalMigrationModelNoSeasonality(initialChain, config, data);
 			case VARIABLE_SELECTION:
 				return new SeasonalMigrationModelNoSeasonalityVarSelect(initialChain, config, data);
+			case EPOCHAl:
+				return new EpochalMigrationModel(initialChain, config, data, 0);
+			default:
+				break;
 			}
 		case N_CONSTANT_SEASONS: 	
 			return new SeasonalMigrationModelNConstantSeasons(initialChain,config,data,config.nSeasonalParts);
@@ -81,7 +85,7 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || 
 					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF ||
 					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_TO_DIFF) {
-				return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,fixPhase, fixFrom, fixTo);
+				return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,fixPhase, fixLength, fixFrom, fixTo);
 				// TODO: TREAT LENGTH
 			}
 			else {
