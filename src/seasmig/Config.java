@@ -33,7 +33,7 @@ public class Config implements Serializable
 	public static enum NoSeasonalityParameterization 
 	{  VARIABLE_SELECTION,		
 	   ALL,
-	   EPOCHAl
+	   EPOCHAL
 	}
 	public static enum TwoConstantSeasonsPhase { FIXED_PHASE_FIXED_LENGTH, FREE_PHASE_FREE_LENGTH, FIXED_PHASE_FREE_LENGTH, FREE_PHASE_FIXED_LENGTH };
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
@@ -79,7 +79,7 @@ public class Config implements Serializable
 	public int nSeasonalParts=4; 
 	
 	// NON-SEASONAL MODEL RELATED PARAMETERS
-	public NoSeasonalityParameterization noSeasonalityParameterization = NoSeasonalityParameterization.VARIABLE_SELECTION;
+	public NoSeasonalityParameterization noSeasonalityParameterization = NoSeasonalityParameterization.EPOCHAL;
 
 	// N EPOCHAL MODEL
 	public int nEpochs = 2;
