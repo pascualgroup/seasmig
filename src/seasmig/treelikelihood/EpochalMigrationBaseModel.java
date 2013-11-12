@@ -45,8 +45,8 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 		// diagonal rates functions are calculated through row sums and are ignored...
 		num_locations=seasonalRates_[0].length;	
 		seasonalRates=seasonalRates_;
-		nParts = epochs.length;
 		epochs = epochs_;
+		nParts = epochs.length;
 		constantModels = new ConstantMigrationBaseModel[nParts];
 
 		for (int i=0;i<nParts;i++) {
