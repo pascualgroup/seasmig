@@ -5,6 +5,7 @@ import java.util.List;
 
 import seasmig.Config;
 import seasmig.Data;
+import seasmig.treelikelihood.EpochalMigrationBaseModel;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.PiecewiseConstantMigrationBaseModel;
@@ -18,21 +19,24 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 	Data data;
 	int numLocations;
 
-	DoubleVariable[][][] rates;			
+	DoubleVariable[][][] rates;
+	DoubleVariable[] epochs;
 	IntVariable treeIndices[];
 	LikelihoodVariable likeVar;
 	private int nTrees[];	
 
 	private ExponentialDistribution ratePriorDist;
 	private int nParts;
+	private boolean freeTimes;
 
 	protected EpochalMigrationModel() { }
 
-	public EpochalMigrationModel(Chain initialChain, Config config, Data data) throws MC3KitException
+	public EpochalMigrationModel(Chain initialChain, Config config, Data data, boolean freeTimes_) throws MC3KitException
 	{
 		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
 
+		this.freeTimes=freeTimes_;
 		this.config = config;
 		this.data = data;
 		this.nParts = config.nEpochs;
@@ -45,8 +49,19 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 
 		rates = new DoubleVariable[nParts][numLocations][numLocations];
 
+		if (freeTimes) {
+			epochs= new DoubleVariable[nParts-1];
+		}
+		
 		beginConstruction();
-
+		
+		if (freeTimes) {
+			// TODO: add sort and Dirichlet distribution
+			for (int i=0;i<epochs.length;i++) {
+				epochs[i]=new DoubleVariable(this, "epochTime."+i, new UniformDistribution(this, config.minEpochTime, config.maxEpochTime));
+			}
+		}
+		
 		treeIndices = new IntVariable[trees.size()];
 		for (int i=0;i<trees.size();i++) {
 			if (nTrees[i]>1) {
@@ -74,7 +89,6 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 
 	private class LikelihoodVariable extends TreesLikelihoodVariable {
 
-
 		LikelihoodVariable(EpochalMigrationModel m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
@@ -84,6 +98,13 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1) {
 					m.addEdge(this, m.treeIndices[i]);
+				}
+			}
+			
+			if (freeTimes) {
+				// TODO: add sort and Dirichlet distribution
+				for (int i=0;i<epochs.length;i++) {
+					m.addEdge(this,m.epochs[i]);
 				}
 			}
 
@@ -130,7 +151,19 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 				}
 			}
 
-			MigrationBaseModel migrationBaseModel = new PiecewiseConstantMigrationBaseModel(ratesDoubleForm,nParts);
+			double[] epochsDoubleForm;
+			
+			if (!freeTimes) {
+				epochsDoubleForm = config.epochTimes;
+			}
+			else {
+				epochsDoubleForm = new double[nParts-1];
+				for (int i=0;i<epochs.length;i++) {
+					epochsDoubleForm[i]=epochs[i].getValue();
+				}
+			}
+	
+			MigrationBaseModel migrationBaseModel = new EpochalMigrationBaseModel(ratesDoubleForm,epochsDoubleForm);
 			LikelihoodTree workingCopy;		
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1)

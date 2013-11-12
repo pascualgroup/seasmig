@@ -1,14 +1,18 @@
 package seasmig.treelikelihood;
 
 import java.util.HashMap;
+
+import mc3kit.DoubleVariable;
+
 import org.javatuples.Pair;
+
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
 
 @SuppressWarnings("serial")
 public class EpochalMigrationBaseModel implements MigrationBaseModel {
-	
+
 	// Precision Parameter
 	static final double infinitesimalTime = 1E-5;
 
@@ -18,6 +22,7 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 	// Precision Parameters
 	int nParts;
 	double[] epochs;
+	DoubleVariable[] epochTimes;
 
 	// Origin Model
 	double[][][] seasonalRates;	
@@ -35,12 +40,12 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 	protected EpochalMigrationBaseModel() {};
 
 	// Constructor	
-	public EpochalMigrationBaseModel(double[][][] seasonalRates_, DoubleFunction[] rootFreq_, double[] epochs_, int nParts_) {	
+	public EpochalMigrationBaseModel(double[][][] seasonalRates_, DoubleFunction[] rootFreq_, double[] epochs_) {	
 		// TODO: Check this...
 		// diagonal rates functions are calculated through row sums and are ignored...
 		num_locations=seasonalRates_[0].length;	
 		seasonalRates=seasonalRates_;
-		nParts = nParts_;
+		nParts = epochs.length;
 		epochs = epochs_;
 		constantModels = new ConstantMigrationBaseModel[nParts];
 
@@ -59,6 +64,11 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 			constantModels[i]=new ConstantMigrationBaseModel(migrationMatrix);
 		}		
 		rootFreq = rootFreq_;
+	}
+
+	// Constructor	
+	public EpochalMigrationBaseModel(double[][][] seasonalRates_, double[] epochs_) {	
+		this(seasonalRates_, null, epochs_);
 	}
 
 	// Methods
