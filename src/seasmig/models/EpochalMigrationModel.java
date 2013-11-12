@@ -28,14 +28,14 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 
 	protected EpochalMigrationModel() { }
 
-	public EpochalMigrationModel(Chain initialChain, Config config, Data data, int nParts) throws MC3KitException
+	public EpochalMigrationModel(Chain initialChain, Config config, Data data) throws MC3KitException
 	{
 		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
 
 		this.config = config;
 		this.data = data;
-		this.nParts = nParts;
+		this.nParts = config.nEpochs;
 		numLocations=data.getNumLocations();
 		List<ArrayList<LikelihoodTree>> trees = data.getTrees();		
 		nTrees = new int[trees.size()];

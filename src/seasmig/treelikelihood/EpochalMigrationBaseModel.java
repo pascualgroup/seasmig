@@ -1,0 +1,179 @@
+package seasmig.treelikelihood;
+
+import java.util.HashMap;
+import org.javatuples.Pair;
+import cern.colt.function.DoubleFunction;
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
+
+@SuppressWarnings("serial")
+public class EpochalMigrationBaseModel implements MigrationBaseModel {
+	
+	// Precision Parameter
+	static final double infinitesimalTime = 1E-5;
+
+	// Cache Parameters 
+	static final int maxCachedTransitionMatrices = 1600;
+
+	// Precision Parameters
+	int nParts;
+	double[] epochs;
+
+	// Origin Model
+	double[][][] seasonalRates;	
+	DoubleFunction[] rootFreq;
+
+	// Constant Migration Models
+	MigrationBaseModel constantModels[];
+
+	// Caching
+	DoubleFactory2D F = DoubleFactory2D.dense;
+	HashMap<Pair<Double,Double>, double[][]> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, double[][]>();
+
+	private int num_locations = 0;
+	private double dt; 
+
+	protected EpochalMigrationBaseModel() {};
+
+	// Constructor	
+	public EpochalMigrationBaseModel(double[][][] seasonalRates_, DoubleFunction[] rootFreq_, double[] epochs_, int nParts_) {	
+		// TODO: Check this...
+		// diagonal rates functions are calculated through row sums and are ignored...
+		num_locations=seasonalRates_[0].length;	
+		seasonalRates=seasonalRates_;
+		nParts = nParts_;
+		epochs = epochs_;
+		constantModels = new ConstantMigrationBaseModel[nParts];
+
+		for (int i=0;i<nParts;i++) {
+			double[][] migrationMatrix = new double[num_locations][num_locations];
+			for (int j=0; j<num_locations; j++) {
+				double row_sum = 0;
+				for (int k=0; k<num_locations; k++) {
+					if (j!=k) {
+						migrationMatrix[j][k]=seasonalRates[i][j][k];
+						row_sum+=migrationMatrix[j][k];
+					}
+				}
+				migrationMatrix[j][j]=-row_sum;
+			}
+			constantModels[i]=new ConstantMigrationBaseModel(migrationMatrix);
+		}		
+		rootFreq = rootFreq_;
+	}
+
+	// Methods
+	@Override
+	public double logprobability(int from_location, int to_location, double from_time, double to_time) {		
+		return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);
+	}
+
+	// Methods
+	@Override
+	public double[] probability(int from_state,  double from_time, double to_time) {		
+		return transitionMatrix(from_time, to_time)[from_state];
+	}
+
+	@Override
+	public double[][] transitionMatrix(double from_time, double to_time) {
+		double[][] cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time,to_time));
+		if (cached!=null) {
+			return cached;
+		}
+		else {			
+			// first step: 
+			double step_start_time = from_time;
+			int epochIndex = epochIndex(from_time);
+			double step_end_time = Math.min(to_time, epochEndTime(epochIndex));
+			DoubleMatrix2D result = F.identity(num_locations);	 
+
+			while (step_start_time<to_time) {
+				// TODO: replace with other matrix mult
+				result = result.zMult(DoubleFactory2D.dense.make(constantModels[epochIndex].transitionMatrix(step_start_time, step_end_time)),null);	
+				step_start_time = step_end_time;
+				epochIndex=epochIndex+1;
+				step_end_time = Math.min(to_time, epochEndTime(epochIndex));
+			}
+
+			// cache result
+			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
+				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
+			}			
+			double[][] returnValue=result.toArray();
+			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time, to_time),returnValue);
+
+			// TODO: replace with no conversion step
+			return returnValue;
+		}
+	}
+
+	private int epochIndex(double from_time) {
+		for (int i=0;i<nParts;i++) {
+			if (epochs[i]>from_time) {
+				return i;
+			}
+		}
+		return nParts-1;
+	}
+
+	private double epochEndTime(int index) {
+		if (index<nParts)
+			return epochs[index];
+		else
+			return Double.MAX_VALUE;
+	}
+
+	@Override
+	public String print() {
+		String returnValue = "Epochal Migration Model:\n";
+		returnValue+="[";
+		for (int i=0;i<seasonalRates.length;i++) {
+			if (i!=0) returnValue+=" ";
+			returnValue+="[";
+			for (int j=0;j<seasonalRates[i].length;j++) {
+				if (i!=j) 
+					returnValue=returnValue+String.format("%40s",seasonalRates[i][j].toString());
+				else 
+					returnValue+=String.format("%40s", "NA");
+				if (j!=seasonalRates[i].length-1) returnValue+=",";
+			}
+			returnValue+="]";
+			if (i!=seasonalRates.length-1) returnValue+="\n";
+		}
+		returnValue+="]\n";
+		return returnValue;	
+	}
+
+
+	@Override
+	public int getNumLocations() {
+		return num_locations ;
+	}
+
+	@Override
+	public String parse() {
+		// TODO Auto-generated method stub
+		return print();
+	}
+
+	@Override
+	public String getModelName() {		
+		return "General Seasonal";
+	}
+
+	@Override
+	public double[] rootfreq(double when) {
+		double[] returnValue = new double[num_locations];
+		for (int i=0;i<num_locations;i++) {
+			if (rootFreq!=null) 
+				returnValue[i]=rootFreq[i].apply(when);		
+			else 
+				returnValue[i]=1.0/num_locations;
+		}
+		return returnValue;
+	}
+
+
+
+}
+

@@ -81,6 +81,10 @@ public class Config implements Serializable
 	// NON-SEASONAL MODEL RELATED PARAMETERS
 	public NoSeasonalityParameterization noSeasonalityParameterization = NoSeasonalityParameterization.VARIABLE_SELECTION;
 
+	// N EPOCHAL MODEL
+	public int nEpochs = 2;
+	public double[] epochTimes = {2006.0};
+	
 	// GENERAL PARAMETERS
 	public double veryLongTime = 1000;	
 	
