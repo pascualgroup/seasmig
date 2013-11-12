@@ -31,7 +31,6 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 	HashMap<Pair<Double,Double>, double[][]> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, double[][]>();
 
 	private int num_locations = 0;
-	private double dt; 
 
 	protected EpochalMigrationBaseModel() {};
 
@@ -108,7 +107,7 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	private int epochIndex(double from_time) {
-		for (int i=0;i<nParts;i++) {
+		for (int i=0;i<nParts-1;i++) {
 			if (epochs[i]>from_time) {
 				return i;
 			}
@@ -117,7 +116,7 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	private double epochEndTime(int index) {
-		if (index<nParts)
+		if (index<(nParts-1))
 			return epochs[index];
 		else
 			return Double.MAX_VALUE;
