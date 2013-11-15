@@ -98,6 +98,8 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 	} 
 
 	private class LikelihoodVariable extends TreesLikelihoodVariable {
+		
+		private double infinitesimalRate = 1E-4;
 
 		LikelihoodVariable(EpochalMigrationModel m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
@@ -157,17 +159,20 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 			double[][][] ratesDoubleForm = new double[nParts][numLocations][numLocations];
 
 			for (int i=0;i<nParts;i++) {
-				for (int j=0;j<numLocations;j++) {					
+				for (int j=0;j<numLocations;j++) {	
+					double rowsum=0;
 					for (int k=0;k<numLocations;k++) {
 						if (j!=k) {
 							if (vs) {
-								ratesDoubleForm[i][j][k]=(rateIndicators[i][j][k].getValue() ? rates[i][j][k].getValue() : 0);
+								ratesDoubleForm[i][j][k]=(rateIndicators[i][j][k].getValue() ? rates[i][j][k].getValue() : infinitesimalRate*(rates[i][j][k].getValue()%1.0));
 							}								
 							else {
 								ratesDoubleForm[i][j][k]=rates[i][j][k].getValue();
 							}
-						}
+						}		
+						rowsum-=ratesDoubleForm[i][j][k];						
 					}
+					ratesDoubleForm[i][j][j]=rowsum;
 				}
 			}
 
