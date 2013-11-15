@@ -20,6 +20,7 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 	int numLocations;
 
 	DoubleVariable[][][] rates;
+	BinaryVariable[][][] rateIndicators;
 	DoubleVariable[] epochs;
 	IntVariable treeIndices[];
 	LikelihoodVariable likeVar;
@@ -28,15 +29,18 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 	private ExponentialDistribution ratePriorDist;
 	private int nParts;
 	private boolean freeTimes;
+	private boolean vs;
+	private BernoulliDistribution rateIndicatorPriorDist;
 
 	protected EpochalMigrationModel() { }
 
-	public EpochalMigrationModel(Chain initialChain, Config config, Data data, boolean freeTimes_) throws MC3KitException
+	public EpochalMigrationModel(Chain initialChain, Config config, Data data, boolean freeTimes_, boolean vs_) throws MC3KitException
 	{
 		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
 
 		this.freeTimes=freeTimes_;
+		this.vs = vs_;
 		this.config = config;
 		this.data = data;
 		this.nParts = config.nEpochs;
@@ -48,6 +52,10 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 		}
 
 		rates = new DoubleVariable[nParts][numLocations][numLocations];
+		
+		if (vs) {
+			rateIndicators = new BinaryVariable[nParts][numLocations][numLocations];
+		}
 
 		if (freeTimes) {
 			epochs= new DoubleVariable[nParts-1];
@@ -70,12 +78,14 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 		}		
 
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
+		if (vs) rateIndicatorPriorDist = new BernoulliDistribution(this, "rateIndicatorPrior", 0.5);
 
 		for (int i=0; i<nParts; i++) {
 			for (int j=0; j<numLocations; j++) {
 				for(int k=0; k<numLocations; k++) {
 					if(j == k) continue; // rateParams[i,i] remains null			
 					rates[i][j][k] = new DoubleVariable(this, "rates."+Integer.toString(i)+"."+Integer.toString(j)+"."+Integer.toString(k), ratePriorDist);
+					if (vs) rateIndicators[i][j][k] = new BinaryVariable(this, "rateIndicators."+Integer.toString(i)+"."+Integer.toString(j)+"."+Integer.toString(k), rateIndicatorPriorDist);					
 				}
 			}
 		}
@@ -107,12 +117,17 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 					m.addEdge(this,m.epochs[i]);
 				}
 			}
-
+			
+			// Should priors be included here? guess not...
+			// if (vs) m.addEdge(this,rateIndicatorPriorDist);
+			// m.addEdge(this,ratePriorDist);
+			
 			for (int i=0; i<nParts; i++) {
 				for (int j=0; j<numLocations; j++) {
 					for(int k=0; k<numLocations; k++) {
 						if(j == k) continue; // rateParams[i,i] remains null			
 						m.addEdge(this,rates[i][j][k]);
+						if (vs) m.addEdge(this, rateIndicators[i][j][k]);
 					}
 				}
 			}
@@ -145,7 +160,12 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 				for (int j=0;j<numLocations;j++) {					
 					for (int k=0;k<numLocations;k++) {
 						if (j!=k) {
-							ratesDoubleForm[i][j][k]=rates[i][j][k].getValue();				
+							if (vs) {
+								ratesDoubleForm[i][j][k]=(rateIndicators[i][j][k].getValue() ? rates[i][j][k].getValue() : 0);
+							}								
+							else {
+								ratesDoubleForm[i][j][k]=rates[i][j][k].getValue();
+							}
 						}
 					}
 				}

@@ -32,10 +32,13 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 			case VARIABLE_SELECTION:
 				return new SeasonalMigrationModelNoSeasonalityVarSelect(initialChain, config, data);
 			case EPOCHAL: 
-				return new EpochalMigrationModel(initialChain, config, data,false);
+				return new EpochalMigrationModel(initialChain, config, data,false,false);
+			case EPOCHALVS: 
+				return new EpochalMigrationModel(initialChain, config, data,false,true);
 			case EPOCHAL_FREE_TIMES:
-				return new EpochalMigrationModel(initialChain, config, data, true);
-		
+				return new EpochalMigrationModel(initialChain, config, data, true,false);
+			case EPOCHAL_FREE_TIMES_VS:
+				return new EpochalMigrationModel(initialChain, config, data, true,true);
 			default:
 				break;
 			}

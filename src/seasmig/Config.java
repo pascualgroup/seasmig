@@ -33,8 +33,10 @@ public class Config implements Serializable
 	public static enum NoSeasonalityParameterization 
 	{  VARIABLE_SELECTION,		
 	   ALL,
-	   EPOCHAL, 
-	   EPOCHAL_FREE_TIMES
+	   EPOCHAL,
+	   EPOCHAL_VS, 
+	   EPOCHAL_FREE_TIMES, EPOCHALVS,
+	   EPOCHAL_FREE_TIMES_VS
 	}
 	public static enum TwoConstantSeasonsPhase { FIXED_PHASE_FIXED_LENGTH, FREE_PHASE_FREE_LENGTH, FIXED_PHASE_FREE_LENGTH, FREE_PHASE_FIXED_LENGTH };
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
