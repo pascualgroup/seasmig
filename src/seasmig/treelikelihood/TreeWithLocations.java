@@ -416,6 +416,30 @@ public class TreeWithLocations implements LikelihoodTree {
 		return returnValue;
 	}
 
+	@Override
+	public String stochasticMapping() {
+		// TODO Auto-generated method stub
+		
+		// 
+		double p=likelihoodModel.rootfreq(0)[0];
+		int rootLocation =0;
+		for (int i=0;i<numLocations;i++) {
+			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
+				rootLocation=i;
+				break;
+			}
+			else {
+				p=p+likelihoodModel.rootfreq(0)[i];
+			}
+		}
+		return stochasticMapping(root, rootLocation);
+	}
+
+	private String stochasticMapping(TreeWithLocationsNode node, int nodeLocation) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
 

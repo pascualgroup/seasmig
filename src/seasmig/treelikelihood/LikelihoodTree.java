@@ -10,4 +10,5 @@ public interface LikelihoodTree extends Serializable {
 	public int getNumLocations();
 	public String newick();
 	public double cachedLogLikelihood();
+	public String stochasticMapping();	
 }

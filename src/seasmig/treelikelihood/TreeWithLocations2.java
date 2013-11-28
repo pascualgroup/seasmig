@@ -329,6 +329,12 @@ public class TreeWithLocations2 implements LikelihoodTree {
 		return logLike;
 	}
 
+	@Override
+	public String stochasticMapping() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
 
 
