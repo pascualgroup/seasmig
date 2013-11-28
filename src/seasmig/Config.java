@@ -96,8 +96,8 @@ public class Config implements Serializable
 	// MODEL DATA RELATED PARAMETERS
 	// TODO: add statese & combine files 
 	public String stateFilename =null; // null if states are loaded from tree or non-existent 
-	public String[] locationFilenames ={"regionsHA9.txt","regionsNA9.txt"}; // null if locations are loaded from tree
-	public String[] treeFilenames = {"beastInputHA9.trees","beastInputNA9.trees"}; // null for test generated data 
+	public String[] locationFilenames ={"regionsHA.txt","regionsNA.txt"}; // null if locations are loaded from tree
+	public String[] treeFilenames = {"beastInputHA.trees","beastInputNA.trees"}; // null for test generated data 
 	public double[] treeWeights = {0.5,0.5};
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree

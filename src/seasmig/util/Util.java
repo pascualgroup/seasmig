@@ -23,27 +23,7 @@ public class Util {
 
 	}
 	
-	public static final double logSumExp(double[] alphas) {
-		// TODO: improve this
-		double sumExp = 0;
-		double minWithoutNegInf = 0;
-		for (int i=0;i<alphas.length;i++) {
-			if (!Double.isInfinite(alphas[i])) {
-				if (alphas[i]<minWithoutNegInf) {
-					minWithoutNegInf = alphas[i];
-				}
-			}
-		}
-		for (int i=0;i<alphas.length;i++) {			
-			sumExp=sumExp+cern.jet.math.Functions.exp.apply(alphas[i]-minWithoutNegInf);
-		}
-		double returnValue=minWithoutNegInf+cern.jet.math.Functions.log.apply(sumExp);
-		if (Double.isNaN(returnValue) ){
-			return minNegative;
-		}
-		return returnValue;
-	}
-
+	
 	static public String print(double[][] Q) {		
 		String returnValue = "{";
 		for (int i=0; i<Q.length;i++) {

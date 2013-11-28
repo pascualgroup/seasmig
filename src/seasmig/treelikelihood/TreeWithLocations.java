@@ -1,6 +1,7 @@
 package seasmig.treelikelihood;
 
 import java.util.HashMap;
+
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.util.Util;
@@ -11,6 +12,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	public static final int UNKNOWN_TAXA = -1;
 	public static final int UNKNOWN_LOCATION = -1;
+	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
 	// Tree & Model
 	TreeWithLocationsNode root = null;		
@@ -193,7 +195,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						for (int to = 0; to < numLocations; to++) {
 							alphas[to]=(Math.log(p[from][to]) + child.logProbs[to]);							
 						}						
-						node.logProbs[from] += Util.logSumExp(alphas);
+						node.logProbs[from] += logSumExp(alphas);
 					}								
 				}
 			}		
@@ -206,7 +208,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i = 0; i < numLocations; i++) {
 			alphas[i]=root.logProbs[i] + Math.log(rootFreq[i]);
 		}			
-		logLike += Util.logSumExp(alphas);
+		logLike += logSumExp(alphas);
 		
 		return logLike;		
 	}
@@ -392,6 +394,28 @@ public class TreeWithLocations implements LikelihoodTree {
 	public double cachedLogLikelihood() {		
 		return logLike;
 	}
+	
+	public final double logSumExp(double[] alphas) {
+		// TODO: improve this
+		double sumExp = 0;
+		double minWithoutNegInf = 0;
+		for (int i=0;i<alphas.length;i++) {
+			if (!Double.isInfinite(alphas[i])) {
+				if (alphas[i]<minWithoutNegInf) {
+					minWithoutNegInf = alphas[i];
+				}
+			}
+		}
+		for (int i=0;i<alphas.length;i++) {			
+			sumExp=sumExp+cern.jet.math.Functions.exp.apply(alphas[i]-minWithoutNegInf);
+		}
+		double returnValue=minWithoutNegInf+cern.jet.math.Functions.log.apply(sumExp);
+		if (Double.isNaN(returnValue) ){
+			return minNegative;
+		}
+		return returnValue;
+	}
+
 
 }
 

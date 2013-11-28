@@ -18,6 +18,8 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	int loc = TreeWithLocations.UNKNOWN_LOCATION; 
 	double time = 0;
 	int taxonIndex = 0;
+	
+	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
 	protected TreeWithLocationsNode() {};
 
@@ -123,7 +125,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 				logAncStateProbs[i] = logProbs[i]+rootfreq[i];					
 		}
 
-		double logTotalProb = Util.logSumExp(logAncStateProbs);
+		double logTotalProb = logSumExp(logAncStateProbs);
 		for (int i=0;i<logProbs.length;i++) {
 			logAncStateProbs[i]=logAncStateProbs[i]-logTotalProb;
 		}
@@ -142,6 +144,27 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 				returnValue+=",";
 		}
 		returnValue+="}]";
+		return returnValue;
+	}
+	
+	public final double logSumExp(double[] alphas) {
+		// TODO: improve this
+		double sumExp = 0;
+		double minWithoutNegInf = 0;
+		for (int i=0;i<alphas.length;i++) {
+			if (!Double.isInfinite(alphas[i])) {
+				if (alphas[i]<minWithoutNegInf) {
+					minWithoutNegInf = alphas[i];
+				}
+			}
+		}
+		for (int i=0;i<alphas.length;i++) {			
+			sumExp=sumExp+cern.jet.math.Functions.exp.apply(alphas[i]-minWithoutNegInf);
+		}
+		double returnValue=minWithoutNegInf+cern.jet.math.Functions.log.apply(sumExp);
+		if (Double.isNaN(returnValue) ){
+			return minNegative;
+		}
 		return returnValue;
 	}
 
