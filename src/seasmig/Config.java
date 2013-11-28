@@ -41,7 +41,7 @@ public class Config implements Serializable
 	public static enum EpochParameterization 
 	{  EPOCHAL,
 	   EPOCHAL_VS, 
-	   EPOCHAL_FREE_TIMES, EPOCHALVS,
+	   EPOCHAL_FREE_TIMES, 	   
 	   EPOCHAL_FREE_TIMES_VS
 	}
 	

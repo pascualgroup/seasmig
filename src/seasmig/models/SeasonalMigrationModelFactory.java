@@ -38,7 +38,7 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 			switch (config.epochParameterization) {
 			case EPOCHAL: 
 				return new EpochalMigrationModel(initialChain, config, data,false,false);
-			case EPOCHALVS: 
+			case EPOCHAL_VS: 
 				return new EpochalMigrationModel(initialChain, config, data,false,true);
 			case EPOCHAL_FREE_TIMES:
 				return new EpochalMigrationModel(initialChain, config, data, true,false);
