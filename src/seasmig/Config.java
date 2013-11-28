@@ -11,9 +11,11 @@ import com.google.gson.Gson;
 @SuppressWarnings("serial")
 public class Config implements Serializable
 {
-	public static enum Seasonality { NONE, TWO_CONSTANT_SEASONS, SINUSOIDAL, N_CONSTANT_SEASONS, N_CONSTANT_SEASONS_VAR_SELECT};  
+	public static enum ModelType { CONSTANT, TWO_CONSTANT_SEASONS, SINUSOIDAL, N_CONSTANT_SEASONS, EPOCHAL};
+	
 	//TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL
 	//TODO: GET N_CONSTANT_SEASONS and N_CONSTANT_SEASONS_VAR_SELECT COMBINED FOR THIS ENUM
+	
 	public static enum TwoConstantSeasonsParameterization 
 	{  RATES12_PARAMETERZIATION,    // Separate rates for the two parts of the years rates1[i][j], rates2[i][j]
 	   RATES12_VARIABLE_SELECTION,  // rate1[i][j]*indicators1[i][j], rate2[i][j]*indicators2[i][j]
@@ -30,14 +32,24 @@ public class Config implements Serializable
 	   								// (1+DiffMult[i][j]*Indicator[i][j])*rate[i][j] is used for season2};
 	   VARIABLE_SELECTION_GTR	   
 	}
+	
 	public static enum NoSeasonalityParameterization 
 	{  VARIABLE_SELECTION,		
 	   ALL,
-	   EPOCHAL,
+	}
+	
+	public static enum EpochParameterization 
+	{  EPOCHAL,
 	   EPOCHAL_VS, 
 	   EPOCHAL_FREE_TIMES, EPOCHALVS,
 	   EPOCHAL_FREE_TIMES_VS
 	}
+	
+	public static enum NConstantSeasonsParameterization 
+	{  ALL,
+	   VARIABLE_SELECTION
+	}
+	
 	public static enum TwoConstantSeasonsPhase { FIXED_PHASE_FIXED_LENGTH, FREE_PHASE_FREE_LENGTH, FIXED_PHASE_FREE_LENGTH, FREE_PHASE_FIXED_LENGTH };
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
 	
@@ -71,7 +83,7 @@ public class Config implements Serializable
 	public boolean verificationStep = false; // Added to allow for "hot swaps" of tree files, when resuming from checkpoint.bin
 
 	// SEASONAL MODEL RELATED PARAMETERS
-	public Seasonality migrationSeasonality = Seasonality.TWO_CONSTANT_SEASONS;
+	public ModelType modelType = ModelType.TWO_CONSTANT_SEASONS;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION TWO SEASONS...
 	public double fixedPhase = 0.3;
@@ -80,9 +92,13 @@ public class Config implements Serializable
 	
 	// N_CONSTANT_SEASONS models only...
 	public int nSeasonalParts=4; 
+	public NConstantSeasonsParameterization nConstantSeasonsParameterization = NConstantSeasonsParameterization.ALL;
 	
 	// NON-SEASONAL MODEL RELATED PARAMETERS
-	public NoSeasonalityParameterization noSeasonalityParameterization = NoSeasonalityParameterization.EPOCHAL;
+	public NoSeasonalityParameterization noSeasonalityParameterization = NoSeasonalityParameterization.ALL;
+	
+	// EPOCHAL MODEL RELATED PARAMETERS
+	public EpochParameterization epochParameterization = EpochParameterization.EPOCHAL;
 
 	// N EPOCHAL MODEL
 	public int nEpochs = 2;

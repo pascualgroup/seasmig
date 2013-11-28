@@ -24,13 +24,18 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 
 	@Override
 	public Model createModel(Chain initialChain) throws MC3KitException {
-		switch (config.migrationSeasonality) {
-		case NONE:	
+		switch (config.modelType) {
+		case CONSTANT:	
 			switch (config.noSeasonalityParameterization) {
 			case ALL:
 				return new SeasonalMigrationModelNoSeasonality(initialChain, config, data);
 			case VARIABLE_SELECTION:
-				return new SeasonalMigrationModelNoSeasonalityVarSelect(initialChain, config, data);
+				return new SeasonalMigrationModelNoSeasonalityVarSelect(initialChain, config, data);			
+			default:
+				break;
+			}
+		case EPOCHAL:
+			switch (config.epochParameterization) {
 			case EPOCHAL: 
 				return new EpochalMigrationModel(initialChain, config, data,false,false);
 			case EPOCHALVS: 
@@ -42,10 +47,16 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 			default:
 				break;
 			}
-		case N_CONSTANT_SEASONS: 	
-			return new SeasonalMigrationModelNConstantSeasons(initialChain,config,data,config.nSeasonalParts);
-		case N_CONSTANT_SEASONS_VAR_SELECT: 	
-			return new SeasonalMigrationModelNConstantSeasonsVarSelect(initialChain,config,data,config.nSeasonalParts);
+
+		case N_CONSTANT_SEASONS: 
+			switch (config.nConstantSeasonsParameterization) {
+			case ALL: 
+				return new SeasonalMigrationModelNConstantSeasons(initialChain,config,data,config.nSeasonalParts);
+			case VARIABLE_SELECTION: 	
+				return new SeasonalMigrationModelNConstantSeasonsVarSelect(initialChain,config,data,config.nSeasonalParts);
+			default:
+				break;
+			}
 		case TWO_CONSTANT_SEASONS: 
 			boolean fixPhase = false;
 			boolean fixLength = false;
@@ -71,16 +82,16 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 			}
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION)
 				return new SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection(initialChain,config,data,fixPhase,fixLength,config.fixRate);
-			
+
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF)
 				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelection(initialChain,config,data,fixPhase,fixLength,config.fixRate);
-			
+
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.VARIABLE_SELECTION_GTR)
 				return new SeasonalMigrationModelTwoConstantSeasonsVariableSelectionGTR(initialChain,config,data,fixPhase,fixLength);
-			
+
 			boolean fixTo = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_TO_DIFF;
 			boolean fixFrom = config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_TO_DIFF;
-		
+
 			if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.RATES12_PARAMETERZIATION) {
 				return new SeasonalMigrationModelTwoConstantSeasonsOrigParametarization(initialChain, config, data,fixPhase);
 			}
@@ -88,9 +99,9 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 				return new SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSelection(initialChain, config, data,fixPhase);
 			}
 			else if (config.twoSeasonParameterization==TwoConstantSeasonsParameterization.DIFF_PARAMETERIZATION ||
-					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || 
-					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF ||
-					 config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_TO_DIFF) {
+					config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_DIFF || 
+					config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_TO_DIFF ||
+					config.twoSeasonParameterization==TwoConstantSeasonsParameterization.FIX_FROM_TO_DIFF) {
 				return new SeasonalMigrationModelTwoConstantSeasons(initialChain, config, data,fixPhase, fixLength, fixFrom, fixTo);
 				// TODO: TREAT LENGTH
 			}
@@ -99,8 +110,9 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 				System.exit(1);
 			}
 			break;
-			default:
-				
+		
+		default:
+
 			//
 			//		case SINUSOIDAL:			
 			//			return new SeasonalMigrationModelTwoConstantSeasonsSinusoidal(initialChain, config, trees);			

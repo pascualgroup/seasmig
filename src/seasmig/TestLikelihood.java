@@ -45,8 +45,8 @@ public class TestLikelihood {
 		testFile.delete();
 		testFile.createNewFile();
 		PrintStream testStream = new PrintStream(testFile);
-		System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.migrationSeasonality+",");				
-		testStream.print("{\""+config.migrationSeasonality+"\",");
+		System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.modelType+",");				
+		testStream.print("{\""+config.modelType+"\",");
 		testStream.print(((DataForTests)data).createModel.parse());
 		System.out.println(((DataForTests)data).createModel.print());
 		double createLikelihood = 0;

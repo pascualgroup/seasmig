@@ -88,8 +88,8 @@ public class DataForTests implements Data {
 			double[][] amps = makeRandomMigrationMatrix(numTestLocations,1);
 			double[][] phases = makeRandomMigrationMatrix(numTestLocations,1);
 
-			switch (config.migrationSeasonality) {
-			case NONE:	
+			switch (config.modelType) {
+			case CONSTANT:	
 				createModel = new ConstantMigrationBaseModel(Q); 
 				break;
 			case TWO_CONSTANT_SEASONS: 
@@ -100,7 +100,7 @@ public class DataForTests implements Data {
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 				break;
 			default: 
-				System.err.println("Migration Seasonality: "+config.migrationSeasonality+" not implemented for this configuration!!!");
+				System.err.println("Migration Seasonality: "+config.modelType+" not implemented for this configuration!!!");
 				System.exit(-1);
 			}
 
@@ -161,8 +161,8 @@ public class DataForTests implements Data {
 			amps = makeRandomMigrationMatrix(numTestLocations,2);
 			phases = makeRandomMigrationMatrix(numTestLocations,1);
 
-			switch (config.migrationSeasonality) {
-			case NONE:	
+			switch (config.modelType) {
+			case CONSTANT:	
 				createModel = new ConstantMigrationBaseModel(Q); 
 				break;
 			case TWO_CONSTANT_SEASONS: 
@@ -173,7 +173,7 @@ public class DataForTests implements Data {
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 				break;
 			default: 
-				System.err.println("Migration Seasonality: "+config.migrationSeasonality+" not implemented for this configuration!!!");
+				System.err.println("Migration Seasonality: "+config.modelType+" not implemented for this configuration!!!");
 				System.exit(-1);
 			}
 
@@ -230,8 +230,8 @@ public class DataForTests implements Data {
 			// For two constant seasons model...
 			double phase = 0.3; double length = 0.5;
 
-			switch (config.migrationSeasonality) {
-			case NONE:	
+			switch (config.modelType) {
+			case CONSTANT:	
 				createModel = new ConstantMigrationBaseModel(Q); 
 				break;
 			case TWO_CONSTANT_SEASONS: 
@@ -241,7 +241,7 @@ public class DataForTests implements Data {
 				createModel = new SinusoidialSeasonalMigrationBaseModel(rates,amps,phases);
 				break;
 			default: 
-				System.err.println("Migration Seasonality: "+config.migrationSeasonality+" not implemented for this configuration!!!");
+				System.err.println("Migration Seasonality: "+config.modelType+" not implemented for this configuration!!!");
 				System.exit(-1);
 			}
 
