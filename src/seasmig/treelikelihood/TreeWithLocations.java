@@ -1,11 +1,8 @@
 package seasmig.treelikelihood;
 
 import java.util.HashMap;
-import java.util.Set;
-
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
-import seasmig.Config;
 import seasmig.util.Util;
 
 
@@ -19,25 +16,18 @@ public class TreeWithLocations implements LikelihoodTree {
 	TreeWithLocationsNode root = null;		
 	private MigrationBaseModel likelihoodModel = null;
 	
-	// BEAST posterior
-	double beastPosterior; 
-
 	int numLocations = 0;
 	private int numIdentifiedLocations;
 	
 	// Taxa
 	HashMap<String, Integer> taxaIndices = new HashMap<String,Integer>();
 	
-	// TODO: this..
 	double[] ZERO_LOG_PROBS;
 	private double logLike = 0;
 	
 	// Tree generate parameters for test purpose
 	static final private double testBranchLengthMean = 0.5;
 	static final private double testBranchLengthVariance = 1.0;
-	
-	double weightBeastPosterior = 0.0;
-	double logLikeWeight = 1.0; 
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(MigrationBaseModel createTreeModel, int numNodes) {		
@@ -65,13 +55,6 @@ public class TreeWithLocations implements LikelihoodTree {
 	public TreeWithLocations(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree) {
 		numLocations=createTreeModel.getNumLocations();
 		ZERO_LOG_PROBS = new double[numLocations];
-		try {
-			beastPosterior=(Double) tree.getAttribute("posterior");
-			System.err.println(beastPosterior);
-		}
-		catch (Exception e){
-			beastPosterior=0;
-		}
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
@@ -127,13 +110,6 @@ public class TreeWithLocations implements LikelihoodTree {
 	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String,Integer> taxaIndices_, String locationAttributeName, int num_locations_) {
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
-		try {
-			beastPosterior=(Double) tree.getAttribute("posterior");
-			System.err.println(beastPosterior);
-		}
-		catch (Exception e){
-			beastPosterior=0;
-		}
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
@@ -161,12 +137,6 @@ public class TreeWithLocations implements LikelihoodTree {
 	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
-		try {
-			beastPosterior=(Double) tree.getAttribute("posterior");
-		}
-		catch (Exception e){
-			beastPosterior=0;
-		}
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
@@ -238,7 +208,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		}			
 		logLike += Util.logSumExp(alphas);
 		
-		logLike=logLike*logLikeWeight+weightBeastPosterior*beastPosterior;
 		return logLike;		
 	}
 
@@ -261,7 +230,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
 		copyTree.root = new TreeWithLocationsNode(root.loc,root.taxonIndex,root.time,null);
 		copyTree.taxaIndices = taxaIndices;
-		copyTree.beastPosterior = beastPosterior;
 		treeCopy(this.root, copyTree.root);  
 		return copyTree;
 	}

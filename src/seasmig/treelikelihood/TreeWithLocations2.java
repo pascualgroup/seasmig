@@ -319,7 +319,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	}
 
 	@Override
-	public Object newick() {
+	public String newick() {
 		// TODO Auto-generated method stub
 		return null;
 	}
