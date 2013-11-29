@@ -62,25 +62,24 @@ public class Config implements Serializable
 	public String checkpointFilename = "checkpoint.bin";
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String mlFilename = "ml.txt";
-	public long checkpointEvery = 10000;
 	public long thin = 5;
 	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 2000; 	// in iterations	
-	public long iterationCount = 100000000L;
-	
+	public long iterationCount = 100000000L;	
 	public long tuneEvery = 500; 
 	public long tuneFor = 5000;
-	public long mlthin = 5;
-	
+	public long mlthin = 5;	
 	public long initialHistoryCount = 50;
-
 	public int chainCount = 4;
 	public double heatPower = 3.0;
-	
+	public long swapInterval = 10;	
 	public double targetAcceptanceRate = 0.25;
 	
-	public boolean verificationStep = false; // Added to allow for "hot swaps" of tree files, when resuming from checkpoint.bin
+	// RESTORE FROM CHECKPOINT 
+	public boolean verificationStep = false; // When false allows for "hot swaps" of tree files, when resuming from checkpoint.bin
+	public long checkpointEvery = 10000;
+	public boolean restoreFromDatabase = false;
 
 	// SEASONAL MODEL RELATED PARAMETERS
 	public ModelType modelType = ModelType.TWO_CONSTANT_SEASONS;
@@ -90,28 +89,26 @@ public class Config implements Serializable
 	public double minSeasonLength = 0.3333333;
 	public boolean fixRate = false;
 	
-	// N_CONSTANT_SEASONS models only...
+	// N_CONSTANT_SEASONS 
 	public int nSeasonalParts=4; 
 	public NConstantSeasonsParameterization nConstantSeasonsParameterization = NConstantSeasonsParameterization.ALL;
 	
-	// NON-SEASONAL MODEL RELATED PARAMETERS
+	// NON-SEASONAL 
 	public NoSeasonalityParameterization noSeasonalityParameterization = NoSeasonalityParameterization.ALL;
 	
-	// EPOCHAL MODEL RELATED PARAMETERS
+	// EPOCHAL 
 	public EpochParameterization epochParameterization = EpochParameterization.EPOCHAL;
-
-	// N EPOCHAL MODEL
 	public int nEpochs = 2;
 	public double[] epochTimes = {2006.0};
+	public double minEpochTime = 1985;
+	public double maxEpochTime = 2011;
 	
 	// GENERAL PARAMETERS
-	public double veryLongTime = 1000;	
-	
+	public double veryLongTime = 1000;		
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	
 	// MODEL DATA RELATED PARAMETERS
-	// TODO: add statese & combine files 
-	public String stateFilename =null; // null if states are loaded from tree or non-existent 
+	public String stateFilename =null; // TODO: null if states are loaded from tree or non-existent 
 	public String[] locationFilenames ={"regionsHA.txt","regionsNA.txt"}; // null if locations are loaded from tree
 	public String[] treeFilenames = {"beastInputHA.trees","beastInputNA.trees"}; // null for test generated data 
 	public double[] treeWeights = {0.5,0.5};
@@ -119,13 +116,9 @@ public class Config implements Serializable
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
 	public int numLocations = 9; // needs to be specified if locations are loaded from trees....
-
-	public boolean restoreFromDatabase = false;
-
-	public long swapInterval = 10;
-
-	public double minEpochTime = 1985;
-	public double maxEpochTime = 2011;
+	
+	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
+	public double lastTipTime = 2012.74; // time of most recent tip on tree, used to calibrate all tree nodes 
 			
 	public Config() {};
 	

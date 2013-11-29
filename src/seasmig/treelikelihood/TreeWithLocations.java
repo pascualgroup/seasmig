@@ -38,17 +38,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
-		double p=createTreeModel.rootfreq(0)[0];
-		int rootLocation =0;
-		for (int i=0;i<numLocations;i++) {
-			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
-				rootLocation=i;
-				break;
-			}
-			else {
-				p=p+createTreeModel.rootfreq(0)[i];
-			}
-		}
+		int rootLocation = getRandomSampleFrom(createTreeModel.rootfreq(0));
 		root = new TreeWithLocationsNode(rootLocation,TreeWithLocations.UNKNOWN_TAXA,0,null);
 		makeRandomTree(createTreeModel, root, numNodes);		
 	}
@@ -61,17 +51,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
 		likelihoodModel=createTreeModel;
-		double p=likelihoodModel.rootfreq(0)[0];
-		int rootLocation =0;
-		for (int i=0;i<numLocations;i++) {
-			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
-				rootLocation=i;
-				break;
-			}
-			else {
-				p=p+likelihoodModel.rootfreq(0)[i];
-			}
-		}
+		int rootLocation = getRandomSampleFrom(likelihoodModel.rootfreq(0));
 		Integer rootTaxonIndex = UNKNOWN_TAXA;
 		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
 		if (rootTaxon!=null) {
@@ -80,17 +60,16 @@ public class TreeWithLocations implements LikelihoodTree {
 		if (rootTaxonIndex==null)
 			rootTaxonIndex = UNKNOWN_TAXA;
 		root = new TreeWithLocationsNode(rootLocation,rootTaxonIndex,0,null);
-		makeSubTree(tree,(String)null, root,tree.getRootNode());
+		makeSubTree(tree,(String)null, root,tree.getRootNode());		
 	}
 	
 	private void fillRandomTraits(TreeWithLocationsNode root) {
 		if (root.children!=null) {
 			for (TreeWithLocationsNode child : root.children) {	
-				double d = cern.jet.random.Uniform.staticNextDouble();
 				double p=0;
 				for (int location=0;location<numLocations;location++) {
 					p=p+Math.exp(likelihoodModel.logprobability(root.loc, location, root.time, child.time));
-					if (d<=p) {
+					if (cern.jet.random.Uniform.staticNextDouble()<=p) {
 						child.loc=location;
 						break;
 					}
@@ -109,7 +88,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from nexsus tree trait location_attribute name
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String,Integer> taxaIndices_, String locationAttributeName, int num_locations_) {
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String,Integer> taxaIndices_, String locationAttributeName, int num_locations_, double lastTipTime) {
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		ZERO_LOG_PROBS = new double[numLocations];
@@ -132,11 +111,12 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		
 		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
+		recalibrateTimes(root, lastTipTime);
 	}
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_/*, HashMap<String, Double> stateMap*/) {
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime/*, HashMap<String, Double> stateMap*/) {
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		ZERO_LOG_PROBS = new double[numLocations];
@@ -158,6 +138,19 @@ public class TreeWithLocations implements LikelihoodTree {
 			rootTaxonIndex= UNKNOWN_TAXA;
 		root = new TreeWithLocationsNode(location,rootTaxonIndex,0,null);
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
+		recalibrateTimes(root, lastTipTime);		
+	}
+
+	private void recalibrateTimes(TreeWithLocationsNode root, double lastTipTime) {		
+		double maxTime=Double.NEGATIVE_INFINITY;
+		for (TreeWithLocationsNode node : root) {
+			if (node.time>maxTime) {
+				maxTime=node.time;
+			}
+		}
+		for (TreeWithLocationsNode node : root) {
+			node.time = node.time - maxTime + lastTipTime; 
+		}
 	}
 
 	public TreeWithLocations(TreeWithLocationsNode root_, MigrationBaseModel likelihoodModel_) {
@@ -293,7 +286,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				
 			}			
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			root.children.add(new TreeWithLocationsNode(location,taxonIndex,root.time+inputTree.getLength(node),root));
+			root.children.add(new TreeWithLocationsNode(location,taxonIndex,root.time+inputTree.getLength(node),root));			
 			makeSubTree(inputTree,locationMap, root.children.get(root.children.size()-1), node);			
 		}
 	}
@@ -324,14 +317,13 @@ public class TreeWithLocations implements LikelihoodTree {
 	public void makeRandomTree(MigrationBaseModel m, TreeWithLocationsNode root, int nNodes) {		
 		if (nNodes>1) {
 			for (int child=0;child<2;child++) {
-				double d = cern.jet.random.Uniform.staticNextDouble();
 				// Decide on branch length
 				double to_time = root.time+cern.jet.random.Gamma.staticNextDouble(testBranchLengthMean*testBranchLengthMean/testBranchLengthVariance,1.0/(testBranchLengthVariance/testBranchLengthMean));
 				double p=0;		
 
 				for (int location=0;location<numLocations;location++) {
 					p=p+Math.exp(m.logprobability(root.loc, location, root.time, to_time));
-					if (d<=p) {
+					if (cern.jet.random.Uniform.staticNextDouble()<=p) {
 						root.children.add(new TreeWithLocationsNode(location,TreeWithLocations.UNKNOWN_LOCATION,to_time,root));
 						break;
 					}
@@ -421,23 +413,23 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO Auto-generated method stub
 		
 		// 
-		double p=likelihoodModel.rootfreq(0)[0];
-		int rootLocation =0;
-		for (int i=0;i<numLocations;i++) {
-			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
-				rootLocation=i;
-				break;
-			}
-			else {
-				p=p+likelihoodModel.rootfreq(0)[i];
-			}
-		}
-		return stochasticMapping(root, rootLocation);
+		return stochasticMapping(root, getRandomSampleFrom(likelihoodModel.rootfreq(root.time)));
 	}
 
 	private String stochasticMapping(TreeWithLocationsNode node, int nodeLocation) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	private int getRandomSampleFrom(double[] probs) {
+		double p=0;		
+		for (int i=0;i<probs.length;i++) {
+			p=p+probs[i];
+			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
+				return i;				
+			}			
+		}
+		return -1;
 	}
 
 

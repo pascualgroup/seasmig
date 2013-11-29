@@ -144,7 +144,7 @@ public class DataFromFiles implements Data
 				if (stateMap==null) {
 					double numIdentifiedLocations=0;
 					for (jebl.evolution.trees.Tree tree : nexusTreeTail) {
-						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations));
+						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations,config.lastTipTime));
 						numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 					}
 					numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
@@ -161,7 +161,7 @@ public class DataFromFiles implements Data
 				System.out.print("Reparsing trees... ");
 				double numIdentifiedLocations=0;
 				for (jebl.evolution.trees.Tree tree : nexusTreeTail) {
-					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices, config.locationAttributeNameInTree, numLocations));
+					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices, config.locationAttributeNameInTree, numLocations,config.lastTipTime));
 					numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 				}		
 				System.out.println(" reparsed "+trees.get(h).size()+" trees");

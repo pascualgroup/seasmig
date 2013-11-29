@@ -27,40 +27,44 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	public TreeWithLocations2(MigrationBaseModel createTreeModel, int numNodes) {		
 		num_locations=createTreeModel.getNumLocations();
 		UNKNOWN_LOCATION=num_locations;
-		likelihoodModel=createTreeModel;
-		double p=likelihoodModel.rootfreq(0)[0];
-		int rootLocation =0;
-		for (int i=0;i<num_locations;i++) {
-			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
-				rootLocation=i;
-				break;
-			}
-			else {
-				p=p+likelihoodModel.rootfreq(0)[i];
-			}
-		}
-		root = new TreeWithLocationsNode2(rootLocation,0,num_locations);
+		likelihoodModel=createTreeModel;		
+		root = new TreeWithLocationsNode2(getRandomSampleFrom(createTreeModel.rootfreq(0)),0,num_locations);
 		makeRandomTree(createTreeModel, root, numNodes);		
 	}
 
 	// Generate random tree states based on input tree topology and model .... 
-	public TreeWithLocations2(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree) {
+	public TreeWithLocations2(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree, double lastTipTime) {
 		num_locations=createTreeModel.getNumLocations();
 		UNKNOWN_LOCATION=num_locations;
-		likelihoodModel=createTreeModel;
-		double p=likelihoodModel.rootfreq(0)[0];
-		int rootLocation =0;
-		for (int i=0;i<num_locations;i++) {
-			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
-				rootLocation=i;
-				break;
-			}
-			else {
-				p=p+likelihoodModel.rootfreq(0)[i];
+		likelihoodModel=createTreeModel;		
+		root = new TreeWithLocationsNode2(getRandomSampleFrom(likelihoodModel.rootfreq(0)),0,num_locations);
+		makeSubTree(tree,(String)null, root,tree.getRootNode());
+		recalibrateTimes(root, lastTipTime);
+	}
+
+	private void recalibrateTimes(TreeWithLocationsNode2 root, double lastTipTime) {
+		double maxTime=getMaxTime(root);
+		recalibrateTimes(root, lastTipTime, maxTime);		
+	}
+
+	private void recalibrateTimes(TreeWithLocationsNode2 root, double lastTipTime, double maxTime) {
+		root.time = root.time - maxTime + lastTipTime;
+		
+		for (TreeWithLocationsNode2 child : root.children) {
+			recalibrateTimes(child,lastTipTime, maxTime);
+		}
+		
+	}
+
+	private double getMaxTime(TreeWithLocationsNode2 root) {
+		double maxTime = root.time;
+		for (TreeWithLocationsNode2 child : root.children) {
+			double childTime=getMaxTime(child);
+			if (maxTime<childTime) {
+				maxTime = childTime;
 			}
 		}
-		root = new TreeWithLocationsNode2(rootLocation,0,num_locations);
-		makeSubTree(tree,(String)null, root,tree.getRootNode());
+		return maxTime;
 	}
 
 	// Generate random tree states based on input tree topology and model .... 
@@ -74,11 +78,10 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	private void fillRandomTraits(TreeWithLocationsNode2 parent) {
 		if (parent.children!=null) {
 			for (TreeWithLocationsNode2 child : parent.children) {	
-				double d = cern.jet.random.Uniform.staticNextDouble();
 				double p=0;
 				for (int location=0;location<num_locations;location++) {
 					p=p+Math.exp(likelihoodModel.logprobability(parent.location, location, parent.time, child.time));
-					if (d<=p) {
+					if (cern.jet.random.Uniform.staticNextDouble()<=p) {
 						child.location=location;
 						break;
 					}
@@ -267,14 +270,13 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	public void makeRandomTree(MigrationBaseModel m, TreeWithLocationsNode2 from, int nNodes) {		
 		if (nNodes>1) {
 			for (int child=0;child<2;child++) {
-				double d = cern.jet.random.Uniform.staticNextDouble();
 				// Decide on branch length
 				double to_time = from.time+cern.jet.random.Gamma.staticNextDouble(testBranchLengthMean*testBranchLengthMean/testBranchLengthVariance,1.0/(testBranchLengthVariance/testBranchLengthMean));
 				double p=0;		
 
 				for (int location=0;location<num_locations;location++) {
 					p=p+Math.exp(m.logprobability(from.location, location, from.time, to_time));
-					if (d<=p) {
+					if (cern.jet.random.Uniform.staticNextDouble()<=p) {
 						from.children.add(new TreeWithLocationsNode2(location,to_time,num_locations));
 						break;
 					}
@@ -333,6 +335,17 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	public String stochasticMapping() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	private int getRandomSampleFrom(double[] probs) {
+		double p=0;		
+		for (int i=0;i<probs.length;i++) {
+			p=p+probs[i];
+			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
+				return i;				
+			}			
+		}
+		return -1;
 	}
 
 }

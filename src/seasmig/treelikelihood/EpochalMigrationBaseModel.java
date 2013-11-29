@@ -25,7 +25,7 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 	DoubleVariable[] epochTimes;
 
 	// Origin Model
-	double[][][] seasonalRates;	
+	double[][][] epochRates;	
 	DoubleFunction[] rootFreq;
 
 	// Constant Migration Models
@@ -44,7 +44,7 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 		// TODO: Check this...
 		// diagonal rates functions are calculated through row sums and are ignored...
 		num_locations=seasonalRates_[0].length;	
-		seasonalRates=seasonalRates_;
+		epochRates=seasonalRates_;
 		epochs = epochs_;
 		nParts = epochs.length;
 		constantModels = new ConstantMigrationBaseModel[nParts];
@@ -55,7 +55,7 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 				double row_sum = 0;
 				for (int k=0; k<num_locations; k++) {
 					if (j!=k) {
-						migrationMatrix[j][k]=seasonalRates[i][j][k];
+						migrationMatrix[j][k]=epochRates[i][j][k];
 						row_sum+=migrationMatrix[j][k];
 					}
 				}
@@ -136,18 +136,18 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 	public String print() {
 		String returnValue = "Epochal Migration Model:\n";
 		returnValue+="[";
-		for (int i=0;i<seasonalRates.length;i++) {
+		for (int i=0;i<epochRates.length;i++) {
 			if (i!=0) returnValue+=" ";
 			returnValue+="[";
-			for (int j=0;j<seasonalRates[i].length;j++) {
+			for (int j=0;j<epochRates[i].length;j++) {
 				if (i!=j) 
-					returnValue=returnValue+String.format("%40s",seasonalRates[i][j].toString());
+					returnValue=returnValue+String.format("%40s",epochRates[i][j].toString());
 				else 
 					returnValue+=String.format("%40s", "NA");
-				if (j!=seasonalRates[i].length-1) returnValue+=",";
+				if (j!=epochRates[i].length-1) returnValue+=",";
 			}
 			returnValue+="]";
-			if (i!=seasonalRates.length-1) returnValue+="\n";
+			if (i!=epochRates.length-1) returnValue+="\n";
 		}
 		returnValue+="]\n";
 		return returnValue;	
