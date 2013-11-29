@@ -118,7 +118,7 @@ public class Config implements Serializable
 	public int numLocations = 9; // needs to be specified if locations are loaded from trees....
 	
 	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
-	public double lastTipTime = 2012.74; // time of most recent tip on tree, used to calibrate all tree nodes 
+	public double[] lastTipTime = {2012.74, 2011.7}; // time of most recent tip on tree, used to calibrate all tree nodes 
 			
 	public Config() {};
 	
