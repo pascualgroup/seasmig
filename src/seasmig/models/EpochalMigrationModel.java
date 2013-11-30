@@ -1,7 +1,9 @@
 package seasmig.models;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
 import seasmig.Config;
 import seasmig.Data;
@@ -115,7 +117,7 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 			
 			if (freeTimes) {
 				// TODO: add sort and Dirichlet distribution
-				for (int i=0;i<epochs.length;i++) {
+				for (int i=0;i<(nParts-1);i++) {
 					m.addEdge(this,m.epochs[i]);
 				}
 			}
@@ -182,10 +184,14 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 				epochsDoubleForm = config.epochTimes;
 			}
 			else {
-				epochsDoubleForm = new double[nParts-1];
-				for (int i=0;i<epochs.length;i++) {
-					epochsDoubleForm[i]=epochs[i].getValue();
+				Vector<Double> epochsDoubleFormVector = new Vector<Double>(nParts-1);
+				for (int i=0;i<epochsDoubleFormVector.size();i++) {
+					epochsDoubleFormVector.set(i, epochs[i].getValue());
 				}
+				Collections.sort(epochsDoubleFormVector);
+				epochsDoubleForm = new double[nParts-1];
+				for (int i=0;i<epochsDoubleForm.length;i++)
+					epochsDoubleForm[i] = epochsDoubleFormVector.get(i);
 			}
 	
 			MigrationBaseModel migrationBaseModel = new EpochalMigrationBaseModel(ratesDoubleForm,epochsDoubleForm);
