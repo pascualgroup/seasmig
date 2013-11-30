@@ -12,4 +12,10 @@ public interface MigrationBaseModel extends Serializable {
 	public String getModelName();
 	public double[] probability(int from_location, double from_time, double to_time);
 	public double[] rootfreq(double when);
+	public Event getNextRandomEvent(double time, int loc);
+	
+	class Event {
+		public double time;
+		int loc; 
+	}
 }

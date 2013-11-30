@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //Nodes in this tree...
+	@SuppressWarnings("serial")
 	public class TreeWithLocationsNode2 implements Serializable {	
 		//Node parent = null;
 		List<TreeWithLocationsNode2> children = new ArrayList<TreeWithLocationsNode2>();

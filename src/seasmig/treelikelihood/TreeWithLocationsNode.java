@@ -2,11 +2,8 @@ package seasmig.treelikelihood;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
-
-import seasmig.util.Util;
 
 //Nodes in this tree...
 @SuppressWarnings("serial")

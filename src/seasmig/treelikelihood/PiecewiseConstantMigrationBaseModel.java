@@ -1,7 +1,9 @@
 package seasmig.treelikelihood;
 
 import java.util.HashMap;
+
 import org.javatuples.Pair;
+
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
@@ -165,6 +167,12 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 				returnValue[i]=1.0/num_locations;
 		}
 		return returnValue;
+	}
+
+	@Override
+	public Pair<Double, Integer> getNextRandomEvent(double time, int loc) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

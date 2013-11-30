@@ -2,8 +2,11 @@ package seasmig.treelikelihood;
 
 import java.util.HashMap;
 
+import org.javatuples.Pair;
+
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
+import seasmig.treelikelihood.MigrationBaseModel.Event;
 import seasmig.util.Util;
 
 
@@ -410,14 +413,31 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String stochasticMapping() {
-		// TODO Auto-generated method stub
-		
-		// 
-		return stochasticMapping(root, getRandomSampleFrom(likelihoodModel.rootfreq(root.time)));
+		// TODO Auto-generated method stub		
+		//
+		StochasticMappingNode stochasticMappingTreeRoot = new StochasticMappingNode(getRandomSampleFromLogProbs(root.logProbs),root.time,null);
+		return stochasticMapping(root, stochasticMappingTreeRoot);
 	}
 
-	private String stochasticMapping(TreeWithLocationsNode node, int nodeLocation) {
+	private String stochasticMapping(TreeWithLocationsNode tnode, StochasticMappingNode snode) {
 		// TODO Auto-generated method stub
+		// 
+		// TODO: What are the assumptions for this to work: stationary?, memory less?, GTR?, constant pop size ?????
+//		for (TreeWithLocationsNode child : tnode.children) {
+//			boolean doneWithChild = false;
+//			do {
+//				Event nextEvent = likelihoodModel.getNextRandomEvent(snode.time, snode.loc);				
+//				if ((nextEvent.time < child.time)) {
+//					// make new node...
+//					// repeat for new node..
+//					
+//				}
+//				else if (snode.loc == child.loc) {					
+//					doneWithChild = true;
+//					//
+//				}			
+//			} while (!doneWithChild);
+//		}
 		return null;
 	}
 	
@@ -425,6 +445,17 @@ public class TreeWithLocations implements LikelihoodTree {
 		double p=0;		
 		for (int i=0;i<probs.length;i++) {
 			p=p+probs[i];
+			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
+				return i;				
+			}			
+		}
+		return -1;
+	}
+	
+	private int getRandomSampleFromLogProbs(double[] logProbs) {
+		double p=0;		
+		for (int i=0;i<logProbs.length;i++) {
+			p=p+cern.jet.math.Functions.exp.apply(logProbs[i]);
 			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
 				return i;				
 			}			

@@ -1,6 +1,8 @@
 package seasmig.treelikelihood;
 import java.util.HashMap;
 
+import org.javatuples.Pair;
+
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
@@ -160,6 +162,12 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	@Override
 	public double[] rootfreq(double when) {
 		return basefreq;
+	}
+
+	@Override
+	public Pair<Double, Integer> getNextRandomEvent(double time, int loc) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

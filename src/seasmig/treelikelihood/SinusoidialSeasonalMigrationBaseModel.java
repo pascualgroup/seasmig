@@ -1,5 +1,7 @@
 package seasmig.treelikelihood;
 
+import org.javatuples.Pair;
+
 import cern.colt.function.DoubleFunction;
 
 
@@ -98,6 +100,12 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 
 	@Override
 	public double[] rootfreq(double when) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Pair<Double, Integer> getNextRandomEvent(double time, int loc) {
 		// TODO Auto-generated method stub
 		return null;
 	}
