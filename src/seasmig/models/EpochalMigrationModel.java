@@ -184,9 +184,10 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 				epochsDoubleForm = config.epochTimes;
 			}
 			else {
+				// TODO: add Dirichlet ... 
 				Vector<Double> epochsDoubleFormVector = new Vector<Double>(nParts-1);
-				for (int i=0;i<epochsDoubleFormVector.size();i++) {
-					epochsDoubleFormVector.set(i, epochs[i].getValue());
+				for (int i=0;i<epochs.length;i++) {
+					epochsDoubleFormVector.add(epochs[i].getValue());
 				}
 				Collections.sort(epochsDoubleFormVector);
 				epochsDoubleForm = new double[nParts-1];
