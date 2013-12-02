@@ -149,10 +149,4 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 			return season2MigrationModel.rootfreq(when);
 	}
 
-	@Override
-	public Pair<Double, Integer> getNextRandomEvent(double time, int loc) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

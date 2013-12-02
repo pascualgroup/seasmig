@@ -321,7 +321,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	}
 
 	@Override
-	public String newick() {
+	public String newickProbs() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -332,7 +332,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	}
 
 	@Override
-	public String stochasticMapping() {
+	public String newickStochasticMapping() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -346,6 +346,12 @@ public class TreeWithLocations2 implements LikelihoodTree {
 			}			
 		}
 		return -1;
+	}
+
+	@Override
+	public String newickAncestralStateReconstruction() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

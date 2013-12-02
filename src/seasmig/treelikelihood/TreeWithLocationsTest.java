@@ -62,7 +62,7 @@ public class TreeWithLocationsTest {
 		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
 		locTree.logLikelihood();
-		System.out.println(locTree.newick());
+		System.out.println(locTree.newickProbs());
 		
 		assertEquals(expectedResult, locTree.logLikelihood(),0.01);			
 	}
@@ -116,7 +116,7 @@ public class TreeWithLocationsTest {
 		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
 		
 		locTree.logLikelihood();
-		System.out.println(locTree.newick());
+		System.out.println(locTree.newickProbs());
 		
 		assertEquals(expectedResult, locTree.logLikelihood(),0.01);			
 	}
@@ -208,7 +208,7 @@ public class TreeWithLocationsTest {
 		
 		// Test
 		locTree.logLikelihood();
-		System.out.println(locTree.newick());
+		System.out.println(locTree.newickProbs());
 		assertEquals(locTree.logLikelihood(), locTree2.logLikelihood(),0.01);
 	
 			

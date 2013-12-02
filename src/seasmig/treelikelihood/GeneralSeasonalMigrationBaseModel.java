@@ -161,12 +161,5 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 		return returnValue;
 	}
 
-	@Override
-	public Pair<Double, Integer> getNextRandomEvent(double time, int loc) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 
 }

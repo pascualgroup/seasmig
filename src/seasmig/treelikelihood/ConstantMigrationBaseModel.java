@@ -164,10 +164,5 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		return basefreq;
 	}
 
-	@Override
-	public Pair<Double, Integer> getNextRandomEvent(double time, int loc) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

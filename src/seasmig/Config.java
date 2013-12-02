@@ -11,13 +11,16 @@ import com.google.gson.Gson;
 @SuppressWarnings("serial")
 public class Config implements Serializable
 {
-	public static enum ModelType { CONSTANT, TWO_CONSTANT_SEASONS, SINUSOIDAL, N_CONSTANT_SEASONS, EPOCHAL};
+	public static enum ModelType { 
+		CONSTANT, 
+		TWO_CONSTANT_SEASONS, 
+		SINUSOIDAL, // TODO:
+		N_CONSTANT_SEASONS,  
+		EPOCHAL
+	}
 	
-	//TODO: IMPLEMENT ADD CONTINUOUS SEASONAL MODEL //TODO: IMPLEMENT SINUSOIDAL
-	//TODO: GET N_CONSTANT_SEASONS and N_CONSTANT_SEASONS_VAR_SELECT COMBINED FOR THIS ENUM
-	
-	public static enum TwoConstantSeasonsParameterization 
-	{  RATES12_PARAMETERZIATION,    // Separate rates for the two parts of the years rates1[i][j], rates2[i][j]
+	public static enum TwoConstantSeasonsParameterization 	{  
+	   RATES12_PARAMETERZIATION,    // Separate rates for the two parts of the years rates1[i][j], rates2[i][j]
 	   RATES12_VARIABLE_SELECTION,  // rate1[i][j]*indicators1[i][j], rate2[i][j]*indicators2[i][j]
 	   DIFF_PARAMETERIZATION,       // (1-DiffMult[i][j])*rate[i][j] is used for season1 
 	   						   		// (1+DiffMult[i][j])*rate[i][j] is used for season2
@@ -33,25 +36,39 @@ public class Config implements Serializable
 	   VARIABLE_SELECTION_GTR	   
 	}
 	
-	public static enum NoSeasonalityParameterization 
-	{  VARIABLE_SELECTION,		
-	   ALL,
+	public static enum TwoConstantSeasonsPhase	{ 
+		FIXED_PHASE_FIXED_LENGTH, 
+		FREE_PHASE_FREE_LENGTH, 
+		FIXED_PHASE_FREE_LENGTH, 
+		FREE_PHASE_FIXED_LENGTH 
 	}
 	
-	public static enum EpochParameterization 
-	{  EPOCHAL,
-	   EPOCHAL_VS, 
-	   EPOCHAL_FREE_TIMES, 	   
-	   EPOCHAL_FREE_TIMES_VS
+	public static enum NoSeasonalityParameterization {  
+		VARIABLE_SELECTION,		
+		ALL,
 	}
 	
-	public static enum NConstantSeasonsParameterization 
-	{  ALL,
-	   VARIABLE_SELECTION
+	public static enum EpochParameterization {  
+		EPOCHAL,
+		EPOCHAL_VS, 
+		EPOCHAL_FREE_TIMES, 	   
+		EPOCHAL_FREE_TIMES_VS
 	}
 	
-	public static enum TwoConstantSeasonsPhase { FIXED_PHASE_FIXED_LENGTH, FREE_PHASE_FREE_LENGTH, FIXED_PHASE_FREE_LENGTH, FREE_PHASE_FIXED_LENGTH };
-	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: IMPLEMENT THIS... 
+	public static enum NConstantSeasonsParameterization {  
+		ALL,
+		VARIABLE_SELECTION
+	}
+	
+	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: 
+		
+	public static enum StateReconstructionAndTreeOutput { 
+		NONE, // don't output trees
+		PROBS, // putput probability of internal node states
+		ASR, // output realization of internal node states // TODO:  
+		STOCHASTIC_MAPPING // output realization of branches and internal node states // TODO:  
+	};   
+	   
 	
 	public Long randomSeed;
 	
@@ -116,6 +133,9 @@ public class Config implements Serializable
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
 	public int numLocations = 9; // needs to be specified if locations are loaded from trees....
+	
+	// ANCESTRAL STATE RECONSTRUCTIOn
+	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.ASR;
 	
 	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
 	public double[] lastTipTime = {2012.74, 2011.7}; // time of most recent tip on tree, used to calibrate all tree nodes 

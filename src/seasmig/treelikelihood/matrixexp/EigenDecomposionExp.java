@@ -6,7 +6,6 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 import cern.colt.matrix.linalg.EigenvalueDecomposition;
-import cern.jet.random.engine.RandomEngine;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.util.Util;
 

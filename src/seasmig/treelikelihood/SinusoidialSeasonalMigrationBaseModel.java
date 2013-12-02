@@ -104,10 +104,4 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 		return null;
 	}
 
-	@Override
-	public Pair<Double, Integer> getNextRandomEvent(double time, int loc) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

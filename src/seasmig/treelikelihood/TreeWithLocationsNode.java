@@ -109,7 +109,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	}
 
 	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....
-	public String parseAncestralStates(double[] rootfreq) {			
+	public String parseProbs(double[] rootfreq) {			
 		String returnValue = "[&prob={";		
 
 		double[] logAncStateProbs = new double[logProbs.length];

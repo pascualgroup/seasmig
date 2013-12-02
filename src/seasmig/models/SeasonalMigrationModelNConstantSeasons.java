@@ -78,7 +78,7 @@ public class SeasonalMigrationModelNConstantSeasons extends SeasonalMigrationMod
 		LikelihoodVariable(SeasonalMigrationModelNConstantSeasons m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
-			super(m, "likeVar", true,nTrees.length);
+			super(m, "likeVar", true,nTrees.length,config);
 
 			// Add dependencies between likelihood variable and parameters
 			for (int i=0;i<nTrees.length;i++) {
