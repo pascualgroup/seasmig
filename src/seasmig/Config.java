@@ -135,7 +135,7 @@ public class Config implements Serializable
 	public int numLocations = 8; // needs to be specified if locations are loaded from trees....
 	
 	// ANCESTRAL STATE RECONSTRUCTIOn
-	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.PROBS;
+	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.ASR;
 	
 	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
 	public double[] lastTipTime = {2012.74, 2011.7}; // time of most recent tip on tree, used to calibrate all tree nodes 

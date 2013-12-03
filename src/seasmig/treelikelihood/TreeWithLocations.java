@@ -470,7 +470,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						else
 							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);							
 						int to = child.loc;																						
-						node.logProbs[from] = Math.log(p[from][to]); // Probability of internal node state based on children 
+						node.logProbs[from] += Math.log(p[from][to]); // Probability of internal node state based on children 
 					}								
 				}
 				node.loc = normalizeAndGetRandomSampleFromLogProbs(node.logProbs);
@@ -491,7 +491,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	public String newickAncestralStateReconstruction() {
 		// TODO: Check this
 		asr();
-		return newickAncestralStateReconstruction(root) + "\n";
+		String returnValue = newickAncestralStateReconstruction(root) + "\n";
+		return returnValue;
 
 	}
 
@@ -501,9 +502,9 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		if (treePart.isTip()) {
 			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);
-			returnValue+=(Integer.toString(treePart.getTaxonIndex())+treePart.loc+":"+branchLength);
+			returnValue+=(Integer.toString(treePart.getTaxonIndex())+ "[loc="+Integer.toString(treePart.loc)+"]:"+branchLength);
 		}
-		else if (treePart.children.size()>0) {
+		else {
 			returnValue+="(";
 			returnValue+=newickAncestralStateReconstruction(treePart.children.get(0));
 			for (int i = 1; i < treePart.children.size(); i++){

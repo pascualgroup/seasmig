@@ -47,6 +47,7 @@ public class TreesLikelihoodVariable extends Variable {
 				returnValue[i]=(header + (trees[i].newickAncestralStateReconstruction()+String.format("\n")));
 			}
 		}
+		break;	
 		case STOCHASTIC_MAPPING: {
 			for (int i=0;i<trees.length;i++) {
 				Model model = this.getModel();		 	
