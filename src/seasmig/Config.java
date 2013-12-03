@@ -64,8 +64,8 @@ public class Config implements Serializable
 		
 	public static enum StateReconstructionAndTreeOutput { 
 		NONE, // don't output trees
-		PROBS, // putput probability of internal node states
-		ASR, // output realization of internal node states // TODO:  
+		PROBS, // output probability of internal node states
+		ASR, // output realization of internal node states // TODO: 
 		STOCHASTIC_MAPPING // output realization of branches and internal node states // TODO:  
 	};   
 	   
@@ -79,18 +79,18 @@ public class Config implements Serializable
 	public String checkpointFilename = "checkpoint.bin";
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String mlFilename = "ml.txt";
-	public long thin = 5;
+	public long thin = 1;
 	
 	// MCMC RELATED PARAMETERS
-	public long burnIn = 2000; 	// in iterations	
+	public long burnIn = 1; 	// in iterations	
 	public long iterationCount = 100000000L;	
 	public long tuneEvery = 500; 
 	public long tuneFor = 5000;
-	public long mlthin = 5;	
+	public long mlthin = 1;	
 	public long initialHistoryCount = 50;
-	public int chainCount = 4;
+	public int chainCount = 3;
 	public double heatPower = 3.0;
-	public long swapInterval = 10;	
+	public long swapInterval = 1;	
 	public double targetAcceptanceRate = 0.25;
 	
 	// RESTORE FROM CHECKPOINT 
@@ -132,10 +132,10 @@ public class Config implements Serializable
 	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
-	public int numLocations = 9; // needs to be specified if locations are loaded from trees....
+	public int numLocations = 8; // needs to be specified if locations are loaded from trees....
 	
 	// ANCESTRAL STATE RECONSTRUCTIOn
-	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.ASR;
+	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.PROBS;
 	
 	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
 	public double[] lastTipTime = {2012.74, 2011.7}; // time of most recent tip on tree, used to calibrate all tree nodes 

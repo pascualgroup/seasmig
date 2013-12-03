@@ -432,11 +432,15 @@ public class TreeWithLocations implements LikelihoodTree {
 		return -1;
 	}
 
-	private int getRandomSampleFromLogProbs(double[] logProbs) {
-		double p=0;		
+	private int normalizeAndGetRandomSampleFromLogProbs(double[] logProbs) {
+		double sum=0;		
+		for (int i=0;i<logProbs.length;i++) {
+			sum+=cern.jet.math.Functions.exp.apply(logProbs[i]);
+		}
+		double p=0;	
 		for (int i=0;i<logProbs.length;i++) {
 			p=p+cern.jet.math.Functions.exp.apply(logProbs[i]);
-			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
+			if (cern.jet.random.Uniform.staticNextDouble()<=(p/sum)) {
 				return i;				
 			}			
 		}
@@ -464,24 +468,23 @@ public class TreeWithLocations implements LikelihoodTree {
 						if (node.time!=child.time && node.loc==child.loc) 												
 							p = likelihoodModel.transitionMatrix(node.time, child.time);
 						else
-							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
-						double[] alphas = new double[numLocations];						
-						int to = child.loc;
-						alphas[to]=Math.log(p[from][to]);																		
-						node.logProbs[from] += logSumExp(alphas); // Probability of internal node state based on children 
+							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);							
+						int to = child.loc;																						
+						node.logProbs[from] = Math.log(p[from][to]); // Probability of internal node state based on children 
 					}								
 				}
-				node.loc = getRandomSampleFromLogProbs(node.logProbs);
+				node.loc = normalizeAndGetRandomSampleFromLogProbs(node.logProbs);
 			}				
 		}
 
 		// Calculate root base frequency contribution... 
+		// TODO: Check this...
 		double[] rootFreq = likelihoodModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
 			alphas[i]=root.logProbs[i] + Math.log(rootFreq[i]);
 		}			
-		root.loc = getRandomSampleFrom(alphas);
+		root.loc =  normalizeAndGetRandomSampleFromLogProbs(alphas);
 	}
 
 	@Override
