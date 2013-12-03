@@ -417,7 +417,47 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String newickStochasticMapping() {
 		// TODO Auto-generated method stub		
-		//		
+		//
+		asr();
+//		for (TreeWithLocationsNode node : preorder(root)) { // Postorder 
+//			do {
+//				do {
+//					event = likelihoodModel.getNextEvent(node);
+//					if (event.time<node.children.time) 
+//						add_child(event.time);
+//						node = child;
+//				} while (event.time<node.children_time);
+//			while {event.location!=child.location)
+//				
+//			if (node.children.size()!=0) { // this is an internal node			
+//				for (int from = 0; from < numLocations; from++) {
+//					for (TreeWithLocationsNode child : node.children ) {
+//						// for now caching is done inside likelihood model...
+//						double[][] p;
+//						if (node.time!=child.time && node.loc==child.loc) 												
+//							p = likelihoodModel.transitionMatrix(node.time, child.time);
+//						else
+//							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
+//						double[] alphas = new double[numLocations];						
+//						for (int to = 0; to < numLocations; to++) { // Integrate over all possible locations
+//							alphas[to]=(Math.log(p[from][to]) + child.logProbs[to]);							
+//						}						
+//						node.logProbs[from] += logSumExp(alphas); // Probability of internal node state based on children 
+//					}								
+//				}
+//
+//			}
+//
+//
+//		}
+//
+//		// Calculate root base frequency contribution... 
+//		double[] rootFreq = likelihoodModel.rootfreq(root.time);
+//		double[] alphas = new double[numLocations];	
+//		for (int i = 0; i < numLocations; i++) {
+//			alphas[i]=root.logProbs[i] + Math.log(rootFreq[i]);
+//		}			
+//		logLike += logSumExp(alphas);
 		return null;
 	}
 
@@ -496,7 +536,6 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	}
 
-	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....
 	private String newickAncestralStateReconstruction(TreeWithLocationsNode treePart) {
 		String returnValue = new String();
 
