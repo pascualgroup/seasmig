@@ -48,10 +48,10 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			}
 			break;			
 		default:			
-			matrixExponentiator=new EigenDecomposionExp(Q);
-			if (!matrixExponentiator.checkMethod()) {
+			//matrixExponentiator=new EigenDecomposionExp(Q);
+			//if (!matrixExponentiator.checkMethod()) {
 				matrixExponentiator=new Matlab7MatrixExp(Q);
-			}
+			//}
 		}
 		// TODO: Maybe use other method to get s.s. freq 
 		basefreq=matrixExponentiator.expm(veryLongTime).viewRow(1);
