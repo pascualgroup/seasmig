@@ -100,7 +100,6 @@ public class Config implements Serializable
 	public double targetAcceptanceRate = 0.25;
 	
 	// RESTORE FROM CHECKPOINT 
-	public boolean verificationStep = false; // When false allows for "hot swaps" of tree files, when resuming from checkpoint.bin
 	public long checkpointEvery = 10000;
 	public boolean restoreFromDatabase = false;
 

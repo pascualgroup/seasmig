@@ -554,7 +554,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		if (treePart.isTip()) {
 			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);
-			returnValue+=(Integer.toString(treePart.getTaxonIndex())+ "[loc="+Integer.toString(treePart.loc)+"]:"+branchLength);
+			returnValue+=(Integer.toString(treePart.getTaxonIndex())+ "[&states="+Integer.toString(treePart.loc)+"]:"+branchLength);
 		}
 		else {
 			returnValue+="(";
@@ -569,7 +569,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				parentTime=treePart.parent.time;
 			}
 			String branchLength = String.format("%.3f", treePart.time-parentTime);
-			returnValue+=treePart.loc+":"+branchLength;
+			returnValue+="[&states="+Integer.toString(treePart.loc)+"]:"+branchLength;
 		}		
 		return returnValue;
 	}

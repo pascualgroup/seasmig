@@ -6,7 +6,6 @@ import mc3kit.DoubleVariable;
 
 import org.javatuples.Pair;
 
-import seasmig.treelikelihood.MigrationBaseModel.Event;
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.DoubleFactory1D;
 import cern.colt.matrix.DoubleFactory2D;

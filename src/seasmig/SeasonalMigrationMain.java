@@ -117,11 +117,8 @@ public class SeasonalMigrationMain
 				// Verification step: just asks all models to recalculate
 				// log prior, likelihood from scratch and compares to existing value;
 				// throws an exception if too much error has accumulated.
-				Step verificationStep= null;
-				if (config.verificationStep) {
-					verificationStep = new VerificationStep(config.thin, 1E-4);
-				}
-
+				Step verificationStep = verificationStep = new VerificationStep(config.thin, 1E-4);
+				
 				// Sample output step
 				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);
 
@@ -145,9 +142,8 @@ public class SeasonalMigrationMain
 					mcmc.addStep(evenSwapStep);
 					mcmc.addStep(oddSwapStep);
 				}
-				if (config.verificationStep) {
-					mcmc.addStep(verificationStep);
-				}
+				
+				mcmc.addStep(verificationStep);				
 				mcmc.addStep(sampOutStep);
 				mcmc.addStep(mlOutStep);
 				mcmc.addStep(plOutStep);

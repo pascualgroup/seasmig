@@ -248,4 +248,61 @@ public class TreeWithLocationsTest {
 		assertEquals(expectedResult, locTree.logLikelihood(),0.01);
 			
 	}
+	
+	@Test
+	public void testASR() throws Exception {
+		/* 
+		   --
+		  /  \
+		 0   --
+		    /  \
+		   1    0
+		 
+		 For the JC model 
+		 for no-change we have p=1/4 E^(-4 t/3) (3 + E^(4 t/3)), 
+		 for a change we have p=1/4 E^(-4 t/3) (-1 + E^(4 t/3))
+		 
+		 branch length is 1....
+		 First site:
+		         changes, no changes
+		 2,2 --> 3, 1
+		 2,0 --> 3, 1
+		 2,3 --> 4
+		 2,1 --> 3, 1
+		 ---
+         0,2 --> 3, 1
+         0,0 --> 1, 3
+         0,3 --> 3, 1
+         0,1 --> 2, 2
+         ---
+         3,2 --> 4
+         3,0 --> 3, 1
+         3,3 --> 3, 1
+         3,1 --> 3, 1
+         ---
+         1,2 --> 4
+         1,0 --> 3, 1
+         1,3 --> 4
+         1,1 --> 2, 2
+         
+		 */
+		
+		
+		
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+																 { 0.333333,-1,0.333333,0.333333},
+																 { 0.333333,0.333333,-1,0.333333},
+																 { 0.333333,0.333333,0.333333,-1}});
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
+		
+		locTree.logLikelihood();
+		System.out.println(locTree.newickProbs());
+		System.out.println(locTree.newickAncestralStateReconstruction());
+					
+	}
 }
