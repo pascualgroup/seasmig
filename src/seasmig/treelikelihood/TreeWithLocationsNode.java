@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import seasmig.treelikelihood.MigrationBaseModel.Event;
+
 //Nodes in this tree...
 @SuppressWarnings("serial")
 public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLocationsNode> {	
@@ -12,10 +14,15 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	public double[] logProbs;
 	TreeWithLocationsNode parent = null;
 	List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
-	int loc = TreeWithLocations.UNKNOWN_LOCATION; 
 	double time = 0;
 	int taxonIndex = 0;
 	
+	// For tips and for ASR
+	int loc = TreeWithLocations.UNKNOWN_LOCATION;
+	
+	// For stochastic mapping
+	public List<Event> changes = null;
+		
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
 	protected TreeWithLocationsNode() {};
@@ -162,6 +169,26 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		if (Double.isNaN(returnValue) ){
 			return minNegative;
 		}
+		return returnValue;
+	}
+
+	public String parseMap() {
+		String returnValue = new String();
+		returnValue+="{";
+		if (changes!=null) {			
+			double timeFrom = time;
+			
+			for (int i=0;i<changes.size()-1;i++) {
+				returnValue+=Integer.toString(changes.get(i).loc)+",";
+				returnValue+=Double.toString(changes.get(i).time-timeFrom)+",";			
+				timeFrom = changes.get(i).time;
+			}
+			returnValue+=Integer.toString(changes.get(changes.size()).loc);
+		}
+		else {
+			returnValue+=Integer.toString(loc);
+		}
+		returnValue+="}";
 		return returnValue;
 	}
 

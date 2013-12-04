@@ -1,5 +1,6 @@
 package seasmig.treelikelihood;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import cern.colt.matrix.DoubleMatrix1D;
@@ -416,16 +417,39 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String newickStochasticMapping() {
-		TreeWithLocations stochasticMappingTree = (TreeWithLocations) this.copy();
-		// TODO:
-		stochasticMappingTree.asr(); // Ancestral state reconstruction
-		stochsticMapping(stochasticMappingTree.root);
+		asr(); // Ancestral state reconstruction
+		stochsticMapping(root);
 		
-		return stochasticMappingTree.newickStates(stochasticMappingTree.root);
+		return newickSM(root);
 	}
 
 	
 	
+	private String newickSM(TreeWithLocationsNode treePart) {
+		String returnValue = new String();
+
+		if (treePart.isTip()) {
+			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);
+			returnValue+=(Integer.toString(treePart.getTaxonIndex())+":"+"[&map="+treePart.parseMap()+"]"+branchLength);
+		}
+		else {
+			returnValue+="(";
+			returnValue+=newickStates(treePart.children.get(0));
+			for (int i = 1; i < treePart.children.size(); i++){
+				returnValue+=",";
+				returnValue+=newickStates(treePart.children.get(i));	
+			}
+			returnValue+=")";
+			double parentTime=0;
+			if (treePart.parent!=null) {
+				parentTime=treePart.parent.time;
+			}
+			String branchLength = String.format("%.3f", treePart.time-parentTime);
+			returnValue+=treePart.loc+":"+branchLength;
+		}		
+		return returnValue;
+	}
+
 	private void stochsticMapping(TreeWithLocationsNode root) {
 		// TODO Auto-generated method stub
 		// TODO: this
@@ -434,13 +458,17 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=0;i<root.children.size();i++) {
 			TreeWithLocationsNode node = root;
 			TreeWithLocationsNode child = node.children.get(i);
+			int currentLoc = node.loc;
+			double currentTime = node.time;
 			Event event = null;
 			do {
-				event = likelihoodModel.nextEvent(node.time, node.loc);
+				event = likelihoodModel.nextEvent(currentTime, currentLoc);
 				if (event.time < child.time) {
-					TreeWithLocationsNode newNode = new TreeWithLocationsNode(event.loc, UNKNOWN_TAXA, event.time, node);
-					node = newNode;
-				}			
+					if (node.changes==null) node.changes = new ArrayList<Event>();					
+					node.changes.add(event);
+					currentLoc = event.loc;
+					currentTime = event.time;
+				}				
 			} while (event.time < child.time || (event.time>child.time && event.loc==child.loc));
 						
 			stochsticMapping(child);
@@ -501,9 +529,9 @@ public class TreeWithLocations implements LikelihoodTree {
 		TreeWithLocationsNode parent = node.parent;		
 		double[] alphas = new double[numLocations];	
 		// TODO: check if clause (here for numerics issues)
-		DoubleMatrix2D p = likelihoodModel.transitionMatrix(parent.time, node.time);
+		DoubleMatrix1D p = likelihoodModel.probability(parent.loc, parent.time, node.time);
 		for (int i=0; i < numLocations; i++) {								
-			alphas[i] = p.get(parent.loc,i) + node.logProbs[i];
+			alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbs[i];
 		}		
 		node.loc = normalizeAndGetRandomSampleFromLogProbs(alphas);
 
