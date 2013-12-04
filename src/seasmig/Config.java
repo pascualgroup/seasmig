@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 @SuppressWarnings("serial")
 public class Config implements Serializable
 {
-	public static enum ModelType { 
+	public static enum MigrationModelType { 
 		CONSTANT, 
 		TWO_CONSTANT_SEASONS, 
 		SINUSOIDAL, // TODO:
@@ -19,6 +19,13 @@ public class Config implements Serializable
 		EPOCHAL
 	}
 	
+	// CONSTANT
+	public static enum NoSeasonalityParameterization {  
+		VARIABLE_SELECTION,		
+		ALL,
+	}
+	
+	// TWO CONSTANT SEASONS
 	public static enum TwoConstantSeasonsParameterization 	{  
 	   RATES12_PARAMETERZIATION,    // Separate rates for the two parts of the years rates1[i][j], rates2[i][j]
 	   RATES12_VARIABLE_SELECTION,  // rate1[i][j]*indicators1[i][j], rate2[i][j]*indicators2[i][j]
@@ -43,25 +50,24 @@ public class Config implements Serializable
 		FREE_PHASE_FIXED_LENGTH 
 	}
 	
-	public static enum NoSeasonalityParameterization {  
-		VARIABLE_SELECTION,		
-		ALL,
-	}
-	
+	// EPOCHAL
 	public static enum EpochParameterization {  
 		EPOCHAL,
 		EPOCHAL_VS, 
 		EPOCHAL_FREE_TIMES, 	   
 		EPOCHAL_FREE_TIMES_VS
 	}
-	
+
+	// N_CONSTANT_SEASONS
 	public static enum NConstantSeasonsParameterization {  
 		ALL,
 		VARIABLE_SELECTION
 	}
 	
+	// STATE MODEL
 	public static enum StateModel { NONE, BROWNIAN, BROWNIAN_SEASONAL };   // TODO: 
-		
+
+	// RECONSTRUCTION
 	public static enum StateReconstructionAndTreeOutput { 
 		NONE, // don't output trees
 		PROBS, // output probability of internal node states
@@ -99,7 +105,7 @@ public class Config implements Serializable
 	public boolean restoreFromDatabase = false;
 
 	// SEASONAL MODEL RELATED PARAMETERS
-	public ModelType modelType = ModelType.TWO_CONSTANT_SEASONS;
+	public MigrationModelType modelType = MigrationModelType.TWO_CONSTANT_SEASONS;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION TWO SEASONS...
 	public double fixedPhase = 0.3;

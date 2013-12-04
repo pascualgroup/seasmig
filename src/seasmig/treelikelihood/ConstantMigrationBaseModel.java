@@ -1,8 +1,8 @@
 package seasmig.treelikelihood;
 import java.util.HashMap;
 
-import org.javatuples.Pair;
-
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
@@ -20,13 +20,13 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	private int num_locations = 0;		
 
 	// cache
-	HashMap<Double, double[][]> cachedTransitionMatrices = new HashMap<Double, double[][]>();
+	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
 	final static int maxCachedTransitionMatrices=16000;
 
 	// Matrix Exponentiation
 	MatrixExponentiator matrixExponentiator;
 
-	private double[] basefreq;	
+	private DoubleMatrix1D basefreq;	
 
 	protected ConstantMigrationBaseModel() {};
 	
@@ -54,7 +54,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 			}
 		}
 		// TODO: Maybe use other method to get s.s. freq 
-		basefreq=matrixExponentiator.expm(veryLongTime)[1];
+		basefreq=matrixExponentiator.expm(veryLongTime).viewRow(1);
 		// TODO: Figure out if calculating base freq helps or interferes. 
 //		basefreq=new double[num_locations];
 //		for (int i=0;i<num_locations;i++) {
@@ -67,24 +67,24 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	public double logprobability(int from_location, int to_location, double from_time, double to_time) {
 
 		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
-		double[][] cached = cachedTransitionMatrices.get(dt);
+		DoubleMatrix2D cached = cachedTransitionMatrices.get(dt);
 
 		if (cached!=null)  
-			return Math.log(cached[from_location][to_location]);		
+			return Math.log(cached.get(from_location,to_location));		
 		else 		
-			return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);		
+			return Math.log(transitionMatrix(from_time, to_time).get(from_location,to_location));		
 	}
 
 	@Override
-	public double[][] transitionMatrix(double from_time, double to_time) {		
+	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {		
 		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
 		
-		double[][] cached = cachedTransitionMatrices.get(dt);
+		DoubleMatrix2D cached = cachedTransitionMatrices.get(dt);
 		if (cached!=null) {
 			return cached;
 		}
 		else {
-			double[][] result = matrixExponentiator.expm(dt);
+			DoubleMatrix2D result = matrixExponentiator.expm(dt);
 			// cache result
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
@@ -149,18 +149,18 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	@Override
-	public double[] probability(int from_location, double from_time,	double to_time) {
+	public DoubleMatrix1D probability(int from_location, double from_time,	double to_time) {
 		double dt = Math.max(timePrecision,cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
-		double[][] cached = cachedTransitionMatrices.get(dt);
+		DoubleMatrix2D cached = cachedTransitionMatrices.get(dt);
 
 		if (cached!=null)  
-			return cached[from_location];		
+			return cached.viewRow(from_location);		
 		else 		
-			return transitionMatrix(from_time, to_time)[from_location];	
+			return transitionMatrix(from_time, to_time).viewRow(from_location);	
 	}
 
 	@Override
-	public double[] rootfreq(double when) {
+	public DoubleMatrix1D rootfreq(double when) {
 		return basefreq;
 	}
 

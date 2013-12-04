@@ -2,6 +2,7 @@ package seasmig.treelikelihood;
 
 import java.util.HashMap;
 
+import cern.colt.matrix.DoubleMatrix1D;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.util.Util;
@@ -132,7 +133,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 		double[] alphas=new double[num_locations];
 		double min = Double.POSITIVE_INFINITY;
 		if (root.location==UNKNOWN_LOCATION) {
-			basefreq=likelihoodModel.rootfreq(root.time);
+			basefreq=likelihoodModel.rootfreq(root.time).toArray();
 			for (int rootLocation=0;rootLocation<num_locations;rootLocation++) {				
 				double alpha=conditionalLogLikelihood(root, rootLocation);
 				if (basefreq!=null) alpha+=Math.log(basefreq[rootLocation]);
@@ -337,10 +338,10 @@ public class TreeWithLocations2 implements LikelihoodTree {
 		return null;
 	}
 	
-	private int getRandomSampleFrom(double[] probs) {
+	private int getRandomSampleFrom(DoubleMatrix1D doubleMatrix1D) {
 		double p=0;		
-		for (int i=0;i<probs.length;i++) {
-			p=p+probs[i];
+		for (int i=0;i<doubleMatrix1D.size();i++) {
+			p=p+doubleMatrix1D.get(i);
 			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
 				return i;				
 			}			

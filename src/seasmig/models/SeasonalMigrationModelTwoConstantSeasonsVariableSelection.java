@@ -264,7 +264,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends S
 
 		private double getRate(double[][] ratesdoubleForm) {
 			MatrixExponentiator matrixExp = new Matlab7MatrixExp(ratesdoubleForm);
-			double[] pi = matrixExp.expm(config.veryLongTime)[1];	
+			double[] pi = matrixExp.expm(config.veryLongTime).viewRow(1).toArray();	
 			double rate=0;
 			for (int i=0;i<numLocations;i++) {
 				rate-=pi[i]*ratesdoubleForm[i][i];

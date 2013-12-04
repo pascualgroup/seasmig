@@ -10,7 +10,6 @@ import seasmig.Data;
 import seasmig.treelikelihood.EpochalMigrationBaseModel;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
-import seasmig.treelikelihood.PiecewiseConstantMigrationBaseModel;
 import mc3kit.*;
 import mc3kit.distributions.*;
 

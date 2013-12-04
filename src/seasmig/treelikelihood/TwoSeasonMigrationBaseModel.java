@@ -6,6 +6,7 @@ import java.util.Vector;
 import org.javatuples.Pair;
 
 import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 
 //TODO: test multiplication order... ok for Q where rows sum to 1
@@ -55,24 +56,24 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	// Methods
 	@Override
 	public double logprobability(int from_state, int to_state, double from_time, double to_time) {	
-		return Math.log(transitionMatrix(from_time, to_time)[from_state][to_state]);
+		return Math.log(transitionMatrix(from_time, to_time).get(from_state,to_state));
 	}
 	
 	// Methods
 	@Override
-	public double[] probability(int from_state,  double from_time, double to_time) {		
-		return transitionMatrix(from_time, to_time)[from_state];
+	public DoubleMatrix1D probability(int from_state,  double from_time, double to_time) {		
+		return transitionMatrix(from_time, to_time).viewRow(from_state);
 	}
 
 	@Override
-	public double[][] transitionMatrix(double from_time, double to_time) {
+	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {
 		// TODO: remove make
 		double from_time_reminder = from_time % 1.0;
 		double from_time_div = from_time - from_time_reminder;
 		double to_time_reminder = to_time - from_time_div;
 		DoubleMatrix2D cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder,to_time_reminder));
 		if (cached!=null) {
-			return cached.toArray();
+			return cached;
 		}
 		else {
 			double step_start_time = from_time;
@@ -84,7 +85,7 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 				double step_start_time_div=step_start_time - step_start_time_reminder;
 				if (isInSeason1(step_start_time)) {					
 					step_end_time = Math.min(to_time,step_start_time_div+season1Start+season1Length+ infitesimalTimeInterval);
-					result = result.zMult(DoubleFactory2D.dense.make(season1MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);									
+					result = result.zMult(season1MigrationModel.transitionMatrix(step_start_time, step_end_time),null);									
 				} 
 				else { // In Season 2 		
 					if (step_start_time_reminder<season1Start) {
@@ -93,7 +94,7 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 					else {
 						step_end_time = Math.min(to_time,step_start_time_div+1.0+season1Start+ infitesimalTimeInterval);
 					}
-					result = result.zMult(DoubleFactory2D.dense.make(season2MigrationModel.transitionMatrix(step_start_time, step_end_time)),null);								
+					result = result.zMult(season2MigrationModel.transitionMatrix(step_start_time, step_end_time),null);								
 				}
 				step_start_time=step_end_time;	
 
@@ -107,7 +108,7 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 			}			
 			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),result);
 			
-			return result.toArray();
+			return result;
 		}
 	}
 
@@ -142,7 +143,7 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	@Override
-	public double[] rootfreq(double when) {
+	public DoubleMatrix1D rootfreq(double when) {
 		if (isInSeason1(when))
 			return season1MigrationModel.rootfreq(when);
 		else

@@ -2,8 +2,8 @@ package seasmig.treelikelihood;
 
 import java.util.HashMap;
 
-import org.javatuples.Pair;
-
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.util.Util;
@@ -168,7 +168,6 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public double logLikelihood() {
-		logLike  = 0;
 		for (TreeWithLocationsNode node : root) { // Postorder 
 
 			if (node.loc==TreeWithLocations.UNKNOWN_LOCATION) {
@@ -183,14 +182,15 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int from = 0; from < numLocations; from++) {
 					for (TreeWithLocationsNode child : node.children ) {
 						// for now caching is done inside likelihood model...
-						double[][] p;
+						DoubleMatrix2D p;						
+						// TODO: check if clause (here for numerics issues) 
 						if (node.time!=child.time && node.loc==child.loc) 												
 							p = likelihoodModel.transitionMatrix(node.time, child.time);
 						else
 							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
 						double[] alphas = new double[numLocations];						
 						for (int to = 0; to < numLocations; to++) { // Integrate over all possible locations
-							alphas[to]=(Math.log(p[from][to]) + child.logProbs[to]);							
+							alphas[to]=(Math.log(p.get(from,to)) + child.logProbs[to]);							
 						}						
 						node.logProbs[from] += logSumExp(alphas); // Probability of internal node state based on children 
 					}								
@@ -202,13 +202,12 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 
 		// Calculate root base frequency contribution... 
-		double[] rootFreq = likelihoodModel.rootfreq(root.time);
+		DoubleMatrix1D rootFreq = likelihoodModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
-			alphas[i]=root.logProbs[i] + Math.log(rootFreq[i]);
-		}			
-		logLike += logSumExp(alphas);
-
+			alphas[i]=root.logProbs[i] + Math.log(rootFreq.get(i));
+		}	
+		logLike = logSumExp(alphas);
 		return logLike;		
 	}
 
@@ -359,7 +358,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	public String newickProbs() {	 
-		return newickProbs(root,likelihoodModel.rootfreq(root.time)) + "\n";
+		return newickProbs(root,likelihoodModel.rootfreq(root.time).toArray()) + "\n";
 	}
 
 	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....
@@ -416,55 +415,57 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String newickStochasticMapping() {
-		// TODO Auto-generated method stub		
+		asr(); // Ancestral state reconstruction
+
+
+		//		for (TreeWithLocationsNode node : root) { // preorder
+
+		//		}
+		//			do {
+		//				do {
+		//					event = likelihoodModel.getNextEvent(node);
+		//					if (event.time<node.children.time) 
+		//						add_child(event.time);
+		//						node = child;
+		//				} while (event.time<node.children_time);
+		//			while {event.location!=child.location)
+		//				
+		//			if (node.children.size()!=0) { // this is an internal node			
+		//				for (int from = 0; from < numLocations; from++) {
+		//					for (TreeWithLocationsNode child : node.children ) {
+		//						// for now caching is done inside likelihood model...
+		//						double[][] p;
+		//						if (node.time!=child.time && node.loc==child.loc) 												
+		//							p = likelihoodModel.transitionMatrix(node.time, child.time);
+		//						else
+		//							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
+		//						double[] alphas = new double[numLocations];						
+		//						for (int to = 0; to < numLocations; to++) { // Integrate over all possible locations
+		//							alphas[to]=(Math.log(p[from][to]) + child.logProbs[to]);							
+		//						}						
+		//						node.logProbs[from] += logSumExp(alphas); // Probability of internal node state based on children 
+		//					}								
+		//				}
 		//
-		asr();
-//		for (TreeWithLocationsNode node : preorder(root)) { // Postorder 
-//			do {
-//				do {
-//					event = likelihoodModel.getNextEvent(node);
-//					if (event.time<node.children.time) 
-//						add_child(event.time);
-//						node = child;
-//				} while (event.time<node.children_time);
-//			while {event.location!=child.location)
-//				
-//			if (node.children.size()!=0) { // this is an internal node			
-//				for (int from = 0; from < numLocations; from++) {
-//					for (TreeWithLocationsNode child : node.children ) {
-//						// for now caching is done inside likelihood model...
-//						double[][] p;
-//						if (node.time!=child.time && node.loc==child.loc) 												
-//							p = likelihoodModel.transitionMatrix(node.time, child.time);
-//						else
-//							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
-//						double[] alphas = new double[numLocations];						
-//						for (int to = 0; to < numLocations; to++) { // Integrate over all possible locations
-//							alphas[to]=(Math.log(p[from][to]) + child.logProbs[to]);							
-//						}						
-//						node.logProbs[from] += logSumExp(alphas); // Probability of internal node state based on children 
-//					}								
-//				}
-//
-//			}
-//
-//
-//		}
-//
-//		// Calculate root base frequency contribution... 
-//		double[] rootFreq = likelihoodModel.rootfreq(root.time);
-//		double[] alphas = new double[numLocations];	
-//		for (int i = 0; i < numLocations; i++) {
-//			alphas[i]=root.logProbs[i] + Math.log(rootFreq[i]);
-//		}			
-//		logLike += logSumExp(alphas);
+		//			}
+		//
+		//
+		//		}
+		//
+		//		// Calculate root base frequency contribution... 
+		//		double[] rootFreq = likelihoodModel.rootfreq(root.time);
+		//		double[] alphas = new double[numLocations];	
+		//		for (int i = 0; i < numLocations; i++) {
+		//			alphas[i]=root.logProbs[i] + Math.log(rootFreq[i]);
+		//		}			
+		//		logLike += logSumExp(alphas);
 		return null;
 	}
 
-	private int getRandomSampleFrom(double[] probs) {
+	private int getRandomSampleFrom(DoubleMatrix1D doubleMatrix1D) {
 		double p=0;		
-		for (int i=0;i<probs.length;i++) {
-			p=p+probs[i];
+		for (int i=0;i<doubleMatrix1D.size();i++) {
+			p=p+doubleMatrix1D.get(i);
 			if (cern.jet.random.Uniform.staticNextDouble()<=p) {
 				return i;				
 			}			
@@ -473,13 +474,19 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	private int normalizeAndGetRandomSampleFromLogProbs(double[] logProbs) {
-		double sum=0;		
-		for (int i=0;i<logProbs.length;i++) {
-			sum+=cern.jet.math.Functions.exp.apply(logProbs[i]);
+		double min=logProbs[0];		
+		for (int i=1;i<logProbs.length;i++) {
+			if (min>logProbs[i])
+				min=logProbs[i];
 		}
+		double sum=0;			
+		for (int i=0;i<logProbs.length;i++) {
+			sum+=cern.jet.math.Functions.exp.apply(logProbs[i]-min);
+		}
+		
 		double p=0;	
 		for (int i=0;i<logProbs.length;i++) {
-			p=p+cern.jet.math.Functions.exp.apply(logProbs[i]);
+			p=p+cern.jet.math.Functions.exp.apply(logProbs[i]-min);
 			if (cern.jet.random.Uniform.staticNextDouble()<=(p/sum)) {
 				return i;				
 			}			
@@ -488,44 +495,37 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	private void asr() {
-		// This overwrites logProbs
-
-		for (TreeWithLocationsNode node : root) { // Postorder 
-
-			if (node.loc==TreeWithLocations.UNKNOWN_LOCATION) {
-				node.logProbs =new double[numLocations]; // Internal node initialization
-			}
-			else {
-				node.logProbs= ZERO_LOG_PROBS.clone();
-				node.logProbs[node.loc]=0; // Tip node
-			}
-
-			if (node.children.size()!=0) { // this is an internal node			
-				for (int from = 0; from < numLocations; from++) {
-					for (TreeWithLocationsNode child : node.children ) {
-						// for now caching is done inside likelihood model...
-						double[][] p;
-						if (node.time!=child.time && node.loc==child.loc) 												
-							p = likelihoodModel.transitionMatrix(node.time, child.time);
-						else
-							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);							
-						int to = child.loc;																						
-						node.logProbs[from] += Math.log(p[from][to]); // Probability of internal node state based on children 
-					}								
-				}
-				node.loc = normalizeAndGetRandomSampleFromLogProbs(node.logProbs);
-			}				
-		}
-
-		// Calculate root base frequency contribution... 
-		// TODO: Check this...
-		double[] rootFreq = likelihoodModel.rootfreq(root.time);
+		
+		// Calculate root state
+		// TODO: check this
+		DoubleMatrix1D rootFreq = likelihoodModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
-			alphas[i]=root.logProbs[i] + Math.log(rootFreq[i]);
-		}			
-		root.loc =  normalizeAndGetRandomSampleFromLogProbs(alphas);
+			alphas[i]=root.logProbs[i] + Math.log(rootFreq.get(i));
+		}		
+		root.loc = normalizeAndGetRandomSampleFromLogProbs(alphas);
+		System.err.println(root.loc);
+		for (TreeWithLocationsNode node : root.children) {
+			asr(node);
+		}		
 	}
+
+	private void asr(TreeWithLocationsNode node) {
+		// TODO: check this
+		TreeWithLocationsNode parent = node.parent;		
+		double[] alphas = new double[numLocations];	
+		// TODO: check if clause (here for numerics issues)
+		DoubleMatrix2D p = likelihoodModel.transitionMatrix(parent.time, node.time);
+		for (int i=0; i < numLocations; i++) {								
+			alphas[i] = p.get(parent.loc,i) + node.logProbs[i];
+		}
+		System.err.println(node.loc);
+		node.loc = normalizeAndGetRandomSampleFromLogProbs(alphas);
+		
+		for (TreeWithLocationsNode child : node.children) {
+			asr(child);
+		}
+	}	
 
 	@Override
 	public String newickAncestralStateReconstruction() {

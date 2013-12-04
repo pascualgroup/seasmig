@@ -65,12 +65,12 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 	}
 
 	@Override
-	public double[][] expm(double t) {
+	public DoubleMatrix2D expm(double t) {
 		// TODO: remove extra construction steps...
 		// TODO: deal with different scales of t
 		if (t>0.1) {
-			DoubleMatrix2D halfProb = DoubleFactory2D.dense.make(expm(t/2.0));
-			return halfProb.zMult(halfProb, null).toArray();
+			DoubleMatrix2D halfProb = expm(t/2.0);
+			return halfProb.zMult(halfProb, null);
 		}
 
 		DoubleMatrix2D result = zeroMatrix.copy();
@@ -84,7 +84,7 @@ public class TaylorMatrixExp implements MatrixExponentiator {
 			result.assign(taylorn, cern.jet.math.Functions.plus);
 		}
 
-		return result.toArray(); 	
+		return result; 	
 
 	}
 

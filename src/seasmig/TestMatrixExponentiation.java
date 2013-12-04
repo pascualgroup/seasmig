@@ -56,7 +56,7 @@ public class TestMatrixExponentiation {
 
 					for (MatrixExponentiator expMethod : tests) {
 						if (expMethod.checkMethod()) {
-							results.add(expMethod.expm(t));
+							results.add(expMethod.expm(t).toArray());
 						}
 						else {
 							results.add(null);
@@ -83,7 +83,7 @@ public class TestMatrixExponentiation {
 						for (MatrixExponentiator expMethod : tests) {
 							System.out.println("method: "+expMethod.getMethodName());
 							if (expMethod.checkMethod()) {
-								System.out.println(Util.print(expMethod.expm(t)));
+								System.out.println(Util.print(expMethod.expm(t).toArray()));
 							}
 							else {
 								System.out.println("Incompatible Method!!!");

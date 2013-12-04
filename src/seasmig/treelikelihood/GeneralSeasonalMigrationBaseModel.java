@@ -5,7 +5,9 @@ import java.util.HashMap;
 import org.javatuples.Pair;
 
 import cern.colt.function.DoubleFunction;
+import cern.colt.matrix.DoubleFactory1D;
 import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 
 @SuppressWarnings("serial")
@@ -31,7 +33,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 
 	// Caching
 	DoubleFactory2D F = DoubleFactory2D.dense;
-	HashMap<Pair<Double,Double>, double[][]> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, double[][]>();
+	HashMap<Pair<Double,Double>, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, DoubleMatrix2D>();
 
 	private int num_locations = 0;
 	private double dt = 1.0/(double)nYearParts; 
@@ -69,22 +71,22 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	// Methods
 	@Override
 	public double logprobability(int from_location, int to_location, double from_time, double to_time) {		
-		return Math.log(transitionMatrix(from_time, to_time)[from_location][to_location]);
+		return Math.log(transitionMatrix(from_time, to_time).get(from_location,to_location));
 	}
 	
 	// Methods
 	@Override
-	public double[] probability(int from_state,  double from_time, double to_time) {		
-		return transitionMatrix(from_time, to_time)[from_state];
+	public DoubleMatrix1D probability(int from_state,  double from_time, double to_time) {		
+		return transitionMatrix(from_time, to_time).viewRow(from_state);
 	}
 
 	@Override
-	public double[][] transitionMatrix(double from_time, double to_time) {
+	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {
 		// TODO: organize this...
 		double from_time_reminder = from_time % 1.0;
 		double from_time_div = from_time - from_time_reminder;		
 		double to_time_reminder = to_time - from_time_div;
-		double[][] cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder,to_time_reminder));
+		DoubleMatrix2D cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder,to_time_reminder));
 		if (cached!=null) {
 			return cached;
 		}
@@ -97,7 +99,7 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 			while (step_start_time<to_time_reminder) {
 				int yearPartIndex = (int) Math.floor(step_start_time%1.0/dt);
 				// TODO: replace with other matrix mult
-				result = result.zMult(DoubleFactory2D.dense.make(constantModels[yearPartIndex].transitionMatrix(step_start_time, step_end_time)),null);	
+				result = result.zMult(constantModels[yearPartIndex].transitionMatrix(step_start_time, step_end_time),null);	
 				step_start_time = step_end_time;
 				step_end_time = Math.min(to_time_reminder, Math.floor((step_start_time+infinitesimalTime)/dt)*dt+dt);
 			}
@@ -106,11 +108,11 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
 			}			
-			double[][] returnValue=result.toArray();
-			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),returnValue);
+			
+			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),result);
 
 			// TODO: replace with no conversion step
-			return returnValue;
+			return result;
 		}
 	}
 
@@ -153,12 +155,12 @@ public class GeneralSeasonalMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	@Override
-	public double[] rootfreq(double when) {
+	public DoubleMatrix1D rootfreq(double when) {
 		double[] returnValue = new double[num_locations];
 		for (int i=0;i<num_locations;i++) {
 			returnValue[i]=rootFreq[i].apply(when);
 		}
-		return returnValue;
+		return DoubleFactory1D.dense.make(returnValue);
 	}
 
 

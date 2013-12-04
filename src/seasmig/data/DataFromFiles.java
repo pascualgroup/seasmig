@@ -13,7 +13,6 @@ import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
-import jebl.evolution.trees.Tree;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.AttributeLoader;
@@ -136,7 +135,9 @@ public class DataFromFiles implements Data
 				String locationFilename = config.locationFilenames[h];
 				AttributeLoader attributeLoader= new SimpleAttributeLoader(locationFilename, config.stateFilename);	
 				HashMap<String,Object> attributes = attributeLoader.getAttributes();
+				@SuppressWarnings("unchecked")
 				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
+				@SuppressWarnings("unchecked")
 				HashMap<String,Double> stateMap = (HashMap<String,Double>) attributes.get("states");
 				numLocations = (Integer) attributes.get("numLocations");
 				System.out.println("loaded "+locationMap.size()+" taxon traits");				

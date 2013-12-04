@@ -2,6 +2,8 @@ package seasmig.treelikelihood.matrixexp;
 
 import org.junit.Test;
 
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
 import seasmig.treelikelihood.MatrixExponentiator;
 
 @SuppressWarnings("serial")
@@ -50,7 +52,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 	}
 
 	@Override
-	public double[][] expm(double t) {
+	public DoubleMatrix2D expm(double t) {
 		double[][] returnValue = new double[3][3];
 
 
@@ -77,7 +79,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 				}
 			}
 
-			return returnValue;
+			return DoubleFactory2D.dense.make(returnValue);
 		} 
 		return null;
 	}
@@ -87,8 +89,8 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 		// TODO: This...
 		MatrixExponentiator matrixExponentiator1 = new AnalyticMatrixExp3(new double[][]{{-3,1,2},{0.5,-4,3.5},{4,6,-10}});
 		MatrixExponentiator matrixExponentiator2 = new Matlab7MatrixExp(new double[][]{{-3,1,2},{0.5,-4,3.5},{4,6,-10}});
-		double[][] res1=matrixExponentiator1.expm(0.1);
-		double[][] res2=matrixExponentiator2.expm(0.1);
+		double[][] res1=matrixExponentiator1.expm(0.1).toArray();
+		double[][] res2=matrixExponentiator2.expm(0.1).toArray();
 
 		System.out.println("res1:");
 		for (int i=0;i<res1.length;i++) {
@@ -108,7 +110,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 		System.out.println("timing:");
 		long startTime1= System.currentTimeMillis();	
 		for (int rep=0;rep<1000000;rep++) {
-			res1=matrixExponentiator1.expm(rep/10000);			
+			res1=matrixExponentiator1.expm(rep/10000).toArray();			
 			if (Math.random()<0.00000001) {
 				System.out.println(res1[0][0]);
 			}
@@ -117,7 +119,7 @@ public class AnalyticMatrixExp3 implements MatrixExponentiator {
 
 		long startTime2= System.currentTimeMillis();
 		for (int rep=0;rep<1000000;rep++) {
-			res2=matrixExponentiator2.expm(rep/10000);			
+			res2=matrixExponentiator2.expm(rep/10000).toArray();			
 			if (Math.random()<0.00000001) {
 				System.out.println(res2[0][0]);
 			}

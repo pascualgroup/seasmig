@@ -1,8 +1,8 @@
 package seasmig.treelikelihood;
 
-import org.javatuples.Pair;
-
 import cern.colt.function.DoubleFunction;
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 
 
 @SuppressWarnings("serial")
@@ -62,17 +62,17 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 	// Methods
 	@Override
 	public double logprobability(int from_state, int to_state, double from_time, double to_time) {		
-		return Math.log(transitionMatrix(from_time, to_time)[from_state][to_state]);
+		return Math.log(transitionMatrix(from_time, to_time).get(from_state,to_state));
 	}
 
 	// Methods
 	@Override
-	public double[] probability(int from_state,  double from_time, double to_time) {		
-		return transitionMatrix(from_time, to_time)[from_state];
+	public DoubleMatrix1D probability(int from_state,  double from_time, double to_time) {		
+		return transitionMatrix(from_time, to_time).viewRow(from_state);
 	}
 
 	@Override
-	public double[][] transitionMatrix(double from_time, double to_time) {
+	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {
 		return baseModel.transitionMatrix(from_time, to_time);
 	}
 
@@ -99,7 +99,7 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 	}
 
 	@Override
-	public double[] rootfreq(double when) {
+	public DoubleMatrix1D rootfreq(double when) {
 		// TODO Auto-generated method stub
 		return null;
 	}

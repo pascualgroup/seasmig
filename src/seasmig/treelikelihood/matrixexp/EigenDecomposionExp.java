@@ -44,7 +44,7 @@ public class EigenDecomposionExp implements MatrixExponentiator {
 
 		
 	@Override
-	public double[][] expm(double tt) {
+	public DoubleMatrix2D expm(double tt) {
 		/*
 		 * DoubleMatrix1D 	zMult(DoubleMatrix1D y, DoubleMatrix1D z, double alpha, double beta, boolean transposeA)
           Linear algebraic matrix-vector multiplication; z = alpha * A * y + beta*z.
@@ -54,7 +54,7 @@ public class EigenDecomposionExp implements MatrixExponentiator {
 		 */
 		// TODO: remove for
 		DoubleMatrix2D expDt = F.diagonal(diagD.copy().assign(cern.jet.math.Functions.mult(tt)).assign(cern.jet.math.Functions.exp));	
-		return V.zMult(expDt.zMult(invV,null,1,0,false,false),null,1,0,false,false).toArray();
+		return V.zMult(expDt.zMult(invV,null,1,0,false,false),null,1,0,false,false);
 	}
 	
 	@Override

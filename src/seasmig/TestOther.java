@@ -7,34 +7,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.GregorianCalendar;
-import java.util.Vector;
-
 import jebl.evolution.io.ImportException;
-import mc3kit.ChainParity;
-import mc3kit.MCMC;
-import mc3kit.Step;
-import mc3kit.SwapStep;
-import mc3kit.VerificationStep;
-import mc3kit.monitoring.MarginalLikelihoodStep;
-import mc3kit.output.PriorLikelihoodOutputStep;
-import mc3kit.output.SampleOutputStep;
-import mc3kit.proposal.DEMCProposalStep;
-import mc3kit.proposal.UnivariateProposalStep;
-
 import org.junit.Test;
 
 import seasmig.data.DataForTests;
 import seasmig.data.DataForTests.TestType;
-import seasmig.models.SeasonalMigrationModelFactory;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.MatrixExponentiator;
-import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
-import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
-import seasmig.treelikelihood.matrixexp.JamaMolerMatrixExp;
-import seasmig.treelikelihood.matrixexp.JblasMatrixExp;
-import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
-import seasmig.treelikelihood.matrixexp.TaylorMatrixExp;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

@@ -1,5 +1,7 @@
 package seasmig.treelikelihood.matrixexp;
 
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.util.Util;
 import seasmig.util.Util.FRexpResult;
@@ -71,7 +73,7 @@ public class JamaMolerMatrixExp implements MatrixExponentiator {
 			end
 	 */
 	@Override
-	public double[][] expm(double t) {
+	public DoubleMatrix2D expm(double t) {
 		
 		Matrix A = new Matrix(Q).times(t);
 		FRexpResult fe = Util.log2(A.normInf()); // [ f, e ] = log2 ( norm ( A, 'inf' ) );
@@ -98,7 +100,7 @@ public class JamaMolerMatrixExp implements MatrixExponentiator {
 		E=D.inverse().times(E); // E = D \ E;
 		for (int k=1;k<=s;k++) 
 			E=E.times(E); // E = E*E 
-		return E.getArray();
+		return DoubleFactory2D.dense.make(E.getArray());
 	}
 
 	@Override

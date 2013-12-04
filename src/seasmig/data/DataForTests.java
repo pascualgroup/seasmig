@@ -52,6 +52,7 @@ public class DataForTests implements Data {
 		System.out.print("\riteration: "+iteration);
 	}
 
+	@SuppressWarnings("unchecked")
 	public DataForTests(Config config_, TestType testType, int numTestRepeats, int numTestLocations, int numTestTrees) throws IOException, ImportException 	{				
 
 		config = config_;		
