@@ -67,7 +67,6 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {
-		// TODO: remove make
 		double from_time_reminder = from_time % 1.0;
 		double from_time_div = from_time - from_time_reminder;
 		double to_time_reminder = to_time - from_time_div;
@@ -131,6 +130,17 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	private boolean isInSeason1(double time) {
 		return (time%1.0>=season1Start) && ((time-season1Start)%1.0<season1Length);			
 	}
+	
+	private boolean isInSameSeason(double time1, double time2) { // Same actual season i.e. both are in winter 2008-2009 but not both are in winter
+		if (isInSeason1(time1) && isInSeason1(time2)) {		
+			return cern.jet.math.Functions.floor.apply(time1)==cern.jet.math.Functions.floor.apply(time2); // Season 1
+		}
+		else if (!isInSeason1(time1) && !isInSeason1(time2)) {
+			return cern.jet.math.Functions.floor.apply(time1 - season1Start - season1Length)==cern.jet.math.Functions.floor.apply(time2 - season1Start - season1Length); // Season 2
+		}
+		else 
+			return false;
+	}
 
 	@Override
 	public int getNumLocations() {
@@ -152,8 +162,31 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public Event nextEvent(double time, int from) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO: check this...
+		Event nextEvent = null;
+		boolean done = false;
+		double currentTime = time;
+		int currentLoc = from;
+		do {
+			if (isInSeason1(currentTime)) {
+				nextEvent = season1MigrationModel.nextEvent(currentTime, currentLoc);
+				done = isInSameSeason(nextEvent.time, currentTime);
+				if (!done) {
+					currentTime = (currentTime-currentTime%1.0+season1Start+season1Length+infitesimalTimeInterval);				
+				}
+			}
+			else {
+				nextEvent = season2MigrationModel.nextEvent(currentTime, currentLoc);
+				done = isInSameSeason(nextEvent.time, currentTime);
+				if (!done) {
+					if (currentTime%1.0<season1Start)
+						currentTime = (currentTime-currentTime%1.0+season1Start+infitesimalTimeInterval);
+					else 
+						currentTime = (currentTime-currentTime%1.0+1.0+season1Start+season1Start+infitesimalTimeInterval);				
+				}
+			}					
+		} while (!done);
+		return nextEvent;
 	}
 
 }

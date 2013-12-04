@@ -6,6 +6,7 @@ import mc3kit.DoubleVariable;
 
 import org.javatuples.Pair;
 
+import seasmig.treelikelihood.MigrationBaseModel.Event;
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.DoubleFactory1D;
 import cern.colt.matrix.DoubleFactory2D;
@@ -185,8 +186,21 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 
 	@Override
 	public Event nextEvent(double time, int from) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO: check this...
+		Event nextEvent = null;
+		boolean done = false;
+		double currentTime = time;
+		int currentLoc = from;
+		do {
+			int currentEpochIndex = epochIndex(currentTime);
+			nextEvent = constantModels[currentEpochIndex].nextEvent(currentTime, currentLoc);
+			int nextEpochIndex = epochIndex(nextEvent.time);
+			done = (nextEpochIndex==currentEpochIndex);
+			if (!done) {
+				currentTime = epochs[nextEpochIndex];				
+			}									
+		} while (!done);
+		return nextEvent;
 	}
 
 }
