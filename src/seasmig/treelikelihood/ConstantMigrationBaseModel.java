@@ -5,7 +5,7 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
-import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
+//import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 
 @SuppressWarnings("serial")
@@ -25,6 +25,8 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 
 	// Matrix Exponentiation
 	MatrixExponentiator matrixExponentiator;
+	
+	
 
 	private DoubleMatrix1D basefreq;	
 
@@ -162,6 +164,24 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	@Override
 	public DoubleMatrix1D rootfreq(double when) {
 		return basefreq;
+	}
+
+	@Override
+	public Event nextEvent(double from_time, int from) {
+		// TODO Auto-generated method stub
+		double lambda = -Q[from][from];
+		
+		double time = cern.jet.random.Exponential.staticNextDouble(lambda); // TODO: check exp parameterization !!!
+		double p=-Q[from][0]/Q[from][from];
+		double rnd = cern.jet.random.Uniform.staticNextDouble();
+		int loc = 0;
+		while (rnd>p && loc<(num_locations-1)) {
+			loc+=1;
+			p = p-Q[from][loc]/Q[from][from];
+		}
+		// TODO: check this
+		
+		return new Event(time, loc);
 	}
 
 

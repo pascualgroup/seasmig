@@ -104,4 +104,10 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 		return null;
 	}
 
+	@Override
+	public Event nextEvent(double time, int from) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

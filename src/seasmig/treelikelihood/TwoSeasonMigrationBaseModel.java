@@ -150,4 +150,10 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 			return season2MigrationModel.rootfreq(when);
 	}
 
+	@Override
+	public Event nextEvent(double time, int from) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -6,6 +6,7 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
+import seasmig.treelikelihood.MigrationBaseModel.Event;
 import seasmig.util.Util;
 
 
@@ -415,18 +416,35 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String newickStochasticMapping() {
+		TreeWithLocations stochasticMappingTree = (TreeWithLocations) this.copy();
 		// TODO:
-		// asr(); // Ancestral state reconstruction
+		stochasticMappingTree.asr(); // Ancestral state reconstruction
+		stochsticMapping(stochasticMappingTree.root);
+		
+		return stochasticMappingTree.newickStates(stochasticMappingTree.root);
+	}
 
-
-		//		for (TreeWithLocationsNode node : root) { // preorder
-
-		//		}
-		//			do {
-		//				do {
-		//					event = likelihoodModel.getNextEvent(node);
-		// 
-		return null;
+	
+	
+	private void stochsticMapping(TreeWithLocationsNode root) {
+		// TODO Auto-generated method stub
+		// TODO: this
+		// TODO: cite
+			
+		for (int i=0;i<root.children.size();i++) {
+			TreeWithLocationsNode node = root;
+			TreeWithLocationsNode child = node.children.get(i);
+			Event event = null;
+			do {
+				event = likelihoodModel.nextEvent(node.time, node.loc);
+				if (event.time < child.time) {
+					TreeWithLocationsNode newNode = new TreeWithLocationsNode(event.loc, UNKNOWN_TAXA, event.time, node);
+					node = newNode;
+				}			
+			} while (event.time < child.time || (event.time>child.time && event.loc==child.loc));
+						
+			stochsticMapping(child);
+		}		
 	}
 
 	private int getRandomSampleFrom(DoubleMatrix1D doubleMatrix1D) {
@@ -452,7 +470,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=0;i<logProbs.length;i++) {
 			sum+=cern.jet.math.Functions.exp.apply(logProbs[i]-min);
 		}
-		
+
 		double p=0;	
 		for (int i=0;i<logProbs.length;i++) {
 			p=p+cern.jet.math.Functions.exp.apply(logProbs[i]-min);
@@ -464,7 +482,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	private void asr() {
-		
+
 		// Calculate root state
 		// TODO: check this
 		DoubleMatrix1D rootFreq = likelihoodModel.rootfreq(root.time);
@@ -488,7 +506,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			alphas[i] = p.get(parent.loc,i) + node.logProbs[i];
 		}		
 		node.loc = normalizeAndGetRandomSampleFromLogProbs(alphas);
-		
+
 		for (TreeWithLocationsNode child : node.children) {
 			asr(child);
 		}
@@ -498,12 +516,12 @@ public class TreeWithLocations implements LikelihoodTree {
 	public String newickAncestralStateReconstruction() {
 		// TODO: Check this
 		asr();
-		String returnValue = newickAncestralStateReconstruction(root) + "\n";
+		String returnValue = newickStates(root) + "\n";
 		return returnValue;
 
 	}
 
-	private String newickAncestralStateReconstruction(TreeWithLocationsNode treePart) {
+	private String newickStates(TreeWithLocationsNode treePart) {
 		String returnValue = new String();
 
 		if (treePart.isTip()) {
@@ -512,10 +530,10 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		else {
 			returnValue+="(";
-			returnValue+=newickAncestralStateReconstruction(treePart.children.get(0));
+			returnValue+=newickStates(treePart.children.get(0));
 			for (int i = 1; i < treePart.children.size(); i++){
 				returnValue+=",";
-				returnValue+=newickAncestralStateReconstruction(treePart.children.get(i));	
+				returnValue+=newickStates(treePart.children.get(i));	
 			}
 			returnValue+=")";
 			double parentTime=0;

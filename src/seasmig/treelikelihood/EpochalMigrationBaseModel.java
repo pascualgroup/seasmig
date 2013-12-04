@@ -183,5 +183,11 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 		return DoubleFactory1D.dense.make(returnValue);
 	}
 
+	@Override
+	public Event nextEvent(double time, int from) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
 
