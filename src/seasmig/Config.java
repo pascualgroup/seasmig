@@ -70,7 +70,7 @@ public class Config implements Serializable
 	// RECONSTRUCTION
 	public static enum StateReconstructionAndTreeOutput { 
 		NONE, // don't output trees
-		PROBS, // output probability of internal node states
+		PROBS, // output conditional probability of internal node states based on children
 		ASR, // output realization of internal node states // TODO: 
 		STOCHASTIC_MAPPING // output realization of branches and internal node states // TODO:  
 	};   
