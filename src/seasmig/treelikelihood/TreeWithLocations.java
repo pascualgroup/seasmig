@@ -455,8 +455,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO: this
 		// TODO: cite
 			
-		for (int i=0;i<root.children.size();i++) {
-			TreeWithLocationsNode child = root.children.get(i);
+		for (TreeWithLocationsNode child : root.children) {
 			int currentLoc = root.loc;
 			double currentTime = root.time;
 			Event event = null;
