@@ -456,20 +456,26 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO: cite
 			
 		for (int i=0;i<root.children.size();i++) {
-			TreeWithLocationsNode node = root;
-			TreeWithLocationsNode child = node.children.get(i);
-			int currentLoc = node.loc;
-			double currentTime = node.time;
+			TreeWithLocationsNode child = root.children.get(i);
+			int currentLoc = root.loc;
+			double currentTime = root.time;
 			Event event = null;
 			do {
 				event = likelihoodModel.nextEvent(currentTime, currentLoc);
 				if (event.time < child.time) {
-					if (node.changes==null) node.changes = new ArrayList<Event>();					
-					node.changes.add(event);
+					if (root.changes==null) root.changes = new ArrayList<Event>();					
+					root.changes.add(event);
 					currentLoc = event.loc;
 					currentTime = event.time;
 				}				
-			} while (event.time < child.time || (event.time>child.time && event.loc==child.loc));
+				// If there is a mismatch between stochastic mapping and child ASR than we 
+				// restart the entire branch
+				if ((event.time>child.time) && (event.loc!=child.loc)) {
+					root.changes.clear();
+					currentLoc = root.loc;
+					currentTime = root.time;
+				}
+			} while (event.time < child.time);
 						
 			stochsticMapping(child);
 		}		
