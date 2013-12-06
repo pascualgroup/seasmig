@@ -181,7 +181,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		}
 		// TODO: check this
 		
-		return new Event(time, loc);
+		return new Event(time+from_time, loc);
 	}
 
 

@@ -430,14 +430,14 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		if (treePart.isTip()) {
 			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);
-			returnValue+=(Integer.toString(treePart.getTaxonIndex())+":"+"[&map="+treePart.parseMap()+"]"+branchLength);
+			returnValue+=(Integer.toString(treePart.getTaxonIndex())+"[&states="+Integer.toString(treePart.loc)+"]:"+treePart.parseMap()+branchLength);
 		}
 		else {
 			returnValue+="(";
-			returnValue+=newickStates(treePart.children.get(0));
+			returnValue+=newickSM(treePart.children.get(0));
 			for (int i = 1; i < treePart.children.size(); i++){
 				returnValue+=",";
-				returnValue+=newickStates(treePart.children.get(i));	
+				returnValue+=newickSM(treePart.children.get(i));	
 			}
 			returnValue+=")";
 			double parentTime=0;
@@ -454,27 +454,32 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO Auto-generated method stub
 		// TODO: this
 		// TODO: cite
-			
-		for (TreeWithLocationsNode child : root.children) {
+        // TODO: preorder iterator			
+		for (TreeWithLocationsNode child : root.children) { 
 			int currentLoc = root.loc;
 			double currentTime = root.time;
+			boolean doneWithBranch = false;
 			Event event = null;
 			do {
 				event = likelihoodModel.nextEvent(currentTime, currentLoc);
 				if (event.time < child.time) {
-					if (root.changes==null) root.changes = new ArrayList<Event>();					
-					root.changes.add(event);
+					if (child.changes==null) child.changes = new ArrayList<Event>();					
+					child.changes.add(event);
 					currentLoc = event.loc;
 					currentTime = event.time;
-				}				
+				}
+				else if (currentLoc!=child.loc) {
 				// If there is a mismatch between stochastic mapping and child ASR than we 
 				// restart the entire branch
-				if ((event.time>child.time) && (event.loc!=child.loc)) {
-					root.changes.clear();
+					if (child.changes!=null) {
+						child.changes.clear();
+					}
 					currentLoc = root.loc;
 					currentTime = root.time;
+				} else {
+					doneWithBranch = true;								
 				}
-			} while (event.time < child.time);
+			} while (!doneWithBranch);
 						
 			stochsticMapping(child);
 		}		

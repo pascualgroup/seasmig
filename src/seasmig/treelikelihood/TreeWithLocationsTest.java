@@ -276,7 +276,8 @@ public class TreeWithLocationsTest {
 		System.out.println(locTree.newickProbs());
 		
 		boolean asrOK = false;
-		for (int repeat=1; repeat<100; repeat++) {		
+		int countParsimonious = 0;
+		for (int repeat=1; repeat<1000; repeat++) {		
 
 			root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
 			root.addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
@@ -292,13 +293,49 @@ public class TreeWithLocationsTest {
 			String asrNewick = locTree.newickAncestralStateReconstruction();			
 			System.out.println(asrNewick);
 			for (int i=0;i<4;i++) {
-				for (int j=0; j<4; j++) {
+				for (int j=0; j<4; j++) {									     
 					if (asrNewick.equals("(-1[&states=0]:1.000,(-1[&states=1]:1.000,-1[&states=0]:1.000)[&states="+Integer.toString(i)+"]:1.000)[&states="+Integer.toString(j)+"]:0.000\n")) {
 						asrOK = true;
-					}
+					}					
 				}
+			}			
+			if (asrNewick.equals("(-1[&states=0]:1.000,(-1[&states=1]:1.000,-1[&states=0]:1.000)[&states=0]:1.000)[&states=0]:0.000\n")) {
+				countParsimonious+=1;
 			}
 			assertEquals(asrOK, true);
 		}
+		assertEquals(countParsimonious > 190 ,true);
+	}
+	
+	
+	@Test
+	public void testSM() throws Exception {
+		// TODO: better test...
+		/* 
+		   --
+		  /  \
+		 0   --
+		    /  \
+		   1    0
+		 		
+         
+		 */
+		
+		
+		TreeWithLocationsNode root = new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(0,1,1.0,root));
+		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(1,2,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(0,3,2.0,null));
+		MigrationBaseModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+																 { 0.333333,-1,0.333333,0.333333},
+																 { 0.333333,0.333333,-1,0.333333},
+																 { 0.333333,0.333333,0.333333,-1}});
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);		
+		locTree.logLikelihood();
+		System.out.println(locTree.newickProbs());
+		System.out.println(locTree.newickAncestralStateReconstruction());	
+		System.out.println(locTree.newickStochasticMapping());
+		assertEquals(false, true);
 	}
 }

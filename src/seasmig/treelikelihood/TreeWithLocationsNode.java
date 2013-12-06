@@ -10,19 +10,19 @@ import seasmig.treelikelihood.MigrationBaseModel.Event;
 //Nodes in this tree...
 @SuppressWarnings("serial")
 public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLocationsNode> {	
-	
+
 	public double[] logProbs;
 	TreeWithLocationsNode parent = null;
 	List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
 	double time = 0;
 	int taxonIndex = 0;
-	
+
 	// For tips and for ASR
 	int loc = TreeWithLocations.UNKNOWN_LOCATION;
-	
+
 	// For stochastic mapping
 	public List<Event> changes = null;
-		
+
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
 	protected TreeWithLocationsNode() {};
@@ -105,6 +105,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		}
 	}
 
+
 	public void addChild(TreeWithLocationsNode locationTreeNode) {
 		this.children.add(locationTreeNode);
 		locationTreeNode.parent=this;
@@ -121,7 +122,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 		double[] logAncStateProbs = new double[logProbs.length];
 		double[] logAncProbs = new double[logProbs.length];
-			
+
 		for (int i=0;i<logProbs.length;i++) {	
 			if (parent!=null)
 				logAncStateProbs[i] = logProbs[i]+parent.logProbs[i];
@@ -133,14 +134,14 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		for (int i=0;i<logProbs.length;i++) {
 			logAncStateProbs[i]=logAncStateProbs[i]-logTotalProb;
 		}
-		
+
 		// Deal with numeric issues of not summing up to 1.0
 		double totalProb = 0;
 		for (int i=0;i<logProbs.length;i++) {			
 			logAncProbs[i]=Math.exp(logAncStateProbs[i]);
 			totalProb+=logAncProbs[i];
 		}
-		
+
 		for (int i=0;i<logProbs.length;i++) {
 			String prob = String.format("%.3f",logAncProbs[i]/totalProb);
 			returnValue+=prob;
@@ -150,7 +151,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		returnValue+="}]";
 		return returnValue;
 	}
-	
+
 	public final double logSumExp(double[] alphas) {
 		// TODO: improve this
 		double sumExp = 0;
@@ -174,21 +175,22 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 	public String parseMap() {
 		String returnValue = new String();
-		returnValue+="{";
-		if (changes!=null) {			
-			double timeFrom = time;
-			
-			for (int i=0;i<changes.size()-1;i++) {
-				returnValue+=Integer.toString(changes.get(i).loc)+",";
-				returnValue+=Double.toString(changes.get(i).time-timeFrom)+",";			
-				timeFrom = changes.get(i).time;
-			}
-			returnValue+=Integer.toString(changes.get(changes.size()).loc);
+
+		if (changes!=null) {
+			if (changes.size()>0) {	
+				returnValue+="[&map={";
+				double timeFrom = parent.time;
+
+				for (int i=0;i<changes.size();i++) {
+					returnValue+=Double.toString(changes.get(i).time-timeFrom);						
+					if (i!=(changes.size()-1)) {
+						returnValue+=","+Integer.toString(changes.get(i).loc)+",";
+					}
+					timeFrom = changes.get(i).time;
+				}
+				returnValue+="]";
+			}	
 		}
-		else {
-			returnValue+=Integer.toString(loc);
-		}
-		returnValue+="}";
 		return returnValue;
 	}
 
