@@ -423,12 +423,12 @@ public class TreeWithLocations implements LikelihoodTree {
 	public String newickStochasticMapping() {
 		asr(); // Ancestral state reconstruction
 		stochsticMapping(root);
-		
+
 		return newickSM(root);
 	}
 
-	
-	
+
+
 	private String newickSM(TreeWithLocationsNode treePart) {
 		String returnValue = new String();
 
@@ -457,7 +457,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private void stochsticMapping(TreeWithLocationsNode root) {
 		// TODO: test
 		// TODO: cite
-        // TODO: preorder iterator			
+		// TODO: preorder iterator			
 		for (TreeWithLocationsNode child : root.children) { 
 			int currentLoc = root.loc;
 			double currentTime = root.time;
@@ -472,8 +472,8 @@ public class TreeWithLocations implements LikelihoodTree {
 					currentTime = event.time;
 				}
 				else if (currentLoc!=child.loc) {
-				// If there is a mismatch between stochastic mapping and child ASR than we 
-				// restart the entire branch
+					// If there is a mismatch between stochastic mapping and child ASR than we 
+					// restart the entire branch
 					if (child.transitions!=null) {
 						child.transitions.clear();
 					}
@@ -483,7 +483,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					doneWithBranch = true;								
 				}
 			} while (!doneWithBranch);
-						
+
 			stochsticMapping(child);
 		}		
 	}
@@ -589,10 +589,10 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String smTransitions() {
-			
+
 		String returnValue = "{";
 		String[][] transitionTimes = new String[numLocations][numLocations];		
-						
+
 		for (TreeWithLocationsNode node : root) {
 			if (node==root) continue;
 			if (node.transitions!=null) {
@@ -606,7 +606,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				}				
 			}
 		}
-		
+
 		for (int i=0;i<numLocations;i++) {
 			returnValue+="{";
 			for (int j=0;j<numLocations;j++) {						
@@ -630,15 +630,109 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	@Override
-	public String smDwellings() {
-		// TODO Auto-generated method stub
-		return null;
+	public String smTipDwellings() {
+		String returnValue = "{";
+		String[] lineages = new String[numLocations];	
+
+		for (int i=0;i<numLocations;i++) {	
+			lineages[i]=new String();			
+		}
+		
+		for (TreeWithLocationsNode node : root) {			
+			if (node==root) continue;
+			if (!node.isTip()) continue;
+			int fromLocation = node.loc;
+			double fromTime = tracebackWithNoChanges(node);
+			if (node.transitions!=null) {
+				if (node.transitions.size()>0) {
+					for (Transition transition : node.transitions) {					
+						lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,transition.time);
+						fromLocation=transition.loc;
+						fromTime=transition.time;
+					}
+				}
+				else {
+					lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
+				}
+			}
+			else {
+				lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
+			}
+		}
+
+		for (int i=0;i<numLocations;i++) {
+			if (lineages[i].length()>0) {
+				returnValue+="{"+lineages[i].substring(0, lineages[i].length()-1)+"}";
+			}
+			else {
+				returnValue+="{}";
+			}
+			if (i!=(numLocations-1)) {
+				returnValue+=",";
+			}			
+		}
+
+		return returnValue;
+	}
+
+	private double tracebackWithNoChanges(TreeWithLocationsNode node) {
+		// TODO: test this
+		TreeWithLocationsNode currentNode = node;
+		while (currentNode.transitions==null && currentNode.parent!=null) {
+			currentNode = currentNode.parent;
+		}
+		if (currentNode.transitions!=null) {
+			return currentNode.transitions.get(currentNode.transitions.size()-1).time; 
+		}
+		else {
+			return currentNode.time;
+		}
 	}
 
 	@Override
 	public String smLineages() {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO: test this
+		String returnValue = "{";
+		String[] lineages = new String[numLocations];		
+
+		for (TreeWithLocationsNode node : root) {			
+			if (node==root) continue;
+			int fromLocation = node.parent.loc;
+			double fromTime = node.parent.time;
+			if (lineages[fromLocation]==null) {
+				lineages[fromLocation]=new String();
+			}
+			if (node.transitions!=null) {
+				if (node.transitions.size()>0) {
+					for (Transition transition : node.transitions) {					
+						lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,transition.time);
+						fromLocation=transition.loc;
+						fromTime=transition.time;
+					}
+				}
+				else {
+					lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
+				}
+			}
+			else {
+				lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
+			}
+		}
+
+		returnValue+="{";
+		for (int i=0;i<numLocations;i++) {	
+			if (lineages[i]!=null) {
+				returnValue+="{"+lineages[i].substring(0, lineages[i].length()-1)+"}";
+			} else {
+				returnValue+="{}";
+			}				
+			if (i!=(numLocations-1)) {
+				returnValue+=",";
+			}			
+		}
+		returnValue+="}";
+		return returnValue;
+
 	}
 
 

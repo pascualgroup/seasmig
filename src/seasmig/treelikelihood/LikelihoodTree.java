@@ -13,6 +13,6 @@ public interface LikelihoodTree extends Serializable {
 	public String newickAncestralStateReconstruction();
 	public String newickStochasticMapping();
 	public String smTransitions();	
-	public String smDwellings();
+	public String smTipDwellings();
 	public String smLineages();
 }

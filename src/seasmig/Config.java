@@ -89,22 +89,22 @@ public class Config implements Serializable
 	public String checkpointFilename = "checkpoint.bin";
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String mlFilename = "ml.txt";
-	public long thin = 1;
+	public long thin = 10;
 	
 	// MCMC RELATED PARAMETERS
-	public long burnIn = 1; 	// in iterations	
+	public long burnIn = 10; 	// in iterations	
 	public long iterationCount = 100000000L;	
-	public long tuneEvery = 500; 
-	public long tuneFor = 5000;
-	public long mlthin = 1;	
-	public long initialHistoryCount = 50;
-	public int chainCount = 3;
+	public long tuneEvery = 500000; 
+	public long tuneFor = 1;
+	public long mlthin = 10;	
+	public long initialHistoryCount = 5;
+	public int chainCount = 4;
 	public double heatPower = 3.0;
 	public long swapInterval = 1;	
 	public double targetAcceptanceRate = 0.25;
 	
 	// RESTORE FROM CHECKPOINT 
-	public long checkpointEvery = 10000;
+	public long checkpointEvery = 1000;
 	public boolean restoreFromDatabase = false;
 
 	// SEASONAL MODEL RELATED PARAMETERS
@@ -136,7 +136,7 @@ public class Config implements Serializable
 	// STOCHASTIC MAPPING OUTPUT	
 	public boolean smTrees = true;  // TODO: 
 	public boolean smTransitions = true; // transition times TODO:
-	public boolean smDwellings = false; // dwelling times in different states TODO:
+	public boolean smTipDwellings = false; // dwelling times in different states TODO:
 	public boolean smLineages = false; // number of lineages in different states TODO:
 	
 	// MODEL DATA RELATED PARAMETERS

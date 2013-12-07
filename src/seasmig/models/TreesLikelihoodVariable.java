@@ -75,10 +75,10 @@ public class TreesLikelihoodVariable extends Variable {
 				}				
 				outputObject.smTransitions=returnValue;				
 			}
-			if (config.smDwellings) {
+			if (config.smTipDwellings) {
 				String[] returnValue=new String[trees.length];
 				for (int i=0;i<trees.length;i++) {
-					returnValue[i]=trees[i].smDwellings();
+					returnValue[i]=trees[i].smTipDwellings();
 				}				
 				outputObject.smDwelings=returnValue;				
 			}

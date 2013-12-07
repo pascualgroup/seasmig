@@ -364,7 +364,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	}
 
 	@Override
-	public String smDwellings() {
+	public String smTipDwellings() {
 		// TODO Auto-generated method stub
 		return null;
 	}
