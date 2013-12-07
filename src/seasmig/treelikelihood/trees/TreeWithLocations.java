@@ -1,7 +1,9 @@
 package seasmig.treelikelihood.trees;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.ListIterator;
 
 import com.sun.glass.ui.Pixels.Format;
 
@@ -637,7 +639,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=0;i<numLocations;i++) {	
 			lineages[i]=new String();			
 		}
-		
+
 		for (TreeWithLocationsNode node : root) {			
 			if (node==root) continue;
 			if (!node.isTip()) continue;
@@ -681,42 +683,44 @@ public class TreeWithLocations implements LikelihoodTree {
 		while (currentNode.transitions==null && currentNode.parent!=null) {
 			currentNode = currentNode.parent;
 		}
-		if (currentNode.transitions!=null) {
-			return currentNode.transitions.get(currentNode.transitions.size()-1).time; 
-		}
-		else {
+		if (currentNode.transitions!=null) 
+			if (currentNode.transitions.size()>0) 
+				return currentNode.transitions.get(currentNode.transitions.size()-1).time;			
+			else
+				return currentNode.time;		
+		else 
 			return currentNode.time;
-		}
 	}
 
 	@Override
 	public String smLineages() {
 		// TODO: test this
 		String returnValue = "{";
-		String[] lineages = new String[numLocations];		
+		String[] lineages = new String[numLocations];	
+		
+		for (int i=0;i<numLocations;i++) {	
+			lineages[i]=new String();			
+		}
 
-		for (TreeWithLocationsNode node : root) {			
+		for (TreeWithLocationsNode node : root) {
+			// Only record lineages from node.parent.time to node.time  
 			if (node==root) continue;
-			int fromLocation = node.parent.loc;
+			int fromLocation = node.loc;
 			double fromTime = node.parent.time;
-			if (lineages[fromLocation]==null) {
-				lineages[fromLocation]=new String();
-			}
-			if (node.transitions!=null) {
-				if (node.transitions.size()>0) {
-					for (Transition transition : node.transitions) {					
-						lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,transition.time);
-						fromLocation=transition.loc;
-						fromTime=transition.time;
-					}
-				}
-				else {
-					lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
-				}
-			}
-			else {
+			if (node.transitions==null) {
 				lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
 			}
+			else if (node.transitions.size()==0) {
+				lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
+			}
+			else {	
+				for (Transition transition : node.transitions) { 														
+					lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,transition.time);
+					fromLocation=transition.loc;
+					fromTime=transition.time;
+				}
+				lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
+			}			
 		}
 
 		returnValue+="{";

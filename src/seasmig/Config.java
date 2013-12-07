@@ -89,7 +89,7 @@ public class Config implements Serializable
 	public String checkpointFilename = "checkpoint.bin";
 	public String priorLikelihoodFilename = "prior_likelihood.txt";
 	public String mlFilename = "ml.txt";
-	public long thin = 10;
+	public long thin = 1;
 	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 10; 	// in iterations	
@@ -136,8 +136,8 @@ public class Config implements Serializable
 	// STOCHASTIC MAPPING OUTPUT	
 	public boolean smTrees = true;  // TODO: 
 	public boolean smTransitions = true; // transition times TODO:
-	public boolean smTipDwellings = false; // dwelling times in different states TODO:
-	public boolean smLineages = false; // number of lineages in different states TODO:
+	public boolean smTipDwellings = true; // dwelling times in different states TODO:
+	public boolean smLineages = true; // number of lineages in different states TODO:
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String stateFilename =null; // TODO: null if states are loaded from tree or non-existent 
