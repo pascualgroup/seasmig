@@ -134,8 +134,8 @@ public class Config implements Serializable
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	
 	// STOCHASTIC MAPPING OUTPUT	
-	public boolean smTrees = false;  // TODO: 
-	public boolean smTransitions = false; // transition times TODO:
+	public boolean smTrees = true;  // TODO: 
+	public boolean smTransitions = true; // transition times TODO:
 	public boolean smDwellings = false; // dwelling times in different states TODO:
 	public boolean smLineages = false; // number of lineages in different states TODO:
 	
@@ -150,7 +150,7 @@ public class Config implements Serializable
 	public int numLocations = 8; // needs to be specified if locations are loaded from trees....
 	
 	// ANCESTRAL STATE RECONSTRUCTIOn
-	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.ASR;
+	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.STOCHASTIC_MAPPING;
 	
 	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
 	public double[] lastTipTime = {2012.74, 2011.7}; // time of most recent tip on tree, used to calibrate all tree nodes 

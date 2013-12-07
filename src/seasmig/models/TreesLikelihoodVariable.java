@@ -20,11 +20,20 @@ public class TreesLikelihoodVariable extends Variable {
 		config = config_;
 	}
 
+	public class TreesLikelihoodVariableOutputObject  {
+		String[] trees = null;
+		String[] smTransitions = null;
+		String[] smDwelings = null;
+		String[] smLineages = null;		
+	}
+	
+
 	@Override
 	public Object makeOutputObject() {		
+		TreesLikelihoodVariableOutputObject outputObject = new TreesLikelihoodVariableOutputObject();
 		switch (config.stateReconstructionAndTreeOutput) {
 		case NONE : {
-			return null;		
+			return outputObject;		
 		}
 		case PROBS: {
 			String[] returnValue=new String[trees.length];
@@ -34,7 +43,8 @@ public class TreesLikelihoodVariable extends Variable {
 				String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
 				returnValue[i]=(header + (trees[i].newickProbs()));
 			}
-			return returnValue;
+			outputObject.trees=returnValue;
+			return outputObject;
 		}
 		case ASR: {
 			String[] returnValue=new String[trees.length];
@@ -44,20 +54,10 @@ public class TreesLikelihoodVariable extends Variable {
 				String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
 				returnValue[i]=(header + (trees[i].newickAncestralStateReconstruction()));			
 			}
-			return returnValue;
+			outputObject.trees=returnValue;
+			return outputObject;
 		}
-		case STOCHASTIC_MAPPING: {				
-			class OutputObject  {
-				@SuppressWarnings("unused")
-				String[] smTrees = null;
-				@SuppressWarnings("unused")
-				String[] smTransitions = null;
-				@SuppressWarnings("unused")
-				String[] smDwelings = null;
-				@SuppressWarnings("unused")
-				String[] smLineages = null;
-			}
-			OutputObject outputObject = new OutputObject();
+		case STOCHASTIC_MAPPING: {					
 			if (config.smTrees) {				
 				String[] returnValue=new String[trees.length];
 				for (int i=0;i<trees.length;i++) {
@@ -66,7 +66,7 @@ public class TreesLikelihoodVariable extends Variable {
 					String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
 					returnValue[i]=(header + (trees[i].newickStochasticMapping()));
 				}				
-				outputObject.smTrees=returnValue;
+				outputObject.trees=returnValue;
 			}		
 			if (config.smTransitions) {
 				String[] returnValue=new String[trees.length];
