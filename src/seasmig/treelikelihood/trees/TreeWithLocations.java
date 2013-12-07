@@ -597,7 +597,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (node==root) continue;
 			if (node.transitions!=null) {
 				int fromLocation = node.parent.loc;
-				for (Transition transition : node.transitions){
+				for (Transition transition : node.transitions) {
 					if (transitionTimes[fromLocation][transition.loc]==null) {
 						transitionTimes[fromLocation][transition.loc]=new String();
 					}
@@ -611,7 +611,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			returnValue+="{";
 			for (int j=0;j<numLocations;j++) {						
 				if (transitionTimes[i][j]!=null) {
-					returnValue+="{"+transitionTimes[i][j].substring(0, transitionTimes.length-1)+"}";
+					returnValue+="{"+transitionTimes[i][j].substring(0, transitionTimes[i][j].length()-1)+"}";
 				}
 				else {
 					returnValue+="{}";
