@@ -11,9 +11,9 @@ import mc3kit.distributions.ExponentialDistribution;
 import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;
 import seasmig.Data;
-import seasmig.treelikelihood.ConstantMigrationBaseModel;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
 
 
 @SuppressWarnings("serial")

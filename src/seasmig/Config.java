@@ -11,6 +11,8 @@ import com.google.gson.Gson;
 @SuppressWarnings("serial")
 public class Config implements Serializable
 {
+	// OPTION DEFINITIONS
+	
 	public static enum MigrationModelType { 
 		CONSTANT, 
 		TWO_CONSTANT_SEASONS, 
@@ -71,10 +73,12 @@ public class Config implements Serializable
 	public static enum StateReconstructionAndTreeOutput { 
 		NONE, // don't output trees
 		PROBS, // output conditional probability of internal node states based on children
-		ASR, // output realization of internal node states // TODO: 
-		STOCHASTIC_MAPPING // output realization of branches and internal node states // TODO:  
-	};   
-	   
+		ASR, // output realization of internal node states // TODO: test 
+		STOCHASTIC_MAPPING, // output realization of branches and internal node states // TODO: test  
+		EXACT_MAPPING_EXPECTATION  // output realization of branches and internal node states // TODO: 
+	};
+
+	// SETTINGS
 	
 	public Long randomSeed;
 	
@@ -128,6 +132,12 @@ public class Config implements Serializable
 	// GENERAL PARAMETERS
 	public double veryLongTime = 1000;		
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
+	
+	// STOCHASTIC MAPPING OUTPUT	
+	public boolean smTrees = false;  // TODO: 
+	public boolean smTransitions = false; // transition times TODO:
+	public boolean smDwellings = false; // dwelling times in different states TODO:
+	public boolean smLineages = false; // number of lineages in different states TODO:
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String stateFilename =null; // TODO: null if states are loaded from tree or non-existent 

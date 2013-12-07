@@ -9,7 +9,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
-import cern.colt.function.DoubleFunction;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.taxa.Taxon;
@@ -18,15 +17,16 @@ import jebl.evolution.trees.Tree;
 import jebl.math.Random;
 import seasmig.Config;
 import seasmig.Data;
-import seasmig.treelikelihood.AttributeLoader;
-import seasmig.treelikelihood.ConstantMigrationBaseModel;
-import seasmig.treelikelihood.GeneralSeasonalMigrationBaseModel;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
-import seasmig.treelikelihood.SimpleAttributeLoader;
-import seasmig.treelikelihood.SinusoidialSeasonalMigrationBaseModel;
-import seasmig.treelikelihood.TreeWithLocations;
-import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
+import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
+import seasmig.treelikelihood.models.GeneralSeasonalMigrationBaseModel;
+import seasmig.treelikelihood.models.SinusoidialSeasonalMigrationBaseModel;
+import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
+import seasmig.treelikelihood.trees.AttributeLoader;
+import seasmig.treelikelihood.trees.SimpleAttributeLoader;
+import seasmig.treelikelihood.trees.TreeWithLocations;
+import cern.colt.function.DoubleFunction;
 
 @SuppressWarnings("serial")
 public class DataForTests implements Data {

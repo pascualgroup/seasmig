@@ -1,10 +1,12 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.trees;
 
 import java.util.HashMap;
 
 import cern.colt.matrix.DoubleMatrix1D;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
+import seasmig.treelikelihood.LikelihoodTree;
+import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.util.Util;
 
 
@@ -351,6 +353,24 @@ public class TreeWithLocations2 implements LikelihoodTree {
 
 	@Override
 	public String newickAncestralStateReconstruction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String smTransitions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String smDwellings() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String smLineages() {
 		// TODO Auto-generated method stub
 		return null;
 	}

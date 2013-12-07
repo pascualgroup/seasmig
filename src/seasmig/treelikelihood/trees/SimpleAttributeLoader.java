@@ -1,4 +1,4 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.trees;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;

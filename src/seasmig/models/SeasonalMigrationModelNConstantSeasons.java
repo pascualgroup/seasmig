@@ -3,13 +3,17 @@ package seasmig.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import mc3kit.Chain;
+import mc3kit.DoubleVariable;
+import mc3kit.IntVariable;
+import mc3kit.MC3KitException;
+import mc3kit.distributions.ExponentialDistribution;
+import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
-import seasmig.treelikelihood.PiecewiseConstantMigrationBaseModel;
-import mc3kit.*;
-import mc3kit.distributions.*;
+import seasmig.treelikelihood.models.PiecewiseConstantMigrationBaseModel;
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModelNConstantSeasons extends SeasonalMigrationModel {

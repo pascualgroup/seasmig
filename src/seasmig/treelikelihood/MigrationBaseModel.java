@@ -8,8 +8,8 @@ import cern.colt.matrix.DoubleMatrix2D;
 
 public interface MigrationBaseModel extends Serializable {
 	
-	class Event {
-		Event(double time, int loc) {
+	public class Transition {
+		public Transition(double time, int loc) {
 			this.time = time;
 			this.loc = loc;
 		}
@@ -26,6 +26,6 @@ public interface MigrationBaseModel extends Serializable {
 	public String getModelName();
 	public DoubleMatrix1D probability(int from_location, double from_time, double to_time);
 	public DoubleMatrix1D rootfreq(double when);
-	public Event nextEvent(double time, int loc);
+	public Transition nextEvent(double time, int loc);
 	
 }

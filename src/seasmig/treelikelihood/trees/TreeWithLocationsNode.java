@@ -1,11 +1,11 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.trees;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import seasmig.treelikelihood.MigrationBaseModel.Event;
+import seasmig.treelikelihood.MigrationBaseModel.Transition;
 
 //Nodes in this tree...
 @SuppressWarnings("serial")
@@ -21,7 +21,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	int loc = TreeWithLocations.UNKNOWN_LOCATION;
 
 	// For stochastic mapping
-	public List<Event> changes = null;
+	public List<Transition> transitions = null;
 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
@@ -176,17 +176,17 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	public String parseMap() {
 		String returnValue = new String();
 
-		if (changes!=null) {
-			if (changes.size()>0) {	
+		if (transitions!=null) {
+			if (transitions.size()>0) {	
 				returnValue+="[&map={";
 				double timeFrom = parent.time;
 
-				for (int i=0;i<changes.size();i++) {
-					returnValue+=Double.toString(changes.get(i).time-timeFrom);						
-					if (i!=(changes.size()-1)) {
-						returnValue+=","+Integer.toString(changes.get(i).loc)+",";
+				for (int i=0;i<transitions.size();i++) {
+					returnValue+=Double.toString(transitions.get(i).time-timeFrom);						
+					if (i!=(transitions.size()-1)) {
+						returnValue+=","+Integer.toString(transitions.get(i).loc)+",";
 					}
-					timeFrom = changes.get(i).time;
+					timeFrom = transitions.get(i).time;
 				}
 				returnValue+="]";
 			}	

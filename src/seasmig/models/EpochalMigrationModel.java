@@ -5,13 +5,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import mc3kit.BinaryVariable;
+import mc3kit.Chain;
+import mc3kit.DoubleVariable;
+import mc3kit.IntVariable;
+import mc3kit.MC3KitException;
+import mc3kit.distributions.BernoulliDistribution;
+import mc3kit.distributions.ExponentialDistribution;
+import mc3kit.distributions.UniformDistribution;
+import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;
 import seasmig.Data;
-import seasmig.treelikelihood.EpochalMigrationBaseModel;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MigrationBaseModel;
-import mc3kit.*;
-import mc3kit.distributions.*;
+import seasmig.treelikelihood.models.EpochalMigrationBaseModel;
 
 @SuppressWarnings("serial")
 public class EpochalMigrationModel extends SeasonalMigrationModel {

@@ -1,4 +1,4 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.models;
 
 import java.util.HashMap;
 
@@ -6,6 +6,7 @@ import mc3kit.DoubleVariable;
 
 import org.javatuples.Pair;
 
+import seasmig.treelikelihood.MigrationBaseModel;
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.DoubleFactory1D;
 import cern.colt.matrix.DoubleFactory2D;
@@ -184,9 +185,9 @@ public class EpochalMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	@Override
-	public Event nextEvent(double time, int from) {
+	public Transition nextEvent(double time, int from) {
 		// TODO: check this...
-		Event nextEvent = null;
+		Transition nextEvent = null;
 		boolean done = false;
 		double currentTime = time;
 		int currentLoc = from;

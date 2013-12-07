@@ -1,5 +1,6 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.models;
 
+import seasmig.treelikelihood.MigrationBaseModel;
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
@@ -105,7 +106,7 @@ public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel
 	}
 
 	@Override
-	public Event nextEvent(double time, int from) {
+	public Transition nextEvent(double time, int from) {
 		// TODO Auto-generated method stub
 		return null;
 	}

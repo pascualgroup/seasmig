@@ -1,14 +1,16 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.trees;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.DoubleMatrix2D;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
-import seasmig.treelikelihood.MigrationBaseModel.Event;
+import seasmig.treelikelihood.LikelihoodTree;
+import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.MigrationBaseModel.Transition;
 import seasmig.util.Util;
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 
 
 @SuppressWarnings("serial")
@@ -224,7 +226,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public LikelihoodTree copy() {
-		// TOOD: test this...
+		// TODO: test this... and or remove ...
 		TreeWithLocations copyTree = new TreeWithLocations();
 		copyTree.likelihoodModel=this.likelihoodModel;
 		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
@@ -430,14 +432,14 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		if (treePart.isTip()) {
 			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);
-			returnValue+=(Integer.toString(treePart.getTaxonIndex())+"[&states="+Integer.toString(treePart.loc)+"]:"+treePart.parseMap()+branchLength);
+			returnValue+=(Integer.toString(treePart.getTaxonIndex())+ "[&states="+Integer.toString(treePart.loc)+"]:"+branchLength);
 		}
 		else {
 			returnValue+="(";
-			returnValue+=newickSM(treePart.children.get(0));
+			returnValue+=newickStates(treePart.children.get(0));
 			for (int i = 1; i < treePart.children.size(); i++){
 				returnValue+=",";
-				returnValue+=newickSM(treePart.children.get(i));	
+				returnValue+=newickStates(treePart.children.get(i));	
 			}
 			returnValue+=")";
 			double parentTime=0;
@@ -445,34 +447,33 @@ public class TreeWithLocations implements LikelihoodTree {
 				parentTime=treePart.parent.time;
 			}
 			String branchLength = String.format("%.3f", treePart.time-parentTime);
-			returnValue+=treePart.loc+":"+branchLength;
+			returnValue+="[&states="+Integer.toString(treePart.loc)+"]:"+branchLength;
 		}		
 		return returnValue;
 	}
 
 	private void stochsticMapping(TreeWithLocationsNode root) {
-		// TODO Auto-generated method stub
-		// TODO: this
+		// TODO: test
 		// TODO: cite
         // TODO: preorder iterator			
 		for (TreeWithLocationsNode child : root.children) { 
 			int currentLoc = root.loc;
 			double currentTime = root.time;
 			boolean doneWithBranch = false;
-			Event event = null;
+			Transition event = null;
 			do {
 				event = likelihoodModel.nextEvent(currentTime, currentLoc);
 				if (event.time < child.time) {
-					if (child.changes==null) child.changes = new ArrayList<Event>();					
-					child.changes.add(event);
+					if (child.transitions==null) child.transitions = new ArrayList<Transition>();					
+					child.transitions.add(event);
 					currentLoc = event.loc;
 					currentTime = event.time;
 				}
 				else if (currentLoc!=child.loc) {
 				// If there is a mismatch between stochastic mapping and child ASR than we 
 				// restart the entire branch
-					if (child.changes!=null) {
-						child.changes.clear();
+					if (child.transitions!=null) {
+						child.transitions.clear();
 					}
 					currentLoc = root.loc;
 					currentTime = root.time;
@@ -582,6 +583,41 @@ public class TreeWithLocations implements LikelihoodTree {
 			returnValue+="[&states="+Integer.toString(treePart.loc)+"]:"+branchLength;
 		}		
 		return returnValue;
+	}
+
+	@Override
+	public String smTransitions() {
+			
+//		ArrayList<Transition>[][] transitions = new ArrayList<Transition>[numLocations][numLocations];
+//						
+//		for (TreeWithLocationsNode node : root) {
+//			if (node==root) continue;
+//			if (node.transitions!=null) {
+//				int fromLocation = node.parent.loc;
+//				for (Transition transition : node.transitions){
+//					if (transitions[fromLocation][transition.loc]!=null) {
+//						transitions[fromLocation[tra]
+//					}
+//				}
+//			}
+//		}
+//		String returnValue = new String();
+//
+//		
+//		return returnValue;
+		return null;
+	}
+
+	@Override
+	public String smDwellings() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String smLineages() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -117,7 +117,7 @@ public class SeasonalMigrationMain
 				// Verification step: just asks all models to recalculate
 				// log prior, likelihood from scratch and compares to existing value;
 				// throws an exception if too much error has accumulated.
-				Step verificationStep = verificationStep = new VerificationStep(config.thin, 1E-4);
+				Step verificationStep = new VerificationStep(config.thin, 1E-4);
 				
 				// Sample output step
 				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);

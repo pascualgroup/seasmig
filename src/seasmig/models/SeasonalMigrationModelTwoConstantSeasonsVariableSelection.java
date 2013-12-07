@@ -19,8 +19,8 @@ import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.MigrationBaseModel;
-import seasmig.treelikelihood.TwoSeasonMigrationBaseModel;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
+import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends SeasonalMigrationModel {

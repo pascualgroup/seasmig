@@ -15,10 +15,10 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.Config;
 import seasmig.Data;
-import seasmig.treelikelihood.AttributeLoader;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.SimpleAttributeLoader;
-import seasmig.treelikelihood.TreeWithLocations;
+import seasmig.treelikelihood.trees.AttributeLoader;
+import seasmig.treelikelihood.trees.SimpleAttributeLoader;
+import seasmig.treelikelihood.trees.TreeWithLocations;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

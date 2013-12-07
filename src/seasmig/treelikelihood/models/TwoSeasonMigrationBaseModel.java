@@ -1,10 +1,11 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.models;
 
 import java.util.HashMap;
 import java.util.Vector;
 
 import org.javatuples.Pair;
 
+import seasmig.treelikelihood.MigrationBaseModel;
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
@@ -161,9 +162,9 @@ public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	@Override
-	public Event nextEvent(double time, int from) {
+	public Transition nextEvent(double time, int from) {
 		// TODO: check this...
-		Event nextEvent = null;
+		Transition nextEvent = null;
 		boolean done = false;
 		double currentTime = time;
 		int currentLoc = from;

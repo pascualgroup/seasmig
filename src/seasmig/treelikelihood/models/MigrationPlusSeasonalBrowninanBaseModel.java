@@ -1,5 +1,7 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.models;
 
+import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.MigrationPlusContinousStateBaseModel;
 import seasmig.util.Util;
 
 public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusContinousStateBaseModel {

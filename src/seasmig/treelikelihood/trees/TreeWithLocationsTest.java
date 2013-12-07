@@ -1,8 +1,12 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.trees;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
+import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
 
 
 public class TreeWithLocationsTest {

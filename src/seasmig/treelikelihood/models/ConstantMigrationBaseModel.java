@@ -1,8 +1,10 @@
-package seasmig.treelikelihood;
+package seasmig.treelikelihood.models;
 import java.util.HashMap;
 
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
+import seasmig.treelikelihood.MatrixExponentiator;
+import seasmig.treelikelihood.MigrationBaseModel;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 //import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
@@ -167,7 +169,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 	}
 
 	@Override
-	public Event nextEvent(double from_time, int from) {
+	public Transition nextEvent(double from_time, int from) {
 		// TODO Auto-generated method stub
 		double lambda = -Q[from][from];
 		
@@ -181,7 +183,7 @@ public class ConstantMigrationBaseModel implements MigrationBaseModel {
 		}
 		// TODO: check this
 		
-		return new Event(time+from_time, loc);
+		return new Transition(time+from_time, loc);
 	}
 
 
