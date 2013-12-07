@@ -21,45 +21,80 @@ public class TreesLikelihoodVariable extends Variable {
 	}
 
 	@Override
-	public Object makeOutputObject() {
-		String[] returnValue=new String[trees.length];
+	public Object makeOutputObject() {		
 		switch (config.stateReconstructionAndTreeOutput) {
 		case NONE : {
-			for (int i=0;i<trees.length;i++) {
-				returnValue[i] = "";
-			}					
+			return null;		
 		}
-		break;
 		case PROBS: {
+			String[] returnValue=new String[trees.length];
 			for (int i=0;i<trees.length;i++) {
 				Model model = this.getModel();		 	
 				// "tree STATE_50850000 [&lnP=-34291.617355973016,posterior=-34291.617355973016] = [&R]"
 				String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
-				returnValue[i]=(header + (trees[i].newickProbs()+String.format("\n")));
+				returnValue[i]=(header + (trees[i].newickProbs()));
 			}
+			return returnValue;
 		}
-		break;
 		case ASR: {
+			String[] returnValue=new String[trees.length];
 			for (int i=0;i<trees.length;i++) {
 				Model model = this.getModel();		 	
 				// "tree STATE_50850000 [&lnP=-34291.617355973016,posterior=-34291.617355973016] = [&R]"
 				String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
-				returnValue[i]=(header + (trees[i].newickAncestralStateReconstruction()+String.format("\n")));
+				returnValue[i]=(header + (trees[i].newickAncestralStateReconstruction()));			
 			}
+			return returnValue;
 		}
-		break;	
-		case STOCHASTIC_MAPPING: {
-			for (int i=0;i<trees.length;i++) {
-				Model model = this.getModel();		 	
-				// "tree STATE_50850000 [&lnP=-34291.617355973016,posterior=-34291.617355973016] = [&R]"
-				String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
-				returnValue[i]=(header + (trees[i].newickStochasticMapping()+String.format("\n")));
+		case STOCHASTIC_MAPPING: {				
+			class OutputObject  {
+				@SuppressWarnings("unused")
+				String[] smTrees = null;
+				@SuppressWarnings("unused")
+				String[] smTransitions = null;
+				@SuppressWarnings("unused")
+				String[] smDwelings = null;
+				@SuppressWarnings("unused")
+				String[] smLineages = null;
 			}
+			OutputObject outputObject = new OutputObject();
+			if (config.smTrees) {				
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {
+					Model model = this.getModel();		 	
+					// "tree STATE_50850000 [&lnP=-34291.617355973016,posterior=-34291.617355973016] = [&R]"
+					String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
+					returnValue[i]=(header + (trees[i].newickStochasticMapping()));
+				}				
+				outputObject.smTrees=returnValue;
+			}		
+			if (config.smTransitions) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {
+					returnValue[i]=trees[i].smTransitions();
+				}				
+				outputObject.smTransitions=returnValue;				
+			}
+			if (config.smDwellings) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {
+					returnValue[i]=trees[i].smDwellings();
+				}				
+				outputObject.smDwelings=returnValue;				
+			}
+			if (config.smLineages) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {	 			
+					returnValue[i]=trees[i].smLineages();
+				}				
+				outputObject.smLineages=returnValue;				
+			}
+			return outputObject;
 		}
 		default: 
 			break;	
 		}	
 
-		return returnValue;
+		return null;
 	}
 }
