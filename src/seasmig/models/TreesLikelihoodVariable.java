@@ -21,7 +21,9 @@ public class TreesLikelihoodVariable extends Variable {
 	}
 
 	public class TreesLikelihoodVariableOutputObject  {
-		String[] trees = null;
+		String[] probTrees = null;
+		String[] asrTrees = null;
+		String[] smTrees = null;
 		String[] smTransitions = null;
 		String[] smTipDwelings = null;
 		String[] smLineages = null;		
@@ -43,7 +45,7 @@ public class TreesLikelihoodVariable extends Variable {
 				String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
 				returnValue[i]=(header + (trees[i].newickProbs()));
 			}
-			outputObject.trees=returnValue;
+			outputObject.probTrees=returnValue;
 			return outputObject;
 		}
 		case ASR: {
@@ -54,7 +56,7 @@ public class TreesLikelihoodVariable extends Variable {
 				String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
 				returnValue[i]=(header + (trees[i].newickAncestralStateReconstruction()));			
 			}
-			outputObject.trees=returnValue;
+			outputObject.asrTrees=returnValue;
 			return outputObject;
 		}
 		case STOCHASTIC_MAPPING: {					
@@ -66,8 +68,18 @@ public class TreesLikelihoodVariable extends Variable {
 					String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
 					returnValue[i]=(header + (trees[i].newickStochasticMapping()));
 				}				
-				outputObject.trees=returnValue;
+				outputObject.smTrees=returnValue;
 			}		
+			if (config.asrTrees) {				
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {
+					Model model = this.getModel();		 	
+					// "tree STATE_50850000 [&lnP=-34291.617355973016,posterior=-34291.617355973016] = [&R]"
+					String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
+					returnValue[i]=(header + (trees[i].newickAncestralStateReconstruction()));
+				}				
+				outputObject.asrTrees=returnValue;
+			}
 			if (config.smTransitions) {
 				String[] returnValue=new String[trees.length];
 				for (int i=0;i<trees.length;i++) {

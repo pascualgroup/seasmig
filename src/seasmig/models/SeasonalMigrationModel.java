@@ -33,23 +33,28 @@ public abstract class SeasonalMigrationModel extends Model implements Serializab
 		}
 
 		TreesLikelihoodVariableOutputObject outputObject = (TreesLikelihoodVariable.TreesLikelihoodVariableOutputObject) getVariable("likeVar").makeOutputObject();
-		if (outputObject.trees!=null) {
-			for (int i=0;i<outputObject.trees.length;i++) {
-				flatMap.put("trees."+i,String.format("%s",outputObject.trees[i]));
+		if (outputObject.asrTrees!=null) {
+			for (int i=0;i<outputObject.asrTrees.length;i++) {
+				flatMap.put("trees."+i,String.format("%s",outputObject.asrTrees[i]));
+			}
+		}
+		if (outputObject.smTrees!=null) {
+			for (int i=0;i<outputObject.smTrees.length;i++) {
+				flatMap.put("smTrees."+i,String.format("%s",outputObject.smTrees[i]));
 			}
 		}
 		if (outputObject.smTransitions!=null) {
-			for (int i=0;i<outputObject.trees.length;i++) {
+			for (int i=0;i<outputObject.smTransitions.length;i++) {
 				flatMap.put("smTransitions."+i,String.format("%s",outputObject.smTransitions[i]));
 			}
 		}
 		if (outputObject.smTipDwelings!=null) {
-			for (int i=0;i<outputObject.trees.length;i++) {
+			for (int i=0;i<outputObject.smTipDwelings.length;i++) {
 				flatMap.put("smTipDwelings."+i,String.format("%s",outputObject.smTipDwelings[i]));
 			}
 		}
 		if (outputObject.smLineages!=null) {
-			for (int i=0;i<outputObject.trees.length;i++) {
+			for (int i=0;i<outputObject.smLineages.length;i++) {
 				flatMap.put("smLineages."+i,String.format("%s",outputObject.smLineages[i]));
 			}
 		}

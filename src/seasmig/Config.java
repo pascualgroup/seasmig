@@ -133,7 +133,8 @@ public class Config implements Serializable
 	public double veryLongTime = 1000;		
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	
-	// STOCHASTIC MAPPING OUTPUT	
+	// STOCHASTIC MAPPING OUTPUT
+	public boolean asrTrees = true;  // TODO:
 	public boolean smTrees = true;  // TODO: 
 	public boolean smTransitions = true; // transition times TODO:
 	public boolean smTipDwellings = true; // dwelling times in different states TODO:
