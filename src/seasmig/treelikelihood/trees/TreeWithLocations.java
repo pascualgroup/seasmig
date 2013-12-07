@@ -433,14 +433,14 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		if (treePart.isTip()) {
 			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);
-			returnValue+=(Integer.toString(treePart.getTaxonIndex())+ "[&states="+Integer.toString(treePart.loc)+"]:"+branchLength);
+			returnValue+=(Integer.toString(treePart.getTaxonIndex())+ "[&states="+Integer.toString(treePart.loc)+"]:"+treePart.parseMap()+branchLength);
 		}
 		else {
 			returnValue+="(";
-			returnValue+=newickStates(treePart.children.get(0));
+			returnValue+=newickSM(treePart.children.get(0));
 			for (int i = 1; i < treePart.children.size(); i++){
 				returnValue+=",";
-				returnValue+=newickStates(treePart.children.get(i));	
+				returnValue+=newickSM(treePart.children.get(i));	
 			}
 			returnValue+=")";
 			double parentTime=0;
@@ -448,7 +448,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				parentTime=treePart.parent.time;
 			}
 			String branchLength = String.format("%.3f", treePart.time-parentTime);
-			returnValue+="[&states="+Integer.toString(treePart.loc)+"]:"+branchLength;
+			returnValue+="[&states="+Integer.toString(treePart.loc)+"]:"+treePart.parseMap()+branchLength;
 		}		
 		return returnValue;
 	}
@@ -566,7 +566,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		if (treePart.isTip()) {
 			String branchLength = String.format("%.3f", treePart.time-treePart.parent.time);			
-			returnValue+=(Integer.toString(treePart.getTaxonIndex())+ "[&states="+Integer.toString(treePart.loc)+"]:"+treePart.parseMap()+branchLength);
+			returnValue+=(Integer.toString(treePart.getTaxonIndex())+ "[&states="+Integer.toString(treePart.loc)+"]:"+branchLength);
 		}
 		else {
 			returnValue+="(";
@@ -581,7 +581,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				parentTime=treePart.parent.time;
 			}
 			String branchLength = String.format("%.3f", treePart.time-parentTime);
-			returnValue+="[&states="+Integer.toString(treePart.loc)+"]:"+treePart.parseMap()+branchLength;
+			returnValue+="[&states="+Integer.toString(treePart.loc)+"]:"+branchLength;
 		}		
 		return returnValue;
 	}
