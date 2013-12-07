@@ -601,7 +601,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					if (transitionTimes[fromLocation][transition.loc]==null) {
 						transitionTimes[fromLocation][transition.loc]=new String();
 					}
-					transitionTimes[fromLocation][transition.loc]+=String.format("%f.3,",transition.time);
+					transitionTimes[fromLocation][transition.loc]+=String.format("%.3f,",transition.time);
 					fromLocation=transition.loc;
 				}				
 			}
