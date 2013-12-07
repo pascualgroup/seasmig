@@ -369,7 +369,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		return newickProbs(root,likelihoodModel.rootfreq(root.time).toArray()) + "\n";
 	}
 
-	// TODO: (348[&antigenic={-6.00510611736,5.84199000915},rate=1.1478703001047978,states="japan_korea"]:2.44, ....
 	private String newickProbs(TreeWithLocationsNode treePart, double[] rootFreq) {
 		String returnValue = new String();
 
@@ -428,8 +427,6 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		return newickSM(root);
 	}
-
-
 
 	private String newickSM(TreeWithLocationsNode treePart) {
 		String returnValue = new String();
@@ -634,10 +631,10 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String smTipDwellings() {
 		String returnValue = "{";
-		String[] lineages = new String[numLocations];	
+		String[] tipDwellings = new String[numLocations];	
 
 		for (int i=0;i<numLocations;i++) {	
-			lineages[i]=new String();			
+			tipDwellings[i]=new String();			
 		}
 
 		for (TreeWithLocationsNode node : root) {			
@@ -645,26 +642,12 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (!node.isTip()) continue;
 			int fromLocation = node.loc;
 			double fromTime = tracebackWithNoChanges(node);
-			if (node.transitions!=null) {
-				if (node.transitions.size()>0) {
-					for (Transition transition : node.transitions) {					
-						lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,transition.time);
-						fromLocation=transition.loc;
-						fromTime=transition.time;
-					}
-				}
-				else {
-					lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
-				}
-			}
-			else {
-				lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
-			}
+			tipDwellings[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
 		}
 
 		for (int i=0;i<numLocations;i++) {
-			if (lineages[i].length()>0) {
-				returnValue+="{"+lineages[i].substring(0, lineages[i].length()-1)+"}";
+			if (tipDwellings[i].length()>0) {
+				returnValue+="{"+tipDwellings[i].substring(0, tipDwellings[i].length()-1)+"}";
 			}
 			else {
 				returnValue+="{}";
@@ -679,17 +662,20 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private double tracebackWithNoChanges(TreeWithLocationsNode node) {
 		// TODO: test this
-		TreeWithLocationsNode currentNode = node;
-		while (currentNode.transitions==null && currentNode.parent!=null) {
-			currentNode = currentNode.parent;
+		if (node.parent==null) {
+			return node.time;
 		}
-		if (currentNode.transitions!=null) 
-			if (currentNode.transitions.size()>0) 
-				return currentNode.transitions.get(currentNode.transitions.size()-1).time;			
-			else
-				return currentNode.time;		
-		else 
-			return currentNode.time;
+		if (node.transitions!=null) {
+			if (node.transitions.size()>0) {
+				return (node.transitions.get(node.transitions.size()-1).time);
+			}
+			else {
+				return (tracebackWithNoChanges(node.parent));
+			}
+		}
+		else {
+			return (tracebackWithNoChanges(node.parent));
+		}
 	}
 
 	@Override
