@@ -590,7 +590,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String smTransitions() {
 			
-		String returnValue = "\"transitionTimes\": {";
+		String returnValue = "{";
 		String[][] transitionTimes = new String[numLocations][numLocations];		
 						
 		for (TreeWithLocationsNode node : root) {
@@ -620,6 +620,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					returnValue+=",";
 				}				
 			}
+			returnValue+="}";
 			if (i!=(numLocations-1)) {
 				returnValue+=",";
 			}
