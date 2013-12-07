@@ -3,6 +3,8 @@ package seasmig.treelikelihood.trees;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.sun.glass.ui.Pixels.Format;
+
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.treelikelihood.LikelihoodTree;
@@ -588,24 +590,42 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String smTransitions() {
 			
-//		ArrayList<Transition>[][] transitions = new ArrayList<Transition>[numLocations][numLocations];
-//						
-//		for (TreeWithLocationsNode node : root) {
-//			if (node==root) continue;
-//			if (node.transitions!=null) {
-//				int fromLocation = node.parent.loc;
-//				for (Transition transition : node.transitions){
-//					if (transitions[fromLocation][transition.loc]!=null) {
-//						transitions[fromLocation[tra]
-//					}
-//				}
-//			}
-//		}
-//		String returnValue = new String();
-//
-//		
-//		return returnValue;
-		return null;
+		String returnValue = "\"transitionTimes\": {";
+		String[][] transitionTimes = new String[numLocations][numLocations];		
+						
+		for (TreeWithLocationsNode node : root) {
+			if (node==root) continue;
+			if (node.transitions!=null) {
+				int fromLocation = node.parent.loc;
+				for (Transition transition : node.transitions){
+					if (transitionTimes[fromLocation][transition.loc]==null) {
+						transitionTimes[fromLocation][transition.loc]=new String();
+					}
+					transitionTimes[fromLocation][transition.loc]+=String.format("%f.3,",transition.time);
+					fromLocation=transition.loc;
+				}				
+			}
+		}
+		
+		for (int i=0;i<numLocations;i++) {
+			returnValue+="{";
+			for (int j=0;j<numLocations;j++) {						
+				if (transitionTimes[i][j]!=null) {
+					returnValue+="{"+transitionTimes[i][j].substring(0, transitionTimes.length-1)+"}";
+				}
+				else {
+					returnValue+="{}";
+				}
+				if (j!=(numLocations-1)) {
+					returnValue+=",";
+				}				
+			}
+			if (i!=(numLocations-1)) {
+				returnValue+=",";
+			}
+		}
+		returnValue+="}";
+		return returnValue;
 	}
 
 	@Override
