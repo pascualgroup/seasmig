@@ -8,7 +8,10 @@ import cern.colt.matrix.DoubleMatrix2D;
 
 public interface MigrationBaseModel extends Serializable {
 	
-	public class Transition {
+	@SuppressWarnings("serial")
+	public class Transition implements Serializable {
+		
+		protected Transition() {};
 		public Transition(double time, int loc) {
 			this.time = time;
 			this.loc = loc;

@@ -1,5 +1,7 @@
 package seasmig.models;
 
+import java.io.Serializable;
+
 import seasmig.Config;
 import seasmig.treelikelihood.LikelihoodTree;
 import mc3kit.Model;
@@ -20,7 +22,8 @@ public class TreesLikelihoodVariable extends Variable {
 		config = config_;
 	}
 
-	public class TreesLikelihoodVariableOutputObject  {
+	public class TreesLikelihoodVariableOutputObject implements Serializable {		
+		protected TreesLikelihoodVariableOutputObject() {};
 		String[] probTrees = null;
 		String[] asrTrees = null;
 		String[] smTrees = null;
