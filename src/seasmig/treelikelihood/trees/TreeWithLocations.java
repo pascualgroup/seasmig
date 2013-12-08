@@ -656,7 +656,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				returnValue+=",";
 			}			
 		}
-
+		returnValue+="}";
 		return returnValue;
 	}
 
@@ -709,7 +709,6 @@ public class TreeWithLocations implements LikelihoodTree {
 			}			
 		}
 
-		returnValue+="{";
 		for (int i=0;i<numLocations;i++) {	
 			if (lineages[i]!=null) {
 				returnValue+="{"+lineages[i].substring(0, lineages[i].length()-1)+"}";
