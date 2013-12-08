@@ -28,7 +28,7 @@ public class TreesLikelihoodVariable extends Variable {
 		String[] asrTrees = null;
 		String[] smTrees = null;
 		String[] smTransitions = null;
-		String[] smTipDwelings = null;
+		String[] smTipDwellings = null;
 		String[] smLineages = null;		
 	}
 	
@@ -95,7 +95,7 @@ public class TreesLikelihoodVariable extends Variable {
 				for (int i=0;i<trees.length;i++) {
 					returnValue[i]=trees[i].smTipDwellings();
 				}				
-				outputObject.smTipDwelings=returnValue;				
+				outputObject.smTipDwellings=returnValue;				
 			}
 			if (config.smLineages) {
 				String[] returnValue=new String[trees.length];

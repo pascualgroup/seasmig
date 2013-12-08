@@ -48,9 +48,9 @@ public abstract class SeasonalMigrationModel extends Model implements Serializab
 				flatMap.put("smTransitions."+i,String.format("%s",outputObject.smTransitions[i]));
 			}
 		}
-		if (outputObject.smTipDwelings!=null) {
-			for (int i=0;i<outputObject.smTipDwelings.length;i++) {
-				flatMap.put("smTipDwelings."+i,String.format("%s",outputObject.smTipDwelings[i]));
+		if (outputObject.smTipDwellings!=null) {
+			for (int i=0;i<outputObject.smTipDwellings.length;i++) {
+				flatMap.put("smTipDwellings."+i,String.format("%s",outputObject.smTipDwellings[i]));
 			}
 		}
 		if (outputObject.smLineages!=null) {
