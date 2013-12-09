@@ -12,9 +12,7 @@ import seasmig.treelikelihood.TransitionModel.Transition;
 public class TreeWithLocationsAndNucleotidesNode implements Serializable, Iterable<TreeWithLocationsAndNucleotidesNode> {	
 
 	public double[] logProbsLOC;
-	public double[][] logProbsCP1;
-	public double[][] logProbsCP2;
-	public double[][] logProbsCP3;
+	public double[][][] logProbsCP; // codon position 0,1,2; sequence position TODO: 
 	TreeWithLocationsAndNucleotidesNode parent = null;
 	List<TreeWithLocationsAndNucleotidesNode> children = new ArrayList<TreeWithLocationsAndNucleotidesNode>();
 	double time = 0;
@@ -22,10 +20,13 @@ public class TreeWithLocationsAndNucleotidesNode implements Serializable, Iterab
 
 	// For tips and for ASR
 	int loc = TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION;
+	Sequence seq;
 
 	// For stochastic mapping
 	public List<Transition> transitions = null;
-	Sequence seq;
+	public List<Transition>[] transitionsCP1 = null;
+	public List<Transition>[] transitionsCP2 = null;
+	public List<Transition>[] transitionsCP3 = null;
 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
@@ -111,9 +112,9 @@ public class TreeWithLocationsAndNucleotidesNode implements Serializable, Iterab
 	}
 
 
-	public void addChild(TreeWithLocationsAndNucleotidesNode locationTreeNode) {
-		this.children.add(locationTreeNode);
-		locationTreeNode.parent=this;
+	public void addChild(TreeWithLocationsAndNucleotidesNode locationAndNucleotideTreeNode) {
+		this.children.add(locationAndNucleotideTreeNode);
+		locationAndNucleotideTreeNode.parent=this;
 
 	}
 
