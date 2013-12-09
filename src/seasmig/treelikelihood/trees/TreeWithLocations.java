@@ -1,11 +1,7 @@
 package seasmig.treelikelihood.trees;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.ListIterator;
-
-import com.sun.glass.ui.Pixels.Format;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
