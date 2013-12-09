@@ -18,7 +18,7 @@ import jebl.math.Random;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
 import seasmig.treelikelihood.models.GeneralSeasonalMigrationBaseModel;
 import seasmig.treelikelihood.models.SinusoidialSeasonalMigrationBaseModel;
@@ -37,8 +37,8 @@ public class DataForTests implements Data {
 	public enum TestType {TEST_USING_GENERATED_TREES, TEST_USING_INPUT_TREES, TEST_MODEL_DEGENERACY};
 
 	// TEST MODELS
-	public MigrationBaseModel createModel = null;
-	public List<MigrationBaseModel> testModels = null;
+	public TransitionModel createModel = null;
+	public List<TransitionModel> testModels = null;
 	private int numTestTips=3000;
 	private int numLocations;
 	private int disturbanceScale;
@@ -115,7 +115,7 @@ public class DataForTests implements Data {
 			System.out.println(" generated "+trees.get(0).size()+" trees");
 			System.out.print("Generating test models... ");
 
-			testModels = new ArrayList<MigrationBaseModel>();
+			testModels = new ArrayList<TransitionModel>();
 
 			for (int i=0; i<numTestRepeats; i++) {
 				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, disturbanceScale*i,99999)));
@@ -297,7 +297,7 @@ public class DataForTests implements Data {
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}				
 
-			testModels = new ArrayList<MigrationBaseModel>();
+			testModels = new ArrayList<TransitionModel>();
 
 			testModels.add(new ConstantMigrationBaseModel(Q));
 			testModels.add(new TwoSeasonMigrationBaseModel(QW,QS,phase, phase+length));

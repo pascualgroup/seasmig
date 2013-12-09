@@ -1,6 +1,6 @@
 package seasmig.treelikelihood.models;
 
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.MigrationPlusContinousStateBaseModel;
 import seasmig.util.Util;
 
@@ -10,7 +10,7 @@ public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusCon
 	
 	
 	BrownianMotionPlusSeasonalityFunction logSeasonalStatesTransitionProbabilities[] = null;
-	private MigrationBaseModel migrationBaseModel;	
+	private TransitionModel migrationBaseModel;	
 	
 	protected MigrationPlusSeasonalBrowninanBaseModel() {};
 	
@@ -50,7 +50,7 @@ public class MigrationPlusSeasonalBrowninanBaseModel implements MigrationPlusCon
 	}
 
 	// Constructor	
-	public MigrationPlusSeasonalBrowninanBaseModel(MigrationBaseModel migrationBaseModel_, double[] alphas, double[] ampAnnual, double[] phaseAnnual, double[] ampBiannual, double[] phaseBiannual) {
+	public MigrationPlusSeasonalBrowninanBaseModel(TransitionModel migrationBaseModel_, double[] alphas, double[] ampAnnual, double[] phaseAnnual, double[] ampBiannual, double[] phaseBiannual) {
 		migrationBaseModel=migrationBaseModel_;
 		logSeasonalStatesTransitionProbabilities = new BrownianMotionPlusSeasonalityFunction[alphas.length];		
 		for (int i=0;i<alphas.length;i++) {

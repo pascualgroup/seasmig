@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.javatuples.Pair;
 
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.DoubleFactory1D;
 import cern.colt.matrix.DoubleFactory2D;
@@ -12,7 +12,7 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 
 @SuppressWarnings("serial")
-public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
+public class PiecewiseConstantMigrationBaseModel implements TransitionModel {
 	// TODO: Check this...
 	// TODO: Check zMult order... sould be ok for Q where rows sum to 1...
 
@@ -30,7 +30,7 @@ public class PiecewiseConstantMigrationBaseModel implements MigrationBaseModel {
 	DoubleFunction[] rootFreq;
 
 	// Constant Migration Models
-	MigrationBaseModel constantModels[];
+	TransitionModel constantModels[];
 
 	// Caching
 	DoubleFactory2D F = DoubleFactory2D.dense;

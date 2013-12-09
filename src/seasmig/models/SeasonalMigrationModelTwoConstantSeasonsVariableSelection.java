@@ -18,7 +18,7 @@ import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.MatrixExponentiator;
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
 
@@ -233,7 +233,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends S
 				}			
 			}			
 
-			MigrationBaseModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonStart,seasonEnd);
+			TransitionModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonStart,seasonEnd);
 			LikelihoodTree workingCopy;		
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1)

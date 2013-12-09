@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import seasmig.treelikelihood.MigrationBaseModel.Transition;
+import seasmig.treelikelihood.TransitionModel.Transition;
 
 //Nodes in this tree...
 @SuppressWarnings("serial")

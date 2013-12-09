@@ -6,7 +6,7 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 
 
-public interface MigrationBaseModel extends Serializable {
+public interface TransitionModel extends Serializable {
 	
 	@SuppressWarnings("serial")
 	public class Transition implements Serializable {

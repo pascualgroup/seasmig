@@ -13,7 +13,7 @@ import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
 
 
@@ -146,7 +146,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarization extend
 			}
 			
 			// TODO: add update to migration model instead of reconstructing...
-			MigrationBaseModel migrationBaseModel;
+			TransitionModel migrationBaseModel;
 			if (!fixPhase)
 				migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonalPhase.getValue(),seasonalPhase.getValue()+0.5);
 			else 

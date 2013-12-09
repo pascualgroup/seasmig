@@ -5,20 +5,23 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import seasmig.treelikelihood.MigrationBaseModel.Transition;
+import seasmig.treelikelihood.TransitionModel.Transition;
 
 //Nodes in this tree...
 @SuppressWarnings("serial")
 public class TreeWithLocationsAndNucleotidesNode implements Serializable, Iterable<TreeWithLocationsAndNucleotidesNode> {	
 
-	public double[] logProbs;
+	public double[] logProbsLOC;
+	public double[][] logProbsCP1;
+	public double[][] logProbsCP2;
+	public double[][] logProbsCP3;
 	TreeWithLocationsAndNucleotidesNode parent = null;
 	List<TreeWithLocationsAndNucleotidesNode> children = new ArrayList<TreeWithLocationsAndNucleotidesNode>();
 	double time = 0;
 	int taxonIndex = 0;
 
 	// For tips and for ASR
-	int loc = TreeWithLocations.UNKNOWN_LOCATION;
+	int loc = TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION;
 
 	// For stochastic mapping
 	public List<Transition> transitions = null;
@@ -120,32 +123,32 @@ public class TreeWithLocationsAndNucleotidesNode implements Serializable, Iterab
 	public String parseProbs(double[] rootfreq) {			
 		String returnValue = "[&prob={";		
 
-		double[] logAncStateProbs = new double[logProbs.length];
-		double[] logAncProbs = new double[logProbs.length];
+		double[] logAncStateProbs = new double[logProbsLOC.length];
+		double[] logAncProbs = new double[logProbsLOC.length];
 
-		for (int i=0;i<logProbs.length;i++) {	
+		for (int i=0;i<logProbsLOC.length;i++) {	
 			if (parent!=null)
-				logAncStateProbs[i] = logProbs[i]+parent.logProbs[i];
+				logAncStateProbs[i] = logProbsLOC[i]+parent.logProbsLOC[i];
 			else
-				logAncStateProbs[i] = logProbs[i]+rootfreq[i];					
+				logAncStateProbs[i] = logProbsLOC[i]+rootfreq[i];					
 		}
 
 		double logTotalProb = logSumExp(logAncStateProbs);
-		for (int i=0;i<logProbs.length;i++) {
+		for (int i=0;i<logProbsLOC.length;i++) {
 			logAncStateProbs[i]=logAncStateProbs[i]-logTotalProb;
 		}
 
 		// Deal with numeric issues of not summing up to 1.0
 		double totalProb = 0;
-		for (int i=0;i<logProbs.length;i++) {			
+		for (int i=0;i<logProbsLOC.length;i++) {			
 			logAncProbs[i]=Math.exp(logAncStateProbs[i]);
 			totalProb+=logAncProbs[i];
 		}
 
-		for (int i=0;i<logProbs.length;i++) {
+		for (int i=0;i<logProbsLOC.length;i++) {
 			String prob = String.format("%.3f",logAncProbs[i]/totalProb);
 			returnValue+=prob;
-			if (i!=(logProbs.length-1)) 
+			if (i!=(logProbsLOC.length-1)) 
 				returnValue+=",";
 		}
 		returnValue+="}]";

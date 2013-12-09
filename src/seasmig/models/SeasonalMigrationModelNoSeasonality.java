@@ -12,7 +12,7 @@ import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
 
 
@@ -124,7 +124,7 @@ public class SeasonalMigrationModelNoSeasonality extends SeasonalMigrationModel 
 			}
 
 			// TODO: add update to migration model instead of reconstructing...
-			MigrationBaseModel migrationBaseModel = new ConstantMigrationBaseModel(ratesdoubleForm);
+			TransitionModel migrationBaseModel = new ConstantMigrationBaseModel(ratesdoubleForm);
 			LikelihoodTree workingCopy;
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1)

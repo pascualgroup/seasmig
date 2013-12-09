@@ -6,7 +6,7 @@ import cern.colt.matrix.DoubleMatrix1D;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.util.Util;
 
 
@@ -20,14 +20,14 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	// Tree & Model
 	TreeWithLocationsNode2 root = null;		
 	int num_locations = 0;
-	private MigrationBaseModel likelihoodModel = null;
+	private TransitionModel likelihoodModel = null;
 	private int UNKNOWN_LOCATION;
 	private int numIdentifiedLocations;
 	private double[] basefreq;
 	private double logLike = 0; 
 
 	// Generate a random tree based on createTreeModel .... 
-	public TreeWithLocations2(MigrationBaseModel createTreeModel, int numNodes) {		
+	public TreeWithLocations2(TransitionModel createTreeModel, int numNodes) {		
 		num_locations=createTreeModel.getNumLocations();
 		UNKNOWN_LOCATION=num_locations;
 		likelihoodModel=createTreeModel;		
@@ -36,7 +36,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	}
 
 	// Generate random tree states based on input tree topology and model .... 
-	public TreeWithLocations2(MigrationBaseModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree, double lastTipTime) {
+	public TreeWithLocations2(TransitionModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree, double lastTipTime) {
 		num_locations=createTreeModel.getNumLocations();
 		UNKNOWN_LOCATION=num_locations;
 		likelihoodModel=createTreeModel;		
@@ -71,7 +71,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	}
 
 	// Generate random tree states based on input tree topology and model .... 
-	public TreeWithLocations2(MigrationBaseModel createTreeModel, TreeWithLocationsNode2 root_) {
+	public TreeWithLocations2(TransitionModel createTreeModel, TreeWithLocationsNode2 root_) {
 		num_locations=createTreeModel.getNumLocations();
 		UNKNOWN_LOCATION=num_locations;
 		likelihoodModel=createTreeModel;			
@@ -126,7 +126,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 
 	@Override 
 	public void setLikelihoodModel(Object likelihoodModel_) {
-		likelihoodModel = (MigrationBaseModel) likelihoodModel_;
+		likelihoodModel = (TransitionModel) likelihoodModel_;
 	}
 
 	@Override
@@ -270,7 +270,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 
 	}
 
-	public void makeRandomTree(MigrationBaseModel m, TreeWithLocationsNode2 from, int nNodes) {		
+	public void makeRandomTree(TransitionModel m, TreeWithLocationsNode2 from, int nNodes) {		
 		if (nNodes>1) {
 			for (int child=0;child<2;child++) {
 				// Decide on branch length

@@ -4,14 +4,14 @@ import java.util.HashMap;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import seasmig.treelikelihood.MatrixExponentiator;
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 //import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 
 @SuppressWarnings("serial")
-public class ConstantMigrationBaseModel implements MigrationBaseModel {
+public class ConstantMigrationBaseModel implements TransitionModel {
 
 	// Precision Parameter
 	static final double timePrecision = 1.0E-5;

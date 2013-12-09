@@ -14,7 +14,7 @@ import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.models.PiecewiseConstantMigrationBaseModel;
 
 @SuppressWarnings("serial")
@@ -149,7 +149,7 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends SeasonalMig
 				}
 			}
 
-			MigrationBaseModel migrationBaseModel = new PiecewiseConstantMigrationBaseModel(ratesDoubleForm,nParts);
+			TransitionModel migrationBaseModel = new PiecewiseConstantMigrationBaseModel(ratesDoubleForm,nParts);
 			LikelihoodTree workingCopy;		
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1)

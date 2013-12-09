@@ -17,7 +17,7 @@ import mc3kit.distributions.UniformIntDistribution;
 import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.models.EpochalMigrationBaseModel;
 
 @SuppressWarnings("serial")
@@ -201,7 +201,7 @@ public class EpochalMigrationModel extends SeasonalMigrationModel {
 					epochsDoubleForm[i] = epochsDoubleFormVector.get(i);
 			}
 	
-			MigrationBaseModel migrationBaseModel = new EpochalMigrationBaseModel(ratesDoubleForm,epochsDoubleForm);
+			TransitionModel migrationBaseModel = new EpochalMigrationBaseModel(ratesDoubleForm,epochsDoubleForm);
 			LikelihoodTree workingCopy;		
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1)

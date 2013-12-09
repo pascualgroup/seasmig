@@ -5,7 +5,7 @@ import java.util.Vector;
 
 import org.javatuples.Pair;
 
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
@@ -14,14 +14,14 @@ import cern.colt.matrix.DoubleMatrix2D;
 
 
 @SuppressWarnings("serial")
-public class TwoSeasonMigrationBaseModel implements MigrationBaseModel {
+public class TwoSeasonMigrationBaseModel implements TransitionModel {
 
 	// Cache Parameters
 	static final int maxCachedTransitionMatrices = 16000;
 
 	// Seasonal Migration Models
-	MigrationBaseModel season1MigrationModel = null;
-	MigrationBaseModel season2MigrationModel = null;
+	TransitionModel season1MigrationModel = null;
+	TransitionModel season2MigrationModel = null;
 
 	// Seasonal Range [...season2....|...season1......|...season2..]
 	//                0             S1S              S1E        1 year

@@ -6,8 +6,8 @@ import java.util.HashMap;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.MigrationBaseModel;
-import seasmig.treelikelihood.MigrationBaseModel.Transition;
+import seasmig.treelikelihood.TransitionModel;
+import seasmig.treelikelihood.TransitionModel.Transition;
 import seasmig.util.Util;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
@@ -16,15 +16,45 @@ import cern.colt.matrix.DoubleMatrix2D;
 @SuppressWarnings("serial")
 public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 
+	//	# Log probability of tip encoding of nucleotides (A,G,C,T,R,Y,S,W,K,M,B,D,H,V,N,-)	
+	public static final double[] NUC_A = new double[]{0,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
+	public static final double[] NUC_G = new double[]{Double.NEGATIVE_INFINITY,0,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
+	public static final double[] NUC_C = new double[]{Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,0,Double.NEGATIVE_INFINITY};
+	public static final double[] NUC_T = new double[]{Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,0};
+	
+	public static final double[] NUC_R = new double[]{Math.log(0.5),Math.log(0.5),Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
+	public static final double[] NUC_Y = new double[]{Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Math.log(0.5),Math.log(0.5)};
+	public static final double[] NUC_S = new double[]{Double.NEGATIVE_INFINITY,Math.log(0.5),Math.log(0.5),Double.NEGATIVE_INFINITY};
+	public static final double[] NUC_W = new double[]{Math.log(0.5),Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Math.log(0.5)};
+	public static final double[] NUC_K = new double[]{Double.NEGATIVE_INFINITY,Math.log(0.5),Double.NEGATIVE_INFINITY,Math.log(0.5)};
+	public static final double[] NUC_M = new double[]{Math.log(0.5),Double.NEGATIVE_INFINITY,Math.log(0.5),Double.NEGATIVE_INFINITY};
+	
+	public static final double[] NUC_B = new double[]{Double.NEGATIVE_INFINITY,Math.log(0.333333333333334),Math.log(0.333333333333333),Math.log(0.333333333333333)};
+	public static final double[] NUC_D = new double[]{Math.log(0.333333333333334),Math.log(0.333333333333333),Double.NEGATIVE_INFINITY,Math.log(0.333333333333333)};
+	public static final double[] NUC_H = new double[]{Math.log(0.333333333333334),Double.NEGATIVE_INFINITY,Math.log(0.333333333333333),Math.log(0.333333333333333)};
+	public static final double[] NUC_V = new double[]{Math.log(0.333333333333334),Math.log(0.333333333333333),Math.log(0.333333333333333),Double.NEGATIVE_INFINITY};
+	
+	public static final double[] NUC_N = new double[]{Math.log(0.25),Math.log(0.25),Math.log(0.25),Math.log(0.25)};
+	public static final double[] NUC_GAP = new double[]{Math.log(0.25),Math.log(0.25),Math.log(0.25),Math.log(0.25)};
+	
+	// ENCOUDING FOR UNKNOWN TAXA NUMBER (i.e. internal nodes)
 	public static final int UNKNOWN_TAXA = -1;
+	
+	// ENCOUDING FOR UNKNOWN GEOGRAPHIC LOCATIN (i.e. internal nodes)
 	public static final int UNKNOWN_LOCATION = -1;
+			
+	// ENCODING FOR LOCATION ERROR 
 	public static final int ERR_LOCATION = -2;
+	
+	// CONST 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
-	// Tree & Model
+	// Tree & Models
 	TreeWithLocationsAndNucleotidesNode root = null;		
-	private MigrationBaseModel likelihoodModel = null;
+	private TransitionModel migrationLikelihoodModel = null;
+	private TransitionModel[] codonLikelihoodModel = new TransitionModel[3]; // CP1, CP2, CP3
 
+	// For Location Reading
 	int numLocations = 0;
 	private int numIdentifiedLocations;
 
@@ -34,9 +64,6 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	double[] ZERO_LOG_PROBS;
 	private double logLike = 0;
 
-	// Tree generate parameters for test purpose
-	static final private double testBranchLengthMean = 0.5;
-	static final private double testBranchLengthVariance = 1.0;
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from nexsus tree trait location_attribute name
@@ -105,10 +132,10 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		}
 	}
 
-	public TreeWithLocationsAndNucleotides(TreeWithLocationsAndNucleotidesNode root_, MigrationBaseModel likelihoodModel_) {
+	public TreeWithLocationsAndNucleotides(TreeWithLocationsAndNucleotidesNode root_, TransitionModel likelihoodModel_) {
 		root = root_;
-		likelihoodModel=likelihoodModel_;
-		numLocations=likelihoodModel.getNumLocations();
+		migrationLikelihoodModel=likelihoodModel_;
+		numLocations=migrationLikelihoodModel.getNumLocations();
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
@@ -120,11 +147,11 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		for (TreeWithLocationsAndNucleotidesNode node : root) { // Postorder 
 
 			if (node.loc==TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION) {
-				node.logProbs =new double[numLocations]; // Internal node initialization
+				node.logProbsLOC =new double[numLocations]; // Internal node initialization
 			}
 			else {
-				node.logProbs= ZERO_LOG_PROBS.clone();
-				node.logProbs[node.loc]=0; // Tip node
+				node.logProbsLOC= ZERO_LOG_PROBS.clone();
+				node.logProbsLOC[node.loc]=0; // Tip node
 			}
 
 			if (node.children.size()!=0) { // this is an internal node			
@@ -134,14 +161,14 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 						DoubleMatrix2D p;						
 						// TODO: check if clause (here for numerics issues) 
 						if (node.time!=child.time && node.loc==child.loc) 												
-							p = likelihoodModel.transitionMatrix(node.time, child.time);
+							p = migrationLikelihoodModel.transitionMatrix(node.time, child.time);
 						else
-							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
+							p = migrationLikelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
 						double[] alphas = new double[numLocations];						
 						for (int to = 0; to < numLocations; to++) { // Integrate over all possible locations
-							alphas[to]=(Math.log(p.get(from,to)) + child.logProbs[to]);							
+							alphas[to]=(Math.log(p.get(from,to)) + child.logProbsLOC[to]);							
 						}						
-						node.logProbs[from] += logSumExp(alphas); // Probability of internal node state based on children 
+						node.logProbsLOC[from] += logSumExp(alphas); // Probability of internal node state based on children 
 					}								
 				}
 
@@ -151,10 +178,10 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		}
 
 		// Calculate root base frequency contribution... 
-		DoubleMatrix1D rootFreq = likelihoodModel.rootfreq(root.time);
+		DoubleMatrix1D rootFreq = migrationLikelihoodModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
-			alphas[i]=root.logProbs[i] + Math.log(rootFreq.get(i));
+			alphas[i]=root.logProbsLOC[i] + Math.log(rootFreq.get(i));
 		}	
 		logLike = logSumExp(alphas);
 		return logLike;		
@@ -173,7 +200,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	public LikelihoodTree copy() {
 		// TODO: test this... and or remove ...
 		TreeWithLocationsAndNucleotides copyTree = new TreeWithLocationsAndNucleotides();
-		copyTree.likelihoodModel=this.likelihoodModel;
+		copyTree.migrationLikelihoodModel=this.migrationLikelihoodModel;
 		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
 		copyTree.numLocations=this.numLocations;		
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
@@ -268,29 +295,6 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 
 	}
 
-	public void makeRandomTree(MigrationBaseModel m, TreeWithLocationsAndNucleotidesNode root, int nNodes) {		
-		if (nNodes>1) {
-			for (int child=0;child<2;child++) {
-				// Decide on branch length
-				double to_time = root.time+cern.jet.random.Gamma.staticNextDouble(testBranchLengthMean*testBranchLengthMean/testBranchLengthVariance,1.0/(testBranchLengthVariance/testBranchLengthMean));
-				double p=0;		
-
-				for (int location=0;location<numLocations;location++) {
-					p=p+Math.exp(m.logprobability(root.loc, location, root.time, to_time));
-					if (cern.jet.random.Uniform.staticNextDouble()<=p) {
-						root.children.add(new TreeWithLocationsAndNucleotidesNode(location,TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION,to_time,root));
-						break;
-					}
-				}			
-			}
-
-			for (TreeWithLocationsAndNucleotidesNode child : root.children) {
-				makeRandomTree(m,child,(int) Math.round(nNodes/2.0));
-			}
-		}
-
-	}
-
 	@Override
 	public int getNumLocations() {		
 		return numLocations;
@@ -303,11 +307,11 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 
 	@Override 
 	public void setLikelihoodModel(Object likelihoodModel_) {
-		likelihoodModel = (MigrationBaseModel) likelihoodModel_;
+		migrationLikelihoodModel = (TransitionModel) likelihoodModel_;
 	}
 
 	public String newickProbs() {	 
-		return newickProbs(root,likelihoodModel.rootfreq(root.time).toArray()) + "\n";
+		return newickProbs(root,migrationLikelihoodModel.rootfreq(root.time).toArray()) + "\n";
 	}
 
 	private String newickProbs(TreeWithLocationsAndNucleotidesNode treePart, double[] rootFreq) {
@@ -404,7 +408,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 			boolean doneWithBranch = false;
 			Transition event = null;
 			do {
-				event = likelihoodModel.nextEvent(currentTime, currentLoc);
+				event = migrationLikelihoodModel.nextEvent(currentTime, currentLoc);
 				if (event.time < child.time) {
 					if (child.transitions==null) child.transitions = new ArrayList<Transition>();					
 					child.transitions.add(event);
@@ -455,10 +459,10 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 
 		// Calculate root state
 		// TODO: check this
-		DoubleMatrix1D rootFreq = likelihoodModel.rootfreq(root.time);
+		DoubleMatrix1D rootFreq = migrationLikelihoodModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
-			alphas[i]=root.logProbs[i] + Math.log(rootFreq.get(i));
+			alphas[i]=root.logProbsLOC[i] + Math.log(rootFreq.get(i));
 		}		
 		root.loc = normalizeAndGetRandomSampleFromLogProbs(alphas);		
 		for (TreeWithLocationsAndNucleotidesNode node : root.children) {
@@ -471,9 +475,9 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		TreeWithLocationsAndNucleotidesNode parent = node.parent;		
 		double[] alphas = new double[numLocations];	
 		// TODO: check if clause (here for numerics issues)
-		DoubleMatrix1D p = likelihoodModel.probability(parent.loc, parent.time, node.time);
+		DoubleMatrix1D p = migrationLikelihoodModel.probability(parent.loc, parent.time, node.time);
 		for (int i=0; i < numLocations; i++) {								
-			alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbs[i];
+			alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbsLOC[i];
 		}		
 		node.loc = normalizeAndGetRandomSampleFromLogProbs(alphas);
 

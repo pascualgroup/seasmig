@@ -1,13 +1,13 @@
 package seasmig.treelikelihood.models;
 
-import seasmig.treelikelihood.MigrationBaseModel;
+import seasmig.treelikelihood.TransitionModel;
 import cern.colt.function.DoubleFunction;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 
 
 @SuppressWarnings("serial")
-public class SinusoidialSeasonalMigrationBaseModel implements MigrationBaseModel {
+public class SinusoidialSeasonalMigrationBaseModel implements TransitionModel {
 	// TODO: Check this...
 
 	private int num_states = 0;
