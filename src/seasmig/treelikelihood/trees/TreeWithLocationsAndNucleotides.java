@@ -16,31 +16,10 @@ import cern.colt.matrix.DoubleMatrix2D;
 @SuppressWarnings("serial")
 public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 
-	//	# Log probability of tip encoding of nucleotides (A,G,C,T,R,Y,S,W,K,M,B,D,H,V,N,-)	
-	public static final double[] NUC_A = new double[]{0,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
-	public static final double[] NUC_G = new double[]{Double.NEGATIVE_INFINITY,0,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
-	public static final double[] NUC_C = new double[]{Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,0,Double.NEGATIVE_INFINITY};
-	public static final double[] NUC_T = new double[]{Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,0};
-	
-	public static final double[] NUC_R = new double[]{Math.log(0.5),Math.log(0.5),Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
-	public static final double[] NUC_Y = new double[]{Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Math.log(0.5),Math.log(0.5)};
-	public static final double[] NUC_S = new double[]{Double.NEGATIVE_INFINITY,Math.log(0.5),Math.log(0.5),Double.NEGATIVE_INFINITY};
-	public static final double[] NUC_W = new double[]{Math.log(0.5),Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Math.log(0.5)};
-	public static final double[] NUC_K = new double[]{Double.NEGATIVE_INFINITY,Math.log(0.5),Double.NEGATIVE_INFINITY,Math.log(0.5)};
-	public static final double[] NUC_M = new double[]{Math.log(0.5),Double.NEGATIVE_INFINITY,Math.log(0.5),Double.NEGATIVE_INFINITY};
-	
-	public static final double[] NUC_B = new double[]{Double.NEGATIVE_INFINITY,Math.log(0.333333333333334),Math.log(0.333333333333333),Math.log(0.333333333333333)};
-	public static final double[] NUC_D = new double[]{Math.log(0.333333333333334),Math.log(0.333333333333333),Double.NEGATIVE_INFINITY,Math.log(0.333333333333333)};
-	public static final double[] NUC_H = new double[]{Math.log(0.333333333333334),Double.NEGATIVE_INFINITY,Math.log(0.333333333333333),Math.log(0.333333333333333)};
-	public static final double[] NUC_V = new double[]{Math.log(0.333333333333334),Math.log(0.333333333333333),Math.log(0.333333333333333),Double.NEGATIVE_INFINITY};
-	
-	public static final double[] NUC_N = new double[]{Math.log(0.25),Math.log(0.25),Math.log(0.25),Math.log(0.25)};
-	public static final double[] NUC_GAP = new double[]{Math.log(0.25),Math.log(0.25),Math.log(0.25),Math.log(0.25)};
-	
 	// ENCOUDING FOR UNKNOWN TAXA NUMBER (i.e. internal nodes)
 	public static final int UNKNOWN_TAXA = -1;
 	
-	// ENCOUDING FOR UNKNOWN GEOGRAPHIC LOCATIN (i.e. internal nodes)
+	// ENCOUDING FOR UNKNOWN GEOGRAPHIC LOCATION (i.e. internal nodes)
 	public static final int UNKNOWN_LOCATION = -1;
 			
 	// ENCODING FOR LOCATION ERROR 
@@ -57,66 +36,64 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	// For Location Reading
 	int numLocations = 0;
 	private int numIdentifiedLocations;
+	private int numIdentifiedSequences;
 
 	// Taxa
 	HashMap<String, Integer> taxaIndices = new HashMap<String,Integer>();
 
-	double[] ZERO_LOG_PROBS;
+	double[] ZERO_LOG_PROBS;	
+	
+	int seqLength = 0;
+	private double locationLogLike = 0;
+	private double seqLogLike = 0;
 	private double logLike = 0;
 
 
-	// Load a tree from a basic jebl tree
-	// locations are loaded from nexsus tree trait location_attribute name
-	public TreeWithLocationsAndNucleotides(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String,Integer> taxaIndices_, String locationAttributeName, int num_locations_, double lastTipTime) {
-		taxaIndices = taxaIndices_;
-		numLocations=num_locations_;
-		ZERO_LOG_PROBS = new double[numLocations];
-		for (int i=0;i<numLocations;i++){
-			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
-		}
-		Integer rootTaxonIndex = UNKNOWN_TAXA;
-		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
-		if (rootTaxon!=null) {
-			rootTaxonIndex = taxaIndices.get(rootTaxon.getName());
-		}
-		if (rootTaxonIndex==null)
-			rootTaxonIndex = UNKNOWN_TAXA;
-		if (tree.getRootNode().getAttribute(locationAttributeName)!=null) {
-			root = new TreeWithLocationsAndNucleotidesNode((Integer) tree.getRootNode().getAttribute(locationAttributeName),rootTaxonIndex,0,null);
-			numIdentifiedLocations+=1;
-		}
-		else {
-			root = new TreeWithLocationsAndNucleotidesNode(UNKNOWN_TAXA,rootTaxonIndex,0,null);
-		}
-
-		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
-		recalibrateTimes(root, lastTipTime);
-	}
+	
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
-	public TreeWithLocationsAndNucleotides(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime/*, HashMap<String, Double> stateMap*/) {
+	// sequences are loaded from a hashmap
+	public TreeWithLocationsAndNucleotides(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, HashMap<String, String> seqStrMap, int num_locations_, double lastTipTime) {		
 		taxaIndices = taxaIndices_;
-		numLocations=num_locations_;
+		numLocations=num_locations_;				
+		
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
+		
+		// PARSE LOCATION
 		Integer location = locationMap.get(tree.getTaxon(tree.getRootNode()));
 		if (location==null) 
 			location=TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION;
 		else
 			numIdentifiedLocations+=1;		
 
-		Integer rootTaxonIndex = UNKNOWN_TAXA;
+		// PARSE SEQUENCE
+		seqLength = ((String) seqStrMap.values().toArray()[0]).length();
+		
+		String seqStr = seqStrMap.get(tree.getTaxon(tree.getRootNode()));
+		Sequence sequence;
+		if (seqStr==null) 
+			sequence=new Sequence(seqLength);
+		else {
+			sequence=new Sequence(seqStr);
+			numIdentifiedSequences+=1;
+		}
+		
+		// PARSE TAXA
+		Integer rootTaxonIndex = UNKNOWN_TAXA;		
 		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
 		if (rootTaxon!=null) {
 			rootTaxonIndex = taxaIndices.get(rootTaxon.getName());
 		}
 		if (rootTaxonIndex==null)
 			rootTaxonIndex= UNKNOWN_TAXA;
-		root = new TreeWithLocationsAndNucleotidesNode(location,rootTaxonIndex,0,null);
-		makeSubTree(tree,locationMap,root,tree.getRootNode());
+		
+		// Create new node
+		root = new TreeWithLocationsAndNucleotidesNode(sequence, location,rootTaxonIndex,0,null);
+		makeSubTree(tree,locationMap,seqStrMap, root,tree.getRootNode());
 		recalibrateTimes(root, lastTipTime);		
 	}
 
@@ -183,8 +160,8 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		for (int i = 0; i < numLocations; i++) {
 			alphas[i]=root.logProbsLOC[i] + Math.log(rootFreq.get(i));
 		}	
-		logLike = logSumExp(alphas);
-		return logLike;		
+		locationLogLike = logSumExp(alphas);
+		return locationLogLike;		
 	}
 
 	private void removeInternalLocations(TreeWithLocationsAndNucleotidesNode node) {
@@ -204,15 +181,18 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
 		copyTree.numLocations=this.numLocations;		
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
-		copyTree.root = new TreeWithLocationsAndNucleotidesNode(root.loc,root.taxonIndex,root.time,null);
+		copyTree.codonLikelihoodModel=this.codonLikelihoodModel;
+		copyTree.numIdentifiedSequences=this.numIdentifiedSequences;
+		copyTree.root = new TreeWithLocationsAndNucleotidesNode(root.seq, root.loc,root.taxonIndex,root.time,null);
 		copyTree.taxaIndices = taxaIndices;
+		copyTree.seqLength = seqLength;
 		treeCopy(this.root, copyTree.root);  
 		return copyTree;
 	}
 
 	private void treeCopy(TreeWithLocationsAndNucleotidesNode from, TreeWithLocationsAndNucleotidesNode to) {
 		for (TreeWithLocationsAndNucleotidesNode child : from.children) {
-			TreeWithLocationsAndNucleotidesNode newChild = new TreeWithLocationsAndNucleotidesNode(child.loc,child.taxonIndex,child.time, to);
+			TreeWithLocationsAndNucleotidesNode newChild = new TreeWithLocationsAndNucleotidesNode(child.seq, child.loc,child.taxonIndex,child.time, to);
 			to.children.add(newChild);			
 			treeCopy(child, newChild);
 		}		
@@ -249,51 +229,46 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	}
 
 	private void makeSubTree(SimpleRootedTree inputTree,
-			HashMap<String, Integer> locationMap, TreeWithLocationsAndNucleotidesNode root,
+			HashMap<String, Integer> locationMap, HashMap<String, String> seqStrMap, TreeWithLocationsAndNucleotidesNode root,
 			jebl.evolution.graphs.Node inputSubTree) {
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {	
 			Taxon taxon = inputTree.getTaxon(node);
 			Integer location = TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION;
-			Integer taxonIndex = TreeWithLocationsAndNucleotides.UNKNOWN_TAXA;			
+			Integer taxonIndex = TreeWithLocationsAndNucleotides.UNKNOWN_TAXA;	
+			Sequence sequence = null;
 			if (taxon!=null) {
+				
+				// Parse location
 				location = locationMap.get(taxon.toString());				
 				if (location==null) 
 					location=TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION;
 				else
 					numIdentifiedLocations+=1;
+				
+				// Parse sequence
+				String seqStr = seqStrMap.get(taxon.toString());	
+				if (seqStr==null) 
+					sequence=new Sequence(seqLength);
+				else {
+					sequence=new Sequence(seqStr);
+					numIdentifiedSequences+=1;
+				}
+				
+				// Parse taxon
 				taxonIndex = taxaIndices.get(taxon.toString());
 				if (taxonIndex==null) 
 					taxonIndex = TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION;
 
-			}			
+			}												
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			root.children.add(new TreeWithLocationsAndNucleotidesNode(location,taxonIndex,root.time+inputTree.getLength(node),root));			
-			makeSubTree(inputTree,locationMap, root.children.get(root.children.size()-1), node);			
+			
+			
+			
+			root.children.add(new TreeWithLocationsAndNucleotidesNode(sequence, location,taxonIndex,root.time+inputTree.getLength(node),root));			
+			makeSubTree(inputTree,locationMap, seqStrMap, root.children.get(root.children.size()-1), node);			
 		}
 	}
 
-	public void makeSubTree(jebl.evolution.trees.SimpleRootedTree inputTree, String locationAttributeName, TreeWithLocationsAndNucleotidesNode outputSubTree, jebl.evolution.graphs.Node inputSubTree) {
-		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {
-			Taxon taxon = inputTree.getTaxon(node);
-			Integer taxonIndex = UNKNOWN_TAXA;
-			if (taxon!=null)
-				taxonIndex = taxaIndices.get(taxon.getName());			
-			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			if (locationAttributeName!=null) {
-				if (node.getAttribute(locationAttributeName)!=null) {
-					outputSubTree.children.add(new TreeWithLocationsAndNucleotidesNode((Integer)node.getAttribute(locationAttributeName),taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
-					numIdentifiedLocations+=1;
-				}
-				else {
-					outputSubTree.children.add(new TreeWithLocationsAndNucleotidesNode(TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
-				}
-			}
-			else 
-				outputSubTree.children.add(new TreeWithLocationsAndNucleotidesNode(TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
-			makeSubTree(inputTree, locationAttributeName, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
-		}
-
-	}
 
 	@Override
 	public int getNumLocations() {		
@@ -341,7 +316,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 
 	@Override
 	public double cachedLogLikelihood() {		
-		return logLike;
+		return locationLogLike;
 	}
 
 	public final double logSumExp(double[] alphas) {

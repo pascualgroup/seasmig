@@ -25,13 +25,15 @@ public class TreeWithLocationsAndNucleotidesNode implements Serializable, Iterab
 
 	// For stochastic mapping
 	public List<Transition> transitions = null;
+	Sequence seq;
 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
 	protected TreeWithLocationsAndNucleotidesNode() {};
 
 	// Internal Node constructor
-	public TreeWithLocationsAndNucleotidesNode(int loc_, int taxonIndex_, double time_, TreeWithLocationsAndNucleotidesNode parent_) {
+	public TreeWithLocationsAndNucleotidesNode(Sequence seq_, int loc_, int taxonIndex_, double time_, TreeWithLocationsAndNucleotidesNode parent_) {
+		seq=seq_;
 		loc=loc_;
 		time=time_;
 		parent=parent_;	
