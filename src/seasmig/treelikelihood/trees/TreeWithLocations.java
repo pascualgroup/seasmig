@@ -460,9 +460,9 @@ public class TreeWithLocations implements LikelihoodTree {
 			double currentTime = root.time;
 			boolean doneWithBranch = false;
 			Transition event = null;
-			int repeates = 0;
+			int repeats = 0;
 			do {
-				repeates+=1;
+				repeats+=1;
 				event = likelihoodModel.nextEvent(currentTime, currentLoc);
 				if (event.time < child.time) {
 					if (child.transitions==null) child.transitions = new ArrayList<Transition>();					
@@ -481,8 +481,8 @@ public class TreeWithLocations implements LikelihoodTree {
 				} else {
 					doneWithBranch = true;								
 				}
-				if (repeates>1000) {
-					System.err.println("Failed to stochasticaly map branch: {("+Integer.toString(root.taxonIndex)+","+Double.toString(root.time)+"),("+Integer.toString(child.taxonIndex)+","+Double.toString(child.time)+")}");
+				if (repeats>10000) {
+					System.err.println("Failed to stochasticaly map branch: {("+Integer.toString(root.taxonIndex)+","+Double.toString(root.time)+","+Double.toString(root.loc)+"),("+Integer.toString(child.taxonIndex)+","+Double.toString(child.time)+","+Double.toString(child.loc)+")}");
 					doneWithBranch=true;
 				}
 			} while (!doneWithBranch);
