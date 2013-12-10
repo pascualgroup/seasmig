@@ -188,7 +188,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 					}
 					timeFrom = transitions.get(i).time;
 				}
-				returnValue+="]";
+				returnValue+="}]";
 			}	
 		}
 		return returnValue;
