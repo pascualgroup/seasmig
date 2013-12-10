@@ -607,7 +607,12 @@ public class TreeWithLocations implements LikelihoodTree {
 			returnValue+="{";
 			for (int j=0;j<numLocations;j++) {						
 				if (transitionTimes[i][j]!=null) {
-					returnValue+="{"+transitionTimes[i][j].substring(0, transitionTimes[i][j].length()-1)+"}";
+					if (transitionTimes[i][j].length()>=2) { 
+						returnValue+="{"+transitionTimes[i][j].substring(0, transitionTimes[i][j].length()-1)+"}";
+					}
+					else {
+						returnValue+="{}";
+					}
 				}
 				else {
 					returnValue+="{}";
