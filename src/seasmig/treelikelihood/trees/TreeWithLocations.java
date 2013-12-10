@@ -648,7 +648,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 
 		for (int i=0;i<numLocations;i++) {
-			if (tipDwellings[i].length()>0) {
+			if (tipDwellings[i].length()>=2) {
 				returnValue+="{"+tipDwellings[i].substring(0, tipDwellings[i].length()-1)+"}";
 			}
 			else {
@@ -685,7 +685,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO: test this
 		String returnValue = "{";
 		String[] lineages = new String[numLocations];	
-		
+
 		for (int i=0;i<numLocations;i++) {	
 			lineages[i]=new String();			
 		}
@@ -713,7 +713,13 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		for (int i=0;i<numLocations;i++) {	
 			if (lineages[i]!=null) {
-				returnValue+="{"+lineages[i].substring(0, lineages[i].length()-1)+"}";
+				if (lineages[i].length()>=2) { 
+					returnValue+="{"+lineages[i].substring(0, lineages[i].length()-1)+"}";
+				}
+				else {
+					returnValue+="{}";
+				}
+
 			} else {
 				returnValue+="{}";
 			}				
