@@ -34,7 +34,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	double[] ZERO_LOG_PROBS;
 	private double logLike = 0;
 	
-	public int smMaxBranchRetries = 100000; 
+	public int smMaxBranchRetries = 10000; 
 
 	// Tree generate parameters for test purpose
 	static final private double testBranchLengthMean = 0.5;
@@ -485,7 +485,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					doneWithBranch = true;								
 				}
 				if (repeats>smMaxBranchRetries) {
-					System.err.println("Failed to stochasticaly map branch after "+Integer.toString(smMaxBranchRetries)+"\n{("+Integer.toString(root.taxonIndex)+","+Double.toString(root.time)+","+Double.toString(root.loc)+"),("+Integer.toString(child.taxonIndex)+","+Double.toString(child.time)+","+Double.toString(child.loc)+")}");
+					System.err.println("Failed to stochasticaly map branch after "+Integer.toString(smMaxBranchRetries)+" iterations\nUsing last attempt for output. Check for aggresive rounding of tip times, or consider adding jitter to tip times.\n{("+Integer.toString(root.taxonIndex)+","+Double.toString(root.time)+","+Double.toString(root.loc)+"),("+Integer.toString(child.taxonIndex)+","+Double.toString(child.time)+","+Double.toString(child.loc)+")}");					
 					failedMapping=true;
 				}
 			} while (!doneWithBranch || failedMapping);
