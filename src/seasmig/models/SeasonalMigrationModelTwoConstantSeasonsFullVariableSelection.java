@@ -98,7 +98,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 		BinaryDistribution diffIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
-		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
+		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, config.rateIndicatorPrior);
 
 		for (int i=0; i< numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {

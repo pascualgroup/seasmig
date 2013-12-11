@@ -134,11 +134,11 @@ public class Config implements Serializable
 	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	
 	// STOCHASTIC MAPPING OUTPUT
-	public boolean asrTrees = true;  // TODO:
-	public boolean smTrees = true;  // TODO: 
-	public boolean smTransitions = true; // transition times TODO:
-	public boolean smTipDwellings = true; // dwelling times in different states TODO:
-	public boolean smLineages = true; // number of lineages in different states TODO:
+	public boolean asrTrees = true;  
+	public boolean smTrees = true;  // TODO: add alternative with single child branches instead of &map 
+	public boolean smTransitions = true; 
+	public boolean smTipDwellings = true; 
+	public boolean smLineages = true; 
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String stateFilename =null; // TODO: null if states are loaded from tree or non-existent 
@@ -149,6 +149,9 @@ public class Config implements Serializable
 	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
 	public int numLocations = 8; // needs to be specified if locations are loaded from trees....
+	
+	// VARIABLE SELECTION
+	public double rateIndicatorPrior = 0.9; // Prior for including any migration between two locations 
 	
 	// ANCESTRAL STATE RECONSTRUCTIOn
 	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.STOCHASTIC_MAPPING;
