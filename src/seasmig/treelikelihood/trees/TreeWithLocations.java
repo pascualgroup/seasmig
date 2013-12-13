@@ -359,7 +359,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	@Override 
-	public void setLikelihoodModel(Object likelihoodModel_) {
+	public void setMigrationModel(Object likelihoodModel_) {
 		likelihoodModel = (TransitionModel) likelihoodModel_;
 	}
 
@@ -741,6 +741,12 @@ public class TreeWithLocations implements LikelihoodTree {
 		returnValue+="}";
 		return returnValue;
 
+	}
+
+	@Override
+	public void setCodonModel(Object condonModel) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

@@ -125,7 +125,7 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	}
 
 	@Override 
-	public void setLikelihoodModel(Object likelihoodModel_) {
+	public void setMigrationModel(Object likelihoodModel_) {
 		likelihoodModel = (TransitionModel) likelihoodModel_;
 	}
 
@@ -373,6 +373,12 @@ public class TreeWithLocations2 implements LikelihoodTree {
 	public String smLineages() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setCodonModel(Object condonModel) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

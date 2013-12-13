@@ -57,7 +57,7 @@ public class TestOther {
 			for (LikelihoodTree tree : data.getTrees().get(0)) {
 				System.out.print(".");
 				LikelihoodTree workingCopy = tree.copy();
-				workingCopy.setLikelihoodModel(((DataForTests) data).testModels.get(i));
+				workingCopy.setMigrationModel(((DataForTests) data).testModels.get(i));
 				testLikelihood+=workingCopy.logLikelihood();
 			}
 			testLikelihood=testLikelihood/data.getTrees().size();

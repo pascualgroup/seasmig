@@ -49,7 +49,22 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	private double logLike = 0;
 
 
+	// for test purpose
+	public TreeWithLocationsAndNucleotides(TreeWithLocationsAndNucleotidesNode root, int numLocations, int seqLength) {
+		taxaIndices = null;
+		this.numLocations=numLocations;				
 
+		ZERO_LOG_PROBS = new double[numLocations];
+		for (int i=0;i<numLocations;i++){
+			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
+		}
+
+		// PARSE SEQUENCE
+		this.seqLength = seqLength;
+
+		// Create new node
+		this.root = root;
+	}
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
@@ -153,7 +168,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	}
 
 	public double seqLogLikelihood() {
-		
+
 		for (TreeWithLocationsAndNucleotidesNode node : root) { // Postorder 
 			if (node.children.size()!=0) { // this is an internal node			
 				for (int from = 0; from < 4; from++) {
@@ -167,7 +182,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 							else {
 								p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time+Util.minValue);
 							}
-																		
+
 							for (int loc=0;loc<seqLength/3;loc++) {
 								if ((loc*3+codonPos) >= seqLength) continue;							
 								double[] alphas = new double[4];						
@@ -184,12 +199,12 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 
 		// Add root frequency		
 		DoubleMatrix1D pi[] = new DoubleMatrix1D[3];
-		
+
 		for (int i=0;i<3;i++) {
 			pi[i]=codonLikelihoodModel[i].rootfreq(root.time);
 		}
 
-		
+
 		for (int codonPos = 0; codonPos <3 ; codonPos++) {
 			for (int loc=0;loc<seqLength/3;loc++) {				
 				if ((loc*3+codonPos) >= seqLength) continue;			
@@ -202,7 +217,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		}			
 		return locationLogLike;		
 	}
-	
+
 	@Override
 	public double logLikelihood() {
 		locLogLikelihood();		
@@ -328,7 +343,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	}
 
 	@Override 
-	public void setLikelihoodModel(Object likelihoodModel_) {
+	public void setMigrationModel(Object likelihoodModel_) {
 		migrationLikelihoodModel = (TransitionModel) likelihoodModel_;
 	}
 
@@ -679,6 +694,12 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		returnValue+="}";
 		return returnValue;
 
+	}
+
+
+	@Override
+	public void setCodonModel(Object codonModel) {
+		this.codonLikelihoodModel = (TransitionModel[]) codonModel;		
 	}
 
 

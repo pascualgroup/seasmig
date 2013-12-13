@@ -3,7 +3,8 @@ package seasmig.treelikelihood;
 import java.io.Serializable;
 
 public interface LikelihoodTree extends Serializable {
-	public void setLikelihoodModel(Object likelihoodModel);
+	public void setMigrationModel(Object migrationModel);
+	public void setCodonModel(Object condonModel);
 	public double logLikelihood();
 	String print();
 	public LikelihoodTree copy(); 

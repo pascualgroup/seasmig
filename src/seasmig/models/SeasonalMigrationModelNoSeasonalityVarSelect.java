@@ -140,7 +140,7 @@ public class SeasonalMigrationModelNoSeasonalityVarSelect extends SeasonalMigrat
 					workingCopy = data.getTrees().get(i).get((int)treeIndices[i].getValue()).copy(); 
 				else
 					workingCopy = data.getTrees().get(i).get(0).copy();
-				workingCopy.setLikelihoodModel(migrationBaseModel);
+				workingCopy.setMigrationModel(migrationBaseModel);
 				logP+=config.treeWeights[i]*workingCopy.logLikelihood();
 				trees[i]=workingCopy;
 			}

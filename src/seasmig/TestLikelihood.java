@@ -54,7 +54,7 @@ public class TestLikelihood {
 			System.out.print(".");
 			// TODO: maybe get likelihood to not require copy...
 			LikelihoodTree workingCopy = tree.copy();
-			workingCopy.setLikelihoodModel(((DataForTests)data).createModel);
+			workingCopy.setMigrationModel(((DataForTests)data).createModel);
 			createLikelihood+=workingCopy.logLikelihood();
 		}
 		createLikelihood=createLikelihood/data.getTrees().size();
@@ -70,7 +70,7 @@ public class TestLikelihood {
 			for (LikelihoodTree tree : data.getTrees().get(0)) {
 				System.out.print(".");
 				LikelihoodTree workingCopy = tree.copy();
-				workingCopy.setLikelihoodModel(((DataForTests)data).testModels.get(i));
+				workingCopy.setMigrationModel(((DataForTests)data).testModels.get(i));
 				testLikelihood+=workingCopy.logLikelihood();
 			}
 			testLikelihood=testLikelihood/data.getTrees().size();
