@@ -153,46 +153,53 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	}
 
 	public double seqLogLikelihood() {
+		
 		for (TreeWithLocationsAndNucleotidesNode node : root) { // Postorder 
 			if (node.children.size()!=0) { // this is an internal node			
 				for (int from = 0; from < 4; from++) {
 					for (TreeWithLocationsAndNucleotidesNode child : node.children ) {						
-						// for now caching is done inside likelihood model...
-						DoubleMatrix2D p[] = new DoubleMatrix2D[3];						
-						// TODO: check if clause (here for numerics issues) 
-						if (node.time!=child.time && node.loc==child.loc) { 												
-							p[0] = codonLikelihoodModel[0].transitionMatrix(node.time, child.time);
-							p[1] = codonLikelihoodModel[1].transitionMatrix(node.time, child.time);
-							p[2] = codonLikelihoodModel[2].transitionMatrix(node.time, child.time);
-						}
-						else {
-							p[0] = codonLikelihoodModel[0].transitionMatrix(node.time, child.time+Util.minValue);
-							p[1] = codonLikelihoodModel[1].transitionMatrix(node.time, child.time+Util.minValue);
-							p[2] = codonLikelihoodModel[2].transitionMatrix(node.time, child.time+Util.minValue);
-						}
-						
-						for (int loc=0;loc<seqLength;loc++) {
-							double[] alphas = new double[numLocations];						
-							for (int to = 0; to < numLocations; to++) { // Integrate over all possible locations
-								alphas[to]=(Math.log(p[loc%2].get(from,to)) + child.logProbsCP[loc%2][loc][to]);							
+						for (int codonPos = 0; codonPos <3 ; codonPos++) {
+							DoubleMatrix2D p = null;						
+							// TODO: check if clause (here for numerics issues) 
+							if (node.time!=child.time && node.loc==child.loc) { 												
+								p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time);
 							}
-							node.logProbsCP[loc%2][loc][from] += logSumExp(alphas); // Probability of internal node state based on children
+							else {
+								p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time+Util.minValue);
+							}
+																		
+							for (int loc=0;loc<seqLength/3;loc++) {
+								if ((loc*3+codonPos) >= seqLength) continue;							
+								double[] alphas = new double[4];						
+								for (int to = 0; to < 4; to++) { // Integrate over all possible nucleotides
+									alphas[to]=(Math.log(p.get(from,to)) + child.logProbsCP[codonPos][loc][to]);							
+								}
+								node.logProbsCP[codonPos][loc][from] += logSumExp(alphas);							
+							}
 						}
 					}								
 				}
 			}
 		}
 
-		// TODO: 
-		// Calculate root base frequency contribution... 
-//		DoubleMatrix1D rootFreq = migrationLikelihoodModel.rootfreq(root.time);
-//		double[] alphas = new double[numLocations];	
-//		for (int i = 0; i < 4; i++) {
-//			for (int loc = 0; loc < seqLength; loc++) {
-//				alphas[i]=root.logProbsCP1[i] + Math.log(rootFreq.get(i));
-//			}
-//			locationLogLike += logSumExp(alphas);
-//		}			
+		// Add root frequency		
+		DoubleMatrix1D pi[] = new DoubleMatrix1D[3];
+		
+		for (int i=0;i<3;i++) {
+			pi[i]=codonLikelihoodModel[i].rootfreq(root.time);
+		}
+
+		
+		for (int codonPos = 0; codonPos <3 ; codonPos++) {
+			for (int loc=0;loc<seqLength/3;loc++) {				
+				if ((loc*3+codonPos) >= seqLength) continue;			
+				double[] alphas = new double[4];	
+				for (int i = 0; i < 4; i++) {				
+					alphas[i]=root.logProbsCP[codonPos][loc][i] + Math.log(pi[codonPos].get(i));
+				}
+				locationLogLike += logSumExp(alphas);
+			}			
+		}			
 		return locationLogLike;		
 	}
 	
