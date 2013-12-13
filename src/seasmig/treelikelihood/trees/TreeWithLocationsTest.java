@@ -314,7 +314,7 @@ public class TreeWithLocationsTest {
 	
 	@Test
 	public void testSM() throws Exception {
-		// TODO: better test...
+		// TODO:test...
 		/* 
 		   --
 		  /  \

@@ -54,18 +54,18 @@ public class TreeWithLocationsAndNucleotidesTest {
 		
 		double expectedResult = -4.2023210731*3;
 		
-		TreeWithLocationsAndNucleotidesNode root = new TreeWithLocationsAndNucleotidesNode(new Sequence(2), TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,0.0,null);		
-		root.addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence("AG"),0,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,1.0,root));
-		root.addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence(2),TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,1.0,null));
-		root.children.get(1).addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence("CT"), 1,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,2.0,null));
-		root.children.get(1).addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence("AG"),0,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,2.0,null));
+		TreeWithLocationsAndNucleotidesNode root = new TreeWithLocationsAndNucleotidesNode(new Sequence(1), TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence("A"),0,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence(1),TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence("C"), 1,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence("A"),0,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,2.0,null));
 		TransitionModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
 																 { 0.333333,0.333333,0.333333,-1}});
 		TransitionModel[] codonModel = new TransitionModel[]{equalModel,equalModel,equalModel};
 		
-		TreeWithLocationsAndNucleotides tree = new TreeWithLocationsAndNucleotides(root, 4, 2);
+		TreeWithLocationsAndNucleotides tree = new TreeWithLocationsAndNucleotides(root, 4, 1);
 		tree.setMigrationModel(equalModel);
 		tree.setCodonModel(codonModel);
 		

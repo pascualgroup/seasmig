@@ -5,6 +5,8 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Sequence implements Serializable {
 
+	// TODO: ARE MIXED (i.e. R,Y..) CODONS REALLY .25 .25 or SHOULD USE PIs ??
+	
 	//	# Log probability of tip encoding of nucleotides (A,G,C,T,R,Y,S,W,K,M,B,D,H,V,N,-)	
 	public static final double[] NUC_A = new double[]{0,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
 	public static final double[] NUC_G = new double[]{Double.NEGATIVE_INFINITY,0,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
@@ -25,6 +27,8 @@ public class Sequence implements Serializable {
 
 	public static final double[] NUC_N = new double[]{Math.log(0.25),Math.log(0.25),Math.log(0.25),Math.log(0.25)};
 	public static final double[] NUC_GAP = new double[]{Math.log(0.25),Math.log(0.25),Math.log(0.25),Math.log(0.25)};
+	
+	public static final double[] INTERNAL = new double[]{0,0,0,0};
 
 	double[][] seq = null;
 
@@ -60,9 +64,13 @@ public class Sequence implements Serializable {
 	public Sequence(int length) {
 		seq = new double[length][];
 		for (int i=0;i<length;i++) {
-			seq[i]=NUC_GAP; 				
+			seq[i]=INTERNAL; 				
 		}
 	}
+	
+	public double[] get(int pos) {
+		return seq[pos];
+	}	
 	
 	public String toString() {
 		// TODO:

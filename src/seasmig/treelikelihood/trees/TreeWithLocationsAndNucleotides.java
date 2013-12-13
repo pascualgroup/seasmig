@@ -135,17 +135,18 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 				node.logProbsLOC= ZERO_LOG_PROBS.clone();
 				node.logProbsLOC[node.loc]=0; // Tip node
 			}
+			
+			if (node.children.size()!=0) { // this is an internal node		
+				for (TreeWithLocationsAndNucleotidesNode child : node.children ) {
+					// for now caching is done inside likelihood model...
+					DoubleMatrix2D p;						
+					// TODO: check if clause (here for numerics issues) 
+					if (node.time!=child.time && node.loc==child.loc) 												
+						p = migrationLikelihoodModel.transitionMatrix(node.time, child.time);
+					else
+						p = migrationLikelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
 
-			if (node.children.size()!=0) { // this is an internal node			
-				for (int from = 0; from < numLocations; from++) {
-					for (TreeWithLocationsAndNucleotidesNode child : node.children ) {
-						// for now caching is done inside likelihood model...
-						DoubleMatrix2D p;						
-						// TODO: check if clause (here for numerics issues) 
-						if (node.time!=child.time && node.loc==child.loc) 												
-							p = migrationLikelihoodModel.transitionMatrix(node.time, child.time);
-						else
-							p = migrationLikelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
+					for (int from = 0; from < numLocations; from++) {
 						double[] alphas = new double[numLocations];						
 						for (int to = 0; to < numLocations; to++) { // Integrate over all possible locations
 							alphas[to]=(Math.log(p.get(from,to)) + child.logProbsLOC[to]);							
@@ -168,11 +169,22 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	}
 
 	public double seqLogLikelihood() {
+		seqLogLike=0;
+		for (TreeWithLocationsAndNucleotidesNode node : root) { // Postorder
+			if (node.logProbsCP==null) {
+				node.logProbsCP = new double[3][(seqLength+1)/3][4];
 
-		for (TreeWithLocationsAndNucleotidesNode node : root) { // Postorder 
+				for (int codonPos = 0; codonPos <3 ; codonPos++) {
+					for (int loc=0;loc<(seqLength+1)/3;loc++) {
+						if ((loc*3+codonPos) >= seqLength) continue;
+						node.logProbsCP[codonPos][loc]=node.seq.get(loc*3+codonPos);									
+					}
+				}
+			}
+
 			if (node.children.size()!=0) { // this is an internal node			
-				for (int from = 0; from < 4; from++) {
-					for (TreeWithLocationsAndNucleotidesNode child : node.children ) {						
+				for (TreeWithLocationsAndNucleotidesNode child : node.children ) {
+					for (int from = 0; from < 4; from++) {
 						for (int codonPos = 0; codonPos <3 ; codonPos++) {
 							DoubleMatrix2D p = null;						
 							// TODO: check if clause (here for numerics issues) 
@@ -183,10 +195,10 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 								p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time+Util.minValue);
 							}
 
-							for (int loc=0;loc<seqLength/3;loc++) {
+							for (int loc=0;loc<(seqLength+1)/3;loc++) {
 								if ((loc*3+codonPos) >= seqLength) continue;							
 								double[] alphas = new double[4];						
-								for (int to = 0; to < 4; to++) { // Integrate over all possible nucleotides
+								for (int to = 0; to < 4; to++) { // Integrate over all possible nucleotides									
 									alphas[to]=(Math.log(p.get(from,to)) + child.logProbsCP[codonPos][loc][to]);							
 								}
 								node.logProbsCP[codonPos][loc][from] += logSumExp(alphas);							
@@ -206,16 +218,16 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 
 
 		for (int codonPos = 0; codonPos <3 ; codonPos++) {
-			for (int loc=0;loc<seqLength/3;loc++) {				
+			for (int loc=0;loc<(seqLength+1)/3;loc++) {				
 				if ((loc*3+codonPos) >= seqLength) continue;			
 				double[] alphas = new double[4];	
 				for (int i = 0; i < 4; i++) {				
 					alphas[i]=root.logProbsCP[codonPos][loc][i] + Math.log(pi[codonPos].get(i));
 				}
-				locationLogLike += logSumExp(alphas);
+				seqLogLike += logSumExp(alphas);
 			}			
 		}			
-		return locationLogLike;		
+		return seqLogLike;		
 	}
 
 	@Override

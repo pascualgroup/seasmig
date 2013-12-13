@@ -33,7 +33,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	double[] ZERO_LOG_PROBS;
 	private double logLike = 0;
-	
+
 	public int smMaxBranchRetries = 100000; 
 
 	// Tree generate parameters for test purpose
@@ -184,16 +184,16 @@ public class TreeWithLocations implements LikelihoodTree {
 				node.logProbs[node.loc]=0; // Tip node
 			}
 
-			if (node.children.size()!=0) { // this is an internal node			
-				for (int from = 0; from < numLocations; from++) {
-					for (TreeWithLocationsNode child : node.children ) {
-						// for now caching is done inside likelihood model...
-						DoubleMatrix2D p;						
-						// TODO: check if clause (here for numerics issues) 
-						if (node.time!=child.time && node.loc==child.loc) 												
-							p = likelihoodModel.transitionMatrix(node.time, child.time);
-						else
-							p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
+			if (node.children.size()!=0) { // this is an internal node							
+				for (TreeWithLocationsNode child : node.children ) {
+					// for now caching is done inside likelihood model...
+					DoubleMatrix2D p;						
+					// TODO: check if clause (here for numerics issues) 
+					if (node.time!=child.time && node.loc==child.loc) 												
+						p = likelihoodModel.transitionMatrix(node.time, child.time);
+					else
+						p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
+					for (int from = 0; from < numLocations; from++) {
 						double[] alphas = new double[numLocations];						
 						for (int to = 0; to < numLocations; to++) { // Integrate over all possible locations
 							alphas[to]=(Math.log(p.get(from,to)) + child.logProbs[to]);							
@@ -746,7 +746,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public void setCodonModel(Object condonModel) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
