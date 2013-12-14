@@ -172,30 +172,25 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		seqLogLike=0;
 		for (TreeWithLocationsAndNucleotidesNode node : root) { // Postorder
 			if (node.logProbsCP==null) {
-				node.logProbsCP = new double[3][(seqLength+1)/3][4];
+				node.logProbsCP = new double[3][(seqLength-1)/3+1][4];
 
 				for (int codonPos = 0; codonPos <3 ; codonPos++) {
-					for (int loc=0;loc<(seqLength+1)/3;loc++) {
+					for (int loc=0;loc<(seqLength-1)/3+1;loc++) {
 						if ((loc*3+codonPos) >= seqLength) continue;
-						node.logProbsCP[codonPos][loc]=node.seq.get(loc*3+codonPos);									
+						node.logProbsCP[codonPos][loc]=node.seq.get(loc*3+codonPos).clone();									
 					}
 				}
 			}
 
 			if (node.children.size()!=0) { // this is an internal node			
-				for (TreeWithLocationsAndNucleotidesNode child : node.children ) {
-					for (int from = 0; from < 4; from++) {
-						for (int codonPos = 0; codonPos <3 ; codonPos++) {
-							DoubleMatrix2D p = null;						
-							// TODO: check if clause (here for numerics issues) 
-							if (node.time!=child.time && node.loc==child.loc) { 												
-								p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time);
-							}
-							else {
-								p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time+Util.minValue);
-							}
+				for (TreeWithLocationsAndNucleotidesNode child : node.children ) {					
+					for (int codonPos = 0; codonPos <3 ; codonPos++) {
+						DoubleMatrix2D p = null;						
+						// TODO: Util.minValue here for numerics issues, check this... 
+						p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time+Util.minValue);
 
-							for (int loc=0;loc<(seqLength+1)/3;loc++) {
+						for (int loc=0;loc<((seqLength-1)/3+1);loc++) {
+							for (int from = 0; from < 4; from++) {													
 								if ((loc*3+codonPos) >= seqLength) continue;							
 								double[] alphas = new double[4];						
 								for (int to = 0; to < 4; to++) { // Integrate over all possible nucleotides									
@@ -218,7 +213,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 
 
 		for (int codonPos = 0; codonPos <3 ; codonPos++) {
-			for (int loc=0;loc<(seqLength+1)/3;loc++) {				
+			for (int loc=0;loc<((seqLength-1)/3+1);loc++) {				
 				if ((loc*3+codonPos) >= seqLength) continue;			
 				double[] alphas = new double[4];	
 				for (int i = 0; i < 4; i++) {				
