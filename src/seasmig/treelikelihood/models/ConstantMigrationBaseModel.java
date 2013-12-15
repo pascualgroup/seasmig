@@ -7,6 +7,7 @@ import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
+import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
 //import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 
@@ -27,13 +28,13 @@ public class ConstantMigrationBaseModel implements TransitionModel {
 
 	// Matrix Exponentiation
 	MatrixExponentiator matrixExponentiator;
-	
-	
+
+
 
 	private DoubleMatrix1D basefreq;	
 
 	protected ConstantMigrationBaseModel() {};
-	
+
 	// Constructor	
 	public ConstantMigrationBaseModel(double[][] Q_) {	
 		Q = Q_;
@@ -51,19 +52,25 @@ public class ConstantMigrationBaseModel implements TransitionModel {
 				matrixExponentiator=new Matlab7MatrixExp(Q);
 			}
 			break;			
-		default:			
-			//matrixExponentiator=new EigenDecomposionExp(Q);
-			//if (!matrixExponentiator.checkMethod()) {
+		default:
+			// TODO: check if this helps
+			matrixExponentiator=new EigenDecomposionExp(Q);
+			if (!matrixExponentiator.checkMethod()) {
 				matrixExponentiator=new Matlab7MatrixExp(Q);
-			//}
+			}
 		}
 		// TODO: Maybe use other method to get s.s. freq 
 		basefreq=matrixExponentiator.expm(veryLongTime).viewRow(1);
 		// TODO: Figure out if calculating base freq helps or interferes. 
-//		basefreq=new double[num_locations];
-//		for (int i=0;i<num_locations;i++) {
-//			basefreq[i]=1.0/num_locations;
-//		}
+		//		basefreq=new double[num_locations];
+		//		for (int i=0;i<num_locations;i++) {
+		//			basefreq[i]=1.0/num_locations;
+		//		}
+	}
+
+	// Constructor	
+	public ConstantMigrationBaseModel(double mu, double[] k, double[] pi) {	
+		// TODO:
 	}
 
 	// Methods
@@ -82,7 +89,7 @@ public class ConstantMigrationBaseModel implements TransitionModel {
 	@Override
 	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {		
 		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
-		
+
 		DoubleMatrix2D cached = cachedTransitionMatrices.get(dt);
 		if (cached!=null) {
 			return cached;
@@ -119,7 +126,7 @@ public class ConstantMigrationBaseModel implements TransitionModel {
 		returnValue+="}\n";
 		return returnValue;
 	}
-	
+
 	@Override
 	public String parse() {		
 		String returnValue = "{";
@@ -172,7 +179,7 @@ public class ConstantMigrationBaseModel implements TransitionModel {
 	public Transition nextEvent(double from_time, int from) {
 		// TODO Auto-generated method stub
 		double lambda = -Q[from][from];
-		
+
 		double time = cern.jet.random.Exponential.staticNextDouble(lambda); // TODO: check exp parameterization !!!
 		double p=-Q[from][0]/Q[from][from];
 		double rnd = cern.jet.random.Uniform.staticNextDouble();
@@ -182,7 +189,7 @@ public class ConstantMigrationBaseModel implements TransitionModel {
 			p = p-Q[from][loc]/Q[from][from];
 		}
 		// TODO: check this
-		
+
 		return new Transition(time+from_time, loc);
 	}
 
