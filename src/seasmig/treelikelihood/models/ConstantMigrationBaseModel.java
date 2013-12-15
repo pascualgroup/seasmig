@@ -8,6 +8,7 @@ import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
+import seasmig.treelikelihood.matrixexp.HKY85MatrixExp;
 import seasmig.treelikelihood.matrixexp.JC69MatrixExp;
 //import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
@@ -71,9 +72,15 @@ public class ConstantMigrationBaseModel implements TransitionModel {
 
 	// Constructor	
 	public ConstantMigrationBaseModel(double mu) {	// JC69
-		// TODO:
 		matrixExponentiator=new JC69MatrixExp(mu);
 	}
+	
+	// Constructor	
+	public ConstantMigrationBaseModel(double mu, double kappa, double piC, double piA, double piG) {	// JC69
+		// TODO:
+		matrixExponentiator=new HKY85MatrixExp(mu, kappa, piC, piA, piG);
+	}
+
 
 	// Methods
 	@Override
