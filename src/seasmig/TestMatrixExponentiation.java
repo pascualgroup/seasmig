@@ -1,5 +1,6 @@
 package seasmig;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Vector;
@@ -11,6 +12,8 @@ import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
+import seasmig.treelikelihood.matrixexp.HKY85MatrixExp;
+import seasmig.treelikelihood.matrixexp.JC69MatrixExp;
 import seasmig.treelikelihood.matrixexp.JamaMolerMatrixExp;
 import seasmig.treelikelihood.matrixexp.JblasMatrixExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
@@ -29,6 +32,124 @@ public class TestMatrixExponentiation {
 	final double tol = 0.001;
 	final int[] testDimensions = {2,3,4,5,6,7,8,9,10,20,40};
 
+	@Test
+	public void testJC69() {
+		MatrixExponentiator matrixExponentiator1 = new JC69MatrixExp(0.1);
+		MatrixExponentiator matrixExponentiator2 = new Matlab7MatrixExp(
+				new double[][]{
+						{-0.1*3.0/4.0,0.1/4.0,0.1/4.0,0.1/4.0},
+						{0.1/4.0,-0.1*3.0/4.0,0.1/4.0,0.1/4.0},
+						{0.1/4.0,0.1/4.0,-0.1*3.0/4.0,0.1/4.0},
+						{0.1/4.0,0.1/4.0,0.1/4.0,-0.1*3.0/4.0}});
+		double[][] res1=matrixExponentiator1.expm(0.1).toArray();
+		double[][] res2=matrixExponentiator2.expm(0.1).toArray();
+
+		System.out.println("res1:");
+		for (int i=0;i<res1.length;i++) {
+			for (int j=0;j<res1[0].length;j++) {
+				System.out.print(res1[i][j]+"\t");				
+			}
+			System.out.println();
+		}
+		System.out.println("res2:");
+		for (int i=0;i<res2.length;i++) {
+			for (int j=0;j<res2[0].length;j++) {
+				System.out.print(res2[i][j]+"\t");								
+			}
+			System.out.println();
+		}
+
+		System.out.println("timing:");
+		long startTime1= System.currentTimeMillis();	
+		for (int rep=0;rep<1000000;rep++) {
+			res1=matrixExponentiator1.expm(rep/10000).toArray();			
+			if (Math.random()<0.00000001) {
+				System.out.println(res1[0][0]);
+			}
+		}
+		long time1= System.currentTimeMillis()-startTime1;
+
+		long startTime2= System.currentTimeMillis();
+		for (int rep=0;rep<1000000;rep++) {
+			res2=matrixExponentiator2.expm(rep/10000).toArray();			
+			if (Math.random()<0.00000001) {
+				System.out.println(res2[0][0]);
+			}
+		}
+		long time2= System.currentTimeMillis()-startTime2;
+		System.out.println("time1: "+time1+"[ms] time2: "+time2+"[ms]");
+	
+		for (int i=0; i<4; i++) 
+			assertArrayEquals(res1[i],res2[i],0.0000001);
+	}
+	
+	@Test
+	public void testHKY85() {
+		double mu = 0.1;
+		double kappa = 0.2;
+		double piC = 0.3;
+		double piA = 0.2;
+		double piG = 0.25;
+		double piT = 1.0 - piC - piA - piG;
+		double[][] Q = {
+				{0,mu*kappa*piC, mu*piA, mu*piG},
+				{mu*kappa*piT, 0, mu*piA, mu*piG},
+				{mu*piT, mu*piC, 0, mu*kappa*piG},
+				{mu*piT, mu*piC, mu*kappa*piA, 0}};
+		
+		for (int i=0;i<4;i++) {
+			double rowsum=0;
+			for (int j=0;j<4;j++) {
+				rowsum=rowsum+Q[i][j];
+			}
+			Q[i][i]=-rowsum;
+		}
+		
+		MatrixExponentiator matrixExponentiator1 = new HKY85MatrixExp(mu,kappa,piC,piA,piG);
+		MatrixExponentiator matrixExponentiator2 = new Matlab7MatrixExp(Q);
+		
+		double[][] res1=matrixExponentiator1.expm(0.1).toArray();
+		double[][] res2=matrixExponentiator2.expm(0.1).toArray();
+
+		System.out.println("res1:");
+		for (int i=0;i<res1.length;i++) {
+			for (int j=0;j<res1[0].length;j++) {
+				System.out.print(res1[i][j]+"\t");				
+			}
+			System.out.println();
+		}
+		System.out.println("res2:");
+		for (int i=0;i<res2.length;i++) {
+			for (int j=0;j<res2[0].length;j++) {
+				System.out.print(res2[i][j]+"\t");								
+			}
+			System.out.println();
+		}
+
+		System.out.println("timing:");
+		long startTime1= System.currentTimeMillis();	
+		for (int rep=0;rep<1000000;rep++) {
+			res1=matrixExponentiator1.expm(rep/10000).toArray();			
+			if (Math.random()<0.00000001) {
+				System.out.println(res1[0][0]);
+			}
+		}
+		long time1= System.currentTimeMillis()-startTime1;
+
+		long startTime2= System.currentTimeMillis();
+		for (int rep=0;rep<1000000;rep++) {
+			res2=matrixExponentiator2.expm(rep/10000).toArray();			
+			if (Math.random()<0.00000001) {
+				System.out.println(res2[0][0]);
+			}
+		}
+		long time2= System.currentTimeMillis()-startTime2;
+		System.out.println("time1: "+time1+"[ms] time2: "+time2+"[ms]");
+	
+		for (int i=0; i<4; i++) 
+			assertArrayEquals(res1[i],res2[i],0.0000001);
+	}
+	
 	@Test
 	public void testMatrixExponentiation() {	
 		int dotIter=0;

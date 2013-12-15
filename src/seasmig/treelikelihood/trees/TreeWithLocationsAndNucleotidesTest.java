@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
-import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
 
 
 public class TreeWithLocationsAndNucleotidesTest {
