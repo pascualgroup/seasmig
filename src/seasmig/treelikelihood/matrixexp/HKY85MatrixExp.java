@@ -8,63 +8,69 @@ import seasmig.treelikelihood.MatrixExponentiator;
 public class HKY85MatrixExp implements MatrixExponentiator {
 
 	boolean methodOK;
-	private double mu;
-	private double kappa;
+	private double k;
 	private double piC;
 	private double piA;
 	private double piG;
 	private double piT;
-	private double beta;
+	private double mu;
 
 	protected HKY85MatrixExp() {};	
 
-	public HKY85MatrixExp(double mu, double kappa, double piC, double piA, double piG) {		
+	public HKY85MatrixExp(double mu, double kappa, double piC, double piA, double piG) {			
+		// kappa ratio of transitions to transversions
+		// mu mutaiton rate
+		// pi_j background or equilibrium frequency of base j
+
 		this.mu = mu;
-		this.kappa = kappa;
+		this.k = kappa;
 		this.piC = piC;
 		this.piA = piA;
 		this.piG = piG;
-		this.piT = 1 - piC - piA - piG; 
-		methodOK = (mu>0) && (kappa>0) && (piC>=0) && (piC<=1.0) && (piA>=0) && (piA<=1.0) && (piG>=0) && (piG<=1.0) && (Math.abs(1-piC-piA-piG-piT)<0.000001);
-		this.beta = 1.0/( 2.0*(piA+piG)*(piC+piT)+2*kappa*((piA*piG)+(piC*piT)) );
+		this.piT = 1 - piC - piA - piG; 	
 		
+		methodOK = (mu>0) && (kappa>0) && (piC>=0) && (piC<=1.0) && (piA>=0) && (piA<=1.0) && (piG>=0) && (piG<=1.0) && ((piA+piC+piG)<1);
+
 	}
 
 	@Override
 	public DoubleMatrix2D expm(double t) {
-		// TODO: check transpose
-		// TCAG is position 0,1,2,3
-		DoubleMatrix2D returnValue = DoubleFactory2D.dense.make(4,4);
+		// see HKY.nb
+		// 
 
-		double expbetamut = cern.jet.math.Functions.exp.apply(-1*t*mu*beta);
-	
-		returnValue.setQuick(0, 1, ( piC*(piT+piC+(piG+piA)*expbetamut)-piC*expbetamut*cern.jet.math.Functions.exp.apply(1+(piT+piC)/(kappa-1)) )/(piT+piC)); // P_TC 
-		returnValue.setQuick(0, 2, piA*(1-expbetamut)); // P_TA
-		returnValue.setQuick(0, 3, piG*(1-expbetamut)); // P_TG
-		returnValue.setQuick(1, 0, ( piT*(piC+piT+(piG+piA)*expbetamut)-piT*expbetamut*cern.jet.math.Functions.exp.apply(1+(piC+piT)/(kappa-1)) )/(piC+piT)); // P_CT
-		returnValue.setQuick(1, 2, piA*(1-expbetamut)); // P_CA
-		returnValue.setQuick(1, 3, piG*(1-expbetamut)); // P_CG
-		returnValue.setQuick(2, 0, piT*(1-expbetamut)); // P_AT
-		returnValue.setQuick(2, 1, piC*(1-expbetamut)); // P_AC
-		returnValue.setQuick(2, 3, ( piG*(piA+piG+(piC+piT)*expbetamut)-piG*expbetamut*cern.jet.math.Functions.exp.apply(1+(piA+piG)/(kappa-1)) )/(piA+piG)); // P_AG
-		returnValue.setQuick(3, 0, piT*(1-expbetamut)); // P_GT
-		returnValue.setQuick(3, 1, piC*(1-expbetamut)); // P_GC
+		// TCAG is position 0,1,2,3
+		DoubleMatrix2D returnValue = DoubleFactory2D.dense.make(4,4);	
+
+		double exp_mu_t = cern.jet.math.Functions.exp.apply(mu*t);
 		
-		returnValue.setQuick(3, 2, ( piA*(piG+piA+(piC+piT)*expbetamut)-piA*expbetamut*cern.jet.math.Functions.exp.apply(1+(piG+piA)/(kappa-1)) )/(piG+piA)); // P_GA;		
-		returnValue.setQuick(0, 0, ( piT*(piT+piG+(piC+piA)*expbetamut)+piG*expbetamut*cern.jet.math.Functions.exp.apply(1+(piT+piG)*(kappa-1)) )/(piT+piG)); // P_TT
-		returnValue.setQuick(1, 1, ( piC*(piC+piG+(piA+piT)*expbetamut)+piG*expbetamut*cern.jet.math.Functions.exp.apply(1+(piC+piG)*(kappa-1)) )/(piC+piG)); // P_CC
-		returnValue.setQuick(2, 2, ( piA*(piA+piG+(piC+piT)*expbetamut)+piG*expbetamut*cern.jet.math.Functions.exp.apply(1+(piA+piG)*(kappa-1)) )/(piA+piG)); // P_AA
-		returnValue.setQuick(3, 3, ( piG*(piG+piA+(piC+piT)*expbetamut)+piA*expbetamut*cern.jet.math.Functions.exp.apply(1+(piG+piA)*(kappa-1)) )/(piG+piA)); // P_GG
-						
+		returnValue.setQuick(0, 0, (piC/cern.jet.math.Functions.exp.apply((-1 + k)*mu*(piC + piT)*t) - piT*(-1 + piC + piT) + exp_mu_t*piT*(piC + piT))/(exp_mu_t*(piC + piT)));
+		returnValue.setQuick(0, 1, (piC*(1 - cern.jet.math.Functions.exp.apply(-((-1 + k)*mu*(piC + piT)*t)) - piC - piT + exp_mu_t*(piC + piT)))/(exp_mu_t*(piC+piT)));
+		returnValue.setQuick(0, 2, -(((-1 + exp_mu_t)*(-1 + piC + piG + piT))/exp_mu_t));
+		returnValue.setQuick(0, 3, piG - piG/exp_mu_t);
+		returnValue.setQuick(1, 0, (piT*(1 - cern.jet.math.Functions.exp.apply(-((-1 + k)*mu*(piC + piT)*t)) - piC - piT + exp_mu_t*(piC + piT)))/(exp_mu_t*(piC + piT)));
+		returnValue.setQuick(1, 1, (piT/cern.jet.math.Functions.exp.apply((-1 + k)*mu*(piC + piT)*t) - piC*(-1 + piC + piT) + exp_mu_t*piC*(piC + piT))/(exp_mu_t*(piC + piT)));
+		returnValue.setQuick(1, 2, returnValue.getQuick(0,2));
+		returnValue.setQuick(1, 3, returnValue.getQuick(0,3));
+		returnValue.setQuick(2, 0, piT - piT/exp_mu_t);
+		returnValue.setQuick(2, 1, piC - piC/exp_mu_t);
+		returnValue.setQuick(2, 2, (cern.jet.math.Functions.exp.apply((-1 + k)*mu*(-1 + piC + piT)*t)*piG + exp_mu_t*(-1 + piC + piT)*(-1 + piC + piG + piT) - (piC + piT)*(-1 + piC + piG + piT))/
+				 (exp_mu_t*(piA + piG)));
+		returnValue.setQuick(2, 3, (piG*(-cern.jet.math.Functions.exp.apply((-1 + k)*mu*(-1 + piC + piT)*t) + piC + piT - exp_mu_t*(-1 + piC + piT)))/(exp_mu_t*(piA + piG)));
+		returnValue.setQuick(3, 0, returnValue.getQuick(2,0));
+		returnValue.setQuick(3, 1, returnValue.getQuick(2,1));
+		returnValue.setQuick(3, 2, ((-1 + piC + piG + piT)*(cern.jet.math.Functions.exp.apply((-1 + k)*mu*(-1 + piC + piT)*t) - piC - piT + exp_mu_t*(-1 + piC + piT)))/(exp_mu_t*(piA + piG)));
+		returnValue.setQuick(3, 3, (-(exp_mu_t*piG*(-1 + piC + piT)) + piG*(piC + piT) - cern.jet.math.Functions.exp.apply((-1 + k)*mu*(-1 + piC + piT)*t)*(-1 + piC + piG + piT))/(exp_mu_t*(piA + piG)));
+
 		return returnValue;
+
 	}
 
 
+
+
 	@Override
-	public boolean checkMethod() {		
-		// TODO: 
-		//return methodOK;
-		return false;
+	public boolean checkMethod() {		 
+		return methodOK;
 	}
 
 	@Override
@@ -77,3 +83,5 @@ public class HKY85MatrixExp implements MatrixExponentiator {
 
 	}
 }
+
+

@@ -1,9 +1,5 @@
 package seasmig.treelikelihood.matrixexp;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
 import seasmig.treelikelihood.MatrixExponentiator;
