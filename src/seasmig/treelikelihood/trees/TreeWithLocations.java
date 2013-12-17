@@ -830,8 +830,8 @@ public class TreeWithLocations implements LikelihoodTree {
 		if (index!=(node.transitions.size()-1)) {
 			return 0;			
 		}
-		else {
-			return getNumLocalTips(node);
+		else {			
+			return (node.isTip() ? 1 : 0)+getNumLocalTips(node);
 		}
 	}
 
@@ -856,14 +856,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private double getTotalBranchLength(TreeWithLocationsNode node,
 			Transition transition) { 
 		// TODO test this		
-		// List with at least one element...
-		int index = node.transitions.indexOf(transition);
-		if (index!=(node.transitions.size()-1)) {
-			return (node.transitions.get(index+1).time - transition.time);			
-		}
-		else {
-			return (node.time-transition.time) + getTotalBranchLength(node);
-		}
+		return (node.time-transition.time) + getTotalBranchLength(node);		
 	}
 
 	private double getTotalBranchLength(TreeWithLocationsNode node) {
