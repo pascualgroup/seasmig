@@ -50,7 +50,7 @@ public class EpochalMigrationBaseModel implements TransitionModel {
 		epochRates=seasonalRates_;
 		epochs = epochs_;
 		nParts = epochs.length;
-		constantModels = new ConstantMigrationBaseModel[nParts];
+		constantModels = new ConstantTransitionBaseModel[nParts];
 
 		for (int i=0;i<nParts;i++) {
 			double[][] migrationMatrix = new double[num_locations][num_locations];
@@ -64,7 +64,7 @@ public class EpochalMigrationBaseModel implements TransitionModel {
 				}
 				migrationMatrix[j][j]=-row_sum;
 			}
-			constantModels[i]=new ConstantMigrationBaseModel(migrationMatrix);
+			constantModels[i]=new ConstantTransitionBaseModel(migrationMatrix);
 		}		
 		rootFreq = rootFreq_;
 	}

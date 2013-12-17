@@ -14,7 +14,7 @@ import seasmig.treelikelihood.matrixexp.JC69MatrixExp;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 
 @SuppressWarnings("serial")
-public class ConstantMigrationBaseModel implements TransitionModel {
+public class ConstantTransitionBaseModel implements TransitionModel {
 
 	// Precision Parameter
 	static final double timePrecision = 1.0E-5;
@@ -35,10 +35,10 @@ public class ConstantMigrationBaseModel implements TransitionModel {
 
 	private DoubleMatrix1D basefreq;	
 
-	protected ConstantMigrationBaseModel() {};
+	protected ConstantTransitionBaseModel() {};
 
 	// Constructor	
-	public ConstantMigrationBaseModel(double[][] Q_) {	
+	public ConstantTransitionBaseModel(double[][] Q_) {	
 		Q = Q_;
 		num_locations=Q_.length;
 		switch (num_locations) {
@@ -71,13 +71,12 @@ public class ConstantMigrationBaseModel implements TransitionModel {
 	}
 
 	// Constructor	
-	public ConstantMigrationBaseModel(double mu) {	// JC69
+	public ConstantTransitionBaseModel(double mu) {	// JC69
 		matrixExponentiator=new JC69MatrixExp(mu);
 	}
 	
 	// Constructor	
-	public ConstantMigrationBaseModel(double mu, double kappa, double piC, double piA, double piG) {	// JC69
-		// TODO:
+	public ConstantTransitionBaseModel(double mu, double kappa, double piC, double piA, double piG) {	// HKY85
 		matrixExponentiator=new HKY85MatrixExp(mu, kappa, piC, piA, piG);
 	}
 

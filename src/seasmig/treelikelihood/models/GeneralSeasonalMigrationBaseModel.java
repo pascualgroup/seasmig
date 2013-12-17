@@ -49,7 +49,7 @@ public class GeneralSeasonalMigrationBaseModel implements TransitionModel {
 		seasonalRates=seasonalRates_;
 		nYearParts = nYearParts_;
 		dt = 1.0/(double)nYearParts;
-		constantModels = new ConstantMigrationBaseModel[nYearParts];
+		constantModels = new ConstantTransitionBaseModel[nYearParts];
 		double t=dt/2.0;
 		for (int i=0;i<nYearParts;i++) {
 			double[][] migrationMatrix = new double[num_locations][num_locations];
@@ -63,7 +63,7 @@ public class GeneralSeasonalMigrationBaseModel implements TransitionModel {
 				}
 				migrationMatrix[j][j]=-row_sum;
 			}
-			constantModels[i]=new ConstantMigrationBaseModel(migrationMatrix);
+			constantModels[i]=new ConstantTransitionBaseModel(migrationMatrix);
 			t+=dt;
 		}		
 		rootFreq = rootFreq_;

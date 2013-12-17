@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import seasmig.treelikelihood.TransitionModel;
-import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
+import seasmig.treelikelihood.models.ConstantTransitionBaseModel;
 import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
 
 
@@ -59,7 +59,7 @@ public class TreeWithLocationsTest {
 		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
-		TransitionModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
 																 { 0.333333,0.333333,0.333333,-1}});
@@ -145,7 +145,7 @@ public class TreeWithLocationsTest {
 			}
 		}
 		double seasonalPhase = cern.jet.random.Uniform.staticNextDouble()*0.5;
-		TransitionModel equalModel = new ConstantMigrationBaseModel(singleMatrix);		
+		TransitionModel equalModel = new ConstantTransitionBaseModel(singleMatrix);		
 		TransitionModel twoSeasonModel = new TwoSeasonMigrationBaseModel(matrixSeas1 ,matrixSeas2 , seasonalPhase, seasonalPhase+0.5);
 		TreeWithLocations locTreeEqual = new TreeWithLocations(root,equalModel);
 		TreeWithLocations locTreeTwoSeasons = new TreeWithLocations(root,twoSeasonModel);
@@ -185,7 +185,7 @@ public class TreeWithLocationsTest {
 		// Model
 		TransitionModel equalModel = 
 				new 
-				ConstantMigrationBaseModel(makeRandomMigrationMatrix(cern.jet.random.Uniform.staticNextIntFromTo(2, 10), 
+				ConstantTransitionBaseModel(makeRandomMigrationMatrix(cern.jet.random.Uniform.staticNextIntFromTo(2, 10), 
 				10*cern.jet.random.Uniform.staticNextDouble()));
 		
 		// Tree Likelihood Method 1
@@ -243,7 +243,7 @@ public class TreeWithLocationsTest {
 		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
-		TransitionModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.2,0.3,0.5},
+		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.2,0.3,0.5},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 1.333333,0.333333,-4,2.333333},
 																 { 0.333333,0.666666,1.0,-2}});
@@ -271,7 +271,7 @@ public class TreeWithLocationsTest {
 		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
-		TransitionModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
 																 { 0.333333,0.333333,0.333333,-1}});
@@ -288,7 +288,7 @@ public class TreeWithLocationsTest {
 			root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
 			root.children.get(1).addChild(new TreeWithLocationsNode(1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 			root.children.get(1).addChild(new TreeWithLocationsNode(0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
-			equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+			equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																	 { 0.333333,-1,0.333333,0.333333},
 																	 { 0.333333,0.333333,-1,0.333333},
 																	 { 0.333333,0.333333,0.333333,-1}});
@@ -331,7 +331,7 @@ public class TreeWithLocationsTest {
 		root.addChild(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(1,2,2.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsNode(0,3,2.0,null));
-		TransitionModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
 																 { 0.333333,0.333333,0.333333,-1}});

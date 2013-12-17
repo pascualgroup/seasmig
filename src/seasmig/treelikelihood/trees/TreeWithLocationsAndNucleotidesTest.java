@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import seasmig.treelikelihood.TransitionModel;
-import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
+import seasmig.treelikelihood.models.ConstantTransitionBaseModel;
 
 
 public class TreeWithLocationsAndNucleotidesTest {
@@ -58,7 +58,7 @@ public class TreeWithLocationsAndNucleotidesTest {
 		root.addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence(2),TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,1.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence("CT"), 1,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,2.0,null));
 		root.children.get(1).addChild(new TreeWithLocationsAndNucleotidesNode(new Sequence("AG"),0,TreeWithLocationsAndNucleotides.UNKNOWN_TAXA,2.0,null));
-		TransitionModel equalModel = new ConstantMigrationBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
 																 { 0.333333,0.333333,0.333333,-1}});

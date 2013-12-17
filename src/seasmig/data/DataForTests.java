@@ -19,7 +19,7 @@ import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
-import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
+import seasmig.treelikelihood.models.ConstantTransitionBaseModel;
 import seasmig.treelikelihood.models.GeneralSeasonalMigrationBaseModel;
 import seasmig.treelikelihood.models.SinusoidialSeasonalMigrationBaseModel;
 import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
@@ -91,7 +91,7 @@ public class DataForTests implements Data {
 
 			switch (config.modelType) {
 			case CONSTANT:	
-				createModel = new ConstantMigrationBaseModel(Q); 
+				createModel = new ConstantTransitionBaseModel(Q); 
 				break;
 			case TWO_CONSTANT_SEASONS: 
 				double phase = 0.3; double length = 0.5;
@@ -118,7 +118,7 @@ public class DataForTests implements Data {
 			testModels = new ArrayList<TransitionModel>();
 
 			for (int i=0; i<numTestRepeats; i++) {
-				testModels.add(new ConstantMigrationBaseModel(disturbMigrationMatrix(Q, disturbanceScale*i,99999)));
+				testModels.add(new ConstantTransitionBaseModel(disturbMigrationMatrix(Q, disturbanceScale*i,99999)));
 			}
 			for (int i=0; i<numTestRepeats; i++) {
 				double phase = Math.max(0,Math.min(1,0.3+i/3*(Random.nextDouble()-0.5))); double length = 0.5;
@@ -164,7 +164,7 @@ public class DataForTests implements Data {
 
 			switch (config.modelType) {
 			case CONSTANT:	
-				createModel = new ConstantMigrationBaseModel(Q); 
+				createModel = new ConstantTransitionBaseModel(Q); 
 				break;
 			case TWO_CONSTANT_SEASONS: 
 				double phase = 0.3; double length = 0.5;
@@ -233,7 +233,7 @@ public class DataForTests implements Data {
 
 			switch (config.modelType) {
 			case CONSTANT:	
-				createModel = new ConstantMigrationBaseModel(Q); 
+				createModel = new ConstantTransitionBaseModel(Q); 
 				break;
 			case TWO_CONSTANT_SEASONS: 
 				createModel = new TwoSeasonMigrationBaseModel(QW,QS,phase,phase+length);
@@ -299,7 +299,7 @@ public class DataForTests implements Data {
 
 			testModels = new ArrayList<TransitionModel>();
 
-			testModels.add(new ConstantMigrationBaseModel(Q));
+			testModels.add(new ConstantTransitionBaseModel(Q));
 			testModels.add(new TwoSeasonMigrationBaseModel(QW,QS,phase, phase+length));
 			
 			generalMigrationFunction = new DoubleFunction[Q.length][Q[0].length]; 

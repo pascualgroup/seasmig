@@ -49,8 +49,8 @@ public class TwoSeasonMigrationBaseModel implements TransitionModel {
 		season1Start=season1Start_;		
 		season1Length=season1End_-season1Start_;
 		season2Length=1-season1Length;
-		season1MigrationModel=new ConstantMigrationBaseModel(Q1_);
-		season2MigrationModel=new ConstantMigrationBaseModel(Q2_);
+		season1MigrationModel=new ConstantTransitionBaseModel(Q1_);
+		season2MigrationModel=new ConstantTransitionBaseModel(Q2_);
 		num_states=Q1_.length;
 	}
 

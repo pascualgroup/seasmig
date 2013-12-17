@@ -13,7 +13,7 @@ import seasmig.Config;
 import seasmig.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
-import seasmig.treelikelihood.models.ConstantMigrationBaseModel;
+import seasmig.treelikelihood.models.ConstantTransitionBaseModel;
 
 
 @SuppressWarnings("serial")
@@ -124,7 +124,7 @@ public class SeasonalMigrationModelNoSeasonality extends SeasonalMigrationModel 
 			}
 
 			// TODO: add update to migration model instead of reconstructing...
-			TransitionModel migrationBaseModel = new ConstantMigrationBaseModel(ratesdoubleForm);
+			TransitionModel migrationBaseModel = new ConstantTransitionBaseModel(ratesdoubleForm);
 			LikelihoodTree workingCopy;
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1)
