@@ -16,4 +16,5 @@ public interface LikelihoodTree extends Serializable {
 	public String smTransitions();	
 	public String smTipDwellings();
 	public String smLineages();
+	public String smDescendants();
 }

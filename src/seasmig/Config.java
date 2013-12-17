@@ -138,7 +138,8 @@ public class Config implements Serializable
 	public boolean smTrees = true;  // TODO: add alternative with single child branches instead of &map 
 	public boolean smTransitions = true; 
 	public boolean smTipDwellings = true; 
-	public boolean smLineages = true; 
+	public boolean smLineages = true;
+	public boolean smDescendants = true; 
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String stateFilename =null; // TODO: null if states are loaded from tree or non-existent 

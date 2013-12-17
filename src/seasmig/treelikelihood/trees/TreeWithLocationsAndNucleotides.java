@@ -709,6 +709,12 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		this.codonLikelihoodModel = (TransitionModel[]) codonModel;		
 	}
 
+	@Override
+	public String smDescendants() {
+		// TODO Auto-generated method stub
+		return null;
+	}	
+
 
 }
 

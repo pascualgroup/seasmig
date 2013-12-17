@@ -381,6 +381,13 @@ public class TreeWithLocations2 implements LikelihoodTree {
 		
 	}
 
+	@Override
+	public String smDescendants() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }
 
 

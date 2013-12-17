@@ -744,6 +744,161 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	@Override
+	public String smDescendants() {
+		// TODO: this
+		String returnValue = "{";
+		String[][] decendants = new String[numLocations][numLocations];		
+
+		for (TreeWithLocationsNode node : root) {
+			if (node==root) continue;
+			if (node.transitions!=null) {
+				int fromLocation = node.parent.loc;
+				for (Transition transition : node.transitions) {
+					if (decendants[fromLocation][transition.loc]==null) {
+						decendants[fromLocation][transition.loc]=new String();
+					}
+					if (fromLocation!=transition.loc) 
+						decendants[fromLocation][transition.loc]+=String.format("{%.3f,%d,%d,%d,%d},",transition.time,getTotalNumTips(node,transition),getTotalBranchLength(node,transition),getLocalNumTips(node,transition),getLocalBranchLength(node,transition));
+					fromLocation=transition.loc;
+				}				
+			}
+		}
+
+		for (int i=0;i<numLocations;i++) {
+			returnValue+="{";
+			for (int j=0;j<numLocations;j++) {						
+				if (decendants[i][j]!=null) {
+					if (decendants[i][j].length()>=2) { 
+						returnValue+="{"+decendants[i][j].substring(0,decendants[i][j].length()-1)+"}";
+					}
+					else {
+						returnValue+="{}";
+					}
+				}
+				else {
+					returnValue+="{}";
+				}
+				if (j!=(numLocations-1)) {
+					returnValue+=",";
+				}				
+			}
+			returnValue+="}";
+			if (i!=(numLocations-1)) {
+				returnValue+=",";
+			}
+		}
+		returnValue+="}";
+
+		return returnValue;
+
+	}
+
+
+	private double getLocalBranchLength(TreeWithLocationsNode node,
+			Transition transition) {
+		// TODO Auto-generated method stub
+		// TODO test this		
+		// List with at least one element...
+		int index = node.transitions.indexOf(transition);
+		if (index!=(node.transitions.size()-1)) {
+			return (node.transitions.get(index+1).time - transition.time);			
+		}
+		else {
+			return (node.time-transition.time) + getLocalBranchLength(node);
+		}
+	}
+
+	private double getLocalBranchLength(TreeWithLocationsNode node) {
+		// TODO test this		
+		double returnValue = 0;
+		for (TreeWithLocationsNode child : node.children) {		
+			if (child.transitions!=null) {
+				if (child.transitions.size()>0) {
+					returnValue+=child.transitions.get(0).time - node.time;
+				}
+				else 
+					returnValue+=(child.time - node.time + getLocalBranchLength(child));
+			}		
+		}
+		return returnValue;
+	}
+
+	private int getLocalNumTips(TreeWithLocationsNode node,
+			Transition transition) {
+		// TODO test this
+		int index = node.transitions.indexOf(transition);
+		if (index!=(node.transitions.size()-1)) {
+			return 0;			
+		}
+		else {
+			return getNumLocalTips(node);
+		}
+	}
+
+	private int getNumLocalTips(TreeWithLocationsNode node) {
+		// TODO test this 		
+		int returnValue = 0;
+		for (TreeWithLocationsNode child : node.children) {		
+			if (child.transitions!=null) {
+				if (child.transitions.size()==0) {
+					if (child.isTip()) {
+						returnValue+=1;
+					}
+					else {
+						returnValue+=getNumLocalTips(child);
+					}
+				}
+			}		
+		}
+		return returnValue;
+	}
+
+	private double getTotalBranchLength(TreeWithLocationsNode node,
+			Transition transition) { 
+		// TODO test this		
+		// List with at least one element...
+		int index = node.transitions.indexOf(transition);
+		if (index!=(node.transitions.size()-1)) {
+			return (node.transitions.get(index+1).time - transition.time);			
+		}
+		else {
+			return (node.time-transition.time) + getTotalBranchLength(node);
+		}
+	}
+
+	private double getTotalBranchLength(TreeWithLocationsNode node) {
+		// TODO test this
+		if (node.isTip()) { 
+			return 0;
+		}
+		else {
+			int returnValue=0;
+			for (TreeWithLocationsNode child : node.children) {
+				returnValue+=(child.time - node.time) + getTotalBranchLength(child);
+			}
+			return returnValue;
+		}
+	}
+
+	private int getTotalNumTips(TreeWithLocationsNode node,	Transition transition) {	
+		// TODO test this
+		return getTotalNumTips(node);
+	}
+
+	private int getTotalNumTips(TreeWithLocationsNode node) {
+		// TODO test this
+		if (node.isTip()) 
+			return 1;
+		else {
+			int returnValue=0;
+			for (TreeWithLocationsNode child : node.children) {
+				returnValue+=getTotalNumTips(child);
+			}
+			return returnValue;
+		}
+	}
+
+	@Override
 	public void setCodonModel(Object condonModel) {
 		// TODO Auto-generated method stub
 
