@@ -758,7 +758,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						decendants[fromLocation][transition.loc]=new String();
 					}
 					if (fromLocation!=transition.loc) 
-						decendants[fromLocation][transition.loc]+=String.format("{%.3f,%d,%d,%d,%d},",transition.time,getTotalNumTips(node,transition),getTotalBranchLength(node,transition),getLocalNumTips(node,transition),getLocalBranchLength(node,transition));
+						decendants[fromLocation][transition.loc]+=String.format("{%.3f,%d,%.3,%d,%.3},",transition.time,getTotalNumTips(node,transition),getTotalBranchLength(node,transition),getLocalNumTips(node,transition),getLocalBranchLength(node,transition));
 					fromLocation=transition.loc;
 				}				
 			}
