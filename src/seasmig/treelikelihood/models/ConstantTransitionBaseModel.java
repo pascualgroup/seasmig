@@ -190,12 +190,12 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 		double time = cern.jet.random.Exponential.staticNextDouble(lambda); 
 		// mean of this exponential is 1/lambda, higher the rate, the shorter the time --> this is the correct direction.
 		
-		int first = (from+1)%4;
+		int first = (from+1)%num_locations;
 		double p=-Q[from][first]/Q[from][from];
 		double rnd = cern.jet.random.Uniform.staticNextDouble();
 		int loc = first;
 		while (rnd>p) {
-			loc=(loc+1)%4;
+			loc=(loc+1)%num_locations;
 			p = p-Q[from][loc]/Q[from][from];
 		}
 		// TODO: check this
