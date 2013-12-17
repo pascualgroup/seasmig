@@ -140,7 +140,8 @@ public class Config implements Serializable
 	public boolean smTransitions = true; 
 	public boolean smTipDwellings = true; 
 	public boolean smLineages = true;
-	public boolean smDescendants = true; 
+	public boolean smDescendants = true;
+	public boolean smTrunkStats = true; 
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String stateFilename =null; // TODO: null if states are loaded from tree or non-existent 
@@ -160,6 +161,10 @@ public class Config implements Serializable
 	
 	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
 	public double[] lastTipTime = {2012.74, 2011.7}; // time of most recent tip on tree, used to calibrate all tree nodes 
+
+	// STOCHASTIC MAPPING OF TRUNK
+	public double presentDayTipInterval = 0.25; // width of time interval of recent considered to have "survived" for trunk designation purpose  
+	public double timeToDesignateTrunk = 2.0; // time back from present day tip ancestry designated as trunk 
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

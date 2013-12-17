@@ -747,17 +747,42 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String smTrunkStats(double presentDayTipInterval, double timeToDesignateTrunk) {
 		// TODO: test this
-				
+		
+		List<TreeWithLocationsNode> trunkNodes = markTrunk(presentDayTipInterval, timeToDesignateTrunk);
+		
 		String returnValue = "{";
-		markTrunk(presentDayTipInterval, timeToDesignateTrunk);
+		
+		
+		for (TreeWithLocationsNode node : trunkNodes) {
+			if (node.parent!=null) {
+				if (node.transitions!=null) {
+					if (node.transitions.size()==0) {
+						returnValue+=("{"+node.loc+","+node.parent.time+","+node.time+"},");
+					}
+					else {
+						double fromTime = node.parent.time;
+						int fromLoc = node.loc;
+						for (Transition transition : node.transitions) {
+							returnValue+=("{"+fromLoc+","+fromTime+","+transition.time+"},"); // TODO:
+							fromTime = transition.time;
+							fromLoc = transition.loc;
+						}
+					}
+				}
+				else {
+					returnValue+=("{"+node.loc+","+node.parent.time+","+node.time+"},");
+				}
+			}
+		}
 		
 		returnValue+="}";
 		return returnValue;
 
 	}
 
-	private void markTrunk(double presentDayTipInterval, double timeToDesignateTrunk) {
+	private List<TreeWithLocationsNode> markTrunk(double presentDayTipInterval, double timeToDesignateTrunk) {
 		double maxTime = root.time;
+		List<TreeWithLocationsNode> returnValue = new ArrayList<TreeWithLocationsNode>();
 		for (TreeWithLocationsNode node : root) {
 			if (node.time>maxTime) {
 				maxTime = node.time;
@@ -772,19 +797,22 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		
 		for (TreeWithLocationsNode node : presentDayTips) {
-			markTrunkAnc(node, maxTime, timeToDesignateTrunk);
+			returnValue.addAll(markTrunkAnc(node, maxTime, timeToDesignateTrunk));
 		}
+		return returnValue;
 		
 	}
 
-	private void markTrunkAnc(TreeWithLocationsNode node, double maxTime, double timeToDesignateTrunk) {
+	private List<TreeWithLocationsNode> markTrunkAnc(TreeWithLocationsNode node, double maxTime, double timeToDesignateTrunk) {
+		List<TreeWithLocationsNode> returnValue = new ArrayList<TreeWithLocationsNode>();
 		if ((maxTime-node.time)>timeToDesignateTrunk) {
 			node.setTrunk();
+			returnValue.add(node);
 		}
 		if (node.parent!=null && !node.parent.isTrunk()) {
-			markTrunkAnc(node.parent, maxTime, timeToDesignateTrunk);
+			returnValue.addAll(markTrunkAnc(node.parent, maxTime, timeToDesignateTrunk));
 		}
-		
+		return returnValue;
 	}
 
 	@Override

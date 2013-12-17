@@ -31,6 +31,7 @@ public class TreesLikelihoodVariable extends Variable {
 		String[] smTipDwellings = null;
 		String[] smLineages = null;	
 		String[] smDescendants = null;
+		String[] smTrunkStats = null;
 	}
 	
 
@@ -109,6 +110,13 @@ public class TreesLikelihoodVariable extends Variable {
 				String[] returnValue=new String[trees.length];
 				for (int i=0;i<trees.length;i++) {	 			
 					returnValue[i]=trees[i].smDescendants();
+				}				
+				outputObject.smDescendants=returnValue;				
+			}
+			if (config.smTrunkStats) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {	 			
+					returnValue[i]=trees[i].smTrunkStats(config.presentDayTipInterval, config.timeToDesignateTrunk);
 				}				
 				outputObject.smDescendants=returnValue;				
 			}
