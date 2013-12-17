@@ -356,9 +356,9 @@ public class TreeWithLocationsTest {
 
 		 */		
 		/* 
-		   -- (0)
+		   -- (1)
 		  /  \
-		 0   -- (0)
+		 0   -- (1)
 		    /  \
 		   1    0
 
@@ -393,13 +393,18 @@ public class TreeWithLocationsTest {
 				{ 0.333333/5.0,0.333333/5.0,0.333333/5,-1.0/5.0}});
 		
 		double[] a = new double[4];
-		for (int i=0;i<10000;i++) {
-			a[equalModel.nextEvent(0.1, 0).loc]+=1.0/40000;
-			a[equalModel.nextEvent(2.1, 0).loc]+=1.0/40000;
-			a[equalModel.nextEvent(4.1, 0).loc]+=1.0/40000;
-			a[equalModel.nextEvent(0.6, 0).loc]+=1.0/40000;			
+		for (int i=0;i<5000;i++) {
+			a[equalModel.nextEvent(0.1, 0).loc]+=1.0/20000;
+			a[equalModel.nextEvent(2.1, 0).loc]+=1.0/20000;
+			a[equalModel.nextEvent(4.1, 0).loc]+=1.0/20000;
+			a[equalModel.nextEvent(0.6, 0).loc]+=1.0/20000;			
 		}
-		System.err.println(a[0]+","+a[1]+","+a[2]+","+a[3]);
-		assertEquals(false, true);
+		System.out.println(a[0]+","+a[1]+","+a[2]+","+a[3]);		
+		assertEquals(a[0], 0, 0.00000000001);
+		assertEquals(a[1], 0.33333333333333, 0.01 );
+		assertEquals(a[2], 0.33333333333333, 0.01 );
+		assertEquals(a[3], 0.33333333333333, 0.01 );
+		
+		// TODO: better test
 	}
 }

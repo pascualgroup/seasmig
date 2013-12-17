@@ -22,6 +22,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 	// For stochastic mapping
 	public List<Transition> transitions = null;
+	private boolean isTrunk = false;
 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
@@ -42,6 +43,14 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 	public boolean isTip() {
 		return this.children.size()==0;
+	}
+	
+	public boolean isTrunk() {
+		return isTrunk;
+	}
+	
+	public void setTrunk() {
+		isTrunk=true;;
 	}
 
 	public class postOrderIter implements Iterator<TreeWithLocationsNode>,  Serializable {

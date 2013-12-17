@@ -17,4 +17,6 @@ public interface LikelihoodTree extends Serializable {
 	public String smTipDwellings();
 	public String smLineages();
 	public String smDescendants();
+	String smTrunkStats(double presentDayTipInterval,
+			double timeToDesignateTrunk);
 }

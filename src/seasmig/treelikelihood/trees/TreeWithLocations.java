@@ -2,6 +2,7 @@ package seasmig.treelikelihood.trees;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
@@ -742,6 +743,49 @@ public class TreeWithLocations implements LikelihoodTree {
 		return returnValue;
 
 	}
+	
+	@Override
+	public String smTrunkStats(double presentDayTipInterval, double timeToDesignateTrunk) {
+		// TODO: test this
+				
+		String returnValue = "{";
+		markTrunk(presentDayTipInterval, timeToDesignateTrunk);
+		
+		returnValue+="}";
+		return returnValue;
+
+	}
+
+	private void markTrunk(double presentDayTipInterval, double timeToDesignateTrunk) {
+		double maxTime = root.time;
+		for (TreeWithLocationsNode node : root) {
+			if (node.time>maxTime) {
+				maxTime = node.time;
+			}
+		}
+		
+		List<TreeWithLocationsNode> presentDayTips = new ArrayList<TreeWithLocationsNode>();
+		for (TreeWithLocationsNode node : root) {
+			if ((maxTime-node.time)<presentDayTipInterval) {
+				presentDayTips.add(node);
+			}
+		}
+		
+		for (TreeWithLocationsNode node : presentDayTips) {
+			markTrunkAnc(node, maxTime, timeToDesignateTrunk);
+		}
+		
+	}
+
+	private void markTrunkAnc(TreeWithLocationsNode node, double maxTime, double timeToDesignateTrunk) {
+		if ((maxTime-node.time)>timeToDesignateTrunk) {
+			node.setTrunk();
+		}
+		if (node.parent!=null && !node.parent.isTrunk()) {
+			markTrunkAnc(node.parent, maxTime, timeToDesignateTrunk);
+		}
+		
+	}
 
 	@Override
 	public String smDescendants() {
@@ -896,7 +940,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO Auto-generated method stub
 
 	}
-
+		
 
 }
 
