@@ -141,7 +141,7 @@ public class Config implements Serializable
 	public boolean smTipDwellings = true; 
 	public boolean smLineages = true;
 	public boolean smDescendants = true;
-	public boolean smTrunkStats = false; 
+	public boolean smTrunkStats = true; 
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String stateFilename =null; // TODO: null if states are loaded from tree or non-existent 
