@@ -387,6 +387,13 @@ public class TreeWithLocations2 implements LikelihoodTree {
 		return null;
 	}
 
+	@Override
+	public String smTrunkStats(double presentDayTipInterval,
+			double timeToDesignateTrunk) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
 
