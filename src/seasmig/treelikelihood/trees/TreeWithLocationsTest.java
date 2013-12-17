@@ -339,7 +339,7 @@ public class TreeWithLocationsTest {
 		locTree.logLikelihood();
 		System.out.println(locTree.newickProbs());
 		System.out.println(locTree.newickAncestralStateReconstruction());	
-		System.out.println(locTree.newickStochasticMapping());
+		System.out.println(locTree.newickStochasticMapping(10000));
 		assertEquals(false, true);
 	}
 
@@ -379,7 +379,7 @@ public class TreeWithLocationsTest {
 		locTree.logLikelihood();
 		System.out.println(locTree.newickProbs());
 		System.out.println(locTree.newickAncestralStateReconstruction());	
-		System.out.println(locTree.newickStochasticMapping());
+		System.out.println(locTree.newickStochasticMapping(1000));
 		System.out.println(locTree.smDescendants());
 		assertEquals(false, true);
 	}

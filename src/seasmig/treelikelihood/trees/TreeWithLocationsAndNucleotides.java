@@ -410,7 +410,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 	}
 
 	@Override
-	public String newickStochasticMapping() {
+	public String newickStochasticMapping(int maxBranchRetries) {
 		asr(); // Ancestral state reconstruction
 		stochsticMapping(root);
 

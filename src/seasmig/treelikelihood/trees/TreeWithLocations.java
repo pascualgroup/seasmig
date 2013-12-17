@@ -35,8 +35,6 @@ public class TreeWithLocations implements LikelihoodTree {
 	double[] ZERO_LOG_PROBS;
 	private double logLike = 0;
 
-	public int smMaxBranchRetries = 100000; 
-
 	// Tree generate parameters for test purpose
 	static final private double testBranchLengthMean = 0.5;
 	static final private double testBranchLengthVariance = 1.0;
@@ -420,9 +418,9 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	@Override
-	public String newickStochasticMapping() {
+	public String newickStochasticMapping(int maxBranchRetries) {
 		asr(); // Ancestral state reconstruction
-		stochsticMapping(root);
+		stochsticMapping(root, maxBranchRetries);
 
 		return newickSM(root);
 	}
@@ -452,7 +450,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		return returnValue;
 	}
 
-	private void stochsticMapping(TreeWithLocationsNode root) {
+	private void stochsticMapping(TreeWithLocationsNode root, int maxBranchRetries) {
 		// TODO: test
 		// TODO: cite
 		// TODO: preorder iterator		
@@ -485,12 +483,12 @@ public class TreeWithLocations implements LikelihoodTree {
 				} else {
 					doneWithBranch = true;								
 				}
-				if (repeats>smMaxBranchRetries) {
-					System.err.println("Failed to stochasticaly map branch after "+Integer.toString(smMaxBranchRetries)+" iterations\nUsing last attempt for output. Check for aggresive rounding of tip times, or consider adding jitter to tip times.\n{("+Integer.toString(root.taxonIndex)+","+Double.toString(root.time)+","+Double.toString(root.loc)+"),("+Integer.toString(child.taxonIndex)+","+Double.toString(child.time)+","+Double.toString(child.loc)+")}");					
+				if (repeats>maxBranchRetries) {
+					System.err.println("Failed to stochasticaly map branch after "+Integer.toString(maxBranchRetries)+" iterations\nUsing last attempt for output. Check for aggresive rounding of tip times, or consider adding jitter to tip times.\n{("+Integer.toString(root.taxonIndex)+","+Double.toString(root.time)+","+Double.toString(root.loc)+"),("+Integer.toString(child.taxonIndex)+","+Double.toString(child.time)+","+Double.toString(child.loc)+")}");					
 					failedMapping=true;
 				}
 			} while (!doneWithBranch && !failedMapping);
-			stochsticMapping(child);
+			stochsticMapping(child,  maxBranchRetries);
 		}
 	}
 

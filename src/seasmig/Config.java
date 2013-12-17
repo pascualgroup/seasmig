@@ -165,6 +165,7 @@ public class Config implements Serializable
 	// STOCHASTIC MAPPING OF TRUNK
 	public double presentDayTipInterval = 0.25; // width of time interval of recent considered to have "survived" for trunk designation purpose  
 	public double timeToDesignateTrunk = 2.0; // time back from present day tip ancestry designated as trunk 
+	public int maxSMBranchRetries = 2000; // maximum number of retries for stochastically mapping a single branch
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

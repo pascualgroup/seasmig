@@ -12,7 +12,7 @@ public interface LikelihoodTree extends Serializable {
 	public String newickProbs();
 	public double cachedLogLikelihood();
 	public String newickAncestralStateReconstruction();
-	public String newickStochasticMapping();
+	public String newickStochasticMapping(int maxBranchRetries);
 	public String smTransitions();	
 	public String smTipDwellings();
 	public String smLineages();
