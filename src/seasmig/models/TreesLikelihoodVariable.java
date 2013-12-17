@@ -118,7 +118,7 @@ public class TreesLikelihoodVariable extends Variable {
 				for (int i=0;i<trees.length;i++) {	 			
 					returnValue[i]=trees[i].smTrunkStats(config.presentDayTipInterval, config.timeToDesignateTrunk);
 				}				
-				outputObject.smDescendants=returnValue;				
+				outputObject.smTrunkStats=returnValue;				
 			}
 			return outputObject;
 		}
