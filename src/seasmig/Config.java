@@ -154,7 +154,7 @@ public class Config implements Serializable
 	public int numLocations = 8; // needs to be specified if locations are loaded from trees....
 	
 	// VARIABLE SELECTION
-	public double rateIndicatorPrior = 0.9; // Prior for including any migration between two locations 
+	public double rateIndicatorPrior = 0.5; // Prior for including any migration between two locations 
 	
 	// ANCESTRAL STATE RECONSTRUCTIOn
 	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.STOCHASTIC_MAPPING;
@@ -165,7 +165,7 @@ public class Config implements Serializable
 	// STOCHASTIC MAPPING OF TRUNK
 	public double presentDayTipInterval = 0.25; // width of time interval of recent considered to have "survived" for trunk designation purpose  
 	public double timeToDesignateTrunk = 2.0; // time back from present day tip ancestry designated as trunk 
-	public int maxSMBranchRetries = 2000; // maximum number of retries for stochastically mapping a single branch
+	public int maxSMBranchRetries = 20000; // maximum number of retries for stochastically mapping a single branch
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

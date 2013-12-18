@@ -33,10 +33,13 @@ public class Sequence implements Serializable {
 	public static final double[] INTERNAL = new double[]{0,0,0,0};
 
 	double[][] seq = null;
+	
+	String header = null;
 
 	protected Sequence() {};
 
-	public Sequence(String seqStr) {
+	public Sequence(String header_, String seqStr) {
+		header=header_;
 		seq = new double[seqStr.length()][];
 		for (int i=0;i<seqStr.length();i++) {
 			switch (seqStr.charAt(i)) { 
@@ -72,6 +75,10 @@ public class Sequence implements Serializable {
 	
 	public double[] get(int pos) {
 		return seq[pos];
+	}	
+	
+	public String getHeader() {
+		return header;
 	}	
 	
 	public String toString() {

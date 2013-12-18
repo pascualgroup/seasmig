@@ -93,7 +93,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 		if (seqStr==null) 
 			sequence=new Sequence(seqLength);
 		else {
-			sequence=new Sequence(seqStr);
+			sequence=new Sequence("ABCD123",seqStr);
 			numIdentifiedSequences+=1;
 		}
 
@@ -319,7 +319,7 @@ public class TreeWithLocationsAndNucleotides implements LikelihoodTree {
 				if (seqStr==null) 
 					sequence=new Sequence(seqLength);
 				else {
-					sequence=new Sequence(seqStr);
+					sequence=new Sequence("ABCD123",seqStr);
 					numIdentifiedSequences+=1;
 				}
 
