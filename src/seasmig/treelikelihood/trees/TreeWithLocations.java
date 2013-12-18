@@ -56,6 +56,23 @@ public class TreeWithLocations implements LikelihoodTree {
 	private double seqLogLike;
 	private double locationLogLike;
 
+	// for test purpose
+	public TreeWithLocations(TreeWithLocationsNode root, int numLocations, int seqLength) {
+		taxaIndices = null;
+		this.numLocations=numLocations;				
+
+		ZERO_LOG_PROBS = new double[numLocations];
+		for (int i=0;i<numLocations;i++){
+			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
+		}
+
+		// PARSE SEQUENCE
+		this.seqLength = seqLength;
+
+		// Create new node
+		this.root = root;
+	}
+
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(TransitionModel createTreeModel, int numNodes) {		
 		numLocations=createTreeModel.getNumLocations();
@@ -171,7 +188,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public double locLogLikelihood() {
 		for (TreeWithLocationsNode node : root) { // Postorder 
 
-			if (node.loc==TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION) {
+			if (node.loc==TreeWithLocations.UNKNOWN_LOCATION) {
 				node.logProbsLOC =new double[numLocations]; // Internal node initialization
 			}
 			else {
