@@ -270,7 +270,7 @@ public class DataForTests implements Data {
 			// Convert trees to internal tree representation
 			if (config.locationFilenames[0]!=null) {
 				System.out.print("Loading traits... ");
-				AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilenames[0], config.stateFilename);
+				AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilenames[0], null,null);
 				// TODO: think about this...
 				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributeLoader.getAttributes().get("locations");
 				HashMap<String,Double> stateMap = (HashMap<String,Double>) attributeLoader.getAttributes().get("states");
@@ -287,15 +287,7 @@ public class DataForTests implements Data {
 				}
 				System.out.println(" reparsed "+trees.size()+" trees");
 			}
-			else {
-				// TODO: add load states from trees...
-				System.out.print("Reparsing trees... ");
-				for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-					trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,config.locationAttributeNameInTree, numLocations,config.lastTipTime[0]));
-				}		
-				System.out.println(" reparsed "+trees.size()+" trees");
-			}				
-
+		
 			testModels = new ArrayList<TransitionModel>();
 
 			testModels.add(new ConstantTransitionBaseModel(Q));

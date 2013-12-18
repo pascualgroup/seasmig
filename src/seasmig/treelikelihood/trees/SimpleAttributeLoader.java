@@ -18,12 +18,15 @@ public class SimpleAttributeLoader implements AttributeLoader{
 
 	protected SimpleAttributeLoader() {};
 	
-	public SimpleAttributeLoader(String locationFilename,String stateFilename) throws NumberFormatException, IOException {
+	public SimpleAttributeLoader(String locationFilename,String stateFilename, String alignmentFilename) throws NumberFormatException, IOException {
 		if (locationFilename!=null) {
 			processLocations(locationFilename);							
 		}
 		if (stateFilename!=null) {
 			processStates(stateFilename);
+		}
+		if (alignmentFilename!=null) {
+			processAlignments(alignmentFilename);
 		}
 	}
 
@@ -64,6 +67,47 @@ public class SimpleAttributeLoader implements AttributeLoader{
 		attributes.put("locations",locationMap);
 		attributes.put("numLocations",locations.size());
 		
+	}
+	
+	void processAlignments(String fileName) throws IOException {
+		// TODO: this
+		// Read fasta file:
+		// >header1
+		// ACCCCCCAAAGTTAATATATRRYYSSSWWWW
+		// AAAAAAAAAAAAA---------AACCCTGTG
+		// ACG
+
+		FileInputStream seqFIStream = new FileInputStream(fileName);
+		DataInputStream seqDIStream = new DataInputStream(seqFIStream);
+		BufferedReader seqReader = new BufferedReader(new InputStreamReader(seqDIStream));
+
+		HashMap<String,Sequence> seqMap = new HashMap<String,Sequence>();
+		
+		String strLine;
+		//Read File Line By Line
+		int i=0;
+		String taxa = null;
+		String seq = "";
+		while ((strLine = seqReader.readLine()) != null)   {
+			i=i+1;
+			if (strLine.substring(0,1).equals(">")) {
+				if (seq.length()>0) {
+					seq.replaceAll("\n", "");
+					seq.replaceAll("\r", "");
+					seqMap.put(taxa, new Sequence(taxa,seq));
+				}				
+				taxa = strLine.substring(1,strLine.length());
+				seq = "";
+			}
+			else {
+				seq = seq+strLine;
+			}
+		}
+		
+		seqReader.close();
+
+		attributes.put("alignments",seqMap);
+		attributes.put("numAlignments",seqMap.size());		
 	}
 	
 	void processStates(String fileName) throws NumberFormatException, IOException {

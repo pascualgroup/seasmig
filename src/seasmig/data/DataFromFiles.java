@@ -17,6 +17,7 @@ import seasmig.migrationmain.Config;
 import seasmig.data.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.trees.AttributeLoader;
+import seasmig.treelikelihood.trees.Sequence;
 import seasmig.treelikelihood.trees.SimpleAttributeLoader;
 import seasmig.treelikelihood.trees.TreeWithLocations;
 
@@ -121,54 +122,46 @@ public class DataFromFiles implements Data
 			meanNumTaxa/=nexusTreeTail.size();
 			System.out.println(" keeping last "+nexusTreeTail.size()+ " trees");
 			System.out.println(meanNumTaxa+" taxa on average per tree");
-
-			// TODO: add states....
+			
 			// Convert trees to internal tree representation
-			boolean locationFilenameExists = false;
+			String locationFilename = null;
 			if (config.locationFilenames[h]!=null) {
 				if (config.locationFilenames[h].length()>0) {
-					locationFilenameExists = true;
+					locationFilename = config.locationFilenames[h];
 				}
 			}
-			if (locationFilenameExists) {
-				System.out.print("Loading traits... ");
-				String locationFilename = config.locationFilenames[h];
-				AttributeLoader attributeLoader= new SimpleAttributeLoader(locationFilename, config.stateFilename);	
-				HashMap<String,Object> attributes = attributeLoader.getAttributes();
-				@SuppressWarnings("unchecked")
-				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
-				@SuppressWarnings("unchecked")
-				HashMap<String,Double> stateMap = (HashMap<String,Double>) attributes.get("states");
-				numLocations = (Integer) attributes.get("numLocations");
-				System.out.println("loaded "+locationMap.size()+" taxon traits");				
-				System.out.print("Reparsing trees... ");
-				if (stateMap==null) {
-					double numIdentifiedLocations=0;
-					for (jebl.evolution.trees.Tree tree : nexusTreeTail) {
-						trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations,config.lastTipTime[h]));
-						numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
-					}
-					numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
-					System.out.println("identified "+numIdentifiedLocations+" locations on average per tree");
+			
+			String alignmentFilename = null;
+			if (config.alignmentFilenames[h]!=null) {
+				if (config.alignmentFilenames[h].length()>0) {
+					alignmentFilename = config.alignmentFilenames[h];
 				}
-				else {
-					// TODO: this...
-				}
-				System.out.println(" reparsed "+trees.get(h).size()+" trees");
 			}
-			else {
-				// TODO: add load states from trees...
-				numLocations=config.numLocations; // TODO: get this to be automatically loaded from trees
-				System.out.print("Reparsing trees... ");
-				double numIdentifiedLocations=0;
-				for (jebl.evolution.trees.Tree tree : nexusTreeTail) {
-					trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices, config.locationAttributeNameInTree, numLocations,config.lastTipTime[h]));
-					numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
-				}		
-				System.out.println(" reparsed "+trees.get(h).size()+" trees");
-				numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
-				System.out.println("identified "+numIdentifiedLocations+" locations on average per tree");
-			}	
+			System.out.print("Loading traits & alignments... ");
+
+			AttributeLoader attributeLoader= new SimpleAttributeLoader(locationFilename, null, alignmentFilename);	
+			HashMap<String,Object> attributes = attributeLoader.getAttributes();
+			@SuppressWarnings("unchecked")
+			HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
+			@SuppressWarnings("unchecked")
+			HashMap<String,Sequence> seqMap = (HashMap<String,Sequence>) attributes.get("alignments");
+			
+			numLocations = (Integer) attributes.get("numLocations");
+			System.out.println("loaded "+locationMap.size()+" taxon traits");	
+			numLocations = (Integer) attributes.get("numAlignments");
+			System.out.println("loaded "+seqMap.size()+" sequences");
+			
+			System.out.print("Reparsing trees... ");
+				
+			double numIdentifiedLocations=0;
+			for (jebl.evolution.trees.Tree tree : nexusTreeTail) {
+				trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations,config.lastTipTime[h]));
+				numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
+			}
+			numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
+			System.out.println("identified "+numIdentifiedLocations+" locations on average per tree");
+				
+			System.out.println(" reparsed "+trees.get(h).size()+" trees");			
 		}
 
 	}

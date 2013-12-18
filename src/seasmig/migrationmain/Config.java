@@ -132,7 +132,6 @@ public class Config implements Serializable
 	
 	// GENERAL PARAMETERS
 	public double veryLongTime = 1000;		
-	public StateModel stateModel = StateModel.NONE; // TODO: IMPLEMENT THIS...
 	
 	// STOCHASTIC MAPPING OUTPUT
 	public boolean asrTrees = true;  
@@ -144,12 +143,9 @@ public class Config implements Serializable
 	public boolean smTrunkStats = true; 
 	
 	// MODEL DATA RELATED PARAMETERS
-	public String stateFilename =null; // TODO: null if states are loaded from tree or non-existent 
 	public String[] locationFilenames ={"regionsHA.txt","regionsNA.txt"}; // null if locations are loaded from tree
 	public String[] treeFilenames = {"beastInputHA.trees","beastInputNA.trees"}; // null for test generated data 
 	public double[] treeWeights = {0.5,0.5};
-	public String locationAttributeNameInTree = "states"; // location attribute in jebl tree
-	public String stateAttributeNameInTree = null; // state attribute in jebl tree
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
 	public int numLocations = 8; // needs to be specified if locations are loaded from trees....
 	
@@ -166,6 +162,8 @@ public class Config implements Serializable
 	public double presentDayTipInterval = 0.25; // width of time interval of recent considered to have "survived" for trunk designation purpose  
 	public double timeToDesignateTrunk = 2.0; // time back from present day tip ancestry designated as trunk 
 	public int maxSMBranchRetries = 20000; // maximum number of retries for stochastically mapping a single branch
+
+	public String[] alignmentFilenames = {"ha.fasta","na.fasta"};
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {
