@@ -28,6 +28,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	int numLocations = 0;
 	private int numIdentifiedLocations;
+	private int numIdentifiedSeqs;
 
 	// Taxa
 	HashMap<String, Integer> taxaIndices = new HashMap<String,Integer>();
@@ -93,35 +94,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		fillRandomTraits(root);
 	}
 
-
-	// Load a tree from a basic jebl tree
-	// locations are loaded from nexsus tree trait location_attribute name
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree, HashMap<String,Integer> taxaIndices_, String locationAttributeName, int num_locations_, double lastTipTime) {
-		taxaIndices = taxaIndices_;
-		numLocations=num_locations_;
-		ZERO_LOG_PROBS = new double[numLocations];
-		for (int i=0;i<numLocations;i++){
-			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
-		}
-		Integer rootTaxonIndex = UNKNOWN_TAXA;
-		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
-		if (rootTaxon!=null) {
-			rootTaxonIndex = taxaIndices.get(rootTaxon.getName());
-		}
-		if (rootTaxonIndex==null)
-			rootTaxonIndex = UNKNOWN_TAXA;
-		if (tree.getRootNode().getAttribute(locationAttributeName)!=null) {
-			root = new TreeWithLocationsNode((Integer) tree.getRootNode().getAttribute(locationAttributeName),rootTaxonIndex,0,null);
-			numIdentifiedLocations+=1;
-		}
-		else {
-			root = new TreeWithLocationsNode(UNKNOWN_TAXA,rootTaxonIndex,0,null);
-		}
-
-		makeSubTree(tree,locationAttributeName, root,tree.getRootNode());
-		recalibrateTimes(root, lastTipTime);
-	}
-
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
 	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime/*, HashMap<String, Double> stateMap*/) {
@@ -136,6 +108,12 @@ public class TreeWithLocations implements LikelihoodTree {
 			location=TreeWithLocations.UNKNOWN_LOCATION;
 		else
 			numIdentifiedLocations+=1;		
+		
+//		Sequence seq = seqMap.get(tree.getTaxon(tree.getRootNode()));
+//		if (seq==null) 
+//			seq=TreeWithLocations.UNKNOWN_LOCATION;
+//		else
+//			numIdentifiedLocations+=1;		
 
 		Integer rootTaxonIndex = UNKNOWN_TAXA;
 		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
@@ -965,6 +943,11 @@ public class TreeWithLocations implements LikelihoodTree {
 	public void setCodonModel(Object condonModel) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public double getNumIdentifiedSeqs() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 		
 
