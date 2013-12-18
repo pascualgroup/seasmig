@@ -17,18 +17,30 @@ import cern.colt.matrix.DoubleMatrix2D;
 @SuppressWarnings("serial")
 public class TreeWithLocations implements LikelihoodTree {
 
+	// ENCOUDING FOR UNKNOWN TAXA NUMBER (i.e. internal nodes)
 	public static final int UNKNOWN_TAXA = -1;
+
+	// ENCOUDING FOR UNKNOWN GEOGRAPHIC LOCATION (i.e. internal nodes)
 	public static final int UNKNOWN_LOCATION = -1;
+
+	// ENCODING FOR LOCATION ERROR // TODO: replace with error 
 	public static final int ERR_LOCATION = -2;
+
+	// CONST 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
-	// Tree & Model
+	// Tree & Models
 	TreeWithLocationsNode root = null;		
-	private TransitionModel likelihoodModel = null;
+	private TransitionModel migrationModel = null;
+	private TransitionModel[] codonLikelihoodModel = new TransitionModel[3]; // CP1, CP2, CP3
 
-	int numLocations = 0;
+	int numLocations = 0; // number of location categories
+
+	// For Location Parsing
 	private int numIdentifiedLocations;
-	private int numIdentifiedSeqs;
+
+	// For Location Parsing
+	private int numIdentifiedSeqs;		
 
 	// Taxa
 	HashMap<String, Integer> taxaIndices = new HashMap<String,Integer>();
@@ -36,9 +48,13 @@ public class TreeWithLocations implements LikelihoodTree {
 	double[] ZERO_LOG_PROBS;
 	private double logLike = 0;
 
-	// Tree generate parameters for test purpose
-	static final private double testBranchLengthMean = 0.5;
-	static final private double testBranchLengthVariance = 1.0;
+	// for sequences
+	private int seqLength;
+	private HashMap<String, Sequence> seqMap;
+
+	// for likelihood
+	private double seqLogLike;
+	private double locationLogLike;
 
 	// Generate a random tree based on createTreeModel .... 
 	public TreeWithLocations(TransitionModel createTreeModel, int numNodes) {		
@@ -48,7 +64,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
 		int rootLocation = getRandomSampleFrom(createTreeModel.rootfreq(0));
-		root = new TreeWithLocationsNode(rootLocation,TreeWithLocations.UNKNOWN_TAXA,0,null);
+		root = new TreeWithLocationsNode(null, rootLocation,TreeWithLocations.UNKNOWN_TAXA,0,null);
 		makeRandomTree(createTreeModel, root, numNodes);	
 	}
 
@@ -59,8 +75,8 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
-		likelihoodModel=createTreeModel;
-		int rootLocation = getRandomSampleFrom(likelihoodModel.rootfreq(0));
+		migrationModel=createTreeModel;
+		int rootLocation = getRandomSampleFrom(migrationModel.rootfreq(0));
 		Integer rootTaxonIndex = UNKNOWN_TAXA;
 		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
 		if (rootTaxon!=null) {
@@ -68,7 +84,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		if (rootTaxonIndex==null)
 			rootTaxonIndex = UNKNOWN_TAXA;
-		root = new TreeWithLocationsNode(rootLocation,rootTaxonIndex,0,null);
+		root = new TreeWithLocationsNode(null, rootLocation,rootTaxonIndex,0,null);
 		makeSubTree(tree,(String)null, root,tree.getRootNode());		
 	}
 
@@ -77,7 +93,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			for (TreeWithLocationsNode child : root.children) {	
 				double p=0;
 				for (int location=0;location<numLocations;location++) {
-					p=p+Math.exp(likelihoodModel.logprobability(root.loc, location, root.time, child.time));
+					p=p+Math.exp(migrationModel.logprobability(root.loc, location, root.time, child.time));
 					if (cern.jet.random.Uniform.staticNextDouble()<=p) {
 						child.loc=location;
 						break;
@@ -96,9 +112,11 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime/*, HashMap<String, Double> stateMap*/) {
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime, HashMap<String, Sequence> seqMap_, int seqLength_) {
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
+		seqMap=seqMap_;
+		seqLength=seqLength_;
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
@@ -108,12 +126,12 @@ public class TreeWithLocations implements LikelihoodTree {
 			location=TreeWithLocations.UNKNOWN_LOCATION;
 		else
 			numIdentifiedLocations+=1;		
-		
-//		Sequence seq = seqMap.get(tree.getTaxon(tree.getRootNode()));
-//		if (seq==null) 
-//			seq=TreeWithLocations.UNKNOWN_LOCATION;
-//		else
-//			numIdentifiedLocations+=1;		
+
+		Sequence seq = seqMap.get(tree.getTaxon(tree.getRootNode()));
+		if (seq==null) 
+			seq=new Sequence(seqLength);
+		else
+			numIdentifiedSeqs+=1;		
 
 		Integer rootTaxonIndex = UNKNOWN_TAXA;
 		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
@@ -122,7 +140,8 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		if (rootTaxonIndex==null)
 			rootTaxonIndex= UNKNOWN_TAXA;
-		root = new TreeWithLocationsNode(location,rootTaxonIndex,0,null);
+
+		root = new TreeWithLocationsNode(seq,location,rootTaxonIndex,0,null);
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 		recalibrateTimes(root, lastTipTime);		
 	}
@@ -141,57 +160,122 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	public TreeWithLocations(TreeWithLocationsNode root_, TransitionModel likelihoodModel_) {
 		root = root_;
-		likelihoodModel=likelihoodModel_;
-		numLocations=likelihoodModel.getNumLocations();
+		migrationModel=likelihoodModel_;
+		numLocations=migrationModel.getNumLocations();
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
 	}
 
-	@Override
-	public double logLikelihood() {
+	public double locLogLikelihood() {
 		for (TreeWithLocationsNode node : root) { // Postorder 
 
-			if (node.loc==TreeWithLocations.UNKNOWN_LOCATION) {
-				node.logProbs =new double[numLocations]; // Internal node initialization
+			if (node.loc==TreeWithLocationsAndNucleotides.UNKNOWN_LOCATION) {
+				node.logProbsLOC =new double[numLocations]; // Internal node initialization
 			}
 			else {
-				node.logProbs= ZERO_LOG_PROBS.clone();
-				node.logProbs[node.loc]=0; // Tip node
+				node.logProbsLOC= ZERO_LOG_PROBS.clone();
+				node.logProbsLOC[node.loc]=0; // Tip node
 			}
 
-			if (node.children.size()!=0) { // this is an internal node							
+			if (node.children.size()!=0) { // this is an internal node		
 				for (TreeWithLocationsNode child : node.children ) {
 					// for now caching is done inside likelihood model...
 					DoubleMatrix2D p;						
 					// TODO: check if clause (here for numerics issues) 
 					if (node.time!=child.time && node.loc==child.loc) 												
-						p = likelihoodModel.transitionMatrix(node.time, child.time);
+						p = migrationModel.transitionMatrix(node.time, child.time);
 					else
-						p = likelihoodModel.transitionMatrix(node.time, child.time+Util.minValue);
+						p = migrationModel.transitionMatrix(node.time, child.time+Util.minValue);
+
 					for (int from = 0; from < numLocations; from++) {
 						double[] alphas = new double[numLocations];						
 						for (int to = 0; to < numLocations; to++) { // Integrate over all possible locations
-							alphas[to]=(Math.log(p.get(from,to)) + child.logProbs[to]);							
+							alphas[to]=(Math.log(p.get(from,to)) + child.logProbsLOC[to]);							
 						}						
-						node.logProbs[from] += logSumExp(alphas); // Probability of internal node state based on children 
+						node.logProbsLOC[from] += logSumExp(alphas); // Probability of internal node state based on children 
 					}								
 				}
 
 			}
-
-
 		}
 
 		// Calculate root base frequency contribution... 
-		DoubleMatrix1D rootFreq = likelihoodModel.rootfreq(root.time);
+		DoubleMatrix1D rootFreq = migrationModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
-			alphas[i]=root.logProbs[i] + Math.log(rootFreq.get(i));
+			alphas[i]=root.logProbsLOC[i] + Math.log(rootFreq.get(i));
 		}	
-		logLike = logSumExp(alphas);
-		return logLike;		
+		locationLogLike = logSumExp(alphas);
+		return locationLogLike;		
+	}
+
+	public double seqLogLikelihood() {
+		seqLogLike=0;
+		if (seqLength>0) {
+			for (TreeWithLocationsNode node : root) { // Postorder
+				if (node.logProbsCP==null) {
+					node.logProbsCP = new double[3][(seqLength-1)/3+1][4];
+
+					for (int codonPos = 0; codonPos <3 ; codonPos++) {
+						for (int loc=0;loc<(seqLength-1)/3+1;loc++) {
+							if ((loc*3+codonPos) >= seqLength) continue;
+							node.logProbsCP[codonPos][loc]=node.seq.get(loc*3+codonPos).clone();									
+						}
+					}
+				}
+
+				if (node.children.size()!=0) { // this is an internal node			
+					for (TreeWithLocationsNode child : node.children ) {					
+						for (int codonPos = 0; codonPos <3 ; codonPos++) {
+							DoubleMatrix2D p = null;						
+							// TODO: Util.minValue here for numerics issues, check this... 
+							p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time+Util.minValue);
+
+							for (int loc=0;loc<((seqLength-1)/3+1);loc++) {
+								for (int from = 0; from < 4; from++) {													
+									if ((loc*3+codonPos) >= seqLength) continue;							
+									double[] alphas = new double[4];						
+									for (int to = 0; to < 4; to++) { // Integrate over all possible nucleotides									
+										alphas[to]=(Math.log(p.get(from,to)) + child.logProbsCP[codonPos][loc][to]);							
+									}
+									node.logProbsCP[codonPos][loc][from] += logSumExp(alphas);							
+								}
+							}
+						}								
+					}
+				}
+			}		
+
+			// Add root frequency		
+			DoubleMatrix1D pi[] = new DoubleMatrix1D[3];
+
+			for (int i=0;i<3;i++) {
+				pi[i]=codonLikelihoodModel[i].rootfreq(root.time);
+			}
+
+
+			for (int codonPos = 0; codonPos <3 ; codonPos++) {
+				for (int loc=0;loc<((seqLength-1)/3+1);loc++) {				
+					if ((loc*3+codonPos) >= seqLength) continue;			
+					double[] alphas = new double[4];	
+					for (int i = 0; i < 4; i++) {				
+						alphas[i]=root.logProbsCP[codonPos][loc][i] + Math.log(pi[codonPos].get(i));
+					}
+					seqLogLike += logSumExp(alphas);
+				}			
+			}			
+		}
+		return seqLogLike;		
+	}
+
+	@Override
+	public double logLikelihood() {
+		locLogLikelihood();		
+		seqLogLikelihood();
+		logLike = locationLogLike+seqLogLike;
+		return logLike;
 	}
 
 	private void removeInternalLocations(TreeWithLocationsNode node) {
@@ -207,19 +291,22 @@ public class TreeWithLocations implements LikelihoodTree {
 	public LikelihoodTree copy() {
 		// TODO: test this... and or remove ...
 		TreeWithLocations copyTree = new TreeWithLocations();
-		copyTree.likelihoodModel=this.likelihoodModel;
+		copyTree.migrationModel=this.migrationModel;
+		copyTree.codonLikelihoodModel=this.codonLikelihoodModel;
 		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
+		copyTree.seqLength = this.seqLength;
+		copyTree.numIdentifiedSeqs=this.numIdentifiedSeqs;
 		copyTree.numLocations=this.numLocations;		
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
-		copyTree.root = new TreeWithLocationsNode(root.loc,root.taxonIndex,root.time,null);
+		copyTree.root = new TreeWithLocationsNode(root.seq, root.loc,root.taxonIndex,root.time,null);
 		copyTree.taxaIndices = taxaIndices;
 		treeCopy(this.root, copyTree.root);  
-		return copyTree;
+		return copyTree;			
 	}
 
 	private void treeCopy(TreeWithLocationsNode from, TreeWithLocationsNode to) {
 		for (TreeWithLocationsNode child : from.children) {
-			TreeWithLocationsNode newChild = new TreeWithLocationsNode(child.loc,child.taxonIndex,child.time, to);
+			TreeWithLocationsNode newChild = new TreeWithLocationsNode(child.seq, child.loc,child.taxonIndex,child.time, to);
 			to.children.add(newChild);			
 			treeCopy(child, newChild);
 		}		
@@ -261,20 +348,31 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (jebl.evolution.graphs.Node node : inputTree.getChildren(inputSubTree)) {	
 			Taxon taxon = inputTree.getTaxon(node);
 			Integer location = TreeWithLocations.UNKNOWN_LOCATION;
-			Integer taxonIndex = TreeWithLocations.UNKNOWN_TAXA;			
+			Integer taxonIndex = TreeWithLocations.UNKNOWN_TAXA;
+			Sequence seq;
 			if (taxon!=null) {
 				location = locationMap.get(taxon.toString());				
 				if (location==null) 
 					location=TreeWithLocations.UNKNOWN_LOCATION;
 				else
 					numIdentifiedLocations+=1;
+
+				seq = seqMap.get(taxon.toString());
+				if (seq==null) 
+					seq=new Sequence(seqLength);
+				else
+					numIdentifiedSeqs+=1;
+
 				taxonIndex = taxaIndices.get(taxon.toString());
 				if (taxonIndex==null) 
 					taxonIndex = TreeWithLocations.UNKNOWN_LOCATION;
 
 			}			
+			else {
+				seq = new Sequence(seqLength);
+			}
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			root.children.add(new TreeWithLocationsNode(location,taxonIndex,root.time+inputTree.getLength(node),root));			
+			root.children.add(new TreeWithLocationsNode(seq, location,taxonIndex,root.time+inputTree.getLength(node),root));			
 			makeSubTree(inputTree,locationMap, root.children.get(root.children.size()-1), node);			
 		}
 	}
@@ -286,23 +384,19 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (taxon!=null)
 				taxonIndex = taxaIndices.get(taxon.getName());			
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			if (locationAttributeName!=null) {
-				if (node.getAttribute(locationAttributeName)!=null) {
-					outputSubTree.children.add(new TreeWithLocationsNode((Integer)node.getAttribute(locationAttributeName),taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
-					numIdentifiedLocations+=1;
-				}
-				else {
-					outputSubTree.children.add(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
-				}
-			}
-			else 
-				outputSubTree.children.add(new TreeWithLocationsNode(TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+			outputSubTree.children.add(new TreeWithLocationsNode(new Sequence(seqLength), TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 			makeSubTree(inputTree, locationAttributeName, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
 		}
 
 	}
 
-	public void makeRandomTree(TransitionModel m, TreeWithLocationsNode root, int nNodes) {		
+	public void makeRandomTree(TransitionModel m, TreeWithLocationsNode root, int nNodes) {
+		// for test purpose
+
+		// tree generate parameters for test purpose
+		final double testBranchLengthMean = 0.5;
+		final double testBranchLengthVariance = 1.0;
+
 		if (nNodes>1) {
 			for (int child=0;child<2;child++) {
 				// Decide on branch length
@@ -312,7 +406,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int location=0;location<numLocations;location++) {
 					p=p+Math.exp(m.logprobability(root.loc, location, root.time, to_time));
 					if (cern.jet.random.Uniform.staticNextDouble()<=p) {
-						root.children.add(new TreeWithLocationsNode(location,TreeWithLocations.UNKNOWN_LOCATION,to_time,root));
+						root.children.add(new TreeWithLocationsNode(new Sequence(seqLength), location,TreeWithLocations.UNKNOWN_LOCATION,to_time,root));
 						break;
 					}
 				}			
@@ -337,11 +431,11 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override 
 	public void setMigrationModel(Object likelihoodModel_) {
-		likelihoodModel = (TransitionModel) likelihoodModel_;
+		migrationModel = (TransitionModel) likelihoodModel_;
 	}
 
 	public String newickProbs() {	 
-		return newickProbs(root,likelihoodModel.rootfreq(root.time).toArray()) + "\n";
+		return newickProbs(root,migrationModel.rootfreq(root.time).toArray()) + "\n";
 	}
 
 	private String newickProbs(TreeWithLocationsNode treePart, double[] rootFreq) {
@@ -443,7 +537,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			int repeats = 0;
 			do {
 				repeats+=1;
-				event = likelihoodModel.nextEvent(currentTime, currentLoc);
+				event = migrationModel.nextEvent(currentTime, currentLoc);
 				if (event.time < child.time) {
 					if (child.transitions==null) child.transitions = new ArrayList<Transition>();					
 					child.transitions.add(event);
@@ -509,10 +603,10 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		// Calculate root state
 		// TODO: check this
-		DoubleMatrix1D rootFreq = likelihoodModel.rootfreq(root.time);
+		DoubleMatrix1D rootFreq = migrationModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
-			alphas[i]=root.logProbs[i] + Math.log(rootFreq.get(i));
+			alphas[i]=root.logProbsLOC[i] + Math.log(rootFreq.get(i));
 		}		
 		root.loc = normalizeAndGetRandomSampleFromLogProbs(alphas);		
 		for (TreeWithLocationsNode node : root.children) {
@@ -525,9 +619,9 @@ public class TreeWithLocations implements LikelihoodTree {
 		TreeWithLocationsNode parent = node.parent;		
 		double[] alphas = new double[numLocations];	
 		// TODO: check if clause (here for numerics issues)
-		DoubleMatrix1D p = likelihoodModel.probability(parent.loc, parent.time, node.time);
+		DoubleMatrix1D p = migrationModel.probability(parent.loc, parent.time, node.time);
 		for (int i=0; i < numLocations; i++) {								
-			alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbs[i];
+			alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbsLOC[i];
 		}		
 		node.loc = normalizeAndGetRandomSampleFromLogProbs(alphas);
 
@@ -719,16 +813,16 @@ public class TreeWithLocations implements LikelihoodTree {
 		return returnValue;
 
 	}
-	
+
 	@Override
 	public String smTrunkStats(double presentDayTipInterval, double timeToDesignateTrunk) {
 		// TODO: test this
-		
+
 		List<TreeWithLocationsNode> trunkNodes = markTrunk(presentDayTipInterval, timeToDesignateTrunk);
-		
+
 		String returnValue = "{";
-		
-		
+
+
 		for (TreeWithLocationsNode node : trunkNodes) {
 			if (node.parent!=null) {
 				if (node.transitions!=null) {
@@ -750,7 +844,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				}
 			}
 		}
-		
+
 		returnValue+="}";
 		return returnValue;
 
@@ -764,19 +858,19 @@ public class TreeWithLocations implements LikelihoodTree {
 				maxTime = node.time;
 			}
 		}
-		
+
 		List<TreeWithLocationsNode> presentDayTips = new ArrayList<TreeWithLocationsNode>();
 		for (TreeWithLocationsNode node : root) {
 			if ((maxTime-node.time)<presentDayTipInterval) {
 				presentDayTips.add(node);
 			}
 		}
-		
+
 		for (TreeWithLocationsNode node : presentDayTips) {
 			returnValue.addAll(markTrunkAnc(node, maxTime, timeToDesignateTrunk));
 		}
 		return returnValue;
-		
+
 	}
 
 	private List<TreeWithLocationsNode> markTrunkAnc(TreeWithLocationsNode node, double maxTime, double timeToDesignateTrunk) {
@@ -940,16 +1034,16 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	@Override
-	public void setCodonModel(Object condonModel) {
+	public void setCodonModel(Object codonModel) {
 		// TODO Auto-generated method stub
-
+		codonLikelihoodModel = (TransitionModel[]) codonModel;
 	}
 
 	public double getNumIdentifiedSeqs() {
 		// TODO Auto-generated method stub
-		return 0;
+		return numIdentifiedSeqs;
 	}
-		
+
 
 }
 

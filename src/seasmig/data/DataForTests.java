@@ -23,6 +23,7 @@ import seasmig.treelikelihood.models.GeneralSeasonalMigrationBaseModel;
 import seasmig.treelikelihood.models.SinusoidialSeasonalMigrationBaseModel;
 import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
 import seasmig.treelikelihood.trees.AttributeLoader;
+import seasmig.treelikelihood.trees.Sequence;
 import seasmig.treelikelihood.trees.SimpleAttributeLoader;
 import seasmig.treelikelihood.trees.TreeWithLocations;
 import cern.colt.function.DoubleFunction;
@@ -279,7 +280,8 @@ public class DataForTests implements Data {
 				System.out.print("Reparsing trees... ");
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
-						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,locationMap,numLocations,config.lastTipTime[0]));
+						HashMap<String, Sequence> seqMap = new HashMap<String,Sequence>();
+						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,locationMap,numLocations,config.lastTipTime[0],seqMap,0));
 					}
 				}
 				else {

@@ -87,7 +87,6 @@ public class Sequence implements Serializable {
 	}
 
 	public int length() {
-		// TODO Auto-generated method stub
 		return seq.length;
 	}
 

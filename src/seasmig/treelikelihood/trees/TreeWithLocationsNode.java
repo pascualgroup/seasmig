@@ -11,25 +11,36 @@ import seasmig.treelikelihood.TransitionModel.Transition;
 @SuppressWarnings("serial")
 public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLocationsNode> {	
 
-	public double[] logProbs;
 	TreeWithLocationsNode parent = null;
 	List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
 	double time = 0;
 	int taxonIndex = 0;
 
-	// For tips and for ASR
 	int loc = TreeWithLocations.UNKNOWN_LOCATION;
+	public Sequence seq;
+	
+	public double[] logProbsLOC;
+	public double[][][] logProbsCP; // codon position 0,1,2; sequence position TODO: 
 
 	// For stochastic mapping
 	public List<Transition> transitions = null;
+	public List<Transition>[] transitionsCP1 = null;
+	public List<Transition>[] transitionsCP2 = null;
+	public List<Transition>[] transitionsCP3 = null;
+	
 	private boolean isTrunk = false;
+	private Sequence noSequence = new Sequence(0);
 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
 	protected TreeWithLocationsNode() {};
 
 	// Internal Node constructor
-	public TreeWithLocationsNode(int loc_, int taxonIndex_, double time_, TreeWithLocationsNode parent_) {
+	public TreeWithLocationsNode(Sequence seq_, int loc_, int taxonIndex_, double time_, TreeWithLocationsNode parent_) {
+		if (seq==null) {
+			seq = noSequence ;
+		}
+		seq=seq_;
 		loc=loc_;
 		time=time_;
 		parent=parent_;	
@@ -129,32 +140,32 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	public String parseProbs(double[] rootfreq) {			
 		String returnValue = "[&prob={";		
 
-		double[] logAncStateProbs = new double[logProbs.length];
-		double[] logAncProbs = new double[logProbs.length];
+		double[] logAncStateProbs = new double[logProbsLOC.length];
+		double[] logAncProbs = new double[logProbsLOC.length];
 
-		for (int i=0;i<logProbs.length;i++) {	
+		for (int i=0;i<logProbsLOC.length;i++) {	
 			if (parent!=null)
-				logAncStateProbs[i] = logProbs[i]+parent.logProbs[i];
+				logAncStateProbs[i] = logProbsLOC[i]+parent.logProbsLOC[i];
 			else
-				logAncStateProbs[i] = logProbs[i]+rootfreq[i];					
+				logAncStateProbs[i] = logProbsLOC[i]+rootfreq[i];					
 		}
 
 		double logTotalProb = logSumExp(logAncStateProbs);
-		for (int i=0;i<logProbs.length;i++) {
+		for (int i=0;i<logProbsLOC.length;i++) {
 			logAncStateProbs[i]=logAncStateProbs[i]-logTotalProb;
 		}
 
 		// Deal with numeric issues of not summing up to 1.0
 		double totalProb = 0;
-		for (int i=0;i<logProbs.length;i++) {			
+		for (int i=0;i<logProbsLOC.length;i++) {			
 			logAncProbs[i]=Math.exp(logAncStateProbs[i]);
 			totalProb+=logAncProbs[i];
 		}
 
-		for (int i=0;i<logProbs.length;i++) {
+		for (int i=0;i<logProbsLOC.length;i++) {
 			String prob = String.format("%.3f",logAncProbs[i]/totalProb);
 			returnValue+=prob;
-			if (i!=(logProbs.length-1)) 
+			if (i!=(logProbsLOC.length-1)) 
 				returnValue+=",";
 		}
 		returnValue+="}]";
@@ -202,6 +213,4 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		}
 		return returnValue;
 	}
-
-
 }
