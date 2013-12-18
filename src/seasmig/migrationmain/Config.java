@@ -1,4 +1,4 @@
-package seasmig;
+package seasmig.migrationmain;
 
 
 import java.io.File;

@@ -1,25 +1,32 @@
-package seasmig;
+package test;
+
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.GregorianCalendar;
+
 import jebl.evolution.io.ImportException;
+
 import org.junit.Test;
 
+import seasmig.data.Data;
 import seasmig.data.DataForTests;
 import seasmig.data.DataForTests.TestType;
+import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class TestLikelihood {
+public class TestOther {
+	
 	// TODO: Organize this....
 	
 	@Test
-	public void testLikelihood() throws IOException, ImportException {
-		final int numTestRepeats = 100;
+	public void testModelDegeneracy() throws IOException, ImportException {
 		// Load config
 		System.out.print("Loading config file... ");
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -38,48 +45,39 @@ public class TestLikelihood {
 		System.out.println(" done");
 
 		// Load data files and prepare data....			
-		Data data = new DataForTests(config,TestType.TEST_USING_GENERATED_TREES,10,3,5);
+		Data data = new DataForTests(config,TestType.TEST_MODEL_DEGENERACY,3,3,10);
 
 		// Creating test file 
 		File testFile = new File("out.test");
 		testFile.delete();
 		testFile.createNewFile();
 		PrintStream testStream = new PrintStream(testFile);
-		System.out.println("Calculating tree likelihood using the same model used to create the tree: SEASONALITY "+config.modelType+",");				
-		testStream.print("{\""+config.modelType+"\",");
-		testStream.print(((DataForTests)data).createModel.parse());
-		System.out.println(((DataForTests)data).createModel.print());
-		double createLikelihood = 0;
-		for (LikelihoodTree tree : data.getTrees().get(0)) {
-			System.out.print(".");
-			// TODO: maybe get likelihood to not require copy...
-			LikelihoodTree workingCopy = tree.copy();
-			workingCopy.setMigrationModel(((DataForTests)data).createModel);
-			createLikelihood+=workingCopy.logLikelihood();
-		}
-		createLikelihood=createLikelihood/data.getTrees().size();
-		System.out.println(createLikelihood);
+		System.out.println("Calculating tree likelihood using degenerate models:");				
+		double[] results = new double[((DataForTests) data).testModels.size()];
 
-		System.out.println("\nCalculating tree likelihood using test models with increasing noise:");
-		for (int i=0;i<((DataForTests)data).testModels.size();i++) {
-			if (i%numTestRepeats ==0) {						
-				System.out.println("SEASONALITY "+((DataForTests)data).testModels.get(i).getModelName());						
-			}
-
+		for (int i=0;i<((DataForTests) data).testModels.size();i++) {
+			System.out.println("SEASONALITY "+((DataForTests) data).testModels.get(i).getModelName());						
+			long startTime= System.currentTimeMillis();	
 			double testLikelihood = 0;
 			for (LikelihoodTree tree : data.getTrees().get(0)) {
 				System.out.print(".");
 				LikelihoodTree workingCopy = tree.copy();
-				workingCopy.setMigrationModel(((DataForTests)data).testModels.get(i));
+				workingCopy.setMigrationModel(((DataForTests) data).testModels.get(i));
 				testLikelihood+=workingCopy.logLikelihood();
 			}
 			testLikelihood=testLikelihood/data.getTrees().size();
 			System.out.println(testLikelihood);
+			results[i]=testLikelihood;
+			long duration= System.currentTimeMillis()-startTime;
+			System.out.println("duration: "+duration+"ms");
 		}
+
 		testStream.print(",\""+(new GregorianCalendar()).getTime()+"\"}");
 		testStream.close();
 
-	}
-
-
+		for (int i=1;i<results.length;i++) {
+			assertEquals(results[i],results[i-1], 1E-3);			
+		}
+		System.exit(0);
+	}	
 }

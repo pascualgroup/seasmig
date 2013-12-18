@@ -1,8 +1,9 @@
-package seasmig;
+package seasmig.migrationmain;
 
 import java.io.File;
 import java.io.FileReader;
 
+import seasmig.data.Data;
 import seasmig.data.DataFromFiles;
 import seasmig.models.SeasonalMigrationModelFactory;
 import mc3kit.ChainParity;

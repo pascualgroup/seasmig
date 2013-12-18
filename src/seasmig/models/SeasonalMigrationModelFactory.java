@@ -1,8 +1,8 @@
 package seasmig.models;
 
-import seasmig.Config;
-import seasmig.Config.TwoConstantSeasonsParameterization;
-import seasmig.Data;
+import seasmig.migrationmain.Config;
+import seasmig.migrationmain.Config.TwoConstantSeasonsParameterization;
+import seasmig.data.Data;
 import mc3kit.Chain;
 import mc3kit.MC3KitException;
 import mc3kit.Model;

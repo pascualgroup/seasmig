@@ -1,7 +1,8 @@
-package seasmig;
+package test;
 
 import java.io.File;
 import java.io.FileReader;
+
 import mc3kit.ChainParity;
 import mc3kit.MCMC;
 import mc3kit.Step;
@@ -15,9 +16,12 @@ import mc3kit.proposal.UnivariateProposalStep;
 
 import org.junit.Test;
 
+import seasmig.data.Data;
 import seasmig.data.DataForTests;
 import seasmig.data.DataForTests.TestType;
+import seasmig.migrationmain.Config;
 import seasmig.models.SeasonalMigrationModelFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

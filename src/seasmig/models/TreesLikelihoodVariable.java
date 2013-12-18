@@ -2,7 +2,7 @@ package seasmig.models;
 
 import java.io.Serializable;
 
-import seasmig.Config;
+import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
 import mc3kit.Model;
 import mc3kit.Variable;
