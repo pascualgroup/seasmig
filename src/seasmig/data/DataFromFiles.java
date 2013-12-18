@@ -33,6 +33,7 @@ public class DataFromFiles implements Data
 	Config config = null;
 	int numLocations;
 	long iteration = 0;
+	private Integer seqLength;
 
 	protected DataFromFiles() {};
 
@@ -132,9 +133,11 @@ public class DataFromFiles implements Data
 			}
 			
 			String alignmentFilename = null;
-			if (config.alignmentFilenames[h]!=null) {
-				if (config.alignmentFilenames[h].length()>0) {
-					alignmentFilename = config.alignmentFilenames[h];
+			if (config.alignmentFilenames!=null) {
+				if (config.alignmentFilenames[h]!=null) {
+					if (config.alignmentFilenames[h].length()>0) {
+						alignmentFilename = config.alignmentFilenames[h];
+					}
 				}
 			}
 			System.out.print("Loading traits & alignments... ");
@@ -145,11 +148,12 @@ public class DataFromFiles implements Data
 			HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
 			@SuppressWarnings("unchecked")
 			HashMap<String,Sequence> seqMap = (HashMap<String,Sequence>) attributes.get("alignments");
-			
+						
 			numLocations = (Integer) attributes.get("numLocations");
 			System.out.println("loaded "+locationMap.size()+" taxon traits");	
-			numLocations = (Integer) attributes.get("numAlignments");
-			System.out.println("loaded "+seqMap.size()+" sequences");
+			seqLength = (Integer) attributes.get("seqLength");
+			if (seqMap!=null)
+				System.out.println("loaded "+seqMap.size()+" sequences");
 			
 			System.out.print("Reparsing trees... ");
 
@@ -167,9 +171,9 @@ public class DataFromFiles implements Data
 				numIdentifiedSeqs+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedSeqs();
 			}
 			numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
-			numIdentifiedLocations=numIdentifiedSeqs/trees.get(h).size();
+			numIdentifiedSeqs=numIdentifiedSeqs/trees.get(h).size();
 			System.out.println("identified "+numIdentifiedLocations+" locations on average per tree");
-			
+			System.out.println("identified "+numIdentifiedSeqs+" sequences on average per tree");
 				
 			System.out.println(" reparsed "+trees.get(h).size()+" trees");			
 		}

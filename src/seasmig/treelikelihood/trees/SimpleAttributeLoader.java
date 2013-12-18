@@ -107,7 +107,12 @@ public class SimpleAttributeLoader implements AttributeLoader{
 		seqReader.close();
 
 		attributes.put("alignments",seqMap);
-		attributes.put("numAlignments",seqMap.size());		
+		if (!seqMap.isEmpty()) {
+			attributes.put("seqLength",seqMap.get(seqMap.keySet().iterator()).length());
+		}
+		else {
+			attributes.put("seqLength",0);
+		}
 	}
 	
 	void processStates(String fileName) throws NumberFormatException, IOException {

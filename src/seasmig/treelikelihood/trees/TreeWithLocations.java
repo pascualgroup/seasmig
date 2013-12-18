@@ -144,11 +144,14 @@ public class TreeWithLocations implements LikelihoodTree {
 		else
 			numIdentifiedLocations+=1;		
 
-		Sequence seq = seqMap.get(tree.getTaxon(tree.getRootNode()));
-		if (seq==null) 
-			seq=new Sequence(seqLength);
-		else
-			numIdentifiedSeqs+=1;		
+		Sequence seq = null;
+		if (seqMap!=null) {
+			seq = seqMap.get(tree.getTaxon(tree.getRootNode()));
+			if (seq==null) 
+				seq=new Sequence(seqLength);
+			else
+				numIdentifiedSeqs+=1;
+		}
 
 		Integer rootTaxonIndex = UNKNOWN_TAXA;
 		Taxon rootTaxon = tree.getTaxon(tree.getRootNode());
@@ -366,7 +369,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			Taxon taxon = inputTree.getTaxon(node);
 			Integer location = TreeWithLocations.UNKNOWN_LOCATION;
 			Integer taxonIndex = TreeWithLocations.UNKNOWN_TAXA;
-			Sequence seq;
+			Sequence seq = null;
 			if (taxon!=null) {
 				location = locationMap.get(taxon.toString());				
 				if (location==null) 
@@ -374,11 +377,13 @@ public class TreeWithLocations implements LikelihoodTree {
 				else
 					numIdentifiedLocations+=1;
 
-				seq = seqMap.get(taxon.toString());
-				if (seq==null) 
-					seq=new Sequence(seqLength);
-				else
-					numIdentifiedSeqs+=1;
+				if (seqMap!=null) {
+					seq = seqMap.get(taxon.toString());
+					if (seq==null) 
+						seq=new Sequence(seqLength);
+					else
+						numIdentifiedSeqs+=1;
+				}
 
 				taxonIndex = taxaIndices.get(taxon.toString());
 				if (taxonIndex==null) 

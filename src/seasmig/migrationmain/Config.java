@@ -163,7 +163,7 @@ public class Config implements Serializable
 	public double timeToDesignateTrunk = 2.0; // time back from present day tip ancestry designated as trunk 
 	public int maxSMBranchRetries = 20000; // maximum number of retries for stochastically mapping a single branch
 
-	public String[] alignmentFilenames = {"ha.fasta","na.fasta"};
+	public String[] alignmentFilenames = null;//{"ha.fasta","na.fasta"};
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {
