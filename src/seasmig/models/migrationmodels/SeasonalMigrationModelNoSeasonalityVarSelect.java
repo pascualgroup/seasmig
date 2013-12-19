@@ -1,4 +1,4 @@
-package seasmig.models;
+package seasmig.models.migrationmodels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import mc3kit.distributions.BernoulliDistribution;
 import mc3kit.distributions.ExponentialDistribution;
 import mc3kit.distributions.UniformIntDistribution;
 import seasmig.migrationmain.Config;
+import seasmig.models.TreesLikelihoodVariable;
 import seasmig.data.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;

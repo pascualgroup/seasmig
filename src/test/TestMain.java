@@ -20,7 +20,7 @@ import seasmig.data.Data;
 import seasmig.data.DataForTests;
 import seasmig.data.DataForTests.TestType;
 import seasmig.migrationmain.Config;
-import seasmig.models.SeasonalMigrationModelFactory;
+import seasmig.models.migrationmodels.SeasonalMigrationModelFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

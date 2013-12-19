@@ -1,12 +1,12 @@
-package seasmig.models;
+package seasmig.models.migrationmodels;
 
-import seasmig.migrationmain.Config;
-import seasmig.migrationmain.Config.TwoConstantSeasonsParameterization;
-import seasmig.data.Data;
 import mc3kit.Chain;
 import mc3kit.MC3KitException;
 import mc3kit.Model;
 import mc3kit.ModelFactory;
+import seasmig.data.Data;
+import seasmig.migrationmain.Config;
+import seasmig.migrationmain.Config.TwoConstantSeasonsParameterization;
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModelFactory implements ModelFactory

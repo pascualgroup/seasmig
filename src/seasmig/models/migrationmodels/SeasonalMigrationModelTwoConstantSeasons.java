@@ -1,29 +1,25 @@
-package seasmig.models;
+package seasmig.models.migrationmodels;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import mc3kit.BinaryDistribution;
-import mc3kit.BinaryVariable;
 import mc3kit.Chain;
 import mc3kit.DoubleDistribution;
 import mc3kit.DoubleVariable;
 import mc3kit.IntVariable;
 import mc3kit.MC3KitException;
-import mc3kit.distributions.BernoulliDistribution;
 import mc3kit.distributions.ExponentialDistribution;
 import mc3kit.distributions.UniformDistribution;
 import mc3kit.distributions.UniformIntDistribution;
 import seasmig.migrationmain.Config;
+import seasmig.models.TreesLikelihoodVariable;
 import seasmig.data.Data;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.TransitionModel;
-import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 import seasmig.treelikelihood.transitionmodels.TwoSeasonMigrationBaseModel;
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection extends SeasonalMigrationModel {
+public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationModel {
 
 	Config config;
 	Data data;
@@ -31,25 +27,24 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 
 	DoubleVariable[][] rates;	
 	DoubleVariable[][] diffMultipliers;
-	BinaryVariable[][] diffIndicators;
-
+	DoubleVariable[] diffMultipliersFrom;
+	DoubleVariable[] diffMultipliersTo;
 	DoubleVariable seasonalPhase;
-	DoubleVariable seasonalLength;
-	double seasonStart;
-	double seasonEnd;
 	IntVariable treeIndices[];
 	LikelihoodVariable likeVar;
 	private int nTrees[];	
 
 	boolean fixedPhase;
-	boolean fixedPhaseLength;
-	boolean fixRate;
+	boolean fixTo;
+	boolean fixFrom;
 	private ExponentialDistribution ratePriorDist;
-	private BinaryVariable[][] rateIndicators;
+	private double seasonStart;
+	private DoubleVariable seasonalLength;
+	private boolean fixedPhaseLength;
 
-	protected SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection() { }
+	protected SeasonalMigrationModelTwoConstantSeasons() { }
 
-	public SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixedPhaseLength, boolean fixRate) throws MC3KitException
+	public SeasonalMigrationModelTwoConstantSeasons(Chain initialChain, Config config, Data data, boolean fixedPhase, boolean fixedPhaseLength, boolean fixFrom, boolean fixTo) throws MC3KitException
 	{
 		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
@@ -57,19 +52,21 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 		this.config = config;
 		this.data = data;
 		this.fixedPhase=fixedPhase;
+		this.fixTo=fixTo;
+		this.fixFrom=fixFrom;
 		this.fixedPhaseLength=fixedPhaseLength;
-		this.fixRate=fixRate;
 		numLocations=data.getNumLocations();
 		List<ArrayList<LikelihoodTree>> trees = data.getTrees();		
 		nTrees = new int[trees.size()];
 		for (int i=0;i<trees.size();i++) {
 			nTrees[i]=trees.get(i).size();
-		}	
+		}
+
 		rates = new DoubleVariable[numLocations][numLocations];
 
+		diffMultipliersFrom = new DoubleVariable[numLocations];
+		diffMultipliersTo = new DoubleVariable[numLocations];
 		diffMultipliers = new DoubleVariable[numLocations][numLocations];
-		diffIndicators = new BinaryVariable[numLocations][numLocations];
-		rateIndicators = new BinaryVariable[numLocations][numLocations];
 
 		beginConstruction();
 
@@ -78,8 +75,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 			if (nTrees[i]>1) {
 				treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
 			}
-		}
-		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
+		}		
 
 		if (fixedPhase && fixedPhaseLength) {
 			seasonStart=config.fixedPhase;			
@@ -96,20 +92,28 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 			seasonalLength = new DoubleVariable(this,"seasonalLength", new UniformDistribution(this,config.minSeasonLength,0.5));			
 		}
 
+		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
-		BinaryDistribution diffIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
-		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, config.rateIndicatorPrior);
 
 		for (int i=0; i< numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
 				rates[i][j] = new DoubleVariable(this, "meanRates."+Integer.toString(i)+"."+Integer.toString(j), ratePriorDist);
-				diffMultipliers[i][j] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i)+"."+Integer.toString(j), diffMultiplierPriorDist);
-				diffIndicators[i][j] = new BinaryVariable(this, "diffIndicators."+Integer.toString(i)+"."+Integer.toString(j), diffIndicatorPriorDist);
-				rateIndicators[i][j] = new BinaryVariable(this, "rateIndicators."+Integer.toString(i)+"."+Integer.toString(j), rateIndicatorPriorDist);
+				if (!fixFrom && !fixTo) 
+					diffMultipliers[i][j] = new DoubleVariable(this, "diffMultipliers."+Integer.toString(i)+"."+Integer.toString(j), diffMultiplierPriorDist);
 			}		
 		}
 
+		if (fixFrom) {
+			for(int i = 0; i < numLocations; i++) {
+				diffMultipliersFrom[i] = new DoubleVariable(this, "diffMultipliersFrom."+Integer.toString(i), diffMultiplierPriorDist);
+			}		
+		}
+		if (fixTo) {
+			for(int i = 0; i < numLocations; i++) {
+				diffMultipliersTo[i] = new DoubleVariable(this, "diffMultipliersTo."+Integer.toString(i), diffMultiplierPriorDist);
+			}		
+		}
 
 		// Custom likelihood variable
 		likeVar = new LikelihoodVariable(this);
@@ -119,10 +123,11 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 	} 
 
 	private class LikelihoodVariable extends TreesLikelihoodVariable {
-	
-		private double infinitesimalRate = 1E-3;
 
-		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection m) throws MC3KitException {
+
+		private double seasonEnd;
+
+		LikelihoodVariable(SeasonalMigrationModelTwoConstantSeasons m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true,nTrees.length,config);
@@ -133,21 +138,26 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 					m.addEdge(this, m.treeIndices[i]);
 				}
 			}
+
 			if (!fixedPhase)
 				m.addEdge(this, m.seasonalPhase);
 			if (!fixedPhaseLength)
 				m.addEdge(this, m.seasonalLength);
 
 			for(int i = 0; i < numLocations; i++) {
+				if (diffMultipliersFrom[i]!=null ) 
+					m.addEdge(this, diffMultipliersFrom[i]);				
+				if (diffMultipliersTo[i]!=null ) 
+					m.addEdge(this, diffMultipliersTo[i]);				
 				for(int j = 0; j < numLocations; j++) {
 					if (i==j) continue;
 					m.addEdge(this,rates[i][j]);
-					m.addEdge(this,diffMultipliers[i][j]);
-					m.addEdge(this,diffIndicators[i][j]);
-					m.addEdge(this,rateIndicators[i][j]);
+					if (diffMultipliers[i][j]!=null) 
+						m.addEdge(this,diffMultipliers[i][j]);		
 				}
 			}
 		}
+
 
 		/*
 		 * The update method is called whenever a node this variable
@@ -167,56 +177,37 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 		public boolean update() {
 
 			double logLikelihood = 0.0;
+			//double logPrior = 0.0;
 
 			double[][] rates1doubleForm = new double[numLocations][numLocations];
-			double[][] rates2doubleForm = new double[numLocations][numLocations];			
-
+			double[][] rates2doubleForm = new double[numLocations][numLocations];
 			for (int i=0;i<numLocations;i++) {
 				double rowsum1=0;
 				double rowsum2=0;
 				for (int j=0;j<numLocations;j++) {
 					if (i!=j) {
-						if (rateIndicators[i][j].getValue()==true) {
-							if (diffIndicators[i][j].getValue()==true) {
-								rates1doubleForm[i][j]=rates[i][j].getValue()*(1-diffMultipliers[i][j].getValue());
-								rates2doubleForm[i][j]=rates[i][j].getValue()*(1+diffMultipliers[i][j].getValue());
-							}
-							else {
-								rates1doubleForm[i][j]=rates[i][j].getValue();
-								rates2doubleForm[i][j]=rates[i][j].getValue();
-							}
+						rates1doubleForm[i][j]=rates[i][j].getValue();
+						rates2doubleForm[i][j]=rates[i][j].getValue();
+						if (diffMultipliers[i][j]!=null) {
+							rates1doubleForm[i][j]*=(1-diffMultipliers[i][j].getValue());
+							rates2doubleForm[i][j]*=(1+diffMultipliers[i][j].getValue());
 						}
-						else {
-							rates1doubleForm[i][j]=infinitesimalRate*(rates[i][j].getValue()%1.0);
-							rates2doubleForm[i][j]=infinitesimalRate*(rates[i][j].getValue()%1.0);
+						else if (diffMultipliersTo[j]!=null && (fixTo)) {
+							rates1doubleForm[i][j]*=(1-diffMultipliersTo[j].getValue());
+							rates2doubleForm[i][j]*=(1+diffMultipliersTo[j].getValue());
 						}
-						rowsum1-=rates1doubleForm[i][j];
-						rowsum2-=rates2doubleForm[i][j];
+						else if (diffMultipliersFrom[i]!=null && (fixFrom)) {
+							rates1doubleForm[i][j]*=(1-diffMultipliersFrom[i].getValue());
+							rates2doubleForm[i][j]*=(1+diffMultipliersFrom[i].getValue());
+						}
+						rowsum1+=rates1doubleForm[i][j];
+						rowsum2+=rates2doubleForm[i][j];
 					}
 				}
-				rates1doubleForm[i][i]=rowsum1;
-				rates2doubleForm[i][i]=rowsum2;
+				rates1doubleForm[i][i]=-rowsum1;
+				rates2doubleForm[i][i]=-rowsum2;		
 			}
 
-			if (fixRate) {
-				double[][] ratesdoubleForm = new double[numLocations][numLocations];
-				
-				for (int i=0;i<numLocations;i++) {
-					double rowsum=0;
-					for (int j=0;j<numLocations;j++) {
-						if (i!=j) 
-							ratesdoubleForm[i][j]=rates[i][j].getValue();						
-						rowsum-=ratesdoubleForm[i][j];
-					}
-					ratesdoubleForm[i][i]=rowsum;
-				}
-				
-				double rate=getRate(ratesdoubleForm);	
-				adjustRate(rates1doubleForm, rate);
-				adjustRate(rates2doubleForm, rate);
-			}
-
-			// TODO: add update to migration model instead of reconstructing...
 			if (fixedPhase && fixedPhaseLength) {
 				seasonStart=config.fixedPhase;	
 				seasonEnd = seasonStart+0.5;
@@ -244,8 +235,8 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 					seasonStart=config.fixedPhase+seasonalLength.getValue()-1.0;
 					seasonEnd=config.fixedPhase;
 				}			
-			}			
-
+			}	
+			
 			TransitionModel migrationBaseModel = new TwoSeasonMigrationBaseModel(rates1doubleForm,rates2doubleForm,seasonStart,seasonEnd);
 			LikelihoodTree workingCopy;		
 			for (int i=0;i<nTrees.length;i++) {
@@ -258,28 +249,9 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 				trees[i]=workingCopy;
 			}						
 
-			setLogP(logLikelihood);				
-			oldLogP=logLikelihood;
+			setLogP(logLikelihood);			
+			oldLogP=logLikelihood;		
 			return true;
-		}
-
-		private void adjustRate(double[][] Q, double adjustedRate) {
-			double inputRate = getRate(Q);
-			for (int i=0;i<Q.length;i++) {
-				for (int j=0;j<Q.length;j++) {
-					Q[i][j]=Q[i][j]/inputRate*adjustedRate;
-				}
-			}
-		}
-
-		private double getRate(double[][] ratesdoubleForm) {
-			MatrixExponentiator matrixExp = new Matlab7MatrixExp(ratesdoubleForm);
-			double[] pi = matrixExp.expm(config.veryLongTime).viewRow(1).toArray();	
-			double rate=0;
-			for (int i=0;i<numLocations;i++) {
-				rate-=pi[i]*ratesdoubleForm[i][i];
-			}
-			return rate;
 		}
 
 		/*

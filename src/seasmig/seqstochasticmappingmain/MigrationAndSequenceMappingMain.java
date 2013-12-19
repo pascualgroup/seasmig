@@ -6,7 +6,7 @@ import java.io.FileReader;
 import seasmig.data.Data;
 import seasmig.data.DataFromFiles;
 import seasmig.migrationmain.Config;
-import seasmig.models.SeasonalMigrationModelFactory;
+import seasmig.models.migrationmodels.*;
 import mc3kit.ChainParity;
 import mc3kit.MCMC;
 import mc3kit.Step;

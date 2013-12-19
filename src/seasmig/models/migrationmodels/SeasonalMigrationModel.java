@@ -1,4 +1,4 @@
-package seasmig.models;
+package seasmig.models.migrationmodels;
 
 import static mc3kit.util.Utils.makeHierarchicalMap;
 
@@ -6,10 +6,11 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import seasmig.models.TreesLikelihoodVariable.TreesLikelihoodVariableOutputObject;
 import mc3kit.Chain;
 import mc3kit.Model;
 import mc3kit.Variable;
+import seasmig.models.*;
+import seasmig.models.TreesLikelihoodVariable.TreesLikelihoodVariableOutputObject;
 
 @SuppressWarnings("serial")
 public abstract class SeasonalMigrationModel extends Model implements Serializable {

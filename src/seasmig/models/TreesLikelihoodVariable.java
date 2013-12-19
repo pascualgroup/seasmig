@@ -25,13 +25,13 @@ public class TreesLikelihoodVariable extends Variable {
 	public class TreesLikelihoodVariableOutputObject implements Serializable {		
 		protected TreesLikelihoodVariableOutputObject() {};
 		String[] probTrees = null;
-		String[] asrTrees = null;
-		String[] smTrees = null;
-		String[] smTransitions = null;
-		String[] smTipDwellings = null;
-		String[] smLineages = null;	
-		String[] smDescendants = null;
-		String[] smTrunkStats = null;
+		public String[] asrTrees = null;
+		public String[] smTrees = null;
+		public String[] smTransitions = null;
+		public String[] smTipDwellings = null;
+		public String[] smLineages = null;	
+		public String[] smDescendants = null;
+		public String[] smTrunkStats = null;
 	}
 	
 
