@@ -32,6 +32,7 @@ public class TreesLikelihoodVariable extends Variable {
 		public String[] smLineages = null;	
 		public String[] smDescendants = null;
 		public String[] smTrunkStats = null;
+		public String[] smSeqMigStats = null;
 	}
 	
 

@@ -3,6 +3,7 @@ package seasmig.models.migrationmodels;
 import java.util.ArrayList;
 import java.util.List;
 import seasmig.models.*;
+import mc3kit.BinaryDistribution;
 import mc3kit.BinaryVariable;
 import mc3kit.Chain;
 import mc3kit.DoubleVariable;
@@ -16,66 +17,56 @@ import seasmig.models.TreesLikelihoodVariable;
 import seasmig.data.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
-import seasmig.treelikelihood.transitionmodels.PiecewiseConstantMigrationBaseModel;
+import seasmig.treelikelihood.transitionmodels.ConstantTransitionBaseModel;
+
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelNConstantSeasonsVarSelect extends MigrationModel {
+public class MigrationModelNoSeasonalityVarSelect extends MigrationModel {
+
 
 	Config config;
 	Data data;
 	int numLocations;
 
-	DoubleVariable[][][] rates;			
+	DoubleVariable[][] rates;
+	BinaryVariable[][] rateIndicators;	
 	IntVariable treeIndices[];
-	BinaryVariable[][][] sameIndicators;
 	LikelihoodVariable likeVar;
-	private int nTrees[];	
+	private int nTrees[];
+	private ExponentialDistribution ratePriorDist;	
 
-	private ExponentialDistribution ratePriorDist;
-	private int nParts;
-	private BernoulliDistribution indicatorPriorDist;
-	//private DoubleVariable indicatorHyperprior;
-	
-	protected SeasonalMigrationModelNConstantSeasonsVarSelect() { }
+	protected MigrationModelNoSeasonalityVarSelect() { }
 
-	public SeasonalMigrationModelNConstantSeasonsVarSelect(Chain initialChain, Config config, Data data, int nParts) throws MC3KitException
+	public MigrationModelNoSeasonalityVarSelect(Chain initialChain, Config config, Data data) throws MC3KitException
 	{
-		// Either rows or columns or none of them can be set to have the same differential rates for season one vs. season two....
 		super(initialChain);
-
 		this.config = config;
-		this.data = data;
-		this.nParts = nParts;
+		this.data = data;		
 		numLocations=data.getNumLocations();
 		List<ArrayList<LikelihoodTree>> trees = data.getTrees();		
 		nTrees = new int[trees.size()];
 		for (int i=0;i<trees.size();i++) {
 			nTrees[i]=trees.get(i).size();
 		}
-
-		rates = new DoubleVariable[nParts][numLocations][numLocations];
-		sameIndicators = new BinaryVariable[nParts][numLocations][numLocations];
-
+		rates = new DoubleVariable[numLocations][numLocations];
+		rateIndicators = new BinaryVariable[numLocations][numLocations];
+			
 		beginConstruction();
-
+		
+		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, config.rateIndicatorPrior);
 		treeIndices = new IntVariable[trees.size()];
 		for (int i=0;i<trees.size();i++) {
 			if (nTrees[i]>1) {
 				treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
 			}
-		}		
-
-		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
-		//indicatorHyperprior = new DoubleVariable(this, "indicatorHyperprior", new UniformDistribution(this));
-		indicatorPriorDist = new BernoulliDistribution(this, "indicatorPrior",config.rateIndicatorPrior);
-
-		for (int i=0; i<nParts; i++) {
-			for (int j=0; j<numLocations; j++) {
-				for(int k=0; k<numLocations; k++) {
-					if(j == k) continue; // rateParams[i,i] remains null			
-					rates[i][j][k] = new DoubleVariable(this, "rates."+Integer.toString(i)+"."+Integer.toString(j)+"."+Integer.toString(k), ratePriorDist);
-					if (i>=1) sameIndicators[i][j][k] = new BinaryVariable(this, "indicators."+Integer.toString(i)+"."+Integer.toString(j)+"."+Integer.toString(k), indicatorPriorDist);
-				}
+		}
+		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
+		
+		for(int i = 0; i < numLocations; i++) {
+			for(int j = 0; j < numLocations; j++) {
+				if(i == j) continue; // rateParams[i,i] remains null			
+				rates[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j),ratePriorDist);
+				rateIndicators[i][j] = new BinaryVariable(this, "rateIndicators."+Integer.toString(i)+"."+Integer.toString(j),rateIndicatorPriorDist);
 			}
 		}
 
@@ -84,15 +75,15 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends MigrationMo
 
 		endConstruction();
 
-	} 
+	} 	
 
 	private class LikelihoodVariable extends TreesLikelihoodVariable {
+	
 
-
-		LikelihoodVariable(SeasonalMigrationModelNConstantSeasonsVarSelect m) throws MC3KitException {
+		LikelihoodVariable(MigrationModelNoSeasonalityVarSelect m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
-			super(m, "likeVar", true,nTrees.length,config);
+			super(m, "likeVar", true, nTrees.length,config);
 
 			// Add dependencies between likelihood variable and parameters
 			for (int i=0;i<nTrees.length;i++) {
@@ -100,14 +91,12 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends MigrationMo
 					m.addEdge(this, m.treeIndices[i]);
 				}
 			}
-			
-			for (int i=0; i<nParts; i++) {
-				for (int j=0; j<numLocations; j++) {
-					for(int k=0; k<numLocations; k++) {
-						if(j == k) continue; // rateParams[i,i] remains null			
-						m.addEdge(this,rates[i][j][k]);
-						if (i>=1) m.addEdge(this,sameIndicators[i][j][k]);
-					}
+
+			for(int i = 0; i < numLocations; i++) {
+				for(int j = 0; j < numLocations; j++) {
+					if (i==j) continue;				
+					m.addEdge(this,rates[i][j]);
+					m.addEdge(this,rateIndicators[i][j]);
 				}
 			}
 		}
@@ -130,42 +119,38 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends MigrationMo
 		@Override
 		public boolean update() {
 
-			double logLikelihood = 0.0;
-			//double logPrior = 0.0;
+			double logP = 0.0;
 
-			double[][][] ratesDoubleForm = new double[nParts][numLocations][numLocations];
-
-			for (int i=0;i<nParts;i++) {
-				for (int j=0;j<numLocations;j++) {					
-					for (int k=0;k<numLocations;k++) {
-						if (j!=k) {
-							if (i>=1) {
-								ratesDoubleForm[i][j][k]=(sameIndicators[i][j][k].getValue() ? ratesDoubleForm[i-1][j][k] : rates[i][j][k].getValue());
-							}
-							else {
-								ratesDoubleForm[i][j][k]=rates[i][j][k].getValue();
-							}
-						}
+			double[][] ratesdoubleForm = new double[numLocations][numLocations];
+			for (int i=0;i<numLocations;i++) {
+				double rowsum=0;
+				for (int j=0;j<numLocations;j++) {
+					if (i!=j) {
+						ratesdoubleForm[i][j]=(rateIndicators[i][j].getValue() ? rates[i][j].getValue() : 0.000001);
+						rowsum-=ratesdoubleForm[i][j];
 					}
 				}
+				ratesdoubleForm[i][i]=rowsum;
 			}
 
-			TransitionModel migrationBaseModel = new PiecewiseConstantMigrationBaseModel(ratesDoubleForm,nParts);
-			LikelihoodTree workingCopy;		
+			// TODO: add update to migration model instead of reconstructing...
+			TransitionModel migrationBaseModel = new ConstantTransitionBaseModel(ratesdoubleForm);
+			LikelihoodTree workingCopy;
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1)
 					workingCopy = data.getTrees().get(i).get((int)treeIndices[i].getValue()).copy(); 
 				else
 					workingCopy = data.getTrees().get(i).get(0).copy();
 				workingCopy.setMigrationModel(migrationBaseModel);
-				logLikelihood+=config.treeWeights[i]*workingCopy.logLikelihood();
+				logP+=config.treeWeights[i]*workingCopy.logLikelihood();
 				trees[i]=workingCopy;
-			}						
+			}
 
-			setLogP(logLikelihood);			
-			oldLogP=logLikelihood;		
+			setLogP(logP);
+			oldLogP=logP;
 			return true;
 		}
+
 
 		/*
 		 * If you want to avoid calculating the log-probability again
@@ -182,6 +167,8 @@ public class SeasonalMigrationModelNConstantSeasonsVarSelect extends MigrationMo
 			}
 			return true;
 		}
-
+		
+		
+		
 	}
 }

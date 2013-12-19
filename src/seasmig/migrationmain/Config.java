@@ -22,6 +22,10 @@ public class Config implements Serializable
 		EPOCHAL
 	}
 	
+	public static enum SeqModelType { 
+		HKY_3CP // HKY model for 3 codon positions
+	}
+	
 	// CONSTANT
 	public static enum NoSeasonalityParameterization {  
 		VARIABLE_SELECTION,		
@@ -107,8 +111,11 @@ public class Config implements Serializable
 	public long checkpointEvery = 1000;
 	public boolean restoreFromDatabase = false;
 
-	// SEASONAL MODEL RELATED PARAMETERS
-	public MigrationModelType modelType = MigrationModelType.TWO_CONSTANT_SEASONS;
+	// SEQ EVOLUTION MODEL RELATED PARAMETERS
+	
+	
+	// MIGRATION MODEL RELATED PARAMETERS
+	public MigrationModelType migrationModelType = MigrationModelType.TWO_CONSTANT_SEASONS;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION TWO SEASONS...
 	public double fixedPhase = 0.3;
@@ -163,6 +170,8 @@ public class Config implements Serializable
 	public int maxSMBranchRetries = 20000; // maximum number of retries for stochastically mapping a single branch
 
 	public String[] alignmentFilenames = null;//{"ha.fasta","na.fasta"};
+
+	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

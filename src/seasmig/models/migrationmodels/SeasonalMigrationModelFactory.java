@@ -24,13 +24,13 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 
 	@Override
 	public Model createModel(Chain initialChain) throws MC3KitException {
-		switch (config.modelType) {
+		switch (config.migrationModelType) {
 		case CONSTANT:	
 			switch (config.noSeasonalityParameterization) {
 			case ALL:
-				return new SeasonalMigrationModelNoSeasonality(initialChain, config, data);
+				return new MigrationModelNoSeasonality(initialChain, config, data);
 			case VARIABLE_SELECTION:
-				return new SeasonalMigrationModelNoSeasonalityVarSelect(initialChain, config, data);			
+				return new MigrationModelNoSeasonalityVarSelect(initialChain, config, data);			
 			default:
 				break;
 			}
@@ -51,9 +51,7 @@ public class SeasonalMigrationModelFactory implements ModelFactory
 		case N_CONSTANT_SEASONS: 
 			switch (config.nConstantSeasonsParameterization) {
 			case ALL: 
-				return new SeasonalMigrationModelNConstantSeasons(initialChain,config,data,config.nSeasonalParts);
-			case VARIABLE_SELECTION: 	
-				return new SeasonalMigrationModelNConstantSeasonsVarSelect(initialChain,config,data,config.nSeasonalParts);
+				return new SeasonalMigrationModelNConstantSeasons(initialChain,config,data,config.nSeasonalParts);			
 			default:
 				break;
 			}

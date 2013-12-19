@@ -3,13 +3,10 @@ package seasmig.models.migrationmodels;
 import java.util.ArrayList;
 import java.util.List;
 import seasmig.models.*;
-import mc3kit.BinaryDistribution;
-import mc3kit.BinaryVariable;
 import mc3kit.Chain;
 import mc3kit.DoubleVariable;
 import mc3kit.IntVariable;
 import mc3kit.MC3KitException;
-import mc3kit.distributions.BernoulliDistribution;
 import mc3kit.distributions.ExponentialDistribution;
 import mc3kit.distributions.UniformIntDistribution;
 import seasmig.migrationmain.Config;
@@ -21,23 +18,22 @@ import seasmig.treelikelihood.transitionmodels.ConstantTransitionBaseModel;
 
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelNoSeasonalityVarSelect extends MigrationModel {
+public class MigrationModelNoSeasonality extends MigrationModel {
 
 
 	Config config;
 	Data data;
 	int numLocations;
 
-	DoubleVariable[][] rates;
-	BinaryVariable[][] rateIndicators;	
+	DoubleVariable[][] rates;	
 	IntVariable treeIndices[];
 	LikelihoodVariable likeVar;
 	private int nTrees[];
 	private ExponentialDistribution ratePriorDist;	
 
-	protected SeasonalMigrationModelNoSeasonalityVarSelect() { }
+	protected MigrationModelNoSeasonality() { }
 
-	public SeasonalMigrationModelNoSeasonalityVarSelect(Chain initialChain, Config config, Data data) throws MC3KitException
+	public MigrationModelNoSeasonality(Chain initialChain, Config config, Data data) throws MC3KitException
 	{
 		super(initialChain);
 		this.config = config;
@@ -49,11 +45,8 @@ public class SeasonalMigrationModelNoSeasonalityVarSelect extends MigrationModel
 			nTrees[i]=trees.get(i).size();
 		}
 		rates = new DoubleVariable[numLocations][numLocations];
-		rateIndicators = new BinaryVariable[numLocations][numLocations];
-			
+
 		beginConstruction();
-		
-		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, config.rateIndicatorPrior);
 		treeIndices = new IntVariable[trees.size()];
 		for (int i=0;i<trees.size();i++) {
 			if (nTrees[i]>1) {
@@ -61,12 +54,11 @@ public class SeasonalMigrationModelNoSeasonalityVarSelect extends MigrationModel
 			}
 		}
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
-		
+
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
 				rates[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j),ratePriorDist);
-				rateIndicators[i][j] = new BinaryVariable(this, "rateIndicators."+Integer.toString(i)+"."+Integer.toString(j),rateIndicatorPriorDist);
 			}
 		}
 
@@ -80,7 +72,7 @@ public class SeasonalMigrationModelNoSeasonalityVarSelect extends MigrationModel
 	private class LikelihoodVariable extends TreesLikelihoodVariable {
 	
 
-		LikelihoodVariable(SeasonalMigrationModelNoSeasonalityVarSelect m) throws MC3KitException {
+		LikelihoodVariable(MigrationModelNoSeasonality m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true, nTrees.length,config);
@@ -96,7 +88,6 @@ public class SeasonalMigrationModelNoSeasonalityVarSelect extends MigrationModel
 				for(int j = 0; j < numLocations; j++) {
 					if (i==j) continue;				
 					m.addEdge(this,rates[i][j]);
-					m.addEdge(this,rateIndicators[i][j]);
 				}
 			}
 		}
@@ -126,8 +117,8 @@ public class SeasonalMigrationModelNoSeasonalityVarSelect extends MigrationModel
 				double rowsum=0;
 				for (int j=0;j<numLocations;j++) {
 					if (i!=j) {
-						ratesdoubleForm[i][j]=(rateIndicators[i][j].getValue() ? rates[i][j].getValue() : 0.000001);
-						rowsum-=ratesdoubleForm[i][j];
+						ratesdoubleForm[i][j]=rates[i][j].getValue();
+						rowsum-=rates[i][j].getValue();
 					}
 				}
 				ratesdoubleForm[i][i]=rowsum;
