@@ -9,14 +9,14 @@ import seasmig.migrationmain.Config;
 import seasmig.migrationmain.Config.TwoConstantSeasonsParameterization;
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelFactory implements ModelFactory
+public class MigrationModelFactory implements ModelFactory
 {
 	Config config;
 	Data data;
 
-	protected SeasonalMigrationModelFactory() {};
+	protected MigrationModelFactory() {};
 
-	public SeasonalMigrationModelFactory(Config config, Data data)
+	public MigrationModelFactory(Config config, Data data)
 	{
 		this.config = config;
 		this.data = data;

@@ -20,7 +20,7 @@ import seasmig.data.Data;
 import seasmig.data.DataForTests;
 import seasmig.data.DataForTests.TestType;
 import seasmig.migrationmain.Config;
-import seasmig.models.migrationmodels.SeasonalMigrationModelFactory;
+import seasmig.models.migrationmodels.MigrationModelFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -75,7 +75,7 @@ public class TestMain {
 					mcmc.setRandomSeed(config.randomSeed);
 
 				// Object that will be asked to create model objects for each chain
-				mcmc.setModelFactory(new SeasonalMigrationModelFactory(config,data));
+				mcmc.setModelFactory(new MigrationModelFactory(config,data));
 
 				// Number of chains
 				mcmc.setChainCount(config.chainCount);
