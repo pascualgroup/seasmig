@@ -10,14 +10,14 @@ import mc3kit.MC3KitException;
 import mc3kit.distributions.ExponentialDistribution;
 import mc3kit.distributions.UniformIntDistribution;
 import seasmig.migrationmain.Config;
-import seasmig.models.TreesLikelihoodVariable;
+import seasmig.models.*;
 import seasmig.data.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.transitionmodels.PiecewiseConstantMigrationBaseModel;
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelNConstantSeasons extends SeasonalMigrationModel {
+public class SeasonalMigrationModelNConstantSeasons extends MigrationModel {
 
 	Config config;
 	Data data;

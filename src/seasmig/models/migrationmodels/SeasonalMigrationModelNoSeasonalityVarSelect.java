@@ -2,7 +2,7 @@ package seasmig.models.migrationmodels;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import seasmig.models.*;
 import mc3kit.BinaryDistribution;
 import mc3kit.BinaryVariable;
 import mc3kit.Chain;
@@ -21,7 +21,7 @@ import seasmig.treelikelihood.transitionmodels.ConstantTransitionBaseModel;
 
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelNoSeasonalityVarSelect extends SeasonalMigrationModel {
+public class SeasonalMigrationModelNoSeasonalityVarSelect extends MigrationModel {
 
 
 	Config config;

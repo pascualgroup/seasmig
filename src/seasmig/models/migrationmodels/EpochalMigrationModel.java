@@ -22,7 +22,7 @@ import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.transitionmodels.EpochalMigrationBaseModel;
 
 @SuppressWarnings("serial")
-public class EpochalMigrationModel extends SeasonalMigrationModel {
+public class EpochalMigrationModel extends MigrationModel {
 
 	Config config;
 	Data data;

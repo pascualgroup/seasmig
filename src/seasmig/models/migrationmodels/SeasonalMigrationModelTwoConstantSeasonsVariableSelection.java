@@ -2,7 +2,7 @@ package seasmig.models.migrationmodels;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import seasmig.models.*;
 import mc3kit.BinaryDistribution;
 import mc3kit.BinaryVariable;
 import mc3kit.Chain;
@@ -24,7 +24,7 @@ import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 import seasmig.treelikelihood.transitionmodels.TwoSeasonMigrationBaseModel;
 
 @SuppressWarnings("serial")
-public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends SeasonalMigrationModel {
+public class SeasonalMigrationModelTwoConstantSeasonsVariableSelection extends MigrationModel {
 
 	Config config;
 	Data data;
