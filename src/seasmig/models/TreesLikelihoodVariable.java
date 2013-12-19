@@ -33,6 +33,7 @@ public class TreesLikelihoodVariable extends Variable {
 		public String[] smDescendants = null;
 		public String[] smTrunkStats = null;
 		public String[] smSeqMigStats = null;
+		public String[] pis = null;
 	}
 	
 
@@ -121,6 +122,64 @@ public class TreesLikelihoodVariable extends Variable {
 				}				
 				outputObject.smTrunkStats=returnValue;				
 			}
+			return outputObject;
+		}
+		case SEQ_STOCHASTIC_MAPPING: {	
+			if (config.smTrees) {				
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {
+					Model model = this.getModel();		 	
+					// "tree STATE_50850000 [&lnP=-34291.617355973016,posterior=-34291.617355973016] = [&R]"
+					String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
+					returnValue[i]=(header + (trees[i].newickStochasticMapping(config.maxSMBranchRetries)));
+				}				
+				outputObject.smTrees=returnValue;
+			}		
+			if (config.asrTrees) {				
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {
+					Model model = this.getModel();		 	
+					// "tree STATE_50850000 [&lnP=-34291.617355973016,posterior=-34291.617355973016] = [&R]"
+					String header = "tree STATE_" + getChain().getIterationCount() + " [&lnP=" + (model.getLogPrior()+trees[i].cachedLogLikelihood()) + "]" +  " = [&R] ";			
+					returnValue[i]=(header + (trees[i].newickAncestralStateReconstruction()));
+				}				
+				outputObject.asrTrees=returnValue;
+			}
+			if (config.smTransitions) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {
+					returnValue[i]=trees[i].smTransitions();
+				}				
+				outputObject.smTransitions=returnValue;				
+			}
+			if (config.smTipDwellings) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {
+					returnValue[i]=trees[i].smTipDwellings();
+				}				
+				outputObject.smTipDwellings=returnValue;				
+			}
+			if (config.smLineages) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {	 			
+					returnValue[i]=trees[i].smLineages();
+				}				
+				outputObject.smLineages=returnValue;				
+			}
+			if (config.smDescendants) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {	 			
+					returnValue[i]=trees[i].smDescendants();
+				}				
+				outputObject.smDescendants=returnValue;				
+			}
+			if (config.smTrunkStats) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {	 			
+					returnValue[i]=trees[i].smTrunkStats(config.presentDayTipInterval, config.timeToDesignateTrunk);
+				}				
+				outputObject.smTrunkStats=returnValue;				
+			}				
 			return outputObject;
 		}
 		default: 

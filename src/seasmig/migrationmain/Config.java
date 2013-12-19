@@ -77,9 +77,10 @@ public class Config implements Serializable
 	public static enum StateReconstructionAndTreeOutput { 
 		NONE, // don't output trees
 		PROBS, // output conditional probability of internal node states based on children
-		ASR, // output realization of internal node states // TODO: test 
-		STOCHASTIC_MAPPING, // output realization of branches and internal node states // TODO: test  
-		EXACT_MAPPING_EXPECTATION  // output realization of branches and internal node states // TODO: 
+		ASR, // output realization of internal node states // TODO: better test
+		STOCHASTIC_MAPPING, // output realization of branches and internal node states // TODO: better test  
+		EXACT_MAPPING_EXPECTATION,  // output realization of branches and internal node states // TODO: 
+		SEQ_STOCHASTIC_MAPPING 
 	};
 
 	// SETTINGS

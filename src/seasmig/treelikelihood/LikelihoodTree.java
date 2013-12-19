@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public interface LikelihoodTree extends Serializable {
 	public void setMigrationModel(Object migrationModel);
-	public void setCodonModel(Object condonModel);
+	public void setCodonModel(Object codonModel);
 	public double logLikelihood();
 	String print();
 	public LikelihoodTree copy(); 

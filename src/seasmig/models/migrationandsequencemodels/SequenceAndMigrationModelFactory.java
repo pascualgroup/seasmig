@@ -6,7 +6,6 @@ import mc3kit.Model;
 import mc3kit.ModelFactory;
 import seasmig.data.Data;
 import seasmig.migrationmain.Config;
-import seasmig.models.migrationmodels.MigrationModelNoSeasonality;
 
 @SuppressWarnings("serial")
 public class SequenceAndMigrationModelFactory implements ModelFactory
