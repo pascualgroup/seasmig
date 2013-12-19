@@ -33,8 +33,7 @@ public class DataFromFiles implements Data
 	Config config = null;
 	int numLocations;
 	long iteration = 0;
-	private Integer seqLength;
-
+	
 	protected DataFromFiles() {};
 
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
@@ -151,13 +150,14 @@ public class DataFromFiles implements Data
 						
 			numLocations = (Integer) attributes.get("numLocations");
 			System.out.println("loaded "+locationMap.size()+" taxon traits");	
-			seqLength = (Integer) attributes.get("seqLength");
+			Integer seqLength = (Integer) attributes.get("seqLength");
+			if (seqLength==null) 
+				seqLength=0;
 			if (seqMap!=null)
 				System.out.println("loaded "+seqMap.size()+" sequences");
 			
 			System.out.print("Reparsing trees... ");
 
-			int seqLength = 0;
 			if (seqMap!=null) {
 				if (seqMap.size()>0)
 					seqLength=seqMap.get(seqMap.keySet().iterator()).length();

@@ -1,4 +1,4 @@
-package seasmig.treelikelihood.models;
+package seasmig.treelikelihood.transitionmodels;
 
 import java.util.HashMap;
 import java.util.Vector;

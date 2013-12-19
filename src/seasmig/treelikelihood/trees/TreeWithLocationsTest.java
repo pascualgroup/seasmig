@@ -5,8 +5,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import seasmig.treelikelihood.TransitionModel;
-import seasmig.treelikelihood.models.ConstantTransitionBaseModel;
-import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
+import seasmig.treelikelihood.transitionmodels.ConstantTransitionBaseModel;
+import seasmig.treelikelihood.transitionmodels.TwoSeasonMigrationBaseModel;
 
 
 public class TreeWithLocationsTest {

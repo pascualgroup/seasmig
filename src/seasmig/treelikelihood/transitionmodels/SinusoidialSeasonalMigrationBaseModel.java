@@ -1,4 +1,4 @@
-package seasmig.treelikelihood.models;
+package seasmig.treelikelihood.transitionmodels;
 
 import seasmig.treelikelihood.TransitionModel;
 import cern.colt.function.DoubleFunction;

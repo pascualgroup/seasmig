@@ -1,8 +1,6 @@
-package seasmig.treelikelihood.models;
+package seasmig.treelikelihood.transitionmodels;
 
 import java.util.HashMap;
-
-import mc3kit.DoubleVariable;
 
 import org.javatuples.Pair;
 
@@ -14,7 +12,9 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 
 @SuppressWarnings("serial")
-public class EpochalMigrationBaseModel implements TransitionModel {
+public class PiecewiseConstantMigrationBaseModel implements TransitionModel {
+	// TODO: Check this...
+	// TODO: Check zMult order... sould be ok for Q where rows sum to 1...
 
 	// Precision Parameter
 	static final double infinitesimalTime = 1E-5;
@@ -23,12 +23,10 @@ public class EpochalMigrationBaseModel implements TransitionModel {
 	static final int maxCachedTransitionMatrices = 1600;
 
 	// Precision Parameters
-	int nParts;
-	double[] epochs;
-	DoubleVariable[] epochTimes;
+	int nYearParts;
 
 	// Origin Model
-	double[][][] epochRates;	
+	double[][][] seasonalRates;	
 	DoubleFunction[] rootFreq;
 
 	// Constant Migration Models
@@ -36,29 +34,30 @@ public class EpochalMigrationBaseModel implements TransitionModel {
 
 	// Caching
 	DoubleFactory2D F = DoubleFactory2D.dense;
-	HashMap<Pair<Double,Double>, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Pair<Double,Double>,DoubleMatrix2D>();
+	HashMap<Pair<Double,Double>, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Pair<Double,Double>, DoubleMatrix2D>();
 
 	private int num_locations = 0;
+	private double dt; 
 
-	protected EpochalMigrationBaseModel() {};
+	protected PiecewiseConstantMigrationBaseModel() {};
 
 	// Constructor	
-	public EpochalMigrationBaseModel(double[][][] seasonalRates_, DoubleFunction[] rootFreq_, double[] epochs_) {	
+	public PiecewiseConstantMigrationBaseModel(double[][][] seasonalRates_, DoubleFunction[] rootFreq_, int nYearParts_) {	
 		// TODO: Check this...
 		// diagonal rates functions are calculated through row sums and are ignored...
 		num_locations=seasonalRates_[0].length;	
-		epochRates=seasonalRates_;
-		epochs = epochs_;
-		nParts = epochs.length;
-		constantModels = new ConstantTransitionBaseModel[nParts];
+		seasonalRates=seasonalRates_;
+		nYearParts = nYearParts_;
+		dt = 1.0/(double)nYearParts;
+		constantModels = new ConstantTransitionBaseModel[nYearParts];
 
-		for (int i=0;i<nParts;i++) {
+		for (int i=0;i<nYearParts;i++) {
 			double[][] migrationMatrix = new double[num_locations][num_locations];
 			for (int j=0; j<num_locations; j++) {
 				double row_sum = 0;
 				for (int k=0; k<num_locations; k++) {
 					if (j!=k) {
-						migrationMatrix[j][k]=epochRates[i][j][k];
+						migrationMatrix[j][k]=seasonalRates[i][j][k];
 						row_sum+=migrationMatrix[j][k];
 					}
 				}
@@ -70,8 +69,8 @@ public class EpochalMigrationBaseModel implements TransitionModel {
 	}
 
 	// Constructor	
-	public EpochalMigrationBaseModel(double[][][] seasonalRates_, double[] epochs_) {	
-		this(seasonalRates_, null, epochs_);
+	public PiecewiseConstantMigrationBaseModel(double[][][] seasonalRates_, int nYearParts_) {	
+		this(seasonalRates_,null,nYearParts_);
 	}
 
 	// Methods
@@ -88,68 +87,57 @@ public class EpochalMigrationBaseModel implements TransitionModel {
 
 	@Override
 	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {
-		DoubleMatrix2D cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time,to_time));
+		// TODO: organize this...
+		double from_time_reminder = from_time % 1.0;
+		double from_time_div = from_time - from_time_reminder;		
+		double to_time_reminder = to_time - from_time_div;
+		DoubleMatrix2D cached = cachedTransitionMatrices.get(new Pair<Double,Double>(from_time_reminder,to_time_reminder));
 		if (cached!=null) {
 			return cached;
 		}
 		else {			
 			// first step: 
-			double step_start_time = from_time;
-			int epochIndex = epochIndex(from_time);
-			double step_end_time = Math.min(to_time, epochEndTime(epochIndex));
+			double step_start_time = from_time_reminder;
+			double step_end_time = Math.min(to_time_reminder, Math.floor(step_start_time/dt)*dt+dt);
 			DoubleMatrix2D result = F.identity(num_locations);	 
 
-			while (step_start_time<to_time) {
+			while (step_start_time<to_time_reminder) {
+				int yearPartIndex = Math.max(Math.min(0,(int) Math.floor(step_start_time%1.0/dt)),nYearParts-1);
+				//assert yearPartIndex<nYearParts;
 				// TODO: replace with other matrix mult
-				result = result.zMult(constantModels[epochIndex].transitionMatrix(step_start_time, step_end_time),null);	
+				result = result.zMult(constantModels[yearPartIndex].transitionMatrix(step_start_time, step_end_time),null);	
 				step_start_time = step_end_time;
-				epochIndex=epochIndex+1;
-				step_end_time = Math.min(to_time, epochEndTime(epochIndex));
+				step_end_time = Math.min(to_time_reminder, Math.floor((step_start_time+infinitesimalTime)/dt)*dt+dt);
 			}
 
 			// cache result
 			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
 				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
 			}			
-			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time, to_time),result);
+
+			cachedTransitionMatrices.put(new Pair<Double,Double>(from_time_reminder, to_time_reminder),result);
 
 			// TODO: replace with no conversion step
 			return result;
 		}
 	}
 
-	private int epochIndex(double from_time) {
-		for (int i=0;i<nParts-1;i++) {
-			if (epochs[i]>from_time) {
-				return i;
-			}
-		}
-		return nParts-1;
-	}
-
-	private double epochEndTime(int index) {
-		if (index<(nParts-1))
-			return epochs[index];
-		else
-			return Double.MAX_VALUE;
-	}
-
 	@Override
 	public String print() {
-		String returnValue = "Epochal Migration Model:\n";
+		String returnValue = "Picewise Constant Migration Model:\n";
 		returnValue+="[";
-		for (int i=0;i<epochRates.length;i++) {
+		for (int i=0;i<seasonalRates.length;i++) {
 			if (i!=0) returnValue+=" ";
 			returnValue+="[";
-			for (int j=0;j<epochRates[i].length;j++) {
+			for (int j=0;j<seasonalRates[i].length;j++) {
 				if (i!=j) 
-					returnValue=returnValue+String.format("%40s",epochRates[i][j].toString());
+					returnValue=returnValue+String.format("%40s",seasonalRates[i][j].toString());
 				else 
 					returnValue+=String.format("%40s", "NA");
-				if (j!=epochRates[i].length-1) returnValue+=",";
+				if (j!=seasonalRates[i].length-1) returnValue+=",";
 			}
 			returnValue+="]";
-			if (i!=epochRates.length-1) returnValue+="\n";
+			if (i!=seasonalRates.length-1) returnValue+="\n";
 		}
 		returnValue+="]\n";
 		return returnValue;	
@@ -186,22 +174,10 @@ public class EpochalMigrationBaseModel implements TransitionModel {
 
 	@Override
 	public Transition nextEvent(double time, int from) {
-		// TODO: check this...
-		Transition nextEvent = null;
-		boolean done = false;
-		double currentTime = time;
-		int currentLoc = from;
-		do {
-			int currentEpochIndex = epochIndex(currentTime);
-			nextEvent = constantModels[currentEpochIndex].nextEvent(currentTime, currentLoc);
-			int nextEpochIndex = epochIndex(nextEvent.time);
-			done = (nextEpochIndex==currentEpochIndex);
-			if (!done) {
-				currentTime = epochs[nextEpochIndex];				
-			}									
-		} while (!done);
-		return nextEvent;
+		// TODO Auto-generated method stub
+		return null;
 	}
+
 
 }
 

@@ -15,7 +15,7 @@ import seasmig.migrationmain.Config;
 import seasmig.data.Data;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
-import seasmig.treelikelihood.models.TwoSeasonMigrationBaseModel;
+import seasmig.treelikelihood.transitionmodels.TwoSeasonMigrationBaseModel;
 
 @SuppressWarnings("serial")
 public class SeasonalMigrationModelTwoConstantSeasons extends SeasonalMigrationModel {

@@ -18,7 +18,7 @@ import seasmig.data.Data;
 import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
-import seasmig.treelikelihood.models.EpochalMigrationBaseModel;
+import seasmig.treelikelihood.transitionmodels.EpochalMigrationBaseModel;
 
 @SuppressWarnings("serial")
 public class EpochalMigrationModel extends SeasonalMigrationModel {

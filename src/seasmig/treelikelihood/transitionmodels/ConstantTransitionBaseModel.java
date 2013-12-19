@@ -1,6 +1,4 @@
-package seasmig.treelikelihood.models;
-import java.util.HashMap;
-
+package seasmig.treelikelihood.transitionmodels;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import seasmig.treelikelihood.MatrixExponentiator;
@@ -10,7 +8,7 @@ import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;
 import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
 import seasmig.treelikelihood.matrixexp.HKY85MatrixExp;
 import seasmig.treelikelihood.matrixexp.JC69MatrixExp;
-//import seasmig.treelikelihood.matrixexp.EigenDecomposionExp;
+import seasmig.treelikelihood.matrixexp.CachedMatrixExponentiator;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
 
 @SuppressWarnings("serial")
@@ -21,17 +19,11 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 	static final double veryLongTime = 1000; // TODO: move to config...
 
 	// Rate Matrix  
-	double[][] Q;
+	double[][] Q = null;
 	private int num_locations = 0;		
-
-	// cache
-	HashMap<Double, DoubleMatrix2D> cachedTransitionMatrices = new HashMap<Double, DoubleMatrix2D>();
-	final static int maxCachedTransitionMatrices=16000;
 
 	// Matrix Exponentiation
 	MatrixExponentiator matrixExponentiator;
-
-
 
 	private DoubleMatrix1D basefreq;	
 
@@ -56,9 +48,9 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 			break;			
 		default:
 			// TODO: check if this helps
-			matrixExponentiator=new EigenDecomposionExp(Q);
+			matrixExponentiator=new CachedMatrixExponentiator(new EigenDecomposionExp(Q));
 			if (!matrixExponentiator.checkMethod()) {
-				matrixExponentiator=new Matlab7MatrixExp(Q);
+				matrixExponentiator=new CachedMatrixExponentiator(new Matlab7MatrixExp(Q));
 			}
 		}
 		// TODO: Maybe use other method to get s.s. freq 
@@ -72,45 +64,57 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 
 	// Constructor	
 	public ConstantTransitionBaseModel(double mu) {	// JC69
+		// TODO: check if cache helps
 		matrixExponentiator=new JC69MatrixExp(mu);
+		basefreq=matrixExponentiator.expm(veryLongTime).viewRow(1);
+		double[][] Q = {
+				{0,mu*0.25, mu*0.25, mu*0.25},
+				{mu*0.25, 0, mu*0.25, mu*0.25},
+				{mu*0.25, mu*0.25, 0, mu*0.25},
+				{mu*0.25, mu*0.25, mu*0.25, 0}};		
+
+		for (int i=0;i<4;i++) {
+			double rowsum=0;
+			for (int j=0;j<4;j++) {
+				rowsum=rowsum+Q[i][j];
+			}
+			Q[i][i]=-rowsum;
+		}
 	}
-	
+
+
 	// Constructor	
 	public ConstantTransitionBaseModel(double mu, double kappa, double piC, double piA, double piG) {	// HKY85
+		// TODO: check if cache helps
 		matrixExponentiator=new HKY85MatrixExp(mu, kappa, piC, piA, piG);
+		basefreq=matrixExponentiator.expm(veryLongTime).viewRow(1);
+		double piT = 1.0 - piA - piG - piC;
+		double[][] Q = {
+				{0,mu*kappa*piC, mu*piA, mu*piG},
+				{mu*kappa*piT, 0, mu*piA, mu*piG},
+				{mu*piT, mu*piC, 0, mu*kappa*piG},
+				{mu*piT, mu*piC, mu*kappa*piA, 0}};		
+
+		for (int i=0;i<4;i++) {
+			double rowsum=0;
+			for (int j=0;j<4;j++) {
+				rowsum=rowsum+Q[i][j];
+			}
+			Q[i][i]=-rowsum;
+		}
 	}
 
 
 	// Methods
 	@Override
 	public double logprobability(int from_location, int to_location, double from_time, double to_time) {
-
-		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
-		DoubleMatrix2D cached = cachedTransitionMatrices.get(dt);
-
-		if (cached!=null)  
-			return Math.log(cached.get(from_location,to_location));		
-		else 		
-			return Math.log(transitionMatrix(from_time, to_time).get(from_location,to_location));		
+		return Math.log(transitionMatrix(from_time, to_time).get(from_location,to_location));		
 	}
 
 	@Override
 	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {		
 		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
-
-		DoubleMatrix2D cached = cachedTransitionMatrices.get(dt);
-		if (cached!=null) {
-			return cached;
-		}
-		else {
-			DoubleMatrix2D result = matrixExponentiator.expm(dt);
-			// cache result
-			if (cachedTransitionMatrices.size()>=maxCachedTransitionMatrices) {
-				cachedTransitionMatrices.remove(cachedTransitionMatrices.keySet().iterator().next());
-			}			
-			cachedTransitionMatrices.put(dt, result);
-			return result;
-		}
+		return matrixExponentiator.expm(dt);		
 	}
 
 	@Override
@@ -169,13 +173,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 
 	@Override
 	public DoubleMatrix1D probability(int from_location, double from_time,	double to_time) {
-		double dt = Math.max(timePrecision,cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
-		DoubleMatrix2D cached = cachedTransitionMatrices.get(dt);
-
-		if (cached!=null)  
-			return cached.viewRow(from_location);		
-		else 		
-			return transitionMatrix(from_time, to_time).viewRow(from_location);	
+		return transitionMatrix(from_time, to_time).viewRow(from_location);	
 	}
 
 	@Override
@@ -189,7 +187,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 
 		double time = cern.jet.random.Exponential.staticNextDouble(lambda); 
 		// mean of this exponential is 1/lambda, higher the rate, the shorter the time --> this is the correct direction.
-		
+
 		int first = (from+1)%num_locations;
 		double p=-Q[from][first]/Q[from][from];
 		double rnd = cern.jet.random.Uniform.staticNextDouble();
@@ -202,6 +200,6 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 
 		return new Transition(time+from_time, loc);
 	}
-	
+
 
 }
