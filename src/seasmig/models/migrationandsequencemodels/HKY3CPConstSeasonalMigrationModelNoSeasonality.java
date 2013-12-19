@@ -1,26 +1,24 @@
 package seasmig.models.migrationandsequencemodels;
 
-import mc3kit.Model;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
-import seasmig.models.*;
 import mc3kit.Chain;
 import mc3kit.DoubleVariable;
 import mc3kit.IntVariable;
 import mc3kit.MC3KitException;
 import mc3kit.distributions.ExponentialDistribution;
+import mc3kit.distributions.NormalDistribution;
 import mc3kit.distributions.UniformDistribution;
 import mc3kit.distributions.UniformIntDistribution;
-import seasmig.migrationmain.Config;
-import seasmig.models.TreesLikelihoodVariable;
 import seasmig.data.Data;
+import seasmig.migrationmain.Config;
+import seasmig.models.MigrationModel;
+import seasmig.models.TreesLikelihoodVariable;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.transitionmodels.ConstantTransitionBaseModel;
+import seasmig.util.Util;
 
 
 @SuppressWarnings("serial")
@@ -32,7 +30,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 	int numLocations;
 
 	// HKY sequence model parameters
-	DoubleVariable[] k;	
+	DoubleVariable[] logk;	
 	DoubleVariable[][] forPis; // will be converted to Dirichlet pis
 	DoubleVariable[] mu;
 
@@ -51,7 +49,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 	// Priors
 	private ExponentialDistribution ratePriorDist;
 	private ExponentialDistribution muPriorDist;
-	private ExponentialDistribution kPriorDist;
+	private NormalDistribution logkPriorDist;
 
 	protected HKY3CPConstSeasonalMigrationModelNoSeasonality() { }
 
@@ -68,7 +66,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 		}
 		rates = new DoubleVariable[numLocations][numLocations];
 		forPis = new DoubleVariable[3][3]; // Codon position, rest will be converted to piC, piA, piG
-		k = new DoubleVariable[3]; // Codon position
+		logk = new DoubleVariable[3]; // Codon position
 		mu = new DoubleVariable[3]; // Codon position
 
 		beginConstruction();
@@ -79,8 +77,10 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 			}
 		}
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
+		// TODO: add 1/x distribution...
 		muPriorDist = new ExponentialDistribution(this,"muPrior");
-		kPriorDist = new ExponentialDistribution(this,"kPrior");
+		// TODO: add Log Normal distribution...
+		logkPriorDist = new NormalDistribution(this,"logkPrior",0,1);
 
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
@@ -94,7 +94,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 		}
 		
 		for(int i = 0; i < 3; i++) {
-			k[i]= new DoubleVariable(this, "k."+Integer.toString(i),kPriorDist);
+			logk[i]= new DoubleVariable(this, "logk."+Integer.toString(i),logkPriorDist);
 		}
 		
 		for(int i = 0; i < 3; i++) {
@@ -139,7 +139,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 			}
 			
 			for(int i = 0; i < 3; i++) {			
-				m.addEdge(this,k[i]);
+				m.addEdge(this,logk[i]);
 			}
 			
 			for(int i = 0; i < 3; i++) {			
@@ -186,21 +186,21 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 			
 			double[] kdoubleForm = new double[3];
 			for (int i=0;i<3;i++) {				
-				kdoubleForm[i]=k[i].getValue();
+				kdoubleForm[i]=cern.jet.math.Functions.exp.apply(logk[i].getValue());
 			}
 			
-			// Pis, convert to Dirichlet
-			// TODO: remove redundancy...
+			// TODO: add Dirichlet distribution...
+			
+			double[][] forPisdoubleform= new double[3][3];
+			for (int i=0;i<3;i++) {
+				for (int j=0;j<3;j++) {
+					forPisdoubleform[i][j] = forPis[i][j].getValue();
+				}
+			}
+			
 			double[][] pisdoubleform = new double[3][3];
 			for (int i=0;i<3;i++) {
-				Vector<Double> forPisVec = new Vector<Double>(3);
-				for (int j=0;j<3;j++) {
-					forPisVec.add(forPis[i][j].getValue());
-					Collections.sort(forPisVec);
-					pisdoubleform[i][0]=forPisVec.get(0)-0;
-					pisdoubleform[i][1]=forPisVec.get(1)-forPisVec.get(0);
-					pisdoubleform[i][2]=forPisVec.get(2)-forPisVec.get(1);
-				}
+				pisdoubleform[i] = Util.toDirichletNonDegenerate(forPisdoubleform[i]);
 			}			
 
 			// TODO: add update to migration model instead of reconstructing...
@@ -226,7 +226,6 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 			oldLogP=logP;
 			return true;
 		}
-
 
 		/*
 		 * If you want to avoid calculating the log-probability again

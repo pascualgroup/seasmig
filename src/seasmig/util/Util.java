@@ -1,5 +1,8 @@
 package seasmig.util;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import cern.jet.random.engine.RandomEngine;
 
 public class Util {
@@ -66,65 +69,6 @@ public class Util {
 		return returnValue;
 	}
 	
-	static public double[][] calcQMatrix(double[][] rMatrix, double[] basefreq) {
-		
-		int n = rMatrix.length;
-		
-		double[][] piMatrix = new double[n][n];				
-		for (int i=0;i<n;i++) {
-			for (int j=0;j<n;j++) {
-				if (i!=j) {
-					piMatrix[i][j]=basefreq[i]*basefreq[j];
-				}
-				else {
-					piMatrix[i][j]=basefreq[i];	
-				}
-			}
-		}
-		
-		// t = R*Pi
-		double[][] t = mul(rMatrix, piMatrix);
-	
-		// fillDiagonal of t with zeros;
-		for (int i=0;i<n;i++)
-			t[i][i]=0;
-					
-		double tscale = sum(t);
-		
-		// t=t/tscale
-		for (int i=0;i<n;i++) {
-			for (int j=0;j<n;j++) {
-				t[i][j]=t[i][j]/tscale;
-			}
-		}
-		
-		// make it so the diags make the rows sum to 0
-		for (int i=0;i<n;i++) {
-			t[i][i]=0.0-sum(t[i]);
-		}
-		
-		// t = t / basefreq
-		for (int i=0;i<n;i++){
-			for (int j=0;j<n;j++){
-				t[i][j]=t[i][j]/basefreq[j];
-			}
-		}
-	
-		// t=transpose(t)
-		for (int i=0;i<n;i++){
-			for (int j=0;j<n;j++){
-				if (i>j) {
-					double temp=t[i][j];
-					t[i][j]=t[j][i];
-					t[j][i]=temp;
-				}
-			}
-		}	
-		
-		return t; 		
-	}
-	
-
 	private static double sum(double[] vector) {
 		double returnValue=0;
 		for (int i=0;i<vector.length;i++){
@@ -217,5 +161,92 @@ public class Util {
 		return newValue;
 	}
 
+	public static class ArrayIndexComparator implements Comparator<Integer>
+	{
+	    private final double[] array;
+
+	    public ArrayIndexComparator(double[] array)
+	    {
+	        this.array = array;
+	    }
+
+	    public Integer[] createIndexArray()
+	    {
+	        Integer[] indexes = new Integer[array.length];
+	        for (int i = 0; i < array.length; i++)
+	        {
+	            indexes[i] = i; // Autoboxing
+	        }
+	        return indexes;
+	    }
+
+	    @Override
+	    public int compare(Integer index1, Integer index2)
+	    {
+	         // Autounbox from Integer to int to use as array indexes
+	        return Double.compare(array[index1],array[index2]);
+	    }
+	}
+	
+	public static double[] toDirichletDegenerate(double[] unif) {
+		// TODO: test this
+		ArrayIndexComparator comparator = new ArrayIndexComparator(unif);
+		Integer[] indexes = comparator.createIndexArray();	
+		Arrays.sort(indexes, comparator);
+		double[] returnValue = new double[unif.length];
+		returnValue[0]=unif[indexes[0]]-0;		
+		for (int i=1;i<indexes.length;i++) {
+			returnValue[i]=unif[indexes[i]]-unif[indexes[i-1]];		
+		}			
+		
+		return returnValue; 
+	}
+	
+	public static double[] toDirichletNonDegenerate(double[] unif) {  // 3 states only
+		// TODO: test this
+		// converts a vector of n i.i.d uniformly distributed U(0,1) variables to n Dirichlet distributed variables the last (1-x0-x1-x2...) is not included
+		// The order of the original variables remains intact in order to prevent multiple mappings to the same realization
+		// (I haven't found an online example of this (the order part), so should be careful about this part of the code)
+		if (unif.length!=3) {
+			System.err.println("non degenerate conversion to Dirichlet only supported for 3 states\n");
+			System.exit(0);
+		}
+		ArrayIndexComparator comparator = new ArrayIndexComparator(unif);
+		Integer[] indexes = comparator.createIndexArray();	
+		Arrays.sort(indexes, comparator);
+		double[] sorted = new double[unif.length+1];
+		sorted[0]=unif[indexes[0]]-0;
+		double sum=sorted[0];
+		for (int i=1;i<indexes.length;i++) {
+			sorted[i]=unif[indexes[i]]-unif[indexes[i-1]];
+			sum=sum+sorted[i];
+		}
+		sorted[indexes.length]=1-sum;
+		// Now sorted is n+1 variables from a Dirichlet distribution x0+x1+x2+..+xn = 1 x0>0, x1>0 ... xn>0
+		// I would return sorted now but I also want a 1-1 mapping
+		
+		// Which order to plug them into the result, to keep a one-on-one mapping
+		// this is the dodgy part:				
+		
+		// lets say n = 3 so we have x0,x1,x2
+		// which in order are xa,xb,xc
+		// and r0 = xa-0, r1 = xb-xa, r2 = xc-xb, r3 = 1 -xc		
+		// there are 3! orderings of r
+		// We still have 4 (n) options of which of the r0,r1,r2,r3 (...rn) to exclude
+		// there is a degeneracy xc could be closer to 1 or to xb with the same result
+		// there is a degeneracy xa could be closer to 0 or to xb with the same result 
+
+		int itemToDrop = ((1-unif[indexes[2]]) > (unif[indexes[2]]-unif[indexes[1]])?2:0) +
+				         ((unif[indexes[0]]-0) > (unif[indexes[1]]-unif[indexes[0]])?1:0);
+		sorted[itemToDrop]=2; // will have > 1 value so will be max
+		Arrays.sort(sorted);
+		double[] returnValue = new double[unif.length];
+		for (int i=0;i<indexes.length;i++) {
+			returnValue[indexes[i]]=sorted[i];
+		}
+		return returnValue;
+	}
+
+			
 
 }
