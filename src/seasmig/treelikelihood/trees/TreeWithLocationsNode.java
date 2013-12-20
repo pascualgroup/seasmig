@@ -24,9 +24,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 	// For stochastic mapping
 	public List<Transition> transitions = null;
-	public List<Transition>[] transitionsCP1 = null;
-	public List<Transition>[] transitionsCP2 = null;
-	public List<Transition>[] transitionsCP3 = null;
+	public List<Transition>[][] mutations = null;
 	
 	private boolean isTrunk = false;
 	private Sequence noSequence = new Sequence(0);
@@ -204,7 +202,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 				for (int i=0;i<transitions.size();i++) {
 					returnValue+=String.format("%.3f", transitions.get(i).time-timeFrom);						
 					if (i!=(transitions.size()-1)) {
-						returnValue+=","+Integer.toString(transitions.get(i).loc)+",";
+						returnValue+=","+Integer.toString(transitions.get(i).trait)+",";
 					}
 					timeFrom = transitions.get(i).time;
 				}

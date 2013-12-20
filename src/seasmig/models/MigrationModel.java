@@ -67,12 +67,11 @@ public abstract class MigrationModel extends Model implements Serializable {
 			for (int i=0;i<outputObject.smTrunkStats.length;i++) {
 				flatMap.put("smTrunkStats."+i,String.format("%s",outputObject.smTrunkStats[i]));
 			}
-		}
-		
+		}			
 		///////////////////////////////////////
-		if (outputObject.smSeqMigStats!=null) {
-			for (int i=0;i<outputObject.smSeqMigStats.length;i++) {
-				flatMap.put("smSeqMigStats."+i,String.format("%s",outputObject.smSeqMigStats[i]));
+		if (outputObject.seqMutationStats!=null) {
+			for (int i=0;i<outputObject.seqMutationStats.length;i++) {
+				flatMap.put("seqMutationStats."+i,String.format("%s",outputObject.seqMutationStats[i]));
 			}
 		}
 		

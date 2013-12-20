@@ -346,10 +346,10 @@ public class TreeWithLocationsTest {
 		
 		double[] a = new double[4];
 		for (int i=0;i<5000;i++) {
-			a[equalModel.nextEvent(0.1, 0).loc]+=1.0/20000;
-			a[equalModel.nextEvent(2.1, 0).loc]+=1.0/20000;
-			a[equalModel.nextEvent(4.1, 0).loc]+=1.0/20000;
-			a[equalModel.nextEvent(0.6, 0).loc]+=1.0/20000;			
+			a[equalModel.nextEvent(0.1, 0).trait]+=1.0/20000;
+			a[equalModel.nextEvent(2.1, 0).trait]+=1.0/20000;
+			a[equalModel.nextEvent(4.1, 0).trait]+=1.0/20000;
+			a[equalModel.nextEvent(0.6, 0).trait]+=1.0/20000;			
 		}
 		System.out.println(a[0]+","+a[1]+","+a[2]+","+a[3]);		
 		assertEquals(a[0], 0, 0.00000000001);

@@ -86,7 +86,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 	// Constructor	
 	public ConstantTransitionBaseModel(double mu, double kappa, double piC, double piA, double piG) {	// HKY85
 		// TODO: check if cache helps
-		matrixExponentiator=new HKY85MatrixExp(mu, kappa, piC, piA, piG);
+		matrixExponentiator=new CachedMatrixExponentiator(new HKY85MatrixExp(mu, kappa, piC, piA, piG));
 		basefreq=matrixExponentiator.expm(veryLongTime).viewRow(1);
 		double piT = 1.0 - piA - piG - piC;
 		double[][] Q = {

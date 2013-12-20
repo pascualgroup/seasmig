@@ -34,6 +34,7 @@ public class TreesLikelihoodVariable extends Variable {
 		public String[] smTrunkStats = null;
 		public String[] smSeqMigStats = null;
 		public String[] pis = null;
+		public String[] seqMutationStats = null;
 	}
 	
 
@@ -179,6 +180,13 @@ public class TreesLikelihoodVariable extends Variable {
 					returnValue[i]=trees[i].smTrunkStats(config.presentDayTipInterval, config.timeToDesignateTrunk);
 				}				
 				outputObject.smTrunkStats=returnValue;				
+			}
+			if (config.seqMutationStats) {
+				String[] returnValue=new String[trees.length];
+				for (int i=0;i<trees.length;i++) {	 			
+					returnValue[i]=trees[i].seqMutationStats();
+				}				
+				outputObject.seqMutationStats=returnValue;				
 			}				
 			return outputObject;
 		}

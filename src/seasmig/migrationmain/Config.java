@@ -148,7 +148,8 @@ public class Config implements Serializable
 	public boolean smTipDwellings = true; 
 	public boolean smLineages = true;
 	public boolean smDescendants = true;
-	public boolean smTrunkStats = true; 
+	public boolean smTrunkStats = true;
+	public boolean seqMutationStats = true; 
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\country_map_whoregions.txt"}; // null if locations are loaded from tree

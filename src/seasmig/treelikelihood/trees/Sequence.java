@@ -33,13 +33,17 @@ public class Sequence implements Serializable {
 	public static final double[] INTERNAL = new double[]{0,0,0,0};
 
 	double[][] seq = null;
+	String seqStr = null;
 	
 	String header = null;
+	
+	static final int UNKNOWN_NUC = -1;
 
 	protected Sequence() {};
 
-	public Sequence(String header_, String seqStr) {
+	public Sequence(String header_, String seqStr_) {
 		header=header_;
+		seqStr=seqStr_;
 		seq = new double[seqStr.length()][];
 		for (int i=0;i<seqStr.length();i++) {
 			switch (seqStr.charAt(i)) { 
@@ -75,6 +79,16 @@ public class Sequence implements Serializable {
 	
 	public double[] get(int pos) {
 		return seq[pos];
+	}	
+	
+	public int getNuc(int pos) {
+		switch (seqStr.charAt(pos)) {
+		case 'T': case 't' : return 0;
+		case 'C': case 'c' : return 1;
+		case 'A': case 'a' : return 2;
+		case 'G': case 'g' : return 3;
+		default: return UNKNOWN_NUC;
+		}
 	}	
 	
 	public String getHeader() {

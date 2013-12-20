@@ -6,6 +6,7 @@ import java.util.List;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
+import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.TransitionModel.Transition;
@@ -563,7 +564,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				if (event.time < child.time) {
 					if (child.transitions==null) child.transitions = new ArrayList<Transition>();					
 					child.transitions.add(event);
-					currentLoc = event.loc;
+					currentLoc = event.trait;
 					currentTime = event.time;
 				}
 				else if (currentLoc!=child.loc) {
@@ -697,12 +698,12 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (node.transitions!=null) {
 				int fromLocation = node.parent.loc;
 				for (Transition transition : node.transitions) {
-					if (transitionTimes[fromLocation][transition.loc]==null) {
-						transitionTimes[fromLocation][transition.loc]=new String();
+					if (transitionTimes[fromLocation][transition.trait]==null) {
+						transitionTimes[fromLocation][transition.trait]=new String();
 					}
-					if (fromLocation!=transition.loc) 
-						transitionTimes[fromLocation][transition.loc]+=String.format("%.3f,",transition.time);
-					fromLocation=transition.loc;
+					if (fromLocation!=transition.trait) 
+						transitionTimes[fromLocation][transition.trait]+=String.format("%.3f,",transition.time);
+					fromLocation=transition.trait;
 				}				
 			}
 		}
@@ -808,7 +809,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			else {	
 				for (Transition transition : node.transitions) { 														
 					lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,transition.time);
-					fromLocation=transition.loc;
+					fromLocation=transition.trait;
 					fromTime=transition.time;
 				}
 				lineages[fromLocation]+=String.format("{%.3f,%.3f},",fromTime,node.time);
@@ -857,7 +858,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						for (Transition transition : node.transitions) {
 							returnValue+=("{"+fromLoc+","+fromTime+","+transition.time+"},"); // TODO:
 							fromTime = transition.time;
-							fromLoc = transition.loc;
+							fromLoc = transition.trait;
 						}
 					}
 				}
@@ -918,12 +919,12 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (node.transitions!=null) {
 				int fromLocation = node.parent.loc;
 				for (Transition transition : node.transitions) {
-					if (decendants[fromLocation][transition.loc]==null) {
-						decendants[fromLocation][transition.loc]=new String();
+					if (decendants[fromLocation][transition.trait]==null) {
+						decendants[fromLocation][transition.trait]=new String();
 					}
-					if (fromLocation!=transition.loc) 
-						decendants[fromLocation][transition.loc]+=String.format("{%.3f,%d,%.3f,%d,%.3f},",transition.time,getTotalNumTips(node,transition),getTotalBranchLength(node,transition),getLocalNumTips(node,transition),getLocalBranchLength(node,transition));
-					fromLocation=transition.loc;
+					if (fromLocation!=transition.trait) 
+						decendants[fromLocation][transition.trait]+=String.format("{%.3f,%d,%.3f,%d,%.3f},",transition.time,getTotalNumTips(node,transition),getTotalBranchLength(node,transition),getLocalNumTips(node,transition),getLocalBranchLength(node,transition));
+					fromLocation=transition.trait;
 				}				
 			}
 		}
@@ -1064,6 +1065,60 @@ public class TreeWithLocations implements LikelihoodTree {
 		return numIdentifiedSeqs;
 	}
 
+	@Override
+	public String seqMutationStats(int maxBranchRetries) {
+
+		stochsticMappingSeq(root, maxBranchRetries);
+
+		return null;
+	}
+
+	private void stochsticMappingSeq(TreeWithLocationsNode root, int maxBranchRetries) {
+		// TODO: test
+		// TODO: cite
+		// TODO: preorder iterator		
+		for (TreeWithLocationsNode child : root.children) {
+			for (int codonPosition = 0; codonPosition<3;codonPosition++) {
+				for (int loc=0; loc<(seqLength/3.0+1);loc++) { 
+					if ((loc*3+codonPosition) >= seqLength) continue;
+
+					child.mutations[codonPosition][loc]=null;
+					int currentNuc = root.seq.getNuc(loc*3+codonPosition);
+					double currentTime = root.time;
+					boolean doneWithBranch = false;
+					boolean failedMapping = false;
+					Transition event = null;
+					int repeats = 0;
+					do {
+						repeats+=1;
+						event = migrationModel.nextEvent(currentTime, currentNuc);
+						if (event.time < child.time) {
+							if (child.mutations[codonPosition][loc]==null) child.mutations[codonPosition][loc] = new ArrayList<Transition>();					
+							child.mutations[codonPosition][loc].add(event);
+							currentNuc = event.trait;
+							currentTime = event.time;
+						}
+						else if (currentNuc!=child.seq.getNuc(loc*3+codonPosition)) {
+							// If there is a mismatch between stochastic mapping and child ASR than we 
+							// restart the entire branch
+							if (child.mutations[codonPosition][loc]!=null) {
+								child.mutations[codonPosition][loc].clear();
+							}
+							currentNuc = root.seq.getNuc(loc*3+codonPosition);
+							currentTime = root.time;
+						} else {
+							doneWithBranch = true;								
+						}
+						if (repeats>maxBranchRetries) {
+							System.err.println("Failed to stochasticaly map branch after "+Integer.toString(maxBranchRetries)+" iterations at loci: "+(loc*3+codonPosition)+"\nUsing last attempt for output. Check for aggresive rounding of tip times, or consider adding jitter to tip times.\n{("+Integer.toString(root.taxonIndex)+","+Double.toString(root.time)+","+Double.toString(root.seq.getNuc(loc*3+codonPosition))+"),("+Integer.toString(child.taxonIndex)+","+Double.toString(child.time)+","+Double.toString(child.seq.getNuc(loc*3+codonPosition))+")}");					
+							failedMapping=true;
+						}
+					} while (!doneWithBranch && !failedMapping);
+				}				
+			}
+			stochsticMappingSeq(child,  maxBranchRetries);
+		}		
+	}
 
 }
 

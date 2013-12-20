@@ -12,23 +12,23 @@ public interface TransitionModel extends Serializable {
 	public class Transition implements Serializable {
 		
 		protected Transition() {};
-		public Transition(double time, int loc) {
+		public Transition(double time, int trait) {
 			this.time = time;
-			this.loc = loc;
+			this.trait = trait;
 		}
 		public double time;
-		public int loc; 
+		public int trait; 
 	}
 	
 	
-	public double logprobability(int from_location, int to_location, double from_time, double to_time);
+	public double logprobability(int from_trait, int to_trait, double from_time, double to_time);
 	public DoubleMatrix2D transitionMatrix(double from_time, double to_time);
 	public int getNumLocations();
 	public String print();
 	public String parse();
 	public String getModelName();
-	public DoubleMatrix1D probability(int from_location, double from_time, double to_time);
+	public DoubleMatrix1D probability(int from_trait, double from_time, double to_time);
 	public DoubleMatrix1D rootfreq(double when);
-	public Transition nextEvent(double time, int loc);
+	public Transition nextEvent(double time, int trait);
 	
 }
