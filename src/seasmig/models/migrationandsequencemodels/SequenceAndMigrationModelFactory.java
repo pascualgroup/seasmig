@@ -28,10 +28,14 @@ public class SequenceAndMigrationModelFactory implements ModelFactory
 			switch (config.seqModelType) {
 			case HKY_3CP:
 				return new HKY3CPConstSeasonalMigrationModelNoSeasonality(initialChain, config, data);
+			case NONE:
+				System.err.println("config error... seqModelType==NONE and ???");
+				System.exit(-1);
 			}
 				
 		default:
-			System.err.println("only constant migration model implemented with seasonality...");
+			System.err.println("only constant migration model implemented with sequence stochastic mapping...");
+			System.exit(-1);
 		}
 		return null;
 	}

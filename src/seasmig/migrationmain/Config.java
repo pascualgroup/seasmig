@@ -23,6 +23,7 @@ public class Config implements Serializable
 	}
 	
 	public static enum SeqModelType { 
+		NONE, // Sequences are not included in likelihood
 		HKY_3CP // HKY model for 3 codon positions
 	}
 	
@@ -116,7 +117,7 @@ public class Config implements Serializable
 	
 	
 	// MIGRATION MODEL RELATED PARAMETERS
-	public MigrationModelType migrationModelType = MigrationModelType.TWO_CONSTANT_SEASONS;
+	public MigrationModelType migrationModelType = MigrationModelType.CONSTANT;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION TWO SEASONS...
 	public double fixedPhase = 0.3;
@@ -166,8 +167,8 @@ public class Config implements Serializable
 	public double[] lastTipTime = {2012.0}; // time of most recent tip on tree, used to calibrate all tree nodes 
 
 	// STOCHASTIC MAPPING OF TRUNK
-	public double presentDayTipInterval = 0.25; // width of time interval of recent considered to have "survived" for trunk designation purpose  
-	public double timeToDesignateTrunk = 2.0; // time back from present day tip ancestry designated as trunk 
+	public double presentDayTipInterval = 2.25; // width of time interval of recent considered to have "survived" for trunk designation purpose  
+	public double timeToDesignateTrunk = 4.0; // time back from present day tip ancestry designated as trunk 
 	public int maxSMBranchRetries = 20000; // maximum number of retries for stochastically mapping a single branch
 
 	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_all_epitopes.fas"};

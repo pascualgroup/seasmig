@@ -69,37 +69,37 @@ public class Util {
 		return returnValue;
 	}
 	
-	private static double sum(double[] vector) {
-		double returnValue=0;
-		for (int i=0;i<vector.length;i++){
-			returnValue+=vector[i];			
-		}
-		return returnValue;
-	}
+//	private static double sum(double[] vector) {
+//		double returnValue=0;
+//		for (int i=0;i<vector.length;i++){
+//			returnValue+=vector[i];			
+//		}
+//		return returnValue;
+//	}
+//
+//	private static double sum(double[][] t) {
+//		int n = t.length;
+//		int m = t[0].length;
+//		double returnValue=0;
+//		for (int i=0;i<n;i++){
+//			for (int j=0;j<m;j++){
+//				returnValue+=t[i][j];
+//			}
+//		}
+//		return returnValue;
+//	}
 
-	private static double sum(double[][] t) {
-		int n = t.length;
-		int m = t[0].length;
-		double returnValue=0;
-		for (int i=0;i<n;i++){
-			for (int j=0;j<m;j++){
-				returnValue+=t[i][j];
-			}
-		}
-		return returnValue;
-	}
-
-	private static double[][] mul(double[][] a, double[][] b) {
-		int n = a.length;
-		int m = a[0].length;
-		double[][] returnValue = new double[n][m];
-		for (int i=0;i<n;i++){
-			for (int j=0;j<m;j++){
-				returnValue[i][j]=a[i][j]*b[i][j];
-			}
-		}
-		return returnValue;
-	}
+//	private static double[][] mul(double[][] a, double[][] b) {
+//		int n = a.length;
+//		int m = a[0].length;
+//		double[][] returnValue = new double[n][m];
+//		for (int i=0;i<n;i++){
+//			for (int j=0;j<m;j++){
+//				returnValue[i][j]=a[i][j]*b[i][j];
+//			}
+//		}
+//		return returnValue;
+//	}
 	
 	public static FRexpResult log2(double value)
 	{

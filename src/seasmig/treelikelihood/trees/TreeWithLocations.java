@@ -1057,12 +1057,10 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public void setCodonModel(Object codonModel) {
-		// TODO Auto-generated method stub
 		codonLikelihoodModel = (TransitionModel[]) codonModel;
 	}
 
 	public double getNumIdentifiedSeqs() {
-		// TODO Auto-generated method stub
 		return numIdentifiedSeqs;
 	}
 
