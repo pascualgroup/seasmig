@@ -88,12 +88,12 @@ public class Config implements Serializable
 	public Long randomSeed;
 	
 	// IO RELATED PARAMETERS
-	public String sampleFilename = "samples.jsons";
-	public String swapStatsFilename = "swap_stats.txt";
+	public String sampleFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\samples.jsons";
+	public String swapStatsFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\swap_stats.txt";
 	public Level logLevel = Level.INFO;
-	public String checkpointFilename = "checkpoint.bin";
-	public String priorLikelihoodFilename = "prior_likelihood.txt";
-	public String mlFilename = "ml.txt";
+	public String checkpointFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\checkpoint.bin";
+	public String priorLikelihoodFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\prior_likelihood.txt";
+	public String mlFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\ml.txt";
 	public long thin = 1;
 	
 	// MCMC RELATED PARAMETERS
@@ -150,9 +150,9 @@ public class Config implements Serializable
 	public boolean smTrunkStats = true; 
 	
 	// MODEL DATA RELATED PARAMETERS
-	public String[] locationFilenames ={"regionsHA.txt","regionsNA.txt"}; // null if locations are loaded from tree
-	public String[] treeFilenames = {"beastInputHA.trees","beastInputNA.trees"}; // null for test generated data 
-	public double[] treeWeights = {0.5,0.5};
+	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\country_map_whoregions.txt"}; // null if locations are loaded from tree
+	public String[] treeFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\VP7human.trees"}; // null for test generated data 
+	public double[] treeWeights = {1.0};
 	public int numTreesFromTail = 10; // at most number of trees to read from tree file's tail
 	public int numLocations = 8; // needs to be specified if locations are loaded from trees....
 	
@@ -163,14 +163,14 @@ public class Config implements Serializable
 	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.STOCHASTIC_MAPPING;
 	
 	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
-	public double[] lastTipTime = {2012.74, 2011.7}; // time of most recent tip on tree, used to calibrate all tree nodes 
+	public double[] lastTipTime = {2012.0}; // time of most recent tip on tree, used to calibrate all tree nodes 
 
 	// STOCHASTIC MAPPING OF TRUNK
 	public double presentDayTipInterval = 0.25; // width of time interval of recent considered to have "survived" for trunk designation purpose  
 	public double timeToDesignateTrunk = 2.0; // time back from present day tip ancestry designated as trunk 
 	public int maxSMBranchRetries = 20000; // maximum number of retries for stochastically mapping a single branch
 
-	public String[] alignmentFilenames = null;//{"ha.fasta","na.fasta"};
+	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_all_epitopes.fas"};
 
 	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
 	

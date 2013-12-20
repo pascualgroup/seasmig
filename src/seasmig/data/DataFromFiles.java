@@ -160,7 +160,7 @@ public class DataFromFiles implements Data
 
 			if (seqMap!=null) {
 				if (seqMap.size()>0)
-					seqLength=seqMap.get(seqMap.keySet().iterator()).length();
+					seqLength=seqMap.get(seqMap.keySet().iterator().next()).length();
 			}
 				
 			double numIdentifiedLocations=0;

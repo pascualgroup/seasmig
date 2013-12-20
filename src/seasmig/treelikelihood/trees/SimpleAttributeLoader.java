@@ -70,7 +70,7 @@ public class SimpleAttributeLoader implements AttributeLoader{
 	}
 	
 	void processAlignments(String fileName) throws IOException {
-		// TODO: this
+		// TODO: test this
 		// Read fasta file:
 		// >header1
 		// ACCCCCCAAAGTTAATATATRRYYSSSWWWW
@@ -104,11 +104,17 @@ public class SimpleAttributeLoader implements AttributeLoader{
 			}
 		}
 		
+		if (seq.length()>0) {
+			seq.replaceAll("\n", "");
+			seq.replaceAll("\r", "");
+			seqMap.put(taxa, new Sequence(taxa,seq));
+		}	
+		
 		seqReader.close();
 
 		attributes.put("alignments",seqMap);
 		if (!seqMap.isEmpty()) {
-			attributes.put("seqLength",seqMap.get(seqMap.keySet().iterator()).length());
+			attributes.put("seqLength",((Sequence) seqMap.values().toArray()[0]).length());
 		}
 		else {
 			attributes.put("seqLength",0);
