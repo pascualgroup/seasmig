@@ -96,7 +96,8 @@ public class Sequence implements Serializable {
 		if (Arrays.equals(seq[pos],NUC_C)) return 1;
 		if (Arrays.equals(seq[pos],NUC_A)) return 2;
 		if (Arrays.equals(seq[pos],NUC_G)) return 3;
-		System.err.println("unidentified nucleotide at position: "+pos+" for sequence with header "+header+"\n"+toString());
+		System.err.printf("(%f,%f,%f,%f) ",seq[pos][0],seq[pos][1],seq[pos][2],seq[pos][3]);
+		System.err.println("unidentified nucleotide at position: "+pos+" for sequence with header "+header+" seqLen="+this.length()+"\n"+toString());		
 		System.exit(-1); // TODO: remove this
 		return UNKNOWN_NUC;
 	}	
