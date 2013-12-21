@@ -162,7 +162,7 @@ public class Config implements Serializable
 	public double rateIndicatorPrior = 0.5; // Prior for including any migration between two locations 
 	
 	// ANCESTRAL STATE RECONSTRUCTIOn
-	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.STOCHASTIC_MAPPING;
+	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.SEQ_STOCHASTIC_MAPPING;
 	
 	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
 	public double[] lastTipTime = {2012.0}; // time of most recent tip on tree, used to calibrate all tree nodes 

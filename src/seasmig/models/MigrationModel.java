@@ -74,6 +74,11 @@ public abstract class MigrationModel extends Model implements Serializable {
 				flatMap.put("seqMutationStats."+i,String.format("%s",outputObject.seqMutationStats[i]));
 			}
 		}
+		if (outputObject.pis!=null) {
+			for (int i=0;i<outputObject.pis.length;i++) {
+				flatMap.put("pi."+i,String.format("%s",outputObject.pis[i]));
+			}
+		}
 		
 		
 		return makeHierarchicalMap(flatMap);

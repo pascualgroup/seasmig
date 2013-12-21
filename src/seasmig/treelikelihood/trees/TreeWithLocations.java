@@ -6,7 +6,6 @@ import java.util.List;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
-import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.TransitionModel.Transition;
@@ -17,6 +16,7 @@ import cern.colt.matrix.DoubleMatrix2D;
 
 @SuppressWarnings("serial")
 public class TreeWithLocations implements LikelihoodTree {
+	// TODO: check -Infinity likelihood source 
 
 	// ENCOUDING FOR UNKNOWN TAXA NUMBER (i.e. internal nodes)
 	public static final int UNKNOWN_TAXA = -1;
@@ -850,24 +850,26 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (node.parent!=null) {
 				if (node.transitions!=null) {
 					if (node.transitions.size()==0) {
-						returnValue+=("{"+node.loc+","+node.parent.time+","+node.time+"},");
+						if (returnValue.charAt(returnValue.length()-1)=='}') returnValue+=",";
+						returnValue+=("{"+node.loc+","+node.parent.time+","+node.time+"}");
 					}
 					else {
 						double fromTime = node.parent.time;
 						int fromLoc = node.loc;
 						for (Transition transition : node.transitions) {
-							returnValue+=("{"+fromLoc+","+fromTime+","+transition.time+"},"); // TODO:
+							if (returnValue.charAt(returnValue.length()-1)=='}') returnValue+=",";
+							returnValue+=("{"+fromLoc+","+fromTime+","+transition.time+"}"); // TODO:
 							fromTime = transition.time;
 							fromLoc = transition.trait;
 						}
 					}
 				}
 				else {
-					returnValue+=("{"+node.loc+","+node.parent.time+","+node.time+"},");
+					if (returnValue.charAt(returnValue.length()-1)=='}') returnValue+=",";
+					returnValue+=("{"+node.loc+","+node.parent.time+","+node.time+"}");
 				}
 			}
-		}
-
+		}		
 		returnValue+="}";
 		return returnValue;
 
@@ -1068,9 +1070,57 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String seqMutationStats(int maxBranchRetries) {
 
+		 // TODO: change to SM time at change in node...
+		 // TODO: change to SM time at change in node...
+		 // TODO: change to SM time at change in node...
+		 // TODO: change to SM time at change in node...
+		 // TODO: change to SM time at change in node...
+		
 		stochsticMappingSeq(root, maxBranchRetries);
 
-		return null;
+		String returnValue = "{";	
+
+		for (TreeWithLocationsNode node : root) {
+			for (int codonPosition = 0; codonPosition<3;codonPosition++) {
+				for (int loc=0; loc<((seqLength-1)/3+1);loc++) { 
+					if ((loc*3+codonPosition) >= seqLength) continue;
+					if (node==root) continue;
+					if (node.mutations.get(codonPosition).get(loc)!=null) {
+						int fromNuc = node.parent.seq.getNuc(loc*3+codonPosition);
+						for (Transition transition : node.mutations.get(codonPosition).get(loc)) {
+							if (returnValue.charAt(returnValue.length()-1)=='}') returnValue+=",";
+							returnValue+=String.format("{%.3f,",transition.time);
+							returnValue+=Integer.toString(loc*3+codonPosition)+",";
+							returnValue+=Sequence.toChar(fromNuc)+",";
+							returnValue+=Sequence.toChar(transition.trait)+",";
+							returnValue+=node.loc; // TODO: change to SM time at change in node...
+							returnValue+="}";
+							fromNuc=transition.trait;
+						}				
+					}
+				}
+			}
+		}
+		returnValue+="}";
+		return returnValue;
+	}
+	
+	@Override
+	public String pis() {
+
+		String returnValue = "{";	
+		for (int i=0; i<3; i++) {
+			returnValue+="\""+Integer.toString(i)+"\": {";			
+			for (int j=0; j<3; j++) {
+				returnValue+="\""+Integer.toString(j)+"\": "+codonLikelihoodModel[i].rootfreq(0).get(j);
+				if (j!=3) returnValue+=",";
+				returnValue+="\n";
+			}
+			if (i!=3) returnValue+=",";
+			returnValue+="\n";
+		}
+		returnValue+="}\n";			
+		return returnValue;
 	}
 
 	private void stochsticMappingSeq(TreeWithLocationsNode root, int maxBranchRetries) {
@@ -1078,11 +1128,21 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO: cite
 		// TODO: preorder iterator		
 		for (TreeWithLocationsNode child : root.children) {
+			if (child.mutations==null) {
+				child.mutations = new ArrayList<ArrayList<ArrayList<TransitionModel.Transition>>>();
+				for (int i=0;i<3;i++) {
+					child.mutations.add(new ArrayList<ArrayList<TransitionModel.Transition>>());
+					for (int j=0;j<((seqLength-1)/3+1);j++) {
+						child.mutations.get(i).add(new ArrayList<TransitionModel.Transition>());
+					}
+				}
+			}
+			
 			for (int codonPosition = 0; codonPosition<3;codonPosition++) {
-				for (int loc=0; loc<(seqLength/3.0+1);loc++) { 
+				for (int loc=0; loc<((seqLength-1)/3+1);loc++) { 
 					if ((loc*3+codonPosition) >= seqLength) continue;
-
-					child.mutations[codonPosition][loc]=null;
+					
+					child.mutations.get(codonPosition).get(loc).clear();
 					int currentNuc = root.seq.getNuc(loc*3+codonPosition);
 					double currentTime = root.time;
 					boolean doneWithBranch = false;
@@ -1092,17 +1152,16 @@ public class TreeWithLocations implements LikelihoodTree {
 					do {
 						repeats+=1;
 						event = migrationModel.nextEvent(currentTime, currentNuc);
-						if (event.time < child.time) {
-							if (child.mutations[codonPosition][loc]==null) child.mutations[codonPosition][loc] = new ArrayList<Transition>();					
-							child.mutations[codonPosition][loc].add(event);
+						if (event.time < child.time) {					
+							child.mutations.get(codonPosition).get(loc).add(event);
 							currentNuc = event.trait;
 							currentTime = event.time;
 						}
 						else if (currentNuc!=child.seq.getNuc(loc*3+codonPosition)) {
 							// If there is a mismatch between stochastic mapping and child ASR than we 
 							// restart the entire branch
-							if (child.mutations[codonPosition][loc]!=null) {
-								child.mutations[codonPosition][loc].clear();
+							if (child.mutations.get(codonPosition).get(loc)!=null) {
+								child.mutations.get(codonPosition).get(loc).clear();
 							}
 							currentNuc = root.seq.getNuc(loc*3+codonPosition);
 							currentTime = root.time;

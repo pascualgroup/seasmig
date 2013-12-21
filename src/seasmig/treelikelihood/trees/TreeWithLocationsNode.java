@@ -24,7 +24,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 	// For stochastic mapping
 	public List<Transition> transitions = null;
-	public List<Transition>[][] mutations = null;
+	public ArrayList<ArrayList<ArrayList<Transition>>> mutations = null;
 	
 	private boolean isTrunk = false;
 	private Sequence noSequence = new Sequence(0);

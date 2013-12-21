@@ -104,4 +104,14 @@ public class Sequence implements Serializable {
 		return seq.length;
 	}
 
+	public static char toChar(int nuc) {
+		switch (nuc) {
+		case 0: return 'T';
+		case 1: return 'C';
+		case 2: return 'A';
+		case 3: return 'G';
+		}
+		return '?';
+	}
+
 }

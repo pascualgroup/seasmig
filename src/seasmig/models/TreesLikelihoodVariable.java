@@ -181,13 +181,22 @@ public class TreesLikelihoodVariable extends Variable {
 				}				
 				outputObject.smTrunkStats=returnValue;				
 			}
+			
+			/////////////////////////////////////
 			if (config.seqMutationStats) {
 				String[] returnValue=new String[trees.length];
 				for (int i=0;i<trees.length;i++) {	 			
 					returnValue[i]=trees[i].seqMutationStats(config.maxSMBranchRetries);
 				}				
 				outputObject.seqMutationStats=returnValue;				
+			}
+			
+			String[] returnValue=new String[trees.length];
+			for (int i=0;i<trees.length;i++) {	 			
+				returnValue[i]=trees[i].pis();
 			}				
+			outputObject.pis=returnValue;											
+
 			return outputObject;
 		}
 		default: 
