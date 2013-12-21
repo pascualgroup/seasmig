@@ -6,9 +6,9 @@ import java.io.Serializable;
 public class Sequence implements Serializable {
 
 	// TODO: ARE MIXED (i.e. R,Y..) CODONS REALLY .25 .25 or SHOULD USE PIs ??
-	
+
 	// HKY85 ORDER NOTATION TCAG
-	
+
 	//	# Log probability of tip encoding of nucleotides (A,G,C,T,R,Y,S,W,K,M,B,D,H,V,N,-)	
 	public static final double[] NUC_T = new double[]{0,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
 	public static final double[] NUC_C = new double[]{Double.NEGATIVE_INFINITY,0,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
@@ -29,14 +29,14 @@ public class Sequence implements Serializable {
 
 	public static final double[] NUC_N = new double[]{Math.log(0.25),Math.log(0.25),Math.log(0.25),Math.log(0.25)};
 	public static final double[] NUC_GAP = new double[]{Math.log(0.25),Math.log(0.25),Math.log(0.25),Math.log(0.25)};
-	
+
 	public static final double[] INTERNAL = new double[]{0,0,0,0};
 
 	double[][] seq = null;
 	String seqStr = null;
-	
+
 	String header = null;
-	
+
 	static final int UNKNOWN_NUC = -1;
 
 	protected Sequence() {};
@@ -76,25 +76,41 @@ public class Sequence implements Serializable {
 			seq[i]=INTERNAL; 				
 		}
 	}
-	
+
 	public double[] get(int pos) {
 		return seq[pos];
 	}	
-	
+
+	public void set(int pos, int value) {
+		switch (value) {
+		case 0: seq[pos]=NUC_T; break;
+		case 1: seq[pos]=NUC_C; break;
+		case 2: seq[pos]=NUC_A; break;
+		case 3: seq[pos]=NUC_G; break;		
+		}
+	}
+
 	public int getNuc(int pos) {
-		switch (seqStr.charAt(pos)) {
-		case 'T': case 't' : return 0;
-		case 'C': case 'c' : return 1;
-		case 'A': case 'a' : return 2;
-		case 'G': case 'g' : return 3;
-		default: return UNKNOWN_NUC;
+		try {
+			switch (seqStr.charAt(pos)) {
+			case 'T': case 't' : return 0;
+			case 'C': case 'c' : return 1;
+			case 'A': case 'a' : return 2;
+			case 'G': case 'g' : return 3;
+			default: return UNKNOWN_NUC;
+			}
+		}
+		catch (Exception e) {
+			System.err.println("failed to map nucelotide data at position: "+Integer.toString(pos)+" of sequence with header" + this.header + "\n" + this.seqStr);
+			System.exit(-1);
+			return -1;
 		}
 	}	
-	
+
 	public String getHeader() {
 		return header;
 	}	
-	
+
 	public String toString() {
 		// TODO:
 		return null;

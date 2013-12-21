@@ -1075,7 +1075,8 @@ public class TreeWithLocations implements LikelihoodTree {
 		 // TODO: change to SM time at change in node...
 		 // TODO: change to SM time at change in node...
 		 // TODO: change to SM time at change in node...
-		
+
+		asrSeq();
 		stochsticMappingSeq(root, maxBranchRetries);
 
 		String returnValue = "{";	
@@ -1178,6 +1179,48 @@ public class TreeWithLocations implements LikelihoodTree {
 			stochsticMappingSeq(child,  maxBranchRetries);
 		}		
 	}
+	
+	private void asrSeq() {
+
+		// Calculate root state
+		// TODO: check this
+		for (int codonPosition = 0; codonPosition<3;codonPosition++) {
+			for (int loc=0; loc<((seqLength-1)/3+1);loc++) { 
+				if ((loc*3+codonPosition) >= seqLength) continue;
+				DoubleMatrix1D rootFreq = codonLikelihoodModel[codonPosition].rootfreq(root.time);
+				double[] alphas = new double[4];	
+				for (int i = 0; i < 4; i++) {
+					alphas[i]=root.logProbsCP[codonPosition][loc][i] + Math.log(rootFreq.get(i));
+				}						
+				root.seq.set(loc*3+codonPosition,normalizeAndGetRandomSampleFromLogProbs(alphas));
+			}
+		}
+		for (TreeWithLocationsNode node : root.children) {
+			asrSeq(node);
+		}		
+	}
+
+	private void asrSeq(TreeWithLocationsNode node) {
+		for (int codonPosition = 0; codonPosition<3;codonPosition++) {
+			for (int loc=0; loc<((seqLength-1)/3+1);loc++) { 
+				if ((loc*3+codonPosition) >= seqLength) continue;
+		
+				// TODO: check this
+				TreeWithLocationsNode parent = node.parent;		
+				double[] alphas = new double[4];	
+				// TODO: check if clause (here for numerics issues)
+				DoubleMatrix1D p = codonLikelihoodModel[codonPosition].probability(parent.loc, parent.time, node.time);
+				for (int i=0; i < 4; i++) {								
+					alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbsCP[codonPosition][loc][i];
+				}		
+				node.seq.set(loc*3+codonPosition,normalizeAndGetRandomSampleFromLogProbs(alphas));
+
+				for (TreeWithLocationsNode child : node.children) {
+					asrSeq(child);
+				}
+			}
+		}
+	}	
 
 }
 
