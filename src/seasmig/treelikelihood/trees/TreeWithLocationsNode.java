@@ -202,7 +202,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 				for (int i=0;i<transitions.size();i++) {
 					returnValue+=String.format("%.3f", transitions.get(i).time-timeFrom);						
 					if (i!=(transitions.size()-1)) {
-						returnValue+=","+Integer.toString(transitions.get(i).trait)+",";
+						returnValue+=","+Integer.toString(transitions.get(i).toTrait)+",";
 					}
 					timeFrom = transitions.get(i).time;
 				}

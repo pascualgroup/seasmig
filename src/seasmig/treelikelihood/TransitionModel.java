@@ -12,12 +12,12 @@ public interface TransitionModel extends Serializable {
 	public class Transition implements Serializable {
 		
 		protected Transition() {};
-		public Transition(double time, int trait) {
+		public Transition(double time, int toTrait) {
 			this.time = time;
-			this.trait = trait;
+			this.toTrait = toTrait;
 		}
 		public double time;
-		public int trait; 
+		public int toTrait; 
 	}
 	
 	

@@ -11,6 +11,9 @@ public interface LikelihoodTree extends Serializable {
 	public int getNumLocations();
 	public String newickProbs();
 	public double cachedLogLikelihood();
+	
+	
+	// Stochastic Mapping & State Reconstruction of Migration
 	public String newickAncestralStateReconstruction();
 	public String newickStochasticMapping(int maxBranchRetries);
 	public String smTransitions();	
@@ -19,6 +22,8 @@ public interface LikelihoodTree extends Serializable {
 	public String smDescendants();
 	String smTrunkStats(double presentDayTipInterval,
 			double timeToDesignateTrunk);
+	
+	// Stochastic Mapping & State Reconstruction of Sequence and Location
 	public String seqMutationStats(int maxBranchRetries);
 	String pis();
 }

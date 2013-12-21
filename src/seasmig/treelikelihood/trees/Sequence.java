@@ -1,6 +1,7 @@
 package seasmig.treelikelihood.trees;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 @SuppressWarnings("serial")
 public class Sequence implements Serializable {
@@ -91,20 +92,13 @@ public class Sequence implements Serializable {
 	}
 
 	public int getNuc(int pos) {
-		try {
-			switch (seqStr.charAt(pos)) {
-			case 'T': case 't' : return 0;
-			case 'C': case 'c' : return 1;
-			case 'A': case 'a' : return 2;
-			case 'G': case 'g' : return 3;
-			default: return UNKNOWN_NUC;
-			}
-		}
-		catch (Exception e) {
-			System.err.println("failed to map nucelotide data at position: "+Integer.toString(pos)+" of sequence with header" + this.header + "\n" + this.seqStr);
-			System.exit(-1);
-			return -1;
-		}
+		if (Arrays.equals(seq[pos],NUC_T)) return 0;
+		if (Arrays.equals(seq[pos],NUC_C)) return 1;
+		if (Arrays.equals(seq[pos],NUC_A)) return 2;
+		if (Arrays.equals(seq[pos],NUC_G)) return 3;
+		System.err.println("unidentified nucleotide at position: "+pos+" for sequence with header "+header+"\n"+toString());
+		System.exit(-1); // TODO: remove this
+		return UNKNOWN_NUC;
 	}	
 
 	public String getHeader() {
@@ -112,8 +106,14 @@ public class Sequence implements Serializable {
 	}	
 
 	public String toString() {
-		// TODO:
-		return null;
+		String returnValue = "";
+		for (int i=0;i<seq.length;i++) {
+			if (Arrays.equals(seq[i],NUC_T)) returnValue+="T";
+			if (Arrays.equals(seq[i],NUC_C)) returnValue+="C";
+			if (Arrays.equals(seq[i],NUC_A)) returnValue+="A";
+			if (Arrays.equals(seq[i],NUC_G)) returnValue+="G";
+		}
+		return returnValue;
 	}
 
 	public int length() {
