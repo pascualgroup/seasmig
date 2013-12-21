@@ -1209,7 +1209,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				TreeWithLocationsNode parent = node.parent;		
 				double[] alphas = new double[4];	
 				// TODO: check if clause (here for numerics issues)
-				DoubleMatrix1D p = codonLikelihoodModel[codonPosition].probability(parent.loc, parent.time, node.time);
+				DoubleMatrix1D p = codonLikelihoodModel[codonPosition].probability(parent.seq.getNuc(loc*3+codonPosition), parent.time, node.time);
 				for (int i=0; i < 4; i++) {								
 					alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbsCP[codonPosition][loc][i];
 				}		
