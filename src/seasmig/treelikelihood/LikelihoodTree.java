@@ -24,6 +24,6 @@ public interface LikelihoodTree extends Serializable {
 			double timeToDesignateTrunk);
 	
 	// Stochastic Mapping & State Reconstruction of Sequence and Location
-	public String seqMutationStats(int maxBranchRetries);
-	String pis();
+	public String seqMutationStats(int maxBranchRetries) throws Exception;
+	String pies();
 }

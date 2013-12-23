@@ -1,6 +1,7 @@
 package seasmig.treelikelihood.transitionmodels;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
@@ -53,8 +54,14 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 				matrixExponentiator=new CachedMatrixExponentiator(new Matlab7MatrixExp(Q));
 			}
 		}
-		// TODO: Maybe use other method to get s.s. freq 
-		basefreq=matrixExponentiator.expm(veryLongTime).viewRow(1);
+		// TODO: Maybe use other method to get s.s. freq		
+		DoubleMatrix2D stationaryDist = matrixExponentiator.expm(veryLongTime);
+		double[] baseFreqdoubleform = new double[num_locations];
+		for (int i=0;i<num_locations;i++) {
+			baseFreqdoubleform[i]=stationaryDist.get(0, i);
+		}
+		basefreq=new DenseDoubleMatrix1D(baseFreqdoubleform);	
+
 		// TODO: Figure out if calculating base freq helps or interferes. 
 		//		basefreq=new double[num_locations];
 		//		for (int i=0;i<num_locations;i++) {
@@ -65,8 +72,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 	// Constructor	
 	public ConstantTransitionBaseModel(double mu) {	// JC69
 		// TODO: check if cache helps
-		matrixExponentiator=new JC69MatrixExp(mu);
-		basefreq=matrixExponentiator.expm(veryLongTime).viewRow(1);
+		matrixExponentiator=new JC69MatrixExp(mu);		
 		double[][] Q = {
 				{0,mu*0.25, mu*0.25, mu*0.25},
 				{mu*0.25, 0, mu*0.25, mu*0.25},
@@ -80,6 +86,8 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 			}
 			Q[i][i]=-rowsum;
 		}
+		
+		basefreq=new DenseDoubleMatrix1D(new double[]{0.25,0.25,0.25,0.25});
 	}
 
 
@@ -87,7 +95,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 	public ConstantTransitionBaseModel(double mu, double kappa, double piC, double piA, double piG) {	// HKY85
 		// TODO: check if cache helps
 		matrixExponentiator=new CachedMatrixExponentiator(new HKY85MatrixExp(mu, kappa, piC, piA, piG));
-		basefreq=matrixExponentiator.expm(veryLongTime).viewRow(1);
+		basefreq=new DenseDoubleMatrix1D(new double[]{1.0-piC-piA-piG,piC,piA,piG});
 		double piT = 1.0 - piA - piG - piC;
 		double[][] Q = {
 				{0,mu*kappa*piC, mu*piA, mu*piG},

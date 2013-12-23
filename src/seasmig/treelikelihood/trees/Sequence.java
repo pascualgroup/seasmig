@@ -90,10 +90,9 @@ public class Sequence implements Serializable {
 		case 3: seq[pos]=NUC_G; break;		
 		}
 	}
-		
+
+	class UNIDENTIFIED_NUCLEOTIDE_EXCEPTION extends Exception {};
 	public int getNuc(int pos) throws Exception{
-		class UNIDENTIFIED_NUCLEOTIDE_EXCEPTION extends Exception {};
-		
 		if (Arrays.equals(seq[pos],NUC_T)) return 0;
 		if (Arrays.equals(seq[pos],NUC_C)) return 1;
 		if (Arrays.equals(seq[pos],NUC_A)) return 2;
@@ -147,6 +146,16 @@ public class Sequence implements Serializable {
 			}
 		}
 		return returnValue;
+	}
+
+	public int getNuc(double[] nuc) throws UNIDENTIFIED_NUCLEOTIDE_EXCEPTION {
+		if (Arrays.equals(nuc,NUC_T)) return 0;
+		if (Arrays.equals(nuc,NUC_C)) return 1;
+		if (Arrays.equals(nuc,NUC_A)) return 2;
+		if (Arrays.equals(nuc,NUC_G)) return 3;
+		System.err.printf("(%f,%f,%f,%f) ",nuc[0],nuc[1],nuc[2],nuc[3]);
+		System.err.println("unidentified nucleotide!\n");		
+		throw new UNIDENTIFIED_NUCLEOTIDE_EXCEPTION();	
 	}
 
 }
