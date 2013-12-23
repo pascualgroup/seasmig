@@ -33,10 +33,10 @@ public class Sequence implements Serializable {
 
 	public static final double[] INTERNAL = new double[]{0,0,0,0};
 
-	double[][] seq = null;
-	String seqStr = null;
+	protected double[][] seq = null;
+	protected String seqStr = null;
 
-	String header = null;
+	protected String header = null;
 
 	static final int UNKNOWN_NUC = -1;
 
@@ -90,16 +90,17 @@ public class Sequence implements Serializable {
 		case 3: seq[pos]=NUC_G; break;		
 		}
 	}
-
-	public int getNuc(int pos) {
+		
+	public int getNuc(int pos) throws Exception{
+		class UNIDENTIFIED_NUCLEOTIDE_EXCEPTION extends Exception {};
+		
 		if (Arrays.equals(seq[pos],NUC_T)) return 0;
 		if (Arrays.equals(seq[pos],NUC_C)) return 1;
 		if (Arrays.equals(seq[pos],NUC_A)) return 2;
 		if (Arrays.equals(seq[pos],NUC_G)) return 3;
 		System.err.printf("(%f,%f,%f,%f) ",seq[pos][0],seq[pos][1],seq[pos][2],seq[pos][3]);
 		System.err.println("unidentified nucleotide at position: "+pos+" for sequence with header "+header+" seqLen="+this.length()+"\n"+toString());		
-		System.exit(-1); // TODO: remove this
-		return UNKNOWN_NUC;
+		throw new UNIDENTIFIED_NUCLEOTIDE_EXCEPTION();		
 	}	
 
 	public String getHeader() {
@@ -109,10 +110,11 @@ public class Sequence implements Serializable {
 	public String toString() {
 		String returnValue = "";
 		for (int i=0;i<seq.length;i++) {
-			if (Arrays.equals(seq[i],NUC_T)) returnValue+="T";
-			if (Arrays.equals(seq[i],NUC_C)) returnValue+="C";
-			if (Arrays.equals(seq[i],NUC_A)) returnValue+="A";
-			if (Arrays.equals(seq[i],NUC_G)) returnValue+="G";
+			if (Arrays.equals(seq[i],NUC_T)) returnValue+="T"; 
+			else if (Arrays.equals(seq[i],NUC_C)) returnValue+="C";
+			else if (Arrays.equals(seq[i],NUC_A)) returnValue+="A";
+			else if (Arrays.equals(seq[i],NUC_G)) returnValue+="G";
+			else returnValue+="?";
 		}
 		return returnValue;
 	}
@@ -129,6 +131,22 @@ public class Sequence implements Serializable {
 		case 3: return 'G';
 		}
 		return '?';
+	}
+
+	public Sequence copy() {
+		Sequence returnValue = new Sequence(0);		
+		returnValue.header = header;
+		returnValue.seqStr = seqStr;
+		if (seq==null) return returnValue;
+		returnValue.seq = new double[seq.length][seq[0].length];
+		for (int i=0;i<seq.length;i++) {
+			if (seq[0]!=null) {
+				for (int j=0;j<seq[0].length;j++) {
+					returnValue.seq[i][j]=seq[i][j];
+				}
+			}
+		}
+		return returnValue;
 	}
 
 }

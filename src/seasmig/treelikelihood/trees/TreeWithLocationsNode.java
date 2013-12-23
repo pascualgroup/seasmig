@@ -23,7 +23,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	public double[][][] logProbsCP; // codon position 0,1,2; sequence position TODO: 
 
 	// For stochastic mapping
-	public List<Transition> transitions = null;
+	public List<Transition> migrations = null;
 	public ArrayList<ArrayList<ArrayList<Transition>>> mutations = null;
 	
 	private boolean isTrunk = false;
@@ -38,7 +38,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		if (seq==null) {
 			seq = noSequence ;
 		}
-		seq=seq_;
+		seq=seq_.copy();
 		loc=loc_;
 		time=time_;
 		parent=parent_;	
@@ -194,17 +194,17 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	public String parseMap() {
 		String returnValue = new String();
 
-		if (transitions!=null) {
-			if (transitions.size()>0) {	
+		if (migrations!=null) {
+			if (migrations.size()>0) {	
 				returnValue+="[&map={";
 				double timeFrom = parent.time;
 
-				for (int i=0;i<transitions.size();i++) {
-					returnValue+=String.format("%.3f", transitions.get(i).time-timeFrom);						
-					if (i!=(transitions.size()-1)) {
-						returnValue+=","+Integer.toString(transitions.get(i).toTrait)+",";
+				for (int i=0;i<migrations.size();i++) {
+					returnValue+=String.format("%.3f", migrations.get(i).time-timeFrom);						
+					if (i!=(migrations.size()-1)) {
+						returnValue+=","+Integer.toString(migrations.get(i).toTrait)+",";
 					}
-					timeFrom = transitions.get(i).time;
+					timeFrom = migrations.get(i).time;
 				}
 				returnValue+="}]";
 			}	
