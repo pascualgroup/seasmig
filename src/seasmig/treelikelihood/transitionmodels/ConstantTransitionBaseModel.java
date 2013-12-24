@@ -21,7 +21,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 
 	// Rate Matrix  
 	double[][] Q = null;
-	private int num_locations = 0;		
+	private int dimension = 0;		
 
 	// Matrix Exponentiation
 	MatrixExponentiator matrixExponentiator;
@@ -33,8 +33,8 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 	// Constructor	
 	public ConstantTransitionBaseModel(double[][] Q_) {	
 		Q = Q_;
-		num_locations=Q_.length;
-		switch (num_locations) {
+		dimension=Q_.length;
+		switch (dimension) {
 		case 2:
 			matrixExponentiator=new AnalyticMatrixExp2(Q);
 			if (!matrixExponentiator.checkMethod()) {
@@ -56,8 +56,8 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 		}
 		// TODO: Maybe use other method to get s.s. freq		
 		DoubleMatrix2D stationaryDist = matrixExponentiator.expm(veryLongTime);
-		double[] baseFreqdoubleform = new double[num_locations];
-		for (int i=0;i<num_locations;i++) {
+		double[] baseFreqdoubleform = new double[dimension];
+		for (int i=0;i<dimension;i++) {
 			baseFreqdoubleform[i]=stationaryDist.get(0, i);
 		}
 		basefreq=new DenseDoubleMatrix1D(baseFreqdoubleform);	
@@ -86,7 +86,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 			}
 			Q[i][i]=-rowsum;
 		}
-		
+		dimension=4;
 		basefreq=new DenseDoubleMatrix1D(new double[]{0.25,0.25,0.25,0.25});
 	}
 
@@ -102,7 +102,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 				{mu*kappa*piT, 0, mu*piA, mu*piG},
 				{mu*piT, mu*piC, 0, mu*kappa*piG},
 				{mu*piT, mu*piC, mu*kappa*piA, 0}};		
-
+		dimension=4;
 		for (int i=0;i<4;i++) {
 			double rowsum=0;
 			for (int j=0;j<4;j++) {
@@ -171,7 +171,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 
 	@Override
 	public int getNumLocations() {
-		return num_locations ;
+		return dimension ;
 	}
 
 	@Override
@@ -194,14 +194,18 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 		double lambda = -Q[from][from];
 		double time = cern.jet.random.Exponential.staticNextDouble(lambda); 
 		// mean of this exponential is 1/lambda, higher the rate, the shorter the time interval --> nextDouble(lambda) is the correct direction.
-
-		int first = (from+1)%num_locations;
+		
+		int first = (from+1)%dimension;
 		double p=-Q[from][first]/Q[from][from];
 		double rnd = cern.jet.random.Uniform.staticNextDouble();
 		int loc = first;
 		while (rnd>p) {
-			loc=(loc+1)%num_locations;
+			loc=(loc+1)%dimension;
 			p = p-Q[from][loc]/Q[from][from];
+			if (loc==first) {
+				loc=(loc-1)%dimension;
+				break;
+			}			
 		}
 		// TODO: check this
 

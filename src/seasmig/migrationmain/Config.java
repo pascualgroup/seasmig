@@ -146,9 +146,9 @@ public class Config implements Serializable
 	public boolean smTrees = true;  // TODO: add alternative with single child branches instead of &map 
 	public boolean smTransitions = true; 
 	public boolean smTipDwellings = true; 
-	public boolean smLineages = false;
+	public boolean smLineages = true;
 	public boolean smDescendants = true;
-	public boolean smTrunkStats = false;
+	public boolean smTrunkStats = true;
 	public boolean seqMutationStats = true;
 	//public double stochasticMappingStartTime = 1900; // TODO: add this
 	

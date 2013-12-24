@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import seasmig.treelikelihood.TransitionModel;
+import seasmig.treelikelihood.TransitionModel.Transition;
 import seasmig.treelikelihood.transitionmodels.ConstantTransitionBaseModel;
 import seasmig.treelikelihood.transitionmodels.TwoSeasonMigrationBaseModel;
 
@@ -345,17 +346,31 @@ public class TreeWithLocationsTest {
 				{ 0.333333/5.0,0.333333/5.0,0.333333/5,-1.0/5.0}});
 		
 		double[] a = new double[4];
-		for (int i=0;i<5000;i++) {
-			a[equalModel.nextEvent(0.1, 0).toTrait]+=1.0/20000;
-			a[equalModel.nextEvent(2.1, 0).toTrait]+=1.0/20000;
-			a[equalModel.nextEvent(4.1, 0).toTrait]+=1.0/20000;
-			a[equalModel.nextEvent(0.6, 0).toTrait]+=1.0/20000;			
+		double[] interval = new double[4];
+		Transition[] transitions = new Transition[4];
+		for (int i=0;i<5000000;i++) {
+			transitions[0]=equalModel.nextEvent(0.1, 0);
+			transitions[1]=equalModel.nextEvent(0.2, 0);
+			transitions[2]=equalModel.nextEvent(0.3, 0);
+			transitions[3]=equalModel.nextEvent(0.4, 0);
+			a[transitions[0].toTrait]+=1.0/20000000.0;
+			a[transitions[1].toTrait]+=1.0/20000000.0;
+			a[transitions[2].toTrait]+=1.0/20000000.0;
+			a[transitions[3].toTrait]+=1.0/20000000.0;			
+			interval[0]+=(transitions[0].time-0.1)/5000000;
+			interval[1]+=(transitions[1].time-0.2)/5000000;
+			interval[2]+=(transitions[2].time-0.3)/5000000;
+			interval[3]+=(transitions[3].time-0.4)/5000000;
 		}
 		System.out.println(a[0]+","+a[1]+","+a[2]+","+a[3]);		
-		assertEquals(a[0], 0, 0.00000000001);
-		assertEquals(a[1], 0.33333333333333, 0.01 );
-		assertEquals(a[2], 0.33333333333333, 0.01 );
-		assertEquals(a[3], 0.33333333333333, 0.01 );
+		assertEquals(0,a[0], 0.00001);
+		assertEquals(0.33333333333333,a[1], 0.01 );
+		assertEquals(0.33333333333333,a[2], 0.01 );
+		assertEquals(0.33333333333333,a[3], 0.01 );
+		assertEquals(5,interval[0], 0.01);
+		assertEquals(5,interval[1], 0.01 );
+		assertEquals(5,interval[2], 0.01 );
+		assertEquals(5,interval[3], 0.01 );
 		
 		// TODO: better test
 	}
