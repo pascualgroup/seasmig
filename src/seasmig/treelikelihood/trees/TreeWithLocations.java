@@ -1083,24 +1083,28 @@ public class TreeWithLocations implements LikelihoodTree {
 		System.out.print("Generating output....");
 		String returnValue = "{";	
 		for (TreeWithLocationsNode node : root) {
-			for (int codonPosition = 0; codonPosition<3;codonPosition++) {
-				for (int loc=0; loc<((seqLength-1)/3+1);loc++) { 
+			for (int codonPosition = 0; codonPosition<3;codonPosition++) {				
+				for (int loc=0; loc<((seqLength-1)/3+1);loc++) {
 					if ((loc*3+codonPosition) >= seqLength) continue;
 					if (node==root) continue;
-					if (node.mutations.get(codonPosition).get(loc)!=null) {
+					if (node.mutations.get(codonPosition).get(loc)!=null) {						
 						int fromNuc = 0;
 						fromNuc = node.parent.seq.getNuc(loc*3+codonPosition);
-
-						for (Transition transition : node.mutations.get(codonPosition).get(loc)) {
-							if (returnValue.charAt(returnValue.length()-1)=='}') returnValue+=",";
-							returnValue+=String.format("{%.3f,",transition.time);
-							returnValue+=Integer.toString(loc*3+codonPosition)+",";
-							returnValue+=Sequence.toChar(fromNuc)+",";
-							returnValue+=Sequence.toChar(transition.toTrait)+",";							
-							returnValue+=getSequenceTransitionLocation(node,transition.time); // TODO: change to SM time at change in node...
-							returnValue+="}";
-							fromNuc=transition.toTrait;
-						}				
+						if (node.mutations.get(codonPosition).get(loc).size()<100) {							
+							for (Transition transition : node.mutations.get(codonPosition).get(loc)) {
+								if (returnValue.charAt(returnValue.length()-1)=='}') returnValue+=",";
+								returnValue+=String.format("{%.3f,",transition.time);
+								returnValue+=Integer.toString(loc*3+codonPosition)+",";
+								returnValue+=Sequence.toChar(fromNuc)+",";
+								returnValue+=Sequence.toChar(transition.toTrait)+",";					
+								returnValue+=getSequenceTransitionLocation(node,transition.time); // TODO: change to SM time at change in node...
+								returnValue+="}";
+								fromNuc=transition.toTrait;
+							}				
+						}
+						else {
+							System.err.println("Too many (>100) mutations on branch ("+node.parent.time+","+node.parent.loc+","+node.loc+","+node.time+") aborting sequence mapping for branch!");
+						}
 					}
 				}
 			}
@@ -1120,10 +1124,13 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		else {
 			int migrationIndex = node.migrations.size()-1;
-			for (int i=(node.migrations.size()-1);i>=0;i--) {
-				if (node.migrations.get(i).time<time) {
-					migrationIndex = i;
+			if (node.migrations.size()<100) {
+				for (int i=(node.migrations.size()-1);i>=0;i--) {
+					if (node.migrations.get(i).time<time) {
+						migrationIndex = i;
+					}
 				}
+				System.err.println("Too many migrations (>100) on branch ("+node.parent.time+","+node.parent.loc+","+node.loc+","+node.time+") using node location");
 			}
 			return node.migrations.get(migrationIndex).toTrait;
 		}
@@ -1212,7 +1219,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=0;i<3;i++) {
 			pi[i]=codonLikelihoodModel[i].rootfreq(root.time);
 		}
-		
+
 		for (int codonPos = 0; codonPos <3 ; codonPos++) {
 			for (int loc=0;loc<((seqLength-1)/3+1);loc++) {				
 				if ((loc*3+codonPos) >= seqLength) continue;			
@@ -1224,7 +1231,6 @@ public class TreeWithLocations implements LikelihoodTree {
 			}			
 		}			
 
-		System.err.println("root sequence asr: "+root.seq);
 		for (TreeWithLocationsNode node : root.children) {
 			asrSeq(node);
 		}		
@@ -1250,8 +1256,6 @@ public class TreeWithLocations implements LikelihoodTree {
 
 
 		}
-
-		System.err.println("node sequence asr: "+node.seq);
 
 		for (TreeWithLocationsNode child : node.children) {
 			asrSeq(child);

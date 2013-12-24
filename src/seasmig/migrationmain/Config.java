@@ -149,7 +149,8 @@ public class Config implements Serializable
 	public boolean smLineages = false;
 	public boolean smDescendants = true;
 	public boolean smTrunkStats = false;
-	public boolean seqMutationStats = true; 
+	public boolean seqMutationStats = true;
+	//public double stochasticMappingStartTime = 1900; // TODO: add this
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\country_map_whoregions.txt"}; // null if locations are loaded from tree

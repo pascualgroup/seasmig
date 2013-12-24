@@ -192,9 +192,8 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 	@Override
 	public Transition nextEvent(double from_time, int from) {
 		double lambda = -Q[from][from];
-
 		double time = cern.jet.random.Exponential.staticNextDouble(lambda); 
-		// mean of this exponential is 1/lambda, higher the rate, the shorter the time --> this is the correct direction.
+		// mean of this exponential is 1/lambda, higher the rate, the shorter the time interval --> nextDouble(lambda) is the correct direction.
 
 		int first = (from+1)%num_locations;
 		double p=-Q[from][first]/Q[from][from];
