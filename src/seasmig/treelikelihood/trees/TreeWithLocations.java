@@ -1075,6 +1075,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		System.out.println("Stochastically mapping mutations:");
 		System.out.print("Sequence ASR....");
 		asrSeq();
+		asr();
 		System.out.println("done!");
 		System.out.print("Sequence SM....");
 		stochsticMappingSeq(root, maxBranchRetries);
