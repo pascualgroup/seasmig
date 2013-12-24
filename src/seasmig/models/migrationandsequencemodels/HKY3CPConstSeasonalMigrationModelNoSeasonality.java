@@ -24,6 +24,7 @@ import seasmig.util.Util;
 @SuppressWarnings("serial")
 public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationModel {
 
+	// TODO: seperate into two variables for seqence and location likelihood...
 
 	Config config;
 	Data data;
