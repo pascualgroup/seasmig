@@ -133,9 +133,11 @@ public class DataFromFiles implements Data
 			
 			String alignmentFilename = null;
 			if (config.alignmentFilenames!=null) {
-				if (config.alignmentFilenames[h]!=null) {
-					if (config.alignmentFilenames[h].length()>0) {
-						alignmentFilename = config.alignmentFilenames[h];
+				if (config.alignmentFilenames.length>0) {
+					if (config.alignmentFilenames[h]!=null) {
+						if (config.alignmentFilenames[h].length()>0) {
+							alignmentFilename = config.alignmentFilenames[h];
+						}
 					}
 				}
 			}
