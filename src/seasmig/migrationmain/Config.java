@@ -149,7 +149,7 @@ public class Config implements Serializable
 	public boolean smLineages = true;
 	public boolean smDescendants = true;
 	public boolean smTrunkStats = true;
-	public boolean seqMutationStats = false;
+	public boolean seqMutationStats = true;
 	//public double stochasticMappingStartTime = 1900; // TODO: add this
 	
 	// MODEL DATA RELATED PARAMETERS
@@ -163,7 +163,7 @@ public class Config implements Serializable
 	public double rateIndicatorPrior = 0.5; // Prior for including any migration between two locations 
 	
 	// ANCESTRAL STATE RECONSTRUCTIOn
-	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.STOCHASTIC_MAPPING;
+	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.SEQ_STOCHASTIC_MAPPING ;
 	
 	// TIME CALIBRATION (THIS PARAMETER IS ABSOLUTLY CRUCIAL) 
 	public double[] lastTipTime = {2012.0}; // time of most recent tip on tree, used to calibrate all tree nodes 
@@ -173,9 +173,9 @@ public class Config implements Serializable
 	public double timeToDesignateTrunk = 4.0; // time back from present day tip ancestry designated as trunk 
 	public int maxSMBranchRetries = 20000; // maximum number of retries for stochastically mapping a single branch
 
-	public String[] alignmentFilenames = {};//"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_partial_epitopes.fas"};
+	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_partial_epitopes.fas"};
 
-	public SeqModelType seqModelType = SeqModelType.NONE;
+	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {
