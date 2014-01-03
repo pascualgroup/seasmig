@@ -58,11 +58,11 @@ public class TestMatrixExponentiation {
 			}
 			System.out.println();
 		}
-		
+
 		for (int i=0; i<4; i++) 
 			assertArrayEquals(res1[i],res2[i],0.0000001);
-		
-	
+
+
 
 		System.out.println("timing:");
 		long startTime1= System.currentTimeMillis();	
@@ -84,38 +84,57 @@ public class TestMatrixExponentiation {
 		long time2= System.currentTimeMillis()-startTime2;
 		System.out.println("time1: "+time1+"[ms] time2: "+time2+"[ms]");
 
-		
+
 	}
 
 	@Test
 	public void testHKY85() {
-		double mu = 0.2;
-		double kappa = 0.5;
-		double piC = 0.3;
-		double piA = 0.2;
-		double piG = 0.26;
+		double mu = cern.jet.random.Uniform.staticNextDoubleFromTo(0, 100);
+		double kappa = cern.jet.random.Uniform.staticNextDoubleFromTo(0, 3);
+		double piC = 0.15;
+		double piA = 0.15;
+		double piG = 0.36;
 		double piT = 1.0 - piC - piA - piG;
 		
-		double[][] Q = {
-				{0,mu*kappa*piC, mu*piA, mu*piG},
-				{mu*kappa*piT, 0, mu*piA, mu*piG},
-				{mu*piT, mu*piC, 0, mu*kappa*piG},
-				{mu*piT, mu*piC, mu*kappa*piA, 0}};		
-		
-		for (int i=0;i<4;i++) {
-			double rowsum=0;
-			for (int j=0;j<4;j++) {
-				rowsum=rowsum+Q[i][j];
+		MatrixExponentiator matrixExponentiator1 = null;
+		MatrixExponentiator matrixExponentiator2 = null;
+
+		for (int testrep=0;testrep<100;testrep++) {
+			mu = cern.jet.random.Uniform.staticNextDoubleFromTo(0, 100);
+			kappa = cern.jet.random.Uniform.staticNextDoubleFromTo(0, 3);
+			piC = 0.15;
+			piA = 0.15;
+			piG = 0.36;
+			piT = 1.0 - piC - piA - piG;
+
+			double[][] Q = {
+					{0,mu*kappa*piC, mu*piA, mu*piG},
+					{mu*kappa*piT, 0, mu*piA, mu*piG},
+					{mu*piT, mu*piC, 0, mu*kappa*piG},
+					{mu*piT, mu*piC, mu*kappa*piA, 0}};		
+
+			for (int i=0;i<4;i++) {
+				double rowsum=0;
+				for (int j=0;j<4;j++) {
+					rowsum=rowsum+Q[i][j];
+				}
+				Q[i][i]=-rowsum;
 			}
-			Q[i][i]=-rowsum;
+
+			matrixExponentiator1 = new HKY85MatrixExp(mu,kappa,piC,piA,piG);
+			matrixExponentiator2 = new Matlab7MatrixExp(Q);
+
+			double[][] res1=matrixExponentiator1.expm(0.5).toArray();
+			double[][] res2=matrixExponentiator2.expm(0.5).toArray();
+
+			for (int i=0; i<4; i++) 
+				for (int j=0; j<4; j++) {
+					assertEquals(res1[i][j],res2[i][j], 0.000001);
+				}			
 		}
 		
-		MatrixExponentiator matrixExponentiator1 = new HKY85MatrixExp(mu,kappa,piC,piA,piG);
-		MatrixExponentiator matrixExponentiator2 = new Matlab7MatrixExp(Q);
-
 		double[][] res1=matrixExponentiator1.expm(0.5).toArray();
 		double[][] res2=matrixExponentiator2.expm(0.5).toArray();
-	
 		System.out.println("res1:");
 		for (int i=0;i<res1.length;i++) {
 			for (int j=0;j<res1[0].length;j++) {
@@ -130,30 +149,22 @@ public class TestMatrixExponentiation {
 			}
 			System.out.println();
 		}
-		
+
 		for (int i=0; i<4; i++) 
 			for (int j=0; j<4; j++) {
-				System.out.println(res1[i][j]);
-				System.out.println(res2[i][j]);
 				assertEquals(res1[i][j],res2[i][j], 0.000001);
-			}
-
+			}		
+		
 		System.out.println("timing:");
 		long startTime1= System.currentTimeMillis();	
 		for (int rep=0;rep<1000000;rep++) {
 			res1=matrixExponentiator1.expm(rep/10000).toArray();			
-			if (Math.random()<0.00000001) {
-				System.out.println(res1[0][0]);
-			}
 		}
 		long time1= System.currentTimeMillis()-startTime1;
 
 		long startTime2= System.currentTimeMillis();
 		for (int rep=0;rep<1000000;rep++) {
 			res2=matrixExponentiator2.expm(rep/10000).toArray();			
-			if (Math.random()<0.00000001) {
-				System.out.println(res2[0][0]);
-			}
 		}
 		long time2= System.currentTimeMillis()-startTime2;
 		System.out.println("time1: "+time1+"[ms] time2: "+time2+"[ms]");	

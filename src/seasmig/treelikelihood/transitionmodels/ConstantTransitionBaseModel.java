@@ -88,13 +88,14 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 		}
 		dimension=4;
 		basefreq=new DenseDoubleMatrix1D(new double[]{0.25,0.25,0.25,0.25});
+		this.Q=Q;
 	}
 
 
 	// Constructor	
 	public ConstantTransitionBaseModel(double mu, double kappa, double piC, double piA, double piG) {	// HKY85
 		// TODO: check if cache helps
-		matrixExponentiator=new CachedMatrixExponentiator(new HKY85MatrixExp(mu, kappa, piC, piA, piG));
+		matrixExponentiator=new HKY85MatrixExp(mu, kappa, piC, piA, piG);
 		basefreq=new DenseDoubleMatrix1D(new double[]{1.0-piC-piA-piG,piC,piA,piG});
 		double piT = 1.0 - piA - piG - piC;
 		double[][] Q = {
@@ -110,6 +111,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 			}
 			Q[i][i]=-rowsum;
 		}
+		this.Q=Q;
 	}
 
 
@@ -121,7 +123,8 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 
 	@Override
 	public DoubleMatrix2D transitionMatrix(double from_time, double to_time) {		
-		double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
+		//double dt = Math.max(timePrecision, cern.jet.math.Functions.round(timePrecision).apply(to_time-from_time)); 
+		double dt = to_time-from_time;
 		return matrixExponentiator.expm(dt);		
 	}
 

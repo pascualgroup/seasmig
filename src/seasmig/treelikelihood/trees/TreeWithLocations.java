@@ -236,15 +236,20 @@ public class TreeWithLocations implements LikelihoodTree {
 		seqLogLike=0;
 		if (seqLength>0) {
 			for (TreeWithLocationsNode node : root) { // Postorder
-				if (node.logProbsCP==null) {
-					node.logProbsCP = new double[3][(seqLength-1)/3+1][4];
 
-					for (int codonPos = 0; codonPos <3 ; codonPos++) {
+				if (node.children.size()!=0) { // this is an internal node		
+					if (node.logProbsCP==null) {
+						node.logProbsCP = new double[3][(seqLength-1)/3+1][4];
+					}					
+				}
+				else { // this is a tip
+					node.logProbsCP = new double[3][(seqLength-1)/3+1][];
+					for (int codonPos = 0; codonPos<3 ; codonPos++) {
 						for (int loc=0;loc<(seqLength-1)/3+1;loc++) {
-							if ((loc*3+codonPos) >= seqLength) continue;
-							node.logProbsCP[codonPos][loc]=node.seq.get(loc*3+codonPos).clone();									
+							if ((loc*3+codonPos) >= seqLength) continue;					
+							node.logProbsCP[codonPos][loc]=node.seq.get(loc*3+codonPos);
 						}
-					}
+					}		
 				}
 
 				if (node.children.size()!=0) { // this is an internal node			
@@ -253,15 +258,15 @@ public class TreeWithLocations implements LikelihoodTree {
 							DoubleMatrix2D p = null;						
 							// TODO: Util.minValue here for numerics issues, check this... 
 							p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time+Util.minValue);
-
+							
 							for (int loc=0;loc<((seqLength-1)/3+1);loc++) {
 								for (int from = 0; from < 4; from++) {													
 									if ((loc*3+codonPos) >= seqLength) continue;							
 									double[] alphas = new double[4];						
-									for (int to = 0; to < 4; to++) { // Integrate over all possible nucleotides									
-										alphas[to]=(Math.log(p.get(from,to)) + child.logProbsCP[codonPos][loc][to]);							
-									}
-									node.logProbsCP[codonPos][loc][from] += logSumExp(alphas);							
+									for (int to = 0; to < 4; to++) { // Integrate over all possible nucleotides												
+										alphas[to]=(Math.log(p.get(from,to)) + child.logProbsCP[codonPos][loc][to]);										
+									}									
+									node.logProbsCP[codonPos][loc][from] += logSumExp(alphas);
 								}
 							}
 						}								
@@ -281,9 +286,9 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int loc=0;loc<((seqLength-1)/3+1);loc++) {				
 					if ((loc*3+codonPos) >= seqLength) continue;			
 					double[] alphas = new double[4];	
-					for (int i = 0; i < 4; i++) {				
+					for (int i = 0; i < 4; i++) {
 						alphas[i]=root.logProbsCP[codonPos][loc][i] + Math.log(pi[codonPos].get(i));
-					}
+					}					
 					seqLogLike += logSumExp(alphas);
 				}			
 			}			
@@ -294,7 +299,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public double logLikelihood() {
 		locLogLikelihood();		
-		seqLogLikelihood();
+		seqLogLikelihood();		
 		logLike = locationLogLike+seqLogLike;
 		return logLike;
 	}
@@ -502,8 +507,10 @@ public class TreeWithLocations implements LikelihoodTree {
 				}
 			}
 		}
-		for (int i=0;i<alphas.length;i++) {			
-			sumExp=sumExp+cern.jet.math.Functions.exp.apply(alphas[i]-minWithoutNegInf);
+		for (int i=0;i<alphas.length;i++) {		
+			if (!Double.isInfinite(alphas[i]) && !Double.isNaN(alphas[i])) {
+				sumExp=sumExp+cern.jet.math.Functions.exp.apply(alphas[i]-minWithoutNegInf);
+			}
 		}
 		double returnValue=minWithoutNegInf+cern.jet.math.Functions.log.apply(sumExp);
 		if (Double.isNaN(returnValue) ){
@@ -1247,7 +1254,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 				double[] alphas = new double[4];	
 				// TODO: check if clause (here for numerics issues)
-				DoubleMatrix1D p = codonLikelihoodModel[codonPosition].probability(parent.seq.getNuc(loc*3+codonPosition), parent.time, node.time);
+				DoubleMatrix1D p = codonLikelihoodModel[codonPosition].probability(parent.seq.getNuc(loc*3+codonPosition), parent.time, node.time+Util.minValue);
 
 				for (int i=0; i < 4; i++) {								
 					alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbsCP[codonPosition][loc][i];
