@@ -64,7 +64,7 @@ public class TreeWithLocationsTest {
 				{ 0.333333,-1,0.333333,0.333333},
 				{ 0.333333,0.333333,-1,0.333333},
 				{ 0.333333,0.333333,0.333333,-1}});
-		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel,null);
 
 		locTree.logLikelihood();
 		System.out.println(locTree.newickProbs());
@@ -118,7 +118,7 @@ public class TreeWithLocationsTest {
 						{ 0.333333*4.0/3.0,0.333333*4.0/3.0,-1*4.0/3.0,0.333333*4.0/3.0},
 						{ 0.333333*4.0/3.0,0.333333*4.0/3.0,0.333333*4.0/3.0,-1*4.0/3.0}},
 						0.3,0.8);
-		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel,null);
 
 		locTree.logLikelihood();
 		System.out.println(locTree.newickProbs());
@@ -148,8 +148,8 @@ public class TreeWithLocationsTest {
 		double seasonalPhase = cern.jet.random.Uniform.staticNextDouble()*0.5;
 		TransitionModel equalModel = new ConstantTransitionBaseModel(singleMatrix);		
 		TransitionModel twoSeasonModel = new TwoSeasonMigrationBaseModel(matrixSeas1 ,matrixSeas2 , seasonalPhase, seasonalPhase+0.5);
-		TreeWithLocations locTreeEqual = new TreeWithLocations(root,equalModel);
-		TreeWithLocations locTreeTwoSeasons = new TreeWithLocations(root,twoSeasonModel);
+		TreeWithLocations locTreeEqual = new TreeWithLocations(root,equalModel,null);
+		TreeWithLocations locTreeTwoSeasons = new TreeWithLocations(root,twoSeasonModel,null);
 
 		assertEquals(locTreeEqual.logLikelihood(), locTreeTwoSeasons.logLikelihood(),1E-10);			
 	}
@@ -200,7 +200,7 @@ public class TreeWithLocationsTest {
 				{ 0.333333,-1,0.333333,0.333333},
 				{ 1.333333,0.333333,-4,2.333333},
 				{ 0.333333,0.666666,1.0,-2}});
-		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel,null);
 
 		assertEquals(expectedResult, locTree.logLikelihood(),0.01);
 
@@ -228,7 +228,7 @@ public class TreeWithLocationsTest {
 				{ 0.333333,-1,0.333333,0.333333},
 				{ 0.333333,0.333333,-1,0.333333},
 				{ 0.333333,0.333333,0.333333,-1}});
-		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);		
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel,null);		
 		locTree.logLikelihood();
 		System.out.println(locTree.newickProbs());
 
@@ -245,7 +245,7 @@ public class TreeWithLocationsTest {
 					{ 0.333333,-1,0.333333,0.333333},
 					{ 0.333333,0.333333,-1,0.333333},
 					{ 0.333333,0.333333,0.333333,-1}});
-			locTree = new TreeWithLocations(root,equalModel);		
+			locTree = new TreeWithLocations(root,equalModel,null);		
 			locTree.logLikelihood();
 			String asrNewick = locTree.newickAncestralStateReconstruction();			
 			System.out.println(asrNewick);
@@ -288,7 +288,7 @@ public class TreeWithLocationsTest {
 				{ 0.333333,-1,0.333333,0.333333},
 				{ 0.333333,0.333333,-1,0.333333},
 				{ 0.333333,0.333333,0.333333,-1}});
-		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);		
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel,null);		
 		locTree.logLikelihood();
 		System.out.println(locTree.newickProbs());
 		System.out.println(locTree.newickAncestralStateReconstruction());	
@@ -328,7 +328,7 @@ public class TreeWithLocationsTest {
 				{ 0.333333/5.0,-1.0/5.0,0.333333/5.0,0.333333/5.0},
 				{ 0.333333/5.0,0.333333/5.0,-1.0/5.0,0.333333/5.0},
 				{ 0.333333/5.0,0.333333/5.0,0.333333/5,-1.0/5.0}});
-		TreeWithLocations locTree = new TreeWithLocations(root,equalModel);		
+		TreeWithLocations locTree = new TreeWithLocations(root,equalModel,null);		
 		locTree.logLikelihood();
 		System.out.println(locTree.newickProbs());
 		System.out.println(locTree.newickAncestralStateReconstruction());	
@@ -340,7 +340,8 @@ public class TreeWithLocationsTest {
 	@Test
 	public void testNextEvent() throws Exception {
 
-		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1.0/5.0,0.333333/5.0,0.333333/5.0,0.333333/5.0},
+		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]
+				{{-1.0/5.0,0.333333/5,0.333333/5,0.333333/5},
 				{ 0.333333/5.0,-1.0/5.0,0.333333/5.0,0.333333/5.0},
 				{ 0.333333/5.0,0.333333/5.0,-1.0/5.0,0.333333/5.0},
 				{ 0.333333/5.0,0.333333/5.0,0.333333/5,-1.0/5.0}});
@@ -367,10 +368,10 @@ public class TreeWithLocationsTest {
 		assertEquals(0.33333333333333,a[1], 0.01 );
 		assertEquals(0.33333333333333,a[2], 0.01 );
 		assertEquals(0.33333333333333,a[3], 0.01 );
-		assertEquals(5,interval[0], 0.01);
-		assertEquals(5,interval[1], 0.01 );
-		assertEquals(5,interval[2], 0.01 );
-		assertEquals(5,interval[3], 0.01 );
+		assertEquals(5.0,interval[0], 0.01);
+		assertEquals(5.0,interval[1], 0.01 );
+		assertEquals(5.0,interval[2], 0.01 );
+		assertEquals(5.0,interval[3], 0.01 );
 		
 		// TODO: better test
 	}
@@ -429,7 +430,7 @@ public class TreeWithLocationsTest {
 																 { 0.333333,0.333333,0.333333,-1}});
 		TransitionModel[] codonModel = new TransitionModel[]{equalModel,equalModel,equalModel};
 		
-		TreeWithLocations tree = new TreeWithLocations(root, 4, 2);
+		TreeWithLocations tree = new TreeWithLocations(root, 4, 2,null);
 		tree.setMigrationModel(equalModel);
 		tree.setCodonModel(codonModel);
 		

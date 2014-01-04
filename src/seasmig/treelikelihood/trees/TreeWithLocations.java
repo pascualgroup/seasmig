@@ -6,6 +6,7 @@ import java.util.List;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
+import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.TransitionModel.Transition;
@@ -57,8 +58,11 @@ public class TreeWithLocations implements LikelihoodTree {
 	private double seqLogLike;
 	private double locationLogLike;
 
+	private Config config;
+
 	// for test purpose
-	public TreeWithLocations(TreeWithLocationsNode root, int numLocations, int seqLength) {
+	public TreeWithLocations(TreeWithLocationsNode root, int numLocations, int seqLength, Config config) {
+		this.config = config;
 		taxaIndices = null;
 		this.numLocations=numLocations;				
 
@@ -75,7 +79,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	// Generate a random tree based on createTreeModel .... 
-	public TreeWithLocations(TransitionModel createTreeModel, int numNodes) {		
+	public TreeWithLocations(TransitionModel createTreeModel, int numNodes, Config config) {
+		this.config = config;
 		numLocations=createTreeModel.getNumLocations();
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
@@ -87,7 +92,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	// Generate random tree states based on input tree topology and model .... 
-	public TreeWithLocations(TransitionModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree) {
+	public TreeWithLocations(TransitionModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree, Config config) {
+		this.config = config;
 		numLocations=createTreeModel.getNumLocations();
 		ZERO_LOG_PROBS = new double[numLocations];
 		for (int i=0;i<numLocations;i++){
@@ -130,7 +136,8 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime, HashMap<String, Sequence> seqMap_, int seqLength_) {
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime, HashMap<String, Sequence> seqMap_, int seqLength_, Config config) {
+		this.config = config;
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
 		seqMap=seqMap_;
@@ -179,7 +186,8 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 	}
 
-	public TreeWithLocations(TreeWithLocationsNode root_, TransitionModel likelihoodModel_) {
+	public TreeWithLocations(TreeWithLocationsNode root_, TransitionModel likelihoodModel_, Config config) {
+		this.config = config;
 		root = root_;
 		migrationModel=likelihoodModel_;
 		numLocations=migrationModel.getNumLocations();
@@ -258,7 +266,7 @@ public class TreeWithLocations implements LikelihoodTree {
 							DoubleMatrix2D p = null;						
 							// TODO: Util.minValue here for numerics issues, check this... 
 							p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time+Util.minValue);
-							
+
 							for (int loc=0;loc<((seqLength-1)/3+1);loc++) {
 								for (int from = 0; from < 4; from++) {													
 									if ((loc*3+codonPos) >= seqLength) continue;							
@@ -558,7 +566,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO: preorder iterator		
 
 		for (TreeWithLocationsNode child : root.children) { 
-			child.migrations=null;
+			child.migrations=new ArrayList<Transition>();
 			int currentLoc = root.loc;
 			double currentTime = root.time;
 			boolean doneWithBranch = false;
@@ -568,8 +576,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			do {
 				repeats+=1;
 				event = migrationModel.nextEvent(currentTime, currentLoc);
-				if (event.time < child.time) {
-					if (child.migrations==null) child.migrations = new ArrayList<Transition>();					
+				if (event.time < child.time) {				
 					child.migrations.add(event);
 					currentLoc = event.toTrait;
 					currentTime = event.time;
@@ -577,9 +584,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				else if (currentLoc!=child.loc) {
 					// If there is a mismatch between stochastic mapping and child ASR than we 
 					// restart the entire branch
-					if (child.migrations!=null) {
-						child.migrations.clear();
-					}
+					child.migrations.clear();
 					currentLoc = root.loc;
 					currentTime = root.time;
 				} else {
@@ -590,6 +595,8 @@ public class TreeWithLocations implements LikelihoodTree {
 					failedMapping=true;
 				}
 			} while (!doneWithBranch && !failedMapping);
+			// TODO: debugging
+			System.err.println(child.migrations.size());
 			stochsticMapping(child,  maxBranchRetries);
 		}
 	}
@@ -1082,37 +1089,38 @@ public class TreeWithLocations implements LikelihoodTree {
 		System.out.println("Stochastically mapping mutations:");
 		System.out.print("Sequence ASR....");
 		asrSeq();
-		asr();
 		System.out.println("done!");
 		System.out.print("Sequence SM....");
 		stochsticMappingSeq(root, maxBranchRetries);
 		System.out.println("done!");
 
-		System.out.print("Generating output....");
+		System.out.print("Generating output");
 		String returnValue = "{";	
+		int i=0;
+		System.out.println();
 		for (TreeWithLocationsNode node : root) {
+			i++;
+			System.out.print(".");
+			if (i%100==0) System.out.println();
 			for (int codonPosition = 0; codonPosition<3;codonPosition++) {				
 				for (int loc=0; loc<((seqLength-1)/3+1);loc++) {
 					if ((loc*3+codonPosition) >= seqLength) continue;
 					if (node==root) continue;
 					if (node.mutations.get(codonPosition).get(loc)!=null) {						
 						int fromNuc = 0;
-						fromNuc = node.parent.seq.getNuc(loc*3+codonPosition);
-						if (node.mutations.get(codonPosition).get(loc).size()<100) {							
-							for (Transition transition : node.mutations.get(codonPosition).get(loc)) {
+						fromNuc = node.parent.seq.getNuc(loc*3+codonPosition);						
+						for (Transition transition : node.mutations.get(codonPosition).get(loc)) {
+							if (transition.time>config.seqStochasticMappingStartTime) {
 								if (returnValue.charAt(returnValue.length()-1)=='}') returnValue+=",";
 								returnValue+=String.format("{%.3f,",transition.time);
 								returnValue+=Integer.toString(loc*3+codonPosition)+",";
 								returnValue+=Sequence.toChar(fromNuc)+",";
 								returnValue+=Sequence.toChar(transition.toTrait)+",";					
 								returnValue+=getSequenceTransitionLocation(node,transition.time); // TODO: change to SM time at change in node...
-								returnValue+="}";
-								fromNuc=transition.toTrait;
-							}				
-						}
-						else {
-							System.err.println("Too many (>100) mutations on branch ("+node.parent.time+","+node.parent.loc+","+node.loc+","+node.time+") aborting sequence mapping for branch!");
-						}
+								returnValue+="}";								
+							}
+							fromNuc=transition.toTrait;
+						}									
 					}
 				}
 			}
@@ -1130,17 +1138,32 @@ public class TreeWithLocations implements LikelihoodTree {
 		else if (node.migrations.size()==0) {
 			return node.loc;
 		}
-		else {
-			int migrationIndex = node.migrations.size()-1;
-			if (node.migrations.size()<100) {
-				for (int i=(node.migrations.size()-1);i>=0;i--) {
-					if (node.migrations.get(i).time<time) {
-						migrationIndex = i;
-					}
-				}
-				System.err.println("Too many migrations (>100) on branch ("+node.parent.time+","+node.parent.loc+","+node.loc+","+node.time+") using node location");
+		else if (node.migrations.get(0).time>time) 	
+			return node.parent.loc;
+		else
+			return binarySearchMigrations(node.migrations,time).toTrait;			
+	}
+
+
+
+	private Transition binarySearchMigrations(List<Transition> migrations, double time) {
+		int start=0;
+		int end=migrations.size()-1;
+		int current=(start+end)/2;
+		while ((end-start)>1) {
+			if (migrations.get(current).time<time) {
+				start=current;
 			}
-			return node.migrations.get(migrationIndex).toTrait;
+			else {
+				end=current;
+			}
+			current = (start+end)/2;			
+		}
+		if (migrations.get(end).time<time) {
+			return migrations.get(end);
+		}
+		else {
+			return migrations.get(start);
 		}
 	}
 
@@ -1261,8 +1284,6 @@ public class TreeWithLocations implements LikelihoodTree {
 				}		
 				node.seq.set(loc*3+codonPosition,normalizeAndGetRandomSampleFromLogProbs(alphas));
 			}
-
-
 		}
 
 		for (TreeWithLocationsNode child : node.children) {

@@ -84,11 +84,12 @@ public class Sequence implements Serializable {
 
 	public void set(int pos, int value) {
 		switch (value) {
-		case 0: seq[pos]=NUC_T; break;
-		case 1: seq[pos]=NUC_C; break;
-		case 2: seq[pos]=NUC_A; break;
-		case 3: seq[pos]=NUC_G; break;		
+		case 0: seq[pos]=NUC_T; return;
+		case 1: seq[pos]=NUC_C; return;
+		case 2: seq[pos]=NUC_A; return;
+		case 3: seq[pos]=NUC_G; return;		
 		}
+		System.err.println("failed to set nucleotide at position: "+pos+" with value (0-T,1-C,2-A,3-G): "+value);
 	}
 
 	class UNIDENTIFIED_NUCLEOTIDE_EXCEPTION extends Exception {};

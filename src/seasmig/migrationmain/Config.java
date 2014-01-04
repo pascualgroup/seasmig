@@ -95,16 +95,16 @@ public class Config implements Serializable
 	public String checkpointFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\checkpoint.bin";
 	public String priorLikelihoodFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\prior_likelihood.txt";
 	public String mlFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\ml.txt";
-	public long thin = 5;
+	public long thin = 20;
 	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 10; 	// in iterations	
 	public long iterationCount = 100000000L;	
 	public long tuneEvery = 500000; 
 	public long tuneFor = 1;
-	public long mlthin = 1;	
+	public long mlthin = 5;	
 	public long initialHistoryCount = 5;
-	public int chainCount = 4;
+	public int chainCount = 8;
 	public double heatPower = 3.0;
 	public long swapInterval = 1;	
 	public double targetAcceptanceRate = 0.25;
@@ -146,11 +146,11 @@ public class Config implements Serializable
 	public boolean smTrees = true;  // TODO: add alternative with single child branches instead of &map 
 	public boolean smTransitions = true; 
 	public boolean smTipDwellings = true; 
-	public boolean smLineages = true;
-	public boolean smDescendants = true;
+	public boolean smLineages = false;
+	public boolean smDescendants = false;
 	public boolean smTrunkStats = false;
 	public boolean seqMutationStats = true;
-	//public double stochasticMappingStartTime = 1900; // TODO: add this
+	public double seqStochasticMappingStartTime = 1950; 
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\country_map_whoregions.txt"}; // null if locations are loaded from tree
@@ -171,7 +171,7 @@ public class Config implements Serializable
 	// STOCHASTIC MAPPING OF TRUNK
 	public double presentDayTipInterval = 2.25; // width of time interval of recent considered to have "survived" for trunk designation purpose  
 	public double timeToDesignateTrunk = 4.0; // time back from present day tip ancestry designated as trunk 
-	public int maxSMBranchRetries = 20000; // maximum number of retries for stochastically mapping a single branch
+	public int maxSMBranchRetries = 200000; // maximum number of retries for stochastically mapping a single branch
 
 	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_partial_epitopes.fas"};
 

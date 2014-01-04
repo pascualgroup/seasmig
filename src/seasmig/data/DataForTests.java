@@ -107,7 +107,7 @@ public class DataForTests implements Data {
 
 			trees.add(new ArrayList<LikelihoodTree>());
 			for (int i=0;i<=numTestTrees;i++) {
-				TreeWithLocations testTree = new TreeWithLocations(createModel,numTestTips);
+				TreeWithLocations testTree = new TreeWithLocations(createModel,numTestTips,config);
 				testTree.removeInternalLocations();
 				trees.get(0).add(testTree);
 			}
@@ -195,7 +195,7 @@ public class DataForTests implements Data {
 				}
 				System.out.println(" keeping last "+nexsusTreeTail.size()+ " trees");			
 				for (int i=0; i<numTestTrees;i++) {				
-					TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree) nexsusTreeTail.get(Random.nextInt(nexsusTreeTail.size())));
+					TreeWithLocations testTree = new TreeWithLocations(createModel,(SimpleRootedTree) nexsusTreeTail.get(Random.nextInt(nexsusTreeTail.size())),config);
 					testTree.fillRandomTraits();
 					testTree.removeInternalLocations();
 					trees.get(h).add(testTree);				
@@ -281,7 +281,7 @@ public class DataForTests implements Data {
 				if (stateMap==null) {
 					for (jebl.evolution.trees.Tree tree : nexsusTreeTail) {
 						HashMap<String, Sequence> seqMap = new HashMap<String,Sequence>();
-						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,locationMap,numLocations,config.lastTipTime[0],seqMap,0));
+						trees.get(0).add(new TreeWithLocations((SimpleRootedTree) tree,taxaIndices,locationMap,numLocations,config.lastTipTime[0],seqMap,0,config));
 					}
 				}
 				else {
