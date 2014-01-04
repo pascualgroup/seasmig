@@ -58,7 +58,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private double seqLogLike;
 	private double locationLogLike;
 
-	private Config config;
+	private Config config = null;
 
 	// for test purpose
 	public TreeWithLocations(TreeWithLocationsNode root, int numLocations, int seqLength, Config config) {
@@ -334,6 +334,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
 		copyTree.root = new TreeWithLocationsNode(root.seq, root.loc,root.taxonIndex,root.time,null);
 		copyTree.taxaIndices = taxaIndices;
+		copyTree.config=config;
 		treeCopy(this.root, copyTree.root);  
 		return copyTree;			
 	}
