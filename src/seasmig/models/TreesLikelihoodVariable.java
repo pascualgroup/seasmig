@@ -35,12 +35,25 @@ public class TreesLikelihoodVariable extends Variable {
 		public String[] smSeqMigStats = null;
 		public String[] pis = null;
 		public String[] seqMutationStats = null;
+		public Double[] seqLikelihood;
+		public Double[] locLikelihood;
 	}
 	
 
 	@Override
 	public Object makeOutputObject() {		
 		TreesLikelihoodVariableOutputObject outputObject = new TreesLikelihoodVariableOutputObject();
+		
+		outputObject.seqLikelihood=new Double[trees.length];
+		for (int i=0;i<trees.length;i++) {
+			outputObject.seqLikelihood[i]=trees[i].seqLikelihood();
+		}				
+		
+		outputObject.locLikelihood=new Double[trees.length];
+		for (int i=0;i<trees.length;i++) {
+			outputObject.locLikelihood[i]=trees[i].locLikelihood();
+		}
+		
 		switch (config.stateReconstructionAndTreeOutput) {
 		case NONE : {
 			return outputObject;		

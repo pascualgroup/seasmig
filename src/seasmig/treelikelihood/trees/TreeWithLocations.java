@@ -1298,6 +1298,16 @@ public class TreeWithLocations implements LikelihoodTree {
 		}		
 	}
 
+	@Override
+	public Double seqLikelihood() {		
+		return this.seqLogLike;
+	}
+
+	@Override
+	public Double locLikelihood() {
+		return this.locationLogLike;
+	}
+
 
 }
 

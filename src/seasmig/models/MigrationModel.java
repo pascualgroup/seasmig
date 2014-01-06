@@ -31,8 +31,21 @@ public abstract class MigrationModel extends Model implements Serializable {
 		for(Variable var : getUnobservedVariables()) {
 			flatMap.put(var.getName(), var.makeOutputObject());
 		}
-
+		
 		TreesLikelihoodVariableOutputObject outputObject = (TreesLikelihoodVariable.TreesLikelihoodVariableOutputObject) getVariable("likeVar").makeOutputObject();
+		
+		if (outputObject.seqLikelihood!=null) {
+			for (int i=0;i<outputObject.seqLikelihood.length;i++) {
+				flatMap.put("seqLikelihood."+i, outputObject.seqLikelihood[i]);
+			}
+		}
+		
+		if (outputObject.locLikelihood!=null) {
+			for (int i=0;i<outputObject.locLikelihood.length;i++) {
+				flatMap.put("locLikelihood."+i, outputObject.locLikelihood[i]);
+			}
+		}
+		
 		if (outputObject.asrTrees!=null) {
 			for (int i=0;i<outputObject.asrTrees.length;i++) {
 				flatMap.put("trees."+i,String.format("%s",outputObject.asrTrees[i]));

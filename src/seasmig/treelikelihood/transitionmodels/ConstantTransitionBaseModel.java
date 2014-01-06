@@ -11,7 +11,6 @@ import seasmig.treelikelihood.matrixexp.HKY85MatrixExp;
 import seasmig.treelikelihood.matrixexp.JC69MatrixExp;
 import seasmig.treelikelihood.matrixexp.CachedMatrixExponentiator;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
-import seasmig.util.Util;
 
 @SuppressWarnings("serial")
 public class ConstantTransitionBaseModel implements TransitionModel {
