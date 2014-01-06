@@ -3,6 +3,7 @@ package seasmig.treelikelihood.trees;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
@@ -302,6 +303,31 @@ public class TreeWithLocations implements LikelihoodTree {
 			}			
 		}
 		return seqLogLike;		
+	}
+
+	// Only works for binary trees
+	public Iterable<TreeWithLocationsNode> eachPreorder() {		
+		ArrayList<TreeWithLocationsNode> returnValue = new ArrayList<TreeWithLocationsNode>();
+		Stack<TreeWithLocationsNode> nodeStack = new Stack<TreeWithLocationsNode>();
+		TreeWithLocationsNode curr = root;
+		while (true) {
+			while (curr.left() != null) {
+				nodeStack.push(curr);
+				curr = curr.left();
+			}
+			while (true) {
+				returnValue.add(curr);
+				if (curr.right() != null) {
+					curr = curr.right();
+					break;
+				}
+				if (!nodeStack.isEmpty()) {
+					curr = nodeStack.pop();
+				} else {
+					return returnValue;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -1169,13 +1195,13 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	@Override
-	public String pies() {
+	public String pis() {
 
 		String returnValue = "{";	
 		for (int i=0; i<3; i++) {
-			returnValue+="\""+Integer.toString(i)+"\": {";			
+			returnValue+=""+Integer.toString(i)+": {";			
 			for (int j=0; j<3; j++) {
-				returnValue+="\""+Integer.toString(j)+"\": "+codonLikelihoodModel[i].rootfreq(0).get(j);
+				returnValue+=""+Integer.toString(j)+": "+codonLikelihoodModel[i].rootfreq(0).get(j);
 				if (j!=3) returnValue+=",";
 				returnValue+="\n";
 			}

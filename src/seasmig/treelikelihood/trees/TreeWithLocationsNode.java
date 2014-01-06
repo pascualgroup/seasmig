@@ -48,7 +48,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	@Override
 	public Iterator<TreeWithLocationsNode> iterator() {
 		return new postOrderIter(this);
-	}
+	}	
 
 	public boolean isTip() {
 		return this.children.size()==0;
@@ -210,5 +210,19 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 			}	
 		}
 		return returnValue;
+	}
+
+	public TreeWithLocationsNode left() {
+		if (this.children!=null) 
+			if (this.children.size()>0) 
+				return this.children.get(0);
+		return null;			
+	}
+	
+	public TreeWithLocationsNode right() {
+		if (this.children!=null) 
+			if (this.children.size()>1) 
+				return this.children.get(1);
+		return null;			
 	}
 }
