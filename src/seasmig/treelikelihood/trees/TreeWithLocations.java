@@ -48,7 +48,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	// Taxa
 	HashMap<String, Integer> taxaIndices = new HashMap<String,Integer>();
 
-	double[] ZERO_LOG_PROBS;	
+	double[] ZERO_LOG_PROBS ;	
 	private double logLike = 0;
 
 	// for sequences
@@ -96,7 +96,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public TreeWithLocations(TransitionModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree, Config config) {
 		this.config = config;
 		numLocations=createTreeModel.getNumLocations();
-		ZERO_LOG_PROBS = new double[numLocations];
+		ZERO_LOG_PROBS = new double[numLocations]; // TODO: ???
 		for (int i=0;i<numLocations;i++){
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
@@ -213,11 +213,8 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (TreeWithLocationsNode child : node.children ) {
 					// for now caching is done inside likelihood model...
 					DoubleMatrix2D p;						
-					// TODO: check if clause (here for numerics issues) 
-					if (node.time!=child.time && node.loc==child.loc) 												
-						p = migrationModel.transitionMatrix(node.time, child.time);
-					else
-						p = migrationModel.transitionMatrix(node.time, child.time+Util.minValue);
+					//					// TODO: check if clause (here for numerics issues) 
+					p = migrationModel.transitionMatrix(node.time, child.time);
 
 					for (int from = 0; from < numLocations; from++) {
 						double[] alphas = new double[numLocations];						
@@ -266,7 +263,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						for (int codonPos = 0; codonPos <3 ; codonPos++) {
 							DoubleMatrix2D p = null;						
 							// TODO: Util.minValue here for numerics issues, check this... 
-							p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time+Util.minValue);
+							p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time);
 
 							for (int loc=0;loc<((seqLength-1)/3+1);loc++) {
 								for (int from = 0; from < 4; from++) {													
@@ -552,7 +549,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String newickStochasticMapping(int maxBranchRetries) {
-		//asr(); // Ancestral state reconstruction
+		asr(); // Ancestral state reconstruction
 		stochsticMapping(maxBranchRetries);
 
 		return newickSM(root);
@@ -603,22 +600,25 @@ public class TreeWithLocations implements LikelihoodTree {
 					currentLoc = event.toTrait;
 					currentTime = event.time;
 				}
-				else if (currentLoc!=node.loc) {
-					// If there is a mismatch between stochastic mapping and child ASR than we 
-					// restart the entire branch
-					node.migrations.clear();
-					currentLoc = node.parent.loc;
-					currentTime = node.parent.time;
-				} else {
-					doneWithBranch = true;								
+				else {
+					if (currentLoc!=node.loc) {
+						// If there is a mismatch between stochastic mapping and child ASR than we 
+						// restart the entire branch
+						node.migrations.clear();
+						currentLoc = node.parent.loc;
+						currentTime = node.parent.time;
+					} else {
+						doneWithBranch = true;								
+					}
 				}
 				if (repeats>maxBranchRetries) {
-					System.err.println("Failed to stochasticaly map branch locations after "+Integer.toString(maxBranchRetries)+" iterations\nUsing last attempt for output.\nReasons include: 1. Low retry limit. 2. Unconverged matrices 3. Long branch 4. Aggresive rounding of tip time, consider adding jitter to tip times.\n{("+Integer.toString(node.parent.taxonIndex)+","+Double.toString(node.parent.time)+","+Double.toString(node.parent.loc)+"),("+Integer.toString(node.taxonIndex)+","+Double.toString(node.time)+","+Double.toString(node.loc)+")}");					
+					System.err.println("Failed to stochasticaly map branch locations after "+Integer.toString(maxBranchRetries)+" iterations\nReasons include: 1. Low retry limit. 2. Unconverged matrices 3. Long branch 4. Aggresive rounding of tip time, consider adding jitter to tip times.\n{("+Integer.toString(node.parent.taxonIndex)+","+Double.toString(node.parent.time)+","+Double.toString(node.parent.loc)+"),("+Integer.toString(node.taxonIndex)+","+Double.toString(node.time)+","+Double.toString(node.loc)+")}");					
 					failedMapping=true;
+					node.migrations.clear();
 				}
 			} while (!doneWithBranch && !failedMapping);
 			// TODO: debugging
-			System.err.println(node.migrations.size());			
+			System.err.println(node.migrations.size()+" from: ("+node.parent.loc+","+node.parent.time+") to: ("+node.loc+","+node.time+")");			
 		}
 	}
 
@@ -654,6 +654,8 @@ public class TreeWithLocations implements LikelihoodTree {
 				return i;				
 			}			
 		}
+		System.err.println("Error sampling random location from log probs!");
+		System.exit(-1);
 		return TreeWithLocations.ERR_LOCATION;
 	}
 
@@ -1187,14 +1189,14 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=0; i<3; i++) {
 			returnValue+=""+Integer.toString(i)+": {";			
 			for (int j=0; j<3; j++) {
-				returnValue+=""+Integer.toString(j)+": "+codonLikelihoodModel[i].rootfreq(0).get(j);
-				if (j!=3) returnValue+=",";
-				returnValue+="\n";
+				returnValue+='\"'+Integer.toString(j)+'\"'+": "+codonLikelihoodModel[i].rootfreq(0).get(j);
+				if (j!=2) returnValue+=",";
+				returnValue+=" ";
 			}
-			if (i!=3) returnValue+=",";
-			returnValue+="\n";
+			if (i!=2) returnValue+=",";
+			returnValue+='\n';
 		}
-		returnValue+="}\n";			
+		returnValue+="}";			
 		return returnValue;
 	}
 
@@ -1202,6 +1204,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO: test
 		// TODO: cite	
 		for (TreeWithLocationsNode node : eachPreorder()) {
+			if (node.parent==null) continue;
 			if (node.mutations==null) {
 				node.mutations = new ArrayList<ArrayList<ArrayList<TransitionModel.Transition>>>();
 				for (int i=0;i<3;i++) {
@@ -1295,7 +1298,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		}		
 	}
 
-	
+
 }
 
 

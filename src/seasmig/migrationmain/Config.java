@@ -104,7 +104,7 @@ public class Config implements Serializable
 	public long tuneFor = 50;
 	public long mlthin = 5;	
 	public long initialHistoryCount = 5;
-	public int chainCount = 2;
+	public int chainCount = 4;
 	public double heatPower = 3.0;
 	public long swapInterval = 1;	
 	public double targetAcceptanceRate = 0.25;
@@ -149,7 +149,7 @@ public class Config implements Serializable
 	public boolean smLineages = false;
 	public boolean smDescendants = false;
 	public boolean smTrunkStats = false;
-	public boolean seqMutationStats = true;
+	public boolean seqMutationStats = false;
 	public double seqStochasticMappingStartTime = 1980; 
 	
 	// MODEL DATA RELATED PARAMETERS

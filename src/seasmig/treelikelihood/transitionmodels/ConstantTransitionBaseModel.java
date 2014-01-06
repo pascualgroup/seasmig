@@ -11,6 +11,7 @@ import seasmig.treelikelihood.matrixexp.HKY85MatrixExp;
 import seasmig.treelikelihood.matrixexp.JC69MatrixExp;
 import seasmig.treelikelihood.matrixexp.CachedMatrixExponentiator;
 import seasmig.treelikelihood.matrixexp.Matlab7MatrixExp;
+import seasmig.util.Util;
 
 @SuppressWarnings("serial")
 public class ConstantTransitionBaseModel implements TransitionModel {
@@ -197,6 +198,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 		double lambda = -Q[from][from];
 		double time = cern.jet.random.Exponential.staticNextDouble(lambda); 
 		// mean of this exponential is 1/lambda, higher the rate, the shorter the time interval --> nextDouble(lambda) is the correct direction.
+		//System.err.println("lambda: "+String.format("%.3f", lambda)+" interval: "+String.format("%.3f", time)+" Q:"+Util.parse(Q));
 		
 		int first = (from+1)%dimension;
 		double p=-Q[from][first]/Q[from][from];
