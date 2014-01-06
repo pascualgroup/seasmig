@@ -95,14 +95,14 @@ public class Config implements Serializable
 	public String checkpointFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\checkpoint.bin";
 	public String priorLikelihoodFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\prior_likelihood.txt";
 	public String mlFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\ml.txt";
-	public long thin = 100;
+	public long thin = 10;
 	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 10; 	// in iterations	
 	public long iterationCount = 100000000L;	
 	public long tuneEvery = 500000; 
 	public long tuneFor = 1;
-	public long mlthin = 5;	
+	public long mlthin = 1;	
 	public long initialHistoryCount = 5;
 	public int chainCount = 8;
 	public double heatPower = 3.0;

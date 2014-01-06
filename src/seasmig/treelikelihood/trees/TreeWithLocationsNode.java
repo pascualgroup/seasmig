@@ -12,7 +12,7 @@ import seasmig.treelikelihood.TransitionModel.Transition;
 public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLocationsNode> {	
 
 	TreeWithLocationsNode parent = null;
-	List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
+	public List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
 	double time = 0;
 	int taxonIndex = 0;
 

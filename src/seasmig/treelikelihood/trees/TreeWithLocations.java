@@ -589,10 +589,8 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private void stochsticMapping(TreeWithLocationsNode root, int maxBranchRetries) {
 		// TODO: test
-		// TODO: cite
-		// TODO: preorder iterator		
-
-		for (TreeWithLocationsNode child : root.children) { 
+		// TODO: cite		
+		for (TreeWithLocationsNode child : eachPreorder()) { 
 			child.migrations=new ArrayList<Transition>();
 			int currentLoc = root.loc;
 			double currentTime = root.time;
@@ -623,8 +621,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				}
 			} while (!doneWithBranch && !failedMapping);
 			// TODO: debugging
-			System.err.println(child.migrations.size());
-			stochsticMapping(child,  maxBranchRetries);
+			System.err.println(child.migrations.size());			
 		}
 	}
 
@@ -1214,9 +1211,8 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private void stochsticMappingSeq(TreeWithLocationsNode root, int maxBranchRetries) throws Exception {
 		// TODO: test
-		// TODO: cite
-		// TODO: preorder iterator		
-		for (TreeWithLocationsNode child : root.children) {
+		// TODO: cite	
+		for (TreeWithLocationsNode child : eachPreorder()) {
 			if (child.mutations==null) {
 				child.mutations = new ArrayList<ArrayList<ArrayList<TransitionModel.Transition>>>();
 				for (int i=0;i<3;i++) {
@@ -1264,8 +1260,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						}
 					} while (!doneWithBranch && !failedMapping);
 				}				
-			}
-			stochsticMappingSeq(child,  maxBranchRetries);
+			}			
 		}		
 	}
 

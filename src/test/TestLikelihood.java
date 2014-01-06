@@ -11,10 +11,9 @@ import jebl.evolution.io.ImportException;
 import org.junit.Test;
 
 import seasmig.data.Data;
-import seasmig.data.DataForTests;
-import seasmig.data.DataForTests.TestType;
 import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
+import test.DataForTests.TestType;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

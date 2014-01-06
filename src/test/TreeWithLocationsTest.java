@@ -1,4 +1,4 @@
-package seasmig.treelikelihood.trees;
+package test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,9 @@ import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.TransitionModel.Transition;
 import seasmig.treelikelihood.transitionmodels.ConstantTransitionBaseModel;
 import seasmig.treelikelihood.transitionmodels.TwoSeasonMigrationBaseModel;
+import seasmig.treelikelihood.trees.Sequence;
+import seasmig.treelikelihood.trees.TreeWithLocations;
+import seasmig.treelikelihood.trees.TreeWithLocationsNode;
 
 
 public class TreeWithLocationsTest {
@@ -341,7 +344,7 @@ public class TreeWithLocationsTest {
 	public void testNextEvent() throws Exception {
 
 		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]
-				{{-1.0/5.0,0.333333/5,0.333333/5,0.333333/5},
+				{{-1.0*5,0.333333*5,0.333333*5,0.333333*5},
 				{ 0.333333/5.0,-1.0/5.0,0.333333/5.0,0.333333/5.0},
 				{ 0.333333/5.0,0.333333/5.0,-1.0/5.0,0.333333/5.0},
 				{ 0.333333/5.0,0.333333/5.0,0.333333/5,-1.0/5.0}});
@@ -368,10 +371,10 @@ public class TreeWithLocationsTest {
 		assertEquals(0.33333333333333,a[1], 0.01 );
 		assertEquals(0.33333333333333,a[2], 0.01 );
 		assertEquals(0.33333333333333,a[3], 0.01 );
-		assertEquals(5.0,interval[0], 0.01);
-		assertEquals(5.0,interval[1], 0.01 );
-		assertEquals(5.0,interval[2], 0.01 );
-		assertEquals(5.0,interval[3], 0.01 );
+		assertEquals(0.2,interval[0], 0.01);
+		assertEquals(0.2,interval[1], 0.01 );
+		assertEquals(0.2,interval[2], 0.01 );
+		assertEquals(0.2,interval[3], 0.01 );
 		
 		// TODO: better test
 	}

@@ -7,7 +7,6 @@ import java.util.Vector;
 
 import org.junit.Test;
 
-import seasmig.data.DataForTests;
 import seasmig.treelikelihood.MatrixExponentiator;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp2;
 import seasmig.treelikelihood.matrixexp.AnalyticMatrixExp3;

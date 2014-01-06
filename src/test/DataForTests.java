@@ -1,4 +1,4 @@
-package seasmig.data;
+package test;
 
 import java.io.File;
 import java.io.FileReader;
@@ -15,6 +15,7 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.math.Random;
+import seasmig.data.Data;
 import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
