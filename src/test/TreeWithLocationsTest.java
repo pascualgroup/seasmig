@@ -442,4 +442,39 @@ public class TreeWithLocationsTest {
 		
 		assertEquals(expectedResult, logLikelihood,0.01);			
 	}
+	
+	@Test
+	public void testPreorderIter() throws Exception {
+		/* 
+		   --
+		  /   \
+		 AG0   --
+		      /  \
+		    CT1   CC0
+		 
+		 */
+		
+		
+		TreeWithLocationsNode root = new TreeWithLocationsNode(new Sequence(2), TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(new Sequence("ABCD123","AG"),0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(new Sequence(2),TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","CT"), 1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","CC"),0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
+																 { 0.333333,-1,0.333333,0.333333},
+																 { 0.333333,0.333333,-1,0.333333},
+																 { 0.333333,0.333333,0.333333,-1}});
+		TransitionModel[] codonModel = new TransitionModel[]{equalModel,equalModel,equalModel};
+		
+		TreeWithLocations tree = new TreeWithLocations(root, 4, 2,null);
+		tree.setMigrationModel(equalModel);
+		tree.setCodonModel(codonModel);
+			
+		String expectedResult = "??AG??CTCC";
+		String returnValue="";
+		for (TreeWithLocationsNode node : tree.eachPreorder()) {
+			returnValue+=node.seq;			
+		}
+		assertEquals(returnValue,expectedResult);
+	}
 }

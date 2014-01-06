@@ -306,28 +306,24 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	// Only works for binary trees
-	public Iterable<TreeWithLocationsNode> eachPreorder() {		
+	public Iterable<TreeWithLocationsNode> eachPreorder() {
 		ArrayList<TreeWithLocationsNode> returnValue = new ArrayList<TreeWithLocationsNode>();
-		Stack<TreeWithLocationsNode> nodeStack = new Stack<TreeWithLocationsNode>();
-		TreeWithLocationsNode curr = root;
-		while (true) {
-			while (curr.left() != null) {
-				nodeStack.push(curr);
-				curr = curr.left();
+		if(root==null) return returnValue;
+		TreeWithLocationsNode current = root;
+		Stack<TreeWithLocationsNode> stack=new Stack<TreeWithLocationsNode>();
+
+		while(true){
+			while(current!=null){
+				//process current Node
+				returnValue.add(current);
+				stack.push(current);
+				current=current.left();
 			}
-			while (true) {
-				returnValue.add(curr);
-				if (curr.right() != null) {
-					curr = curr.right();
-					break;
-				}
-				if (!nodeStack.isEmpty()) {
-					curr = nodeStack.pop();
-				} else {
-					return returnValue;
-				}
-			}
+			if(stack.isEmpty()) break;
+			current=stack.pop();
+			current=current.right();
 		}
+		return returnValue;
 	}
 
 	@Override
