@@ -95,7 +95,7 @@ public class Config implements Serializable
 	public String checkpointFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\checkpoint.bin";
 	public String priorLikelihoodFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\prior_likelihood.txt";
 	public String mlFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\ml.txt";
-	public long thin = 20;
+	public long thin = 50;
 	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 10; 	// in iterations	
@@ -150,7 +150,7 @@ public class Config implements Serializable
 	public boolean smDescendants = false;
 	public boolean smTrunkStats = false;
 	public boolean seqMutationStats = true;
-	public double seqStochasticMappingStartTime = 1950; 
+	public double seqStochasticMappingStartTime = 1980; 
 	
 	// MODEL DATA RELATED PARAMETERS
 	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\country_map_whoregions.txt"}; // null if locations are loaded from tree
