@@ -595,11 +595,11 @@ public class TreeWithLocations implements LikelihoodTree {
 			int repeats = 0;
 			do {
 				repeats+=1;
-				event = migrationModel.nextEvent(currentTime, currentLoc);
-				currentLoc = event.toTrait;
-				currentTime = event.time;
+				event = migrationModel.nextEvent(currentTime, currentLoc);				
 				if (event.time < node.time) {				
 					node.migrations.add(event);					
+					currentLoc = event.toTrait;
+					currentTime = event.time;
 				}
 				else {
 					if (currentLoc!=node.loc) {
@@ -1229,11 +1229,11 @@ public class TreeWithLocations implements LikelihoodTree {
 					int repeats = 0;
 					do {
 						repeats+=1;
-						event = migrationModel.nextEvent(currentTime, currentNuc);
-						currentNuc = event.toTrait;
-						currentTime = event.time;
+						event = migrationModel.nextEvent(currentTime, currentNuc);						
 						if (event.time < node.time) {					
-							node.mutations.get(codonPosition).get(loc).add(event);							
+							node.mutations.get(codonPosition).get(loc).add(event);
+							currentNuc = event.toTrait;
+							currentTime = event.time;
 						} 
 						else if (currentNuc!=node.seq.getNuc(loc*3+codonPosition)) {
 							// If there is a mismatch between stochastic mapping and child ASR than we 

@@ -53,6 +53,8 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 	private NormalDistribution logkPriorDist;
 	private ExponentialDistribution rateHyperPriorDist;
 	private DoubleVariable rateHyperPrior;
+	private ExponentialDistribution muHyperPriorDist;
+	private DoubleVariable muHyperPrior;
 	protected HKY3CPConstSeasonalMigrationModelNoSeasonality() { }
 
 	public HKY3CPConstSeasonalMigrationModelNoSeasonality(Chain initialChain, Config config, Data data) throws MC3KitException
@@ -84,7 +86,10 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 		ratePriorDist = new ExponentialDistribution(this,"ratePriorDist");
 		ratePriorDist.setRate(rateHyperPrior);		
 		// TODO: add 1/x distribution...
+		muHyperPriorDist = new ExponentialDistribution(this,"muHyperPriorDist");
+		muHyperPrior = new DoubleVariable(this, "muHyperPrior", muHyperPriorDist);
 		muPriorDist = new ExponentialDistribution(this,"muPrior");
+		muPriorDist.setRate(muHyperPrior);
 		// TODO: add Log Normal distribution...
 		logkPriorDist = new NormalDistribution(this,"logkPrior",0,50);
 
@@ -124,6 +129,8 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true, nTrees.length,config);
 
+			// TODO: make sure you don't need to add m.addEdge(m.muHyperPrior,m.muPriorDist); etc... ??
+			
 			// Add dependencies between likelihood variable and parameters
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1) {
