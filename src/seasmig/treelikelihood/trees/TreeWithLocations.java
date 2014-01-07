@@ -583,6 +583,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private void stochsticMapping(int maxBranchRetries) {
 		// TODO: test
 		// TODO: cite		
+		System.err.println(" Q="+migrationModel.parse());
 		for (TreeWithLocationsNode node : eachPreorder()) { 
 			if (node.parent==null) continue;
 			node.migrations=new ArrayList<Transition>();

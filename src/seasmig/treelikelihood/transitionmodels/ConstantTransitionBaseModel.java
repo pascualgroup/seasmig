@@ -195,7 +195,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 	@Override
 	public Transition nextEvent(double from_time, int from) {
 		double lambda = -Q[from][from];
-		double time = cern.jet.random.Exponential.staticNextDouble(lambda); 
+		double time = cern.jet.random.Exponential.staticNextDouble(lambda); // TODO: ??????????
 		// mean of this exponential is 1/lambda, higher the rate, the shorter the time interval --> nextDouble(lambda) is the correct direction.
 		//System.err.println("lambda: "+String.format("%.3f", lambda)+" interval: "+String.format("%.3f", time)+" Q:"+Util.parse(Q));
 		

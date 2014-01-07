@@ -86,7 +86,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 		// TODO: add 1/x distribution...
 		muPriorDist = new ExponentialDistribution(this,"muPrior");
 		// TODO: add Log Normal distribution...
-		logkPriorDist = new NormalDistribution(this,"logkPrior",0,1);
+		logkPriorDist = new NormalDistribution(this,"logkPrior",0,50);
 
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
