@@ -1189,12 +1189,12 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=0; i<3; i++) {
 			returnValue+=""+Integer.toString(i)+": {";			
 			for (int j=0; j<3; j++) {
-				returnValue+='\"'+Integer.toString(j)+'\"'+": "+codonLikelihoodModel[i].rootfreq(0).get(j);
+				returnValue+=Integer.toString(j)+": "+codonLikelihoodModel[i].rootfreq(0).get(j);
 				if (j!=2) returnValue+=",";
 				returnValue+=" ";
 			}
 			if (i!=2) returnValue+=",";
-			returnValue+='\n';
+			returnValue+=" ";
 		}
 		returnValue+="}";			
 		return returnValue;
