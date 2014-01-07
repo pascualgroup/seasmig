@@ -149,7 +149,7 @@ public class Config implements Serializable
 	public boolean smLineages = false;
 	public boolean smDescendants = false;
 	public boolean smTrunkStats = false;
-	public boolean seqMutationStats = true;
+	public boolean seqMutationStats = false;
 	public double seqStochasticMappingStartTime = 1985; 
 	
 	// MODEL DATA RELATED PARAMETERS
