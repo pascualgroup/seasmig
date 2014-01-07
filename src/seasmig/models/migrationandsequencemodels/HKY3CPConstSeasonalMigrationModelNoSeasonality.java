@@ -51,7 +51,8 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 	private ExponentialDistribution ratePriorDist;
 	private ExponentialDistribution muPriorDist;
 	private NormalDistribution logkPriorDist;
-
+	private ExponentialDistribution rateHyperPriorDist;
+	private DoubleVariable rateHyperPrior;
 	protected HKY3CPConstSeasonalMigrationModelNoSeasonality() { }
 
 	public HKY3CPConstSeasonalMigrationModelNoSeasonality(Chain initialChain, Config config, Data data) throws MC3KitException
@@ -77,7 +78,11 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 				treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
 			}
 		}
-		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
+		
+		rateHyperPriorDist = new ExponentialDistribution(this,"rateHyperPriorDist");
+		rateHyperPrior= new DoubleVariable(this, "rateHyperPrior", rateHyperPriorDist);
+		ratePriorDist = new ExponentialDistribution(this,"ratePriorDist");
+		ratePriorDist.setRate(rateHyperPrior);		
 		// TODO: add 1/x distribution...
 		muPriorDist = new ExponentialDistribution(this,"muPrior");
 		// TODO: add Log Normal distribution...
