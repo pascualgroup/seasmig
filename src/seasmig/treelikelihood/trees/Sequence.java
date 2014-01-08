@@ -94,6 +94,7 @@ public class Sequence implements Serializable {
 
 	class UNIDENTIFIED_NUCLEOTIDE_EXCEPTION extends Exception {};
 	public int getNuc(int pos) throws Exception{
+		if (pos>=seq.length) return UNKNOWN_NUC;
 		if (Arrays.equals(seq[pos],NUC_T)) return 0;
 		if (Arrays.equals(seq[pos],NUC_C)) return 1;
 		if (Arrays.equals(seq[pos],NUC_A)) return 2;

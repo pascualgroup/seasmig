@@ -329,16 +329,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		seqLogLikelihood();		
 		logLike = locationLogLike+seqLogLike;
 		return logLike;
-	}
-
-	private void removeInternalLocations(TreeWithLocationsNode node) {
-		if (node.children.size()!=0) {
-			node.loc=TreeWithLocations.UNKNOWN_LOCATION;
-			for (TreeWithLocationsNode child : node.children) {
-				removeInternalLocations(child);				
-			}
-		}				
-	}
+	}	
 
 	@Override
 	public LikelihoodTree copy() {
@@ -388,9 +379,17 @@ public class TreeWithLocations implements LikelihoodTree {
 		return returnValue;
 	}
 
-
-	public void removeInternalLocations() {
-		removeInternalLocations(root);
+	@Override
+	public void clearInternalNodes() {
+		for (TreeWithLocationsNode node : root) {
+			if (node.children!=null) {
+				if (node.children.size()>0) {
+					node.loc=TreeWithLocations.UNKNOWN_LOCATION;
+					node.mutations=null;
+					node.migrations=null;
+				}
+			}
+		}
 
 	}
 	protected TreeWithLocations() {
@@ -583,7 +582,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private void stochasticMapping(int maxBranchRetries) {
 		// TODO: test
 		// TODO: cite		
-		System.err.println(" Q="+migrationModel.parse());
+		//System.err.println(" Q="+migrationModel.parse());
 		for (TreeWithLocationsNode node : eachPreorder()) { 
 			if (node.parent==null) continue;
 			node.migrations=new ArrayList<Transition>();
@@ -613,13 +612,13 @@ public class TreeWithLocations implements LikelihoodTree {
 					}
 				}
 				if (repeats>maxBranchRetries) {
-					System.err.println("Failed to stochasticaly map branch locations after "+Integer.toString(maxBranchRetries)+" iterations\nReasons include: 1. Low retry limit. 2. Unconverged matrices 3. Long branch 4. Aggresive rounding of tip time, consider adding jitter to tip times.\n{("+Integer.toString(node.parent.taxonIndex)+","+Double.toString(node.parent.time)+","+Double.toString(node.parent.loc)+"),("+Integer.toString(node.taxonIndex)+","+Double.toString(node.time)+","+Double.toString(node.loc)+")}");					
+					//System.err.println("Failed to stochasticaly map branch locations after "+Integer.toString(maxBranchRetries)+" iterations\nReasons include: 1. Low retry limit. 2. Unconverged matrices 3. Long branch 4. Aggresive rounding of tip time, consider adding jitter to tip times.\n{("+Integer.toString(node.parent.taxonIndex)+","+Double.toString(node.parent.time)+","+Double.toString(node.parent.loc)+"),("+Integer.toString(node.taxonIndex)+","+Double.toString(node.time)+","+Double.toString(node.loc)+")}");					
 					failedMapping=true;
 					node.migrations.clear();
 				}
 			} while (!doneWithBranch && !failedMapping);
-			// TODO: debugging
-			System.err.println(node.migrations.size()+" from: ("+node.parent.loc+","+node.parent.time+") to: ("+node.loc+","+node.time+")");			
+			
+			//System.err.println(node.migrations.size()+" from: ("+node.parent.loc+","+node.parent.time+") to: ("+node.loc+","+node.time+")");			
 		}
 	}
 
@@ -1130,8 +1129,24 @@ public class TreeWithLocations implements LikelihoodTree {
 								if (returnValue.charAt(returnValue.length()-1)=='}') returnValue+=",";
 								returnValue+=String.format("{%.3f,",transition.time);
 								returnValue+=Integer.toString(loc*3+codonPosition)+",";
-								returnValue+=Sequence.toChar(fromNuc)+",";
-								returnValue+=Sequence.toChar(transition.toTrait)+",";					
+								returnValue+=Sequence.toChar(fromNuc)+",";								
+								returnValue+=Sequence.toChar(transition.toTrait)+",";
+								/// codon
+								if (config.seqMutationsStatsCodonOutput) {
+									char cp0 = Sequence.toChar(node.parent.seq.getNuc(loc*3+0));
+									char cp1 = Sequence.toChar(node.parent.seq.getNuc(loc*3+1));
+									char cp2 = Sequence.toChar(node.parent.seq.getNuc(loc*3+2));
+									returnValue+=cp0+cp1+cp2+",";								
+									returnValue+=(codonPosition==0 ? Sequence.toChar(transition.toTrait) : cp0);
+									returnValue+=(codonPosition==1 ? Sequence.toChar(transition.toTrait) : cp1);
+									returnValue+=(codonPosition==2 ? Sequence.toChar(transition.toTrait) : cp2)+",";
+								}
+								/// source seq						
+								if (config.seqMutationsStatsSeqOutput) {
+									returnValue+=node.parent.seq+",";
+								}
+								///
+								
 								returnValue+=getSequenceTransitionLocation(node,transition.time); // TODO: change to SM time at change in node...
 								returnValue+="}";								
 							}
@@ -1193,9 +1208,9 @@ public class TreeWithLocations implements LikelihoodTree {
 				returnValue+=Integer.toString(j)+": "+codonLikelihoodModel[i].rootfreq(0).get(j);
 				if (j!=2) returnValue+=",";
 				returnValue+=" ";
-			}
-			if (i!=2) returnValue+=",";
+			}			
 			returnValue+="}";
+			if (i!=2) returnValue+=",";
 		}
 		returnValue+="}";			
 		return returnValue;
@@ -1308,6 +1323,9 @@ public class TreeWithLocations implements LikelihoodTree {
 	public Double locLikelihood() {
 		return this.locationLogLike;
 	}
+
+	
+	
 
 
 }
