@@ -91,7 +91,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 		muPriorDist = new ExponentialDistribution(this,"muPrior");
 		muPriorDist.setRate(muHyperPrior);
 		// TODO: add Log Normal distribution...
-		logkPriorDist = new NormalDistribution(this,"logkPrior",0,50);
+		logkPriorDist = new NormalDistribution(this,"logkPrior",0,2);
 
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
@@ -195,11 +195,13 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 			double[] mudoubleForm = new double[3];
 			for (int i=0;i<3;i++) {				
 				mudoubleForm[i]=mu[i].getValue();
+				//System.err.println("mu["+i+"]="+mudoubleForm[i]);
 			}
 			
 			double[] kdoubleForm = new double[3];
 			for (int i=0;i<3;i++) {				
-				kdoubleForm[i]=cern.jet.math.Functions.exp.apply(logk[i].getValue());
+				kdoubleForm[i]=cern.jet.math.Functions.exp.apply(logk[i].getValue());		
+				//System.err.println("kappa["+i+"]="+kdoubleForm[i]);
 			}
 			
 			// TODO: add Dirichlet distribution...
@@ -214,6 +216,9 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 			double[][] pisdoubleform = new double[3][3];
 			for (int i=0;i<3;i++) {
 				pisdoubleform[i] = Util.toDirichletNonDegenerate(forPisdoubleform[i]);
+//				for (int j=0;j<3;j++) {
+//					System.err.println("pi["+i+"]"+"["+j+"]"+"="+pisdoubleform[i][j]);
+//				}
 			}			
 
 			// TODO: add update to migration model instead of reconstructing...
@@ -221,7 +226,9 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 			TransitionModel[] codonModel = new TransitionModel[3];
 			for (int i=0; i<3; i++) {
 				codonModel[i]=new ConstantTransitionBaseModel(mudoubleForm[i],kdoubleForm[i],pisdoubleform[i][0],pisdoubleform[i][1],pisdoubleform[i][2]);
+				//System.err.println(Util.parse(((ConstantTransitionBaseModel) codonModel[i]).Q));
 			}
+			//System.err.println();
 			
 			LikelihoodTree workingCopy;
 			for (int i=0;i<nTrees.length;i++) {

@@ -20,7 +20,7 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 	static final double veryLongTime = 1000; // TODO: move to config...
 
 	// Rate Matrix  
-	double[][] Q = null;
+	public double[][] Q = null;
 	private int dimension = 0;		
 
 	// Matrix Exponentiation
@@ -212,7 +212,9 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 			}			
 		}
 		// TODO: check this
-
+		if (loc>=dimension) {
+			System.err.println("error in stochastic mapping nextEvent, dimension="+dimension+" loc="+loc);
+		}
 		return new Transition(time+from_time, loc);
 	}
 

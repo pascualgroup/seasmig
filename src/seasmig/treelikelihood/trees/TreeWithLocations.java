@@ -550,7 +550,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String newickStochasticMapping(int maxBranchRetries) {
 		asr(); // Ancestral state reconstruction
-		stochsticMapping(maxBranchRetries);
+		stochasticMapping(maxBranchRetries);
 
 		return newickSM(root);
 	}
@@ -580,7 +580,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		return returnValue;
 	}
 
-	private void stochsticMapping(int maxBranchRetries) {
+	private void stochasticMapping(int maxBranchRetries) {
 		// TODO: test
 		// TODO: cite		
 		System.err.println(" Q="+migrationModel.parse());
@@ -1229,7 +1229,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					int repeats = 0;
 					do {
 						repeats+=1;
-						event = migrationModel.nextEvent(currentTime, currentNuc);						
+						event = codonLikelihoodModel[codonPosition].nextEvent(currentTime, currentNuc);						
 						if (event.time < node.time) {					
 							node.mutations.get(codonPosition).get(loc).add(event);
 							currentNuc = event.toTrait;
