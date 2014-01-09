@@ -382,12 +382,13 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public void clearInternalNodes() {
 		for (TreeWithLocationsNode node : root) {
+			node.mutations=null;
+			node.migrations=null;
 			if (node.children!=null) {
 				if (node.children.size()>0) {
 					node.loc=TreeWithLocations.UNKNOWN_LOCATION;
-					node.mutations=null;
-					node.migrations=null;
-				}
+					node.seq=null;
+				}				
 			}
 		}
 
@@ -1133,20 +1134,19 @@ public class TreeWithLocations implements LikelihoodTree {
 								returnValue+=Sequence.toChar(transition.toTrait)+",";
 								/// codon
 								if (config.seqMutationsStatsCodonOutput) {
-									char cp0 = Sequence.toChar(node.parent.seq.getNuc(loc*3+0));
-									char cp1 = Sequence.toChar(node.parent.seq.getNuc(loc*3+1));
-									char cp2 = Sequence.toChar(node.parent.seq.getNuc(loc*3+2));
+									String cp0 = ""+Sequence.toChar(node.parent.seq.getNuc(loc*3+0));
+									String cp1 = ""+Sequence.toChar(node.parent.seq.getNuc(loc*3+1));
+									String cp2 = ""+Sequence.toChar(node.parent.seq.getNuc(loc*3+2));
 									returnValue+=cp0+cp1+cp2+",";								
 									returnValue+=(codonPosition==0 ? Sequence.toChar(transition.toTrait) : cp0);
 									returnValue+=(codonPosition==1 ? Sequence.toChar(transition.toTrait) : cp1);
 									returnValue+=(codonPosition==2 ? Sequence.toChar(transition.toTrait) : cp2)+",";
 								}
-								/// source seq						
+								// source seq						
 								if (config.seqMutationsStatsSeqOutput) {
 									returnValue+=node.parent.seq+",";
 								}
-								///
-								
+																
 								returnValue+=getSequenceTransitionLocation(node,transition.time); // TODO: change to SM time at change in node...
 								returnValue+="}";								
 							}

@@ -95,7 +95,7 @@ public class Config implements Serializable
 	public String checkpointFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\checkpoint.bin";
 	public String priorLikelihoodFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\prior_likelihood.txt";
 	public String mlFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\ml.txt";
-	public long thin = 2;
+	public long thin = 100;
 	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 500; 	// in iterations	
@@ -105,7 +105,7 @@ public class Config implements Serializable
 	public long mlthin = 5;	
 	public long initialHistoryCount = 2;
 	public int chainCount = 8;
-	public double heatPower = 3.0;
+	public double heatPower = 1.0;
 	public long swapInterval = 1;	
 	public double targetAcceptanceRate = 0.25;
 	
@@ -146,8 +146,8 @@ public class Config implements Serializable
 	public boolean smTrees = true;  // TODO: add alternative with single child branches instead of &map 
 	public boolean smTransitions = true; 
 	public boolean smTipDwellings = true; 
-	public boolean smLineages = true;
-	public boolean smDescendants = true;
+	public boolean smLineages = false;
+	public boolean smDescendants = false;
 	public boolean smTrunkStats = true;
 	public boolean seqMutationStats = true;
 	public boolean seqMutationsStatsCodonOutput = true;
@@ -175,9 +175,11 @@ public class Config implements Serializable
 	public double timeToDesignateTrunk = 4.0; // time back from present day tip ancestry designated as trunk 
 	public int maxSMBranchRetries = 200000; // maximum number of retries for stochastically mapping a single branch
 
-	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_partial_epitopes_short.fas"};
+	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_all_epitopes.fas"};
 
 	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
+
+	public double verificationTolerance = 100.0; // TODO: check why verification fails with seq data, and is it just a convergence things.
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

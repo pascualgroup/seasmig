@@ -110,7 +110,7 @@ public class SeasonalMigrationMain
 						config.thin, // Thin historical samples for DEMC in memory
 						config.initialHistoryCount, // Collect this many samples before starting DEMC proposals
 						8, // Minimum number of variables to propose at a time
-						128, // Maximum number of variables to propose at a time
+						32, // Maximum number of variables to propose at a time
 						true, // Use standard "parallel" DEMC proposals (no projection)
 						true, // Also use double-size parallel DEMC proposals
 						true // Also use snooker proposals
@@ -127,7 +127,7 @@ public class SeasonalMigrationMain
 				// Verification step: just asks all models to recalculate
 				// log prior, likelihood from scratch and compares to existing value;
 				// throws an exception if too much error has accumulated.
-				Step verificationStep = new VerificationStep(config.thin, 1E-4);
+				Step verificationStep = new VerificationStep(config.thin, config.verificationTolerance);
 				
 				// Sample output step
 				Step sampOutStep = new SampleOutputStep(config.sampleFilename, config.thin);
