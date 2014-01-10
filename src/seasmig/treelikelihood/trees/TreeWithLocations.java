@@ -88,7 +88,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
 		int rootLocation = getRandomSampleFrom(createTreeModel.rootfreq(0));
-		root = new TreeWithLocationsNode(null, rootLocation,TreeWithLocations.UNKNOWN_TAXA,0,null, false);
+		root = new TreeWithLocationsNode(null, rootLocation,TreeWithLocations.UNKNOWN_TAXA,0,null);
 		makeRandomTree(createTreeModel, root, numNodes);	
 	}
 
@@ -109,7 +109,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		if (rootTaxonIndex==null)
 			rootTaxonIndex = UNKNOWN_TAXA;
-		root = new TreeWithLocationsNode(null, rootLocation,rootTaxonIndex,0,null,false);
+		root = new TreeWithLocationsNode(null, rootLocation,rootTaxonIndex,0,null);
 		makeSubTree(tree,(String)null, root,tree.getRootNode());		
 	}
 
@@ -170,7 +170,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		if (rootTaxonIndex==null)
 			rootTaxonIndex= UNKNOWN_TAXA;
 
-		root = new TreeWithLocationsNode(seq,location,rootTaxonIndex,0,null,false);
+		root = new TreeWithLocationsNode(seq,location,rootTaxonIndex,0,null);
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 		recalibrateTimes(root, lastTipTime);		
 	}
@@ -342,7 +342,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.numIdentifiedSeqs=this.numIdentifiedSeqs;
 		copyTree.numLocations=this.numLocations;		
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
-		copyTree.root = new TreeWithLocationsNode(root.seq, root.loc,root.taxonIndex,root.time,null,false);
+		copyTree.root = new TreeWithLocationsNode(root.seq, root.loc,root.taxonIndex,root.time,null);
 		copyTree.taxaIndices = taxaIndices;
 		copyTree.config=config;
 		treeCopy(this.root, copyTree.root);  
@@ -351,16 +351,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private void treeCopy(TreeWithLocationsNode from, TreeWithLocationsNode to) {
 		for (TreeWithLocationsNode child : from.children) {
-			TreeWithLocationsNode newChild = null;
-			if (child.children==null) { 
-				newChild = new TreeWithLocationsNode(child.seq, child.loc,child.taxonIndex,child.time, to,true);
-			}
-			else if (child.children.size()==0) {
-				newChild = new TreeWithLocationsNode(child.seq, child.loc,child.taxonIndex,child.time, to,true);
-			}
-			else {
-				newChild = new TreeWithLocationsNode(child.seq, child.loc,child.taxonIndex,child.time, to,false);
-			}
+			TreeWithLocationsNode newChild = new TreeWithLocationsNode(child.seq, child.loc,child.taxonIndex,child.time, to);
 			to.children.add(newChild);			
 			treeCopy(child, newChild);
 		}		
@@ -437,7 +428,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				seq = new Sequence(seqLength);
 			}
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			root.children.add(new TreeWithLocationsNode(seq, location,taxonIndex,root.time+inputTree.getLength(node),root,false));			
+			root.children.add(new TreeWithLocationsNode(seq, location,taxonIndex,root.time+inputTree.getLength(node),root));			
 			makeSubTree(inputTree,locationMap, root.children.get(root.children.size()-1), node);			
 		}
 	}
@@ -449,7 +440,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (taxon!=null)
 				taxonIndex = taxaIndices.get(taxon.getName());			
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			outputSubTree.children.add(new TreeWithLocationsNode(new Sequence(seqLength), TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree,false));
+			outputSubTree.children.add(new TreeWithLocationsNode(new Sequence(seqLength), TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
 			makeSubTree(inputTree, locationAttributeName, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
 		}
 
@@ -471,7 +462,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int location=0;location<numLocations;location++) {
 					p=p+Math.exp(m.logprobability(root.loc, location, root.time, to_time));
 					if (cern.jet.random.Uniform.staticNextDouble()<=p) {
-						root.children.add(new TreeWithLocationsNode(new Sequence(seqLength), location,TreeWithLocations.UNKNOWN_LOCATION,to_time,root,false));
+						root.children.add(new TreeWithLocationsNode(new Sequence(seqLength), location,TreeWithLocations.UNKNOWN_LOCATION,to_time,root));
 						break;
 					}
 				}			

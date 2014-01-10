@@ -58,11 +58,11 @@ public class TreeWithLocationsTest {
 
 		double expectedResult = -4.2023210731;
 
-		TreeWithLocationsNode root = new TreeWithLocationsNode(null, TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root,true));
-		root.addChild(new TreeWithLocationsNode(null, TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null, 1,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(null, TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(null, TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null, 1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 				{ 0.333333,-1,0.333333,0.333333},
 				{ 0.333333,0.333333,-1,0.333333},
@@ -106,11 +106,11 @@ public class TreeWithLocationsTest {
 
 		double expectedResult = -4.2023210731;
 
-		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root,true));
-		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		TransitionModel equalModel = new TwoSeasonMigrationBaseModel(
 				new double[][]{{-1*2.0/3.0,0.333333*2.0/3.0,0.333333*2.0/3.0,0.333333*2.0/3.0},
 						{ 0.333333*2.0/3.0,-1*2.0/3.0,0.333333*2.0/3.0,0.333333*2.0/3.0},
@@ -132,11 +132,11 @@ public class TreeWithLocationsTest {
 	@Test
 	public void testLikelihoodTwoSeasons2() throws Exception {		
 
-		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root,true));
-		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 
 		double[][] singleMatrix = makeRandomMigrationMatrix(cern.jet.random.Uniform.staticNextIntFromTo(2, 10),				
 				10*cern.jet.random.Uniform.staticNextDouble());
@@ -194,11 +194,11 @@ public class TreeWithLocationsTest {
 		double expectedResult = -3.5715396865307345; // This wasn't calculated manually but is the output of the run
 		// i.e. good for regression testing
 
-		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root,true));
-		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.2,0.3,0.5},
 				{ 0.333333,-1,0.333333,0.333333},
 				{ 1.333333,0.333333,-4,2.333333},
@@ -222,11 +222,11 @@ public class TreeWithLocationsTest {
 		 */
 
 
-		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root,true));
-		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 				{ 0.333333,-1,0.333333,0.333333},
 				{ 0.333333,0.333333,-1,0.333333},
@@ -239,11 +239,11 @@ public class TreeWithLocationsTest {
 		int countParsimonious = 0;
 		for (int repeat=1; repeat<1000; repeat++) {		
 
-			root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-			root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root,true));
-			root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-			root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
-			root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
+			root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+			root.addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+			root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+			root.children.get(1).addChild(new TreeWithLocationsNode(null,1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+			root.children.get(1).addChild(new TreeWithLocationsNode(null,0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 			equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 					{ 0.333333,-1,0.333333,0.333333},
 					{ 0.333333,0.333333,-1,0.333333},
@@ -282,11 +282,11 @@ public class TreeWithLocationsTest {
 		 */
 
 
-		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-		root.addChild(new TreeWithLocationsNode(null,0,1,1.0,root,true));
-		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,2,2.0,null,true));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,3,2.0,null,true));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(null,0,1,1.0,root));
+		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,2,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,3,2.0,null));
 		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 				{ 0.333333,-1,0.333333,0.333333},
 				{ 0.333333,0.333333,-1,0.333333},
@@ -322,11 +322,11 @@ public class TreeWithLocationsTest {
 		 */		
 
 
-		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-		root.addChild(new TreeWithLocationsNode(null,0,1,1.0,root,true));
-		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,2,2.0,null,true));
-		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,3,2.0,null,true));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(null,0,1,1.0,root));
+		root.addChild(new TreeWithLocationsNode(null,TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,1,2,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(null,0,3,2.0,null));
 		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1.0/5.0,0.333333/5.0,0.333333/5.0,0.333333/5.0},
 				{ 0.333333/5.0,-1.0/5.0,0.333333/5.0,0.333333/5.0},
 				{ 0.333333/5.0,0.333333/5.0,-1.0/5.0,0.333333/5.0},
@@ -480,11 +480,11 @@ public class TreeWithLocationsTest {
 		
 		double expectedResult = -4.2023210731*3;
 		
-		TreeWithLocationsNode root = new TreeWithLocationsNode(new Sequence(2), TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-		root.addChild(new TreeWithLocationsNode(new Sequence("ABCD123","AG"),0,TreeWithLocations.UNKNOWN_TAXA,1.0,root,true));
-		root.addChild(new TreeWithLocationsNode(new Sequence(2),TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","CT"), 1,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
-		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","AG"),0,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(new Sequence(2), TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(new Sequence("ABCD123","AG"),0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(new Sequence(2),TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","CT"), 1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","AG"),0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
@@ -513,11 +513,11 @@ public class TreeWithLocationsTest {
 		 */
 		
 		
-		TreeWithLocationsNode root = new TreeWithLocationsNode(new Sequence(2), TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null,false);		
-		root.addChild(new TreeWithLocationsNode(new Sequence("ABCD123","AG"),0,TreeWithLocations.UNKNOWN_TAXA,1.0,root,true));
-		root.addChild(new TreeWithLocationsNode(new Sequence(2),TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null,false));
-		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","CT"), 1,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
-		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","CC"),0,TreeWithLocations.UNKNOWN_TAXA,2.0,null,true));
+		TreeWithLocationsNode root = new TreeWithLocationsNode(new Sequence(2), TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,0.0,null);		
+		root.addChild(new TreeWithLocationsNode(new Sequence("ABCD123","AG"),0,TreeWithLocations.UNKNOWN_TAXA,1.0,root));
+		root.addChild(new TreeWithLocationsNode(new Sequence(2),TreeWithLocations.UNKNOWN_LOCATION,TreeWithLocations.UNKNOWN_TAXA,1.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","CT"), 1,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
+		root.children.get(1).addChild(new TreeWithLocationsNode(new Sequence("ABCD123","CC"),0,TreeWithLocations.UNKNOWN_TAXA,2.0,null));
 		TransitionModel equalModel = new ConstantTransitionBaseModel(new double[][]{{-1,0.333333,0.333333,0.333333},
 																 { 0.333333,-1,0.333333,0.333333},
 																 { 0.333333,0.333333,-1,0.333333},
