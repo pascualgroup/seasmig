@@ -1136,8 +1136,10 @@ public class TreeWithLocations implements LikelihoodTree {
 								if (config.seqMutationsStatsCodonOutput) {
 									String cp0 = ""+Sequence.toChar(node.parent.seq.getNuc(loc*3+0));
 									String cp1 = ""+Sequence.toChar(node.parent.seq.getNuc(loc*3+1));
-									String cp2 = ""+Sequence.toChar(node.parent.seq.getNuc(loc*3+2));
-									returnValue+=cp0+cp1+cp2+",";								
+									String cp2 = ""+Sequence.toChar(node.parent.seq.getNuc(loc*3+2));															
+									returnValue+=(codonPosition==0 ? Sequence.toChar(fromNuc) : cp0);
+									returnValue+=(codonPosition==1 ? Sequence.toChar(fromNuc) : cp1);
+									returnValue+=(codonPosition==2 ? Sequence.toChar(fromNuc) : cp2)+",";
 									returnValue+=(codonPosition==0 ? Sequence.toChar(transition.toTrait) : cp0);
 									returnValue+=(codonPosition==1 ? Sequence.toChar(transition.toTrait) : cp1);
 									returnValue+=(codonPosition==2 ? Sequence.toChar(transition.toTrait) : cp2)+",";

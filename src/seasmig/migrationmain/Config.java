@@ -95,15 +95,15 @@ public class Config implements Serializable
 	public String checkpointFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\checkpoint.bin";
 	public String priorLikelihoodFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\prior_likelihood.txt";
 	public String mlFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\ml.txt";
-	public long thin = 100;
+	public long thin = 50;
 	
 	// MCMC RELATED PARAMETERS
-	public long burnIn = 500; 	// in iterations	
+	public long burnIn = 200; 	// in iterations	
 	public long iterationCount = 100000000L;	
-	public long tuneEvery = 100; 
-	public long tuneFor = 500;
+	public long tuneEvery = 50; 
+	public long tuneFor = 200;
 	public long mlthin = 5;	
-	public long initialHistoryCount = 2;
+	public long initialHistoryCount = 5;
 	public int chainCount = 8;
 	public double heatPower = 1.0;
 	public long swapInterval = 1;	
@@ -144,11 +144,11 @@ public class Config implements Serializable
 	// STOCHASTIC MAPPING OUTPUT
 	public boolean asrTrees = true;  
 	public boolean smTrees = true;  // TODO: add alternative with single child branches instead of &map 
-	public boolean smTransitions = true; 
+	public boolean smTransitions = false; 
 	public boolean smTipDwellings = true; 
 	public boolean smLineages = false;
 	public boolean smDescendants = false;
-	public boolean smTrunkStats = true;
+	public boolean smTrunkStats = false;
 	public boolean seqMutationStats = true;
 	public boolean seqMutationsStatsCodonOutput = true;
 	public boolean seqMutationsStatsSeqOutput = true;
@@ -158,7 +158,7 @@ public class Config implements Serializable
 	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\country_map_whoregions.txt"}; // null if locations are loaded from tree
 	public String[] treeFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\VP7human.trees"}; // null for test generated data 
 	public double[] treeWeights = {1.0};
-	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
+	public int numTreesFromTail = 25; // at most number of trees to read from tree file's tail
 	public int numLocations = 7; // needs to be specified if locations are loaded from trees....
 	
 	// VARIABLE SELECTION
@@ -179,7 +179,7 @@ public class Config implements Serializable
 
 	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
 
-	public double verificationTolerance = 1.0; // TODO: check why verification fails with seq data, and is it just a convergence things.
+	public double verificationTolerance = 0.1; // TODO: check why verification fails ?ed? with seq data, and is it just a convergence things.
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {
