@@ -34,11 +34,11 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	protected TreeWithLocationsNode() {};
 
 	// Internal Node constructor
-	public TreeWithLocationsNode(Sequence seq_, int loc_, int taxonIndex_, double time_, TreeWithLocationsNode parent_) {
+	public TreeWithLocationsNode(Sequence seq_, int loc_, int taxonIndex_, double time_, TreeWithLocationsNode parent_, boolean tip) {
 		if (seq==null) {
 			seq = noSequence ;
 		}
-		seq=seq_.copy();
+		if (!tip) seq=seq_.copy();
 		loc=loc_;
 		time=time_;
 		parent=parent_;	

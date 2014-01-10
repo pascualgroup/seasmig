@@ -158,7 +158,7 @@ public class Config implements Serializable
 	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\country_map_whoregions.txt"}; // null if locations are loaded from tree
 	public String[] treeFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\VP7human.trees"}; // null for test generated data 
 	public double[] treeWeights = {1.0};
-	public int numTreesFromTail = 5000; // at most number of trees to read from tree file's tail
+	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	public int numLocations = 7; // needs to be specified if locations are loaded from trees....
 	
 	// VARIABLE SELECTION
