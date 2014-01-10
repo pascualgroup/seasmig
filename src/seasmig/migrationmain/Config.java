@@ -179,7 +179,7 @@ public class Config implements Serializable
 
 	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
 
-	public double verificationTolerance = 100.0; // TODO: check why verification fails with seq data, and is it just a convergence things.
+	public double verificationTolerance = 1.0; // TODO: check why verification fails with seq data, and is it just a convergence things.
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

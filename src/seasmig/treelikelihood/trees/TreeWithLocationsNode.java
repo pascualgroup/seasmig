@@ -38,7 +38,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		if (seq==null) {
 			seq = noSequence ;
 		}
-		seq=seq_;// .copy() ???? TODO: ?????
+		seq=seq_.copy();
 		loc=loc_;
 		time=time_;
 		parent=parent_;	
