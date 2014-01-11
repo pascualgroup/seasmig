@@ -731,8 +731,8 @@ public class TreeWithLocations implements LikelihoodTree {
 					if (transitionTimes[fromLocation][transition.toTrait]==null) {
 						transitionTimes[fromLocation][transition.toTrait]=new String();
 					}
-					if (fromLocation!=transition.toTrait) 
-						transitionTimes[fromLocation][transition.toTrait]+=String.format("%.3f,",transition.time);
+					//if (fromLocation!=transition.toTrait) // TODO: this shouldn't happen 
+					transitionTimes[fromLocation][transition.toTrait]+=String.format("%.3f,",transition.time);
 					fromLocation=transition.toTrait;
 				}				
 			}
@@ -1105,10 +1105,10 @@ public class TreeWithLocations implements LikelihoodTree {
 		System.out.println("Stochastically mapping mutations:");
 		System.out.print("Sequence ASR....");
 		asrSeq();
-		System.out.println("done!");
+		System.out.print("done! ");
 		System.out.print("Sequence SM....");
 		stochsticMappingSeq(maxBranchRetries);
-		System.out.println("done!");
+		System.out.print("done! ");
 
 		System.out.print("Generating output");
 		String returnValue = "{";	
@@ -1116,8 +1116,8 @@ public class TreeWithLocations implements LikelihoodTree {
 		System.out.println();
 		for (TreeWithLocationsNode node : root) {
 			i++;
-			System.out.print(".");
-			if (i%100==0) System.out.println();
+			if (i%10==0) System.out.print(".");
+			if (i%1000==0) System.out.println();
 			for (int codonPosition = 0; codonPosition<3;codonPosition++) {				
 				for (int loc=0; loc<((seqLength-1)/3+1);loc++) {
 					if ((loc*3+codonPosition) >= seqLength) continue;
@@ -1146,10 +1146,10 @@ public class TreeWithLocations implements LikelihoodTree {
 								}
 								// source seq						
 								if (config.seqMutationsStatsSeqOutput) {
-									returnValue+=node.parent.seq+",";
-								}
-																
-								returnValue+=getSequenceTransitionLocation(node,transition.time); // TODO: change to SM time at change in node...
+									node.parent.seq.copy().set(loc*3+codonPosition, fromNuc);									
+									returnValue+=node.parent.seq.copy().set(loc*3+codonPosition, fromNuc)+",";
+								}															
+								returnValue+=getSequenceTransitionLocation(node,transition.time); 
 								returnValue+="}";								
 							}
 							fromNuc=transition.toTrait;
@@ -1236,7 +1236,6 @@ public class TreeWithLocations implements LikelihoodTree {
 			for (int codonPosition = 0; codonPosition<3;codonPosition++) {
 				for (int loc=0; loc<((seqLength-1)/3+1);loc++) { 
 					if ((loc*3+codonPosition) >= seqLength) continue;
-
 					node.mutations.get(codonPosition).get(loc).clear();
 					int currentNuc =  node.parent.seq.getNuc(loc*3+codonPosition);
 					double currentTime = node.parent.time;
@@ -1255,9 +1254,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						else if (currentNuc!=node.seq.getNuc(loc*3+codonPosition)) {
 							// If there is a mismatch between stochastic mapping and child ASR than we 
 							// restart the entire branch
-							if (node.mutations.get(codonPosition).get(loc)!=null) {
-								node.mutations.get(codonPosition).get(loc).clear();
-							}
+							node.mutations.get(codonPosition).get(loc).clear();							
 							currentNuc = node.parent.seq.getNuc(loc*3+codonPosition);
 							currentTime = node.parent.time;
 						} 
@@ -1304,7 +1301,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					TreeWithLocationsNode parent = node.parent;
 
 					double[] alphas = new double[4];	
-					// TODO: check if clause (here for numerics issues)
+					// TODO: check need for Util.minValue
 					DoubleMatrix1D p = codonLikelihoodModel[codonPosition].probability(parent.seq.getNuc(loc*3+codonPosition), parent.time, node.time+Util.minValue);
 
 					for (int i=0; i < 4; i++) {								
