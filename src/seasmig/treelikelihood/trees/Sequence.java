@@ -140,6 +140,7 @@ public class Sequence implements Serializable {
 		returnValue.header = header;
 		returnValue.seqStr = seqStr;
 		if (seq==null) return returnValue;
+		if (seq.length<1) return returnValue; 
 		returnValue.seq = new double[seq.length][seq[0].length];
 		for (int i=0;i<seq.length;i++) {
 			if (seq[0]!=null) {
