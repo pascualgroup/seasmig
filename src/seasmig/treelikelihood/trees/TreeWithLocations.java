@@ -1112,8 +1112,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		System.out.print("Generating output");
 		String returnValue = "{";	
-		int i=0;
-		System.out.println();
+		int i=0;		
 		for (TreeWithLocationsNode node : root) {
 			i++;
 			if (i%10==0) System.out.print(".");
