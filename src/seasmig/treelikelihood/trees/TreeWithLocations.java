@@ -8,6 +8,7 @@ import java.util.Stack;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.migrationmain.Config;
+import seasmig.migrationmain.Config.SeqModelType;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.TransitionModel.Transition;
@@ -88,7 +89,10 @@ public class TreeWithLocations implements LikelihoodTree {
 			ZERO_LOG_PROBS[i]=Double.NEGATIVE_INFINITY;
 		}
 		int rootLocation = getRandomSampleFrom(createTreeModel.rootfreq(0));
-		root = new TreeWithLocationsNode(null, rootLocation,TreeWithLocations.UNKNOWN_TAXA,0,null);
+		if (config.seqModelType==SeqModelType.NONE)
+			root = new TreeWithLocationsNode(null, rootLocation,TreeWithLocations.UNKNOWN_TAXA,0,null,false);
+		else
+			root = new TreeWithLocationsNode(null, rootLocation,TreeWithLocations.UNKNOWN_TAXA,0,null,true);
 		makeRandomTree(createTreeModel, root, numNodes);	
 	}
 
@@ -109,7 +113,10 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		if (rootTaxonIndex==null)
 			rootTaxonIndex = UNKNOWN_TAXA;
-		root = new TreeWithLocationsNode(null, rootLocation,rootTaxonIndex,0,null);
+		if (config.seqModelType==SeqModelType.NONE)
+			root = new TreeWithLocationsNode(null, rootLocation,rootTaxonIndex,0,null,false);
+		else
+			root = new TreeWithLocationsNode(null, rootLocation,rootTaxonIndex,0,null,true);
 		makeSubTree(tree,(String)null, root,tree.getRootNode());		
 	}
 
@@ -169,8 +176,12 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		if (rootTaxonIndex==null)
 			rootTaxonIndex= UNKNOWN_TAXA;
-
-		root = new TreeWithLocationsNode(seq,location,rootTaxonIndex,0,null);
+		
+		if (config.seqModelType==SeqModelType.NONE)
+			root = new TreeWithLocationsNode(seq,location,rootTaxonIndex,0,null,false);
+		else
+			root = new TreeWithLocationsNode(seq,location,rootTaxonIndex,0,null,true);
+		
 		makeSubTree(tree,locationMap,root,tree.getRootNode());
 		recalibrateTimes(root, lastTipTime);		
 	}
@@ -342,7 +353,10 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.numIdentifiedSeqs=this.numIdentifiedSeqs;
 		copyTree.numLocations=this.numLocations;		
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
-		copyTree.root = new TreeWithLocationsNode(root.seq, root.loc,root.taxonIndex,root.time,null);
+		if (config.seqModelType==SeqModelType.NONE)
+			copyTree.root = new TreeWithLocationsNode(root.seq, root.loc,root.taxonIndex,root.time,null,false);
+		else
+			copyTree.root = new TreeWithLocationsNode(root.seq, root.loc,root.taxonIndex,root.time,null,true);
 		copyTree.taxaIndices = taxaIndices;
 		copyTree.config=config;
 		treeCopy(this.root, copyTree.root);  
@@ -351,7 +365,11 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private void treeCopy(TreeWithLocationsNode from, TreeWithLocationsNode to) {
 		for (TreeWithLocationsNode child : from.children) {
-			TreeWithLocationsNode newChild = new TreeWithLocationsNode(child.seq, child.loc,child.taxonIndex,child.time, to);
+			TreeWithLocationsNode newChild = null;
+			if (config.seqModelType==SeqModelType.NONE)
+				newChild = new TreeWithLocationsNode(child.seq, child.loc,child.taxonIndex,child.time, to,false);
+			else
+				newChild = new TreeWithLocationsNode(child.seq, child.loc,child.taxonIndex,child.time, to,true);
 			to.children.add(newChild);			
 			treeCopy(child, newChild);
 		}		
@@ -428,7 +446,10 @@ public class TreeWithLocations implements LikelihoodTree {
 				seq = new Sequence(seqLength);
 			}
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			root.children.add(new TreeWithLocationsNode(seq, location,taxonIndex,root.time+inputTree.getLength(node),root));			
+			if (config.seqModelType==SeqModelType.NONE)
+				root.children.add(new TreeWithLocationsNode(seq, location,taxonIndex,root.time+inputTree.getLength(node),root,false));
+			else
+				root.children.add(new TreeWithLocationsNode(seq, location,taxonIndex,root.time+inputTree.getLength(node),root,true));
 			makeSubTree(inputTree,locationMap, root.children.get(root.children.size()-1), node);			
 		}
 	}
@@ -440,7 +461,10 @@ public class TreeWithLocations implements LikelihoodTree {
 			if (taxon!=null)
 				taxonIndex = taxaIndices.get(taxon.getName());			
 			if (taxonIndex==null) taxonIndex = UNKNOWN_TAXA;
-			outputSubTree.children.add(new TreeWithLocationsNode(new Sequence(seqLength), TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree));
+			if (config.seqModelType==SeqModelType.NONE)
+				outputSubTree.children.add(new TreeWithLocationsNode(new Sequence(seqLength), TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree,false));
+			else
+				outputSubTree.children.add(new TreeWithLocationsNode(new Sequence(seqLength), TreeWithLocations.UNKNOWN_LOCATION,taxonIndex,outputSubTree.time+inputTree.getLength(node),outputSubTree,true));
 			makeSubTree(inputTree, locationAttributeName, outputSubTree.children.get(outputSubTree.children.size()-1), node);			
 		}
 
@@ -462,7 +486,10 @@ public class TreeWithLocations implements LikelihoodTree {
 				for (int location=0;location<numLocations;location++) {
 					p=p+Math.exp(m.logprobability(root.loc, location, root.time, to_time));
 					if (cern.jet.random.Uniform.staticNextDouble()<=p) {
-						root.children.add(new TreeWithLocationsNode(new Sequence(seqLength), location,TreeWithLocations.UNKNOWN_LOCATION,to_time,root));
+						if (config.seqModelType==SeqModelType.NONE)
+							root.children.add(new TreeWithLocationsNode(new Sequence(seqLength), location,TreeWithLocations.UNKNOWN_LOCATION,to_time,root,false));
+						else
+							root.children.add(new TreeWithLocationsNode(new Sequence(seqLength), location,TreeWithLocations.UNKNOWN_LOCATION,to_time,root,true));
 						break;
 					}
 				}			
