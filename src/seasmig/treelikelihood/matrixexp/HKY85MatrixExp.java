@@ -28,7 +28,7 @@ public class HKY85MatrixExp implements MatrixExponentiator {
 		this.piA = piA;
 		this.piG = piG;
 		this.piT = 1 - piC - piA - piG;		
-		methodOK = (mu>0) && (kappa>0) && (piC>=0) && (piC<=1.0) && (piA>=0) && (piA<=1.0) && (piG>=0) && (piG<=1.0) && ((piA+piC+piG)<1);
+		methodOK = (mu>=0) && (kappa>=0) && (piC>=0) && (piC<=1.0) && (piA>=0) && (piA<=1.0) && (piG>=0) && (piG<=1.0) && ((piA+piC+piG)<=1);
 		if (!methodOK) {
 			System.err.println("error initializing HKY85 parameters:");
 			System.err.println("mu="+mu+", k="+k+", piC="+piC+", piA="+piA+", piG="+piG+", piT="+this.piT);
