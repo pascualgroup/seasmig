@@ -95,7 +95,7 @@ public class Config implements Serializable
 	public String checkpointFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\checkpoint.bin";
 	public String priorLikelihoodFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\prior_likelihood.txt";
 	public String mlFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\ml.txt";
-	public long thin = 50;
+	public long thin = 2;
 	
 	// MCMC RELATED PARAMETERS
 	public long burnIn = 200; 	// in iterations	
@@ -104,7 +104,7 @@ public class Config implements Serializable
 	public long tuneFor = 200;
 	public long mlthin = 5;	
 	public long initialHistoryCount = 5;
-	public int chainCount = 8;
+	public int chainCount = 3;
 	public double heatPower = 1.0;
 	public long swapInterval = 1;	
 	public double targetAcceptanceRate = 0.25;
@@ -144,7 +144,7 @@ public class Config implements Serializable
 	// STOCHASTIC MAPPING OUTPUT
 	public boolean asrTrees = true;  
 	public boolean smTrees = true;  // TODO: add alternative with single child branches instead of &map 
-	public boolean smTransitions = false; 
+	public boolean smTransitions = true; 
 	public boolean smTipDwellings = true; 
 	public boolean smLineages = false;
 	public boolean smDescendants = false;
@@ -175,7 +175,7 @@ public class Config implements Serializable
 	public double timeToDesignateTrunk = 4.0; // time back from present day tip ancestry designated as trunk 
 	public int maxSMBranchRetries = 200000; // maximum number of retries for stochastically mapping a single branch
 
-	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_all_epitopes.fas"};
+	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_partial_epitopes_short.fas"};
 
 	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
 

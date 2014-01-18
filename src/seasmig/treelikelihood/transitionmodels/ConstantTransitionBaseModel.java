@@ -213,7 +213,12 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 		}
 		// TODO: check this
 		if (loc>=dimension) {
-			System.err.println("error in stochastic mapping nextEvent, dimension="+dimension+" loc="+loc);
+			System.err.println("error in stochastic mapping nextEvent, dimension="+dimension+" loc="+loc+" from="+from);
+			System.exit(-1);
+		}
+		if (loc==from) {
+			System.err.println("error in stochastic mapping nextEvent, dimension="+dimension+" loc="+loc+" from="+from);
+			System.exit(-1);
 		}
 		return new Transition(time+from_time, loc);
 	}

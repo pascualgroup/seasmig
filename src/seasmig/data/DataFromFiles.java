@@ -151,12 +151,12 @@ public class DataFromFiles implements Data
 			HashMap<String,Sequence> seqMap = (HashMap<String,Sequence>) attributes.get("alignments");
 						
 			numLocations = (Integer) attributes.get("numLocations");
-			System.out.println("loaded "+locationMap.size()+" taxon traits");	
+			System.out.println("loaded "+locationMap.size()+" taxon traits"+" from "+locationFilename);	
 			Integer seqLength = (Integer) attributes.get("seqLength");
 			if (seqLength==null) 
 				seqLength=0;
 			if (seqMap!=null)
-				System.out.println("loaded "+seqMap.size()+" sequences");
+				System.out.println("loaded "+seqMap.size()+" sequences"+" from "+alignmentFilename);
 			
 			System.out.print("Reparsing trees... ");
 

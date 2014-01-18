@@ -29,5 +29,6 @@ public interface LikelihoodTree extends Serializable {
 	public Double locLikelihood();
 	
 	// Cleanup after reconstruction
-	public void clearInternalNodes(); 
+	public void clearInternalNodes();
+	public Object getRoot(); // TODO: remove this
 }

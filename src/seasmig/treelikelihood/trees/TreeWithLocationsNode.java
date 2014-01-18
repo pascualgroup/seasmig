@@ -11,12 +11,12 @@ import seasmig.treelikelihood.TransitionModel.Transition;
 @SuppressWarnings("serial")
 public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLocationsNode> {	
 
-	TreeWithLocationsNode parent = null;
+	private TreeWithLocationsNode parent = null;
 	public List<TreeWithLocationsNode> children = new ArrayList<TreeWithLocationsNode>();
 	double time = 0;
 	int taxonIndex = 0;
 
-	int loc = TreeWithLocations.UNKNOWN_LOCATION;
+	private int loc = TreeWithLocations.UNKNOWN_LOCATION;
 	public Sequence seq;
 	
 	public double[] logProbsLOC;
@@ -40,9 +40,9 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		} 	
 		if (useSequenceData)
 			seq=seq_.copy();		
-		loc=loc_;
+		setLoc(loc_);
 		time=time_;
-		parent=parent_;	
+		setParent(parent_);	
 		taxonIndex=taxonIndex_;
 	}
 
@@ -70,8 +70,8 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 		public postOrderIter(TreeWithLocationsNode root) {
 			// Start at left most leaf
-			if (root.parent!=null) {
-				nextIndex=(root.parent.children.get(0)==root ? 0 : 1);
+			if (root.getParent()!=null) {
+				nextIndex=(root.getParent().children.get(0)==root ? 0 : 1);
 			}
 			next=root;
 			while (next.children.size()>0) {
@@ -88,20 +88,20 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		public TreeWithLocationsNode next() {
 			TreeWithLocationsNode returnValue=next;
 			// If more children after this one reach leftmost child of next child
-			if (next.parent!=null) {
-				if ((nextIndex+1)<next.parent.children.size()){
+			if (next.getParent()!=null) {
+				if ((nextIndex+1)<next.getParent().children.size()){
 					nextIndex+=1;
-					next=next.parent.children.get(nextIndex);
+					next=next.getParent().children.get(nextIndex);
 					while (next.children.size()>0) {
 						next=next.children.get(0);
 						nextIndex=0;
 					}
 				}
 				else {
-					next=next.parent;
+					next=next.getParent();
 					if (next!=null) {
-						if (next.parent!=null)
-							nextIndex = (next.parent.children.get(0)==next ? 0 : 1);
+						if (next.getParent()!=null)
+							nextIndex = (next.getParent().children.get(0)==next ? 0 : 1);
 						else
 							nextIndex=0;
 					}
@@ -116,8 +116,8 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		@Override
 		public void remove() {
 			if (next!=null) {		
-				if (next.parent!=null) {
-					next.parent.children.remove((next.parent.children.get(0)==next ? 0 : 1)/*positionBinaryTree(next,next.parent.children)*/);
+				if (next.getParent()!=null) {
+					next.getParent().children.remove((next.getParent().children.get(0)==next ? 0 : 1)/*positionBinaryTree(next,next.parent.children)*/);
 					nextIndex-=1;
 				}
 			}				
@@ -127,7 +127,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 	public void addChild(TreeWithLocationsNode locationTreeNode) {
 		this.children.add(locationTreeNode);
-		locationTreeNode.parent=this;
+		locationTreeNode.setParent(this);
 
 	}
 
@@ -143,8 +143,8 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		double[] logAncProbs = new double[logProbsLOC.length];
 
 		for (int i=0;i<logProbsLOC.length;i++) {	
-			if (parent!=null)
-				logAncStateProbs[i] = logProbsLOC[i]+parent.logProbsLOC[i];
+			if (getParent()!=null)
+				logAncStateProbs[i] = logProbsLOC[i]+getParent().logProbsLOC[i];
 			else
 				logAncStateProbs[i] = logProbsLOC[i]+rootfreq[i];					
 		}
@@ -198,7 +198,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		if (migrations!=null) {
 			if (migrations.size()>0) {	
 				returnValue+="[&map={";
-				double timeFrom = parent.time;
+				double timeFrom = getParent().time;
 
 				for (int i=0;i<migrations.size();i++) {
 					returnValue+=String.format("%.3f", migrations.get(i).time-timeFrom);						
@@ -225,5 +225,21 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 			if (this.children.size()>1) 
 				return this.children.get(1);
 		return null;			
+	}
+
+	public int getLoc() {
+		return loc;
+	}
+
+	public void setLoc(int loc) {
+		this.loc = loc;
+	}
+
+	public TreeWithLocationsNode getParent() {
+		return parent;
+	}
+
+	public void setParent(TreeWithLocationsNode parent) {
+		this.parent = parent;
 	}
 }
