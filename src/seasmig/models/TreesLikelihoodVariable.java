@@ -170,21 +170,21 @@ public class TreesLikelihoodVariable extends Variable {
 				String[] returnValue=new String[trees.length];
 				for (int i=0;i<trees.length;i++) {
 					// TODO: Remove this...
-					for (TreeWithLocationsNode node : (TreeWithLocationsNode) trees[i].getRoot()) { 
-						// TODO: organize this
-						if (node.migrations!=null) {
-							if (node.migrations.size()>0) {
-								if (node.migrations.get(node.migrations.size()-1).toTrait!=node.getLoc()) {
-									System.err.println("failed branch location stochastic mapping (last migration)! (there)");
-									//System.exit(-1);						
-								}
-								if (node.migrations.get(0).toTrait==node.getParent().getLoc()) {
-									System.err.println("failed branch location stochastic mapping (first migration)! (here)");
-									//System.exit(-1);						
-								}
-							}
-						}
-					}
+//					for (TreeWithLocationsNode node : (TreeWithLocationsNode) trees[i].getRoot()) { 
+//						// TODO: organize this
+//						if (node.migrations!=null) {
+//							if (node.migrations.size()>0) {
+//								if (node.migrations.get(node.migrations.size()-1).toTrait!=node.getLoc()) {
+//									System.err.println("failed branch location stochastic mapping (last migration)! (there)");
+//									//System.exit(-1);						
+//								}
+//								if (node.migrations.get(0).toTrait==node.getParent().getLoc()) {
+//									System.err.println("failed branch location stochastic mapping (first migration)! (here)");
+//									//System.exit(-1);						
+//								}
+//							}
+//						}
+//					}
 					returnValue[i]=trees[i].smTransitions();
 				}				
 				outputObject.smTransitions=returnValue;				

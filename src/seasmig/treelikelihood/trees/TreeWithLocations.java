@@ -671,7 +671,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			// System.err.println(node.migrations.size()+" from: ("+node.parent.loc+","+node.parent.time+") to: ("+node.loc+","+node.time+")");			
 		}	
 		
-		System.err.println("finished tree mapping");
+		//System.err.println("finished tree mapping");
 		stochasticallyMapped=true;
 	
 		
