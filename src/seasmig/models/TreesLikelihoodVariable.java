@@ -166,6 +166,7 @@ public class TreesLikelihoodVariable extends Variable {
 				outputObject.asrTrees=returnValue;
 			}
 			if (config.smTransitions) {
+				
 				String[] returnValue=new String[trees.length];
 				for (int i=0;i<trees.length;i++) {
 					// TODO: Remove this...
@@ -175,11 +176,11 @@ public class TreesLikelihoodVariable extends Variable {
 							if (node.migrations.size()>0) {
 								if (node.migrations.get(node.migrations.size()-1).toTrait!=node.getLoc()) {
 									System.err.println("failed branch location stochastic mapping (last migration)! (there)");
-									System.exit(-1);						
+									//System.exit(-1);						
 								}
 								if (node.migrations.get(0).toTrait==node.getParent().getLoc()) {
 									System.err.println("failed branch location stochastic mapping (first migration)! (here)");
-									System.exit(-1);						
+									//System.exit(-1);						
 								}
 							}
 						}

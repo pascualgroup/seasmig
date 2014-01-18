@@ -62,6 +62,10 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private Config config = null;
 
+	private boolean stochasticallyMapped = false;
+
+	private boolean asrDone =false;
+
 	// for test purpose
 	public TreeWithLocations(TreeWithLocationsNode root, int numLocations, int seqLength, Config config) {
 		this.config = config;
@@ -359,6 +363,8 @@ public class TreeWithLocations implements LikelihoodTree {
 			copyTree.root = new TreeWithLocationsNode(root.seq, root.getLoc(),root.taxonIndex,root.time,null,true);
 		copyTree.taxaIndices = taxaIndices;
 		copyTree.config=config;
+		copyTree.stochasticallyMapped=false;
+		copyTree.asrDone=false;
 		treeCopy(this.root, copyTree.root);  
 		return copyTree;			
 	}
@@ -611,6 +617,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		// TODO: test
 		// TODO: cite		
 		//System.err.println(" Q="+migrationModel.parse());
+		if (stochasticallyMapped) return;		
 		for (TreeWithLocationsNode node : eachPreorder()) { 
 			if (node.getParent()==null) continue;
 			node.migrations=new ArrayList<Transition>();
@@ -660,9 +667,13 @@ public class TreeWithLocations implements LikelihoodTree {
 					}
 				}
 			}
-			//System.err.println(node.migrations.size()+" from: ("+node.parent.loc+","+node.parent.time+") to: ("+node.loc+","+node.time+")");			
+			
+			// System.err.println(node.migrations.size()+" from: ("+node.parent.loc+","+node.parent.time+") to: ("+node.loc+","+node.time+")");			
 		}	
 		
+		System.err.println("finished tree mapping");
+		stochasticallyMapped=true;
+	
 		
 	}
 
@@ -704,7 +715,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	private void asr() {
-
+		if (asrDone) return;		
 		// Calculate root state
 		// TODO: check this
 		DoubleMatrix1D rootFreq = migrationModel.rootfreq(root.time);
@@ -723,7 +734,8 @@ public class TreeWithLocations implements LikelihoodTree {
 			}		
 			node.setLoc(normalizeAndGetRandomSampleFromLogProbs(alphas));
 
-		}		
+		}	
+		asrDone=true;
 	}	
 
 	@Override
@@ -778,7 +790,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					//if (fromLocation!=transition.toTrait) // TODO: this shouldn't happen 
 					if (fromLocation==transition.toTrait) {
 						System.err.println("error in stochastic mapping smTransitions"+" from="+fromLocation+" to="+transition.toTrait);
-						System.exit(-1);
+						//System.exit(-1);
 					}
 					transitionTimes[fromLocation][transition.toTrait]+=String.format("%.3f,",transition.time);
 					fromLocation=transition.toTrait;
