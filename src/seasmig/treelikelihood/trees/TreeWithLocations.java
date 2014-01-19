@@ -65,6 +65,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	private boolean stochasticallyMapped = false;
 
 	private boolean asrDone =false;
+	
+	private boolean asrSeqDone =false;
 
 	// for test purpose
 	public TreeWithLocations(TreeWithLocationsNode root, int numLocations, int seqLength, Config config) {
@@ -365,6 +367,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.config=config;
 		copyTree.stochasticallyMapped=false;
 		copyTree.asrDone=false;
+		copyTree.asrSeqDone=false;
 		treeCopy(this.root, copyTree.root);  
 		return copyTree;			
 	}
@@ -1334,6 +1337,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	private void asrSeq() throws Exception {
+		
+		if (asrSeqDone) return;	
 
 		// Add root frequency		
 		DoubleMatrix1D pi[] = new DoubleMatrix1D[3];
@@ -1373,6 +1378,8 @@ public class TreeWithLocations implements LikelihoodTree {
 				}
 			}
 		}		
+		
+		asrSeqDone=true;
 	}
 
 	@Override
