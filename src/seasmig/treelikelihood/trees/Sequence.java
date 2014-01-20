@@ -97,6 +97,7 @@ public class Sequence implements Serializable {
 	}
 
 	public double[] get(int pos) {
+		if (seq==null) fillSeq();
 		return seq[pos];
 	}	
 
@@ -164,7 +165,7 @@ public class Sequence implements Serializable {
 		returnValue.tip = tip;
 		if (seq==null) return returnValue;
 		if (seq.length<1) return returnValue;
-		if (emptySeq) fillSeq();
+		if (emptySeq) return returnValue;
 		returnValue.seq = new double[seq.length][seq[0].length];
 		for (int i=0;i<seq.length;i++) {
 			if (seq[0]!=null) {
