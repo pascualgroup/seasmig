@@ -38,8 +38,12 @@ public class Sequence implements Serializable {
 
 	protected String header = null;
 	private boolean tip;
+	private int seqLength = 0;
+	private boolean emptySeq = true;
 
 	static final int UNKNOWN_NUC = -1;
+	private static final Exception EMPTY_SEQUENCE_EXCEPTION = null;
+	private static final Exception UNIDENTIFIED_NUCLEOTIDE_EXCEPTION = null;
 
 	protected Sequence() {};
 
@@ -47,6 +51,8 @@ public class Sequence implements Serializable {
 	public Sequence(String header_, String seqStr_) {
 		header=header_;
 		seqStr=seqStr_;
+		seqLength=seqStr.length();
+		emptySeq=false;
 		tip=true;
 		seq = new double[seqStr.length()][];
 		for (int i=0;i<seqStr.length();i++) {
@@ -76,9 +82,16 @@ public class Sequence implements Serializable {
 
 	// For constructing internal node sequences
 	public Sequence(int length) {
-		seq = new double[length][];
+		emptySeq = true;
+		seqLength=length;
 		tip=false;
-		for (int i=0;i<length;i++) {
+		seq=null;
+	}
+	
+	private void fillSeq() {
+		emptySeq=false;
+		seq = new double[seqLength][];	
+		for (int i=0;i<seqLength;i++) {
 			seq[i]=INTERNAL; 				
 		}
 	}
@@ -88,6 +101,7 @@ public class Sequence implements Serializable {
 	}	
 
 	public Sequence set(int pos, int value) {
+		if (seq==null) fillSeq();		
 		switch (value) {
 		case 0: seq[pos]=NUC_T; return this;
 		case 1: seq[pos]=NUC_C; return this;
@@ -98,8 +112,8 @@ public class Sequence implements Serializable {
 		return null;
 	}
 
-	class UNIDENTIFIED_NUCLEOTIDE_EXCEPTION extends Exception {};
 	public int getNuc(int pos) throws Exception{
+		if (seq==null) fillSeq();
 		if (pos>=seq.length) return UNKNOWN_NUC;
 		if (Arrays.equals(seq[pos],NUC_T)) return 0;
 		if (Arrays.equals(seq[pos],NUC_C)) return 1;
@@ -107,7 +121,7 @@ public class Sequence implements Serializable {
 		if (Arrays.equals(seq[pos],NUC_G)) return 3;
 		System.err.printf("(%f,%f,%f,%f) ",seq[pos][0],seq[pos][1],seq[pos][2],seq[pos][3]);
 		System.err.println("unidentified nucleotide at position: "+pos+" for sequence with header "+header+" seqLen="+this.length()+"\n"+toString());		
-		throw new UNIDENTIFIED_NUCLEOTIDE_EXCEPTION();		
+		throw UNIDENTIFIED_NUCLEOTIDE_EXCEPTION;		
 	}	
 
 	public String getHeader() {
@@ -115,8 +129,9 @@ public class Sequence implements Serializable {
 	}	
 
 	public String toString() {
+		if (seq==null) fillSeq();
 		String returnValue = "";
-		for (int i=0;i<seq.length;i++) {
+		for (int i=0;i<seqLength;i++) {
 			if (Arrays.equals(seq[i],NUC_T)) returnValue+="T"; 
 			else if (Arrays.equals(seq[i],NUC_C)) returnValue+="C";
 			else if (Arrays.equals(seq[i],NUC_A)) returnValue+="A";
@@ -127,7 +142,7 @@ public class Sequence implements Serializable {
 	}
 
 	public int length() {
-		return seq.length;
+		return seqLength;
 	}
 
 	public static char toChar(int nuc) {
@@ -144,8 +159,12 @@ public class Sequence implements Serializable {
 		Sequence returnValue = new Sequence(0);		
 		returnValue.header = header;
 		returnValue.seqStr = seqStr;
+		returnValue.emptySeq = emptySeq;
+		returnValue.seqLength = seqLength;
+		returnValue.tip = tip;
 		if (seq==null) return returnValue;
-		if (seq.length<1) return returnValue; 
+		if (seq.length<1) return returnValue;
+		if (emptySeq) fillSeq();
 		returnValue.seq = new double[seq.length][seq[0].length];
 		for (int i=0;i<seq.length;i++) {
 			if (seq[0]!=null) {
@@ -157,14 +176,14 @@ public class Sequence implements Serializable {
 		return returnValue;
 	}
 
-	public int getNuc(double[] nuc) throws UNIDENTIFIED_NUCLEOTIDE_EXCEPTION {
+	public static int getNuc(double[] nuc) throws Exception {
 		if (Arrays.equals(nuc,NUC_T)) return 0;
 		if (Arrays.equals(nuc,NUC_C)) return 1;
 		if (Arrays.equals(nuc,NUC_A)) return 2;
 		if (Arrays.equals(nuc,NUC_G)) return 3;
 		System.err.printf("(%f,%f,%f,%f) ",nuc[0],nuc[1],nuc[2],nuc[3]);
 		System.err.println("unidentified nucleotide!\n");		
-		throw new UNIDENTIFIED_NUCLEOTIDE_EXCEPTION();	
+		throw UNIDENTIFIED_NUCLEOTIDE_EXCEPTION;	
 	}
 
 	public boolean isTip() {
