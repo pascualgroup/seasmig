@@ -39,7 +39,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 			seq = noSequence;
 		} 	
 		if (useSequenceData)
-			seq=seq_.copy();		
+			if (!seq.isTip()) seq=seq_.copy();		
 		setLoc(loc_);
 		time=time_;
 		setParent(parent_);	

@@ -37,14 +37,17 @@ public class Sequence implements Serializable {
 	protected String seqStr = null;
 
 	protected String header = null;
+	private boolean tip;
 
 	static final int UNKNOWN_NUC = -1;
 
 	protected Sequence() {};
 
+	// For constructing tip sequences
 	public Sequence(String header_, String seqStr_) {
 		header=header_;
 		seqStr=seqStr_;
+		tip=true;
 		seq = new double[seqStr.length()][];
 		for (int i=0;i<seqStr.length();i++) {
 			switch (seqStr.charAt(i)) { 
@@ -71,8 +74,10 @@ public class Sequence implements Serializable {
 		}
 	}
 
+	// For constructing internal node sequences
 	public Sequence(int length) {
 		seq = new double[length][];
+		tip=false;
 		for (int i=0;i<length;i++) {
 			seq[i]=INTERNAL; 				
 		}
@@ -160,6 +165,10 @@ public class Sequence implements Serializable {
 		System.err.printf("(%f,%f,%f,%f) ",nuc[0],nuc[1],nuc[2],nuc[3]);
 		System.err.println("unidentified nucleotide!\n");		
 		throw new UNIDENTIFIED_NUCLEOTIDE_EXCEPTION();	
+	}
+
+	public boolean isTip() {
+		return tip;
 	}
 
 }
