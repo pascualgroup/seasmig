@@ -167,11 +167,15 @@ public class DataFromFiles implements Data
 				
 			double numIdentifiedLocations=0;
 			double numIdentifiedSeqs=0;
-			for (jebl.evolution.trees.Tree tree : nexusTreeTail) {
+			int numid = 0;
+			for (jebl.evolution.trees.Tree tree : nexusTreeTail) {				
 				trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations,config.lastTipTime[h],seqMap,seqLength,config));
+				numid++;
+				if (numid%10==0) System.out.print(".");
 				numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 				numIdentifiedSeqs+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedSeqs();
 			}
+			System.out.println("done!");
 			numIdentifiedLocations=numIdentifiedLocations/trees.get(h).size();
 			numIdentifiedSeqs=numIdentifiedSeqs/trees.get(h).size();
 			System.out.println("identified "+numIdentifiedLocations+" locations on average per tree");
