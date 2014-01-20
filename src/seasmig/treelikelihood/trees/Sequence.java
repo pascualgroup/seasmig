@@ -163,14 +163,17 @@ public class Sequence implements Serializable {
 		returnValue.emptySeq = emptySeq;
 		returnValue.seqLength = seqLength;
 		returnValue.tip = tip;
+		returnValue.seq = seq;
 		if (seq==null) return returnValue;
 		if (seq.length<1) return returnValue;
 		if (emptySeq) return returnValue;
-		returnValue.seq = new double[seq.length][seq[0].length];
-		for (int i=0;i<seq.length;i++) {
-			if (seq[0]!=null) {
-				for (int j=0;j<seq[0].length;j++) {
-					returnValue.seq[i][j]=seq[i][j];
+		if (!tip) {
+			returnValue.seq = new double[seq.length][seq[0].length];
+			for (int i=0;i<seq.length;i++) {
+				if (seq[0]!=null) {
+					for (int j=0;j<seq[0].length;j++) {
+						returnValue.seq[i][j]=seq[i][j];
+					}
 				}
 			}
 		}
