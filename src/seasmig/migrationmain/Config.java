@@ -150,6 +150,7 @@ public class Config implements Serializable
 	public boolean smLineages = false;
 	public boolean smDescendants = false;
 	public boolean smTrunkStats = false;
+	public boolean smMigrationNodeNumAndTipData = true;
 	public boolean seqMutationStats = true;
 	public boolean seqMutationsStatsCodonOutput = true;
 	public boolean seqMutationsStatsSeqOutput = true;
@@ -187,6 +188,8 @@ public class Config implements Serializable
 	public double[] HKY_3CP_Input_pis0;
 	public double[] HKY_3CP_Input_pis1;
 	public double[] HKY_3CP_Input_pis2;
+
+
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

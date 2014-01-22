@@ -233,7 +233,7 @@ public class TreesLikelihoodVariable extends Variable {
 			
 			String[] returnValue=new String[trees.length];
 			for (int i=0;i<trees.length;i++) {	 			
-				returnValue[i]=trees[i].pis();
+				returnValue[i]=trees[i].pies();
 			}				
 			outputObject.pis=returnValue;											
 

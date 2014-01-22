@@ -669,17 +669,10 @@ public class TreeWithLocations implements LikelihoodTree {
 						System.exit(-1);						
 					}
 				}
-			}
-			
-			// System.err.println(node.migrations.size()+" from: ("+node.parent.loc+","+node.parent.time+") to: ("+node.loc+","+node.time+")");			
-		}	
-		
-		//System.err.println("finished tree mapping");
+			}			
+		}			
 		stochasticallyMapped=true;
-	
-		
 	}
-
 
 	private int getRandomSampleFrom(DoubleMatrix1D doubleMatrix1D) {
 		double p=0;		
@@ -781,8 +774,10 @@ public class TreeWithLocations implements LikelihoodTree {
 
 		String returnValue = "{";
 		String[][] transitionTimes = new String[numLocations][numLocations];		
-
+		
+		int postOrderIndex=0;
 		for (TreeWithLocationsNode node : root) {
+			postOrderIndex++;
 			if (node==root) continue;
 			if (node.migrations!=null) {
 				int fromLocation = node.getParent().getLoc();
@@ -790,12 +785,21 @@ public class TreeWithLocations implements LikelihoodTree {
 					if (transitionTimes[fromLocation][transition.toTrait]==null) {
 						transitionTimes[fromLocation][transition.toTrait]=new String();
 					}
-					//if (fromLocation!=transition.toTrait) // TODO: this shouldn't happen 
-					if (fromLocation==transition.toTrait) {
-						System.err.println("error in stochastic mapping smTransitions"+" from="+fromLocation+" to="+transition.toTrait);
-						//System.exit(-1);
+					assert(fromLocation!=transition.toTrait);
+					if (config.smMigrationNodeNumAndTipData) { 
+						String nodeString = "";
+						// is tip
+						nodeString+="{"+node.isTip()+",";
+						// post order node number
+						nodeString+=Integer.toString(postOrderIndex)+",";
+						// migraration time
+						nodeString+=String.format("%.3f",transition.time)+"},";
+						//
+						transitionTimes[fromLocation][transition.toTrait]+=nodeString;
 					}
-					transitionTimes[fromLocation][transition.toTrait]+=String.format("%.3f,",transition.time);
+					else  {
+						transitionTimes[fromLocation][transition.toTrait]+=String.format("%.3f,",transition.time);
+					}
 					fromLocation=transition.toTrait;
 				}				
 			}
@@ -1210,8 +1214,14 @@ public class TreeWithLocations implements LikelihoodTree {
 								if (config.seqMutationsStatsSeqOutput) {
 									node.getParent().seq.copy().set(loc*3+codonPosition, fromNuc);									
 									returnValue+=node.getParent().seq.copy().set(loc*3+codonPosition, fromNuc)+",";
-								}															
-								returnValue+=getSequenceTransitionLocation(node,transition.time); 
+								}							
+								// location
+								returnValue+=getSequenceTransitionLocation(node,transition.time) + ",";
+								// is tip
+								returnValue+=node.isTip()+",";
+								// post order node number
+								returnValue+=Integer.toString(i);
+								//
 								returnValue+="}";								
 							}
 							fromNuc=transition.toTrait;
@@ -1263,7 +1273,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	@Override
-	public String pis() {
+	public String pies() {
 
 		String returnValue = "{";	
 		for (int i=0; i<3; i++) {
