@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
-import seasmig.treelikelihood.trees.TreeWithLocationsNode;
 import mc3kit.Model;
 import mc3kit.Variable;
 

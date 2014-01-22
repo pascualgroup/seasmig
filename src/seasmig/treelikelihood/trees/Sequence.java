@@ -42,7 +42,6 @@ public class Sequence implements Serializable {
 	private boolean emptySeq = true;
 
 	static final int UNKNOWN_NUC = -1;
-	private static final Exception EMPTY_SEQUENCE_EXCEPTION = null;
 	private static final Exception UNIDENTIFIED_NUCLEOTIDE_EXCEPTION = null;
 
 	protected Sequence() {};

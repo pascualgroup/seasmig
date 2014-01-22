@@ -8,8 +8,6 @@ import mc3kit.DoubleVariable;
 import mc3kit.IntVariable;
 import mc3kit.MC3KitException;
 import mc3kit.distributions.ExponentialDistribution;
-import mc3kit.distributions.NormalDistribution;
-import mc3kit.distributions.UniformDistribution;
 import mc3kit.distributions.UniformIntDistribution;
 import seasmig.data.Data;
 import seasmig.migrationmain.Config;
@@ -18,7 +16,6 @@ import seasmig.models.TreesLikelihoodVariable;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.transitionmodels.ConstantTransitionBaseModel;
-import seasmig.util.Util;
 
 
 @SuppressWarnings("serial")
