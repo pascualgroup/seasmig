@@ -24,7 +24,8 @@ public class Config implements Serializable
 	
 	public static enum SeqModelType { 
 		NONE, // Sequences are not included in likelihood
-		HKY_3CP // HKY model for 3 codon positions
+		HKY_3CP, // HKY model for 3 codon positions
+		HKY_3CP_AS_INPUT 
 	}
 	
 	// CONSTANT
@@ -180,6 +181,12 @@ public class Config implements Serializable
 	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
 
 	public double verificationTolerance = 0.1; // TODO: check why verification fails ?ed? with seq data, and is it just a convergence things.
+
+	public double[] HKY_3CP_Input_mu;
+	public double[] HKY_3CP_Input_k;
+	public double[] HKY_3CP_Input_pis0;
+	public double[] HKY_3CP_Input_pis1;
+	public double[] HKY_3CP_Input_pis2;
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

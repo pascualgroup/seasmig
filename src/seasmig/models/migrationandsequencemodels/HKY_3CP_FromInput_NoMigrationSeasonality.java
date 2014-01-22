@@ -22,18 +22,13 @@ import seasmig.util.Util;
 
 
 @SuppressWarnings("serial")
-public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationModel {
+public class HKY_3CP_FromInput_NoMigrationSeasonality extends MigrationModel {
 
 	// TODO: seperate into two variables for seqence and location likelihood...
 
 	Config config;
 	Data data;
 	int numLocations;
-
-	// HKY sequence model parameters
-	DoubleVariable[] logk;	
-	DoubleVariable[][] forPis; // will be converted to Dirichlet pis
-	DoubleVariable[] mu;
 
 	// Constant migration model parameters
 	DoubleVariable[][] rates;
@@ -48,16 +43,16 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 	private int nTrees[];
 	
 	// Priors
-	private ExponentialDistribution ratePriorDist;
-	private ExponentialDistribution muPriorDist;
-	private NormalDistribution logkPriorDist;
+	private ExponentialDistribution ratePriorDist;	
 	private ExponentialDistribution rateHyperPriorDist;
 	private DoubleVariable rateHyperPrior;
-	private ExponentialDistribution muHyperPriorDist;
-	private DoubleVariable muHyperPrior;
-	protected HKY3CPConstSeasonalMigrationModelNoSeasonality() { }
+	private double[] mudoubleForm;
+	private double[] kdoubleForm;
+	private double[][] pisdoubleForm = new double[3][];
+	
+	protected HKY_3CP_FromInput_NoMigrationSeasonality() { }
 
-	public HKY3CPConstSeasonalMigrationModelNoSeasonality(Chain initialChain, Config config, Data data) throws MC3KitException
+	public HKY_3CP_FromInput_NoMigrationSeasonality(Chain initialChain, Config config, Data data) throws MC3KitException
 	{
 		super(initialChain);
 		this.config = config;
@@ -69,10 +64,13 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 			nTrees[i]=trees.get(i).size();
 		}
 		rates = new DoubleVariable[numLocations][numLocations];
-		forPis = new DoubleVariable[3][3]; // Codon position, rest will be converted to piC, piA, piG
-		logk = new DoubleVariable[3]; // Codon position
-		mu = new DoubleVariable[3]; // Codon position
-
+		
+		mudoubleForm = config.HKY_3CP_Input_mu;
+		kdoubleForm = config.HKY_3CP_Input_k;
+		pisdoubleForm[0]= config.HKY_3CP_Input_pis0;
+		pisdoubleForm[1]= config.HKY_3CP_Input_pis1;
+		pisdoubleForm[2]= config.HKY_3CP_Input_pis2;
+	
 		beginConstruction();
 		treeIndices = new IntVariable[trees.size()];
 		for (int i=0;i<trees.size();i++) {
@@ -84,35 +82,14 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 		rateHyperPriorDist = new ExponentialDistribution(this,"rateHyperPriorDist");
 		rateHyperPrior= new DoubleVariable(this, "rateHyperPrior", rateHyperPriorDist);
 		ratePriorDist = new ExponentialDistribution(this,"ratePriorDist");
-		ratePriorDist.setRate(rateHyperPrior);		
-		// TODO: add 1/x distribution...
-		muHyperPriorDist = new ExponentialDistribution(this,"muHyperPriorDist");
-		muHyperPrior = new DoubleVariable(this, "muHyperPrior", muHyperPriorDist);
-		muPriorDist = new ExponentialDistribution(this,"muPrior");
-		muPriorDist.setRate(muHyperPrior);
-		// TODO: add Log Normal distribution...
-		logkPriorDist = new NormalDistribution(this,"logkPrior",0,2);
+		ratePriorDist.setRate(rateHyperPrior);			
 
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
 				if(i == j) continue; // rateParams[i,i] remains null			
 				rates[i][j] = new DoubleVariable(this, "rateParams."+Integer.toString(i)+"."+Integer.toString(j),ratePriorDist);
 			}
-		}
-		
-		for(int i = 0; i < 3; i++) {
-			mu[i]= new DoubleVariable(this, "mu."+Integer.toString(i),muPriorDist);
-		}
-		
-		for(int i = 0; i < 3; i++) {
-			logk[i]= new DoubleVariable(this, "logk."+Integer.toString(i),logkPriorDist);
-		}
-		
-		for(int i = 0; i < 3; i++) {
-			for(int j = 0; j < 3; j++) {
-				forPis[i][j] = new DoubleVariable(this, "forPis."+Integer.toString(i)+"."+Integer.toString(j),new UniformDistribution(this));
-			}
-		}
+		}		
 
 		// Custom likelihood variable
 		likeVar = new LikelihoodVariable(this);
@@ -123,8 +100,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 
 	private class LikelihoodVariable extends TreesLikelihoodVariable {
 	
-
-		LikelihoodVariable(HKY3CPConstSeasonalMigrationModelNoSeasonality m) throws MC3KitException {
+		LikelihoodVariable(HKY_3CP_FromInput_NoMigrationSeasonality m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true, nTrees.length,config);
@@ -144,20 +120,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 					m.addEdge(this,rates[i][j]);
 				}
 			}
-			
-			for(int i = 0; i < 3; i++) {
-				for(int j = 0; j < 3; j++) {			
-					m.addEdge(this,forPis[i][j]);
-				}
-			}
-			
-			for(int i = 0; i < 3; i++) {			
-				m.addEdge(this,logk[i]);
-			}
-			
-			for(int i = 0; i < 3; i++) {			
-				m.addEdge(this,mu[i]);
-			}
+					
 		}
 
 
@@ -190,46 +153,15 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 					}
 				}
 				ratesdoubleForm[i][i]=rowsum;
-			}
+			}						
 			
-			double[] mudoubleForm = new double[3];
-			for (int i=0;i<3;i++) {				
-				mudoubleForm[i]=mu[i].getValue();
-				//System.err.println("mu["+i+"]="+mudoubleForm[i]);
-			}
-			
-			double[] kdoubleForm = new double[3];
-			for (int i=0;i<3;i++) {				
-				kdoubleForm[i]=cern.jet.math.Functions.exp.apply(logk[i].getValue());		
-				//System.err.println("kappa["+i+"]="+kdoubleForm[i]);
-			}
-			
-			// TODO: add Dirichlet distribution...
-			
-			double[][] forPisdoubleform= new double[3][3];
-			for (int i=0;i<3;i++) {
-				for (int j=0;j<3;j++) {
-					forPisdoubleform[i][j] = forPis[i][j].getValue();
-				}
-			}
-			
-			double[][] pisdoubleform = new double[3][3];
-			for (int i=0;i<3;i++) {
-				pisdoubleform[i] = Util.toDirichletNonDegenerate(forPisdoubleform[i]);
-//				for (int j=0;j<3;j++) {
-//					System.err.println("pi["+i+"]"+"["+j+"]"+"="+pisdoubleform[i][j]);
-//				}
-			}			
-
 			// TODO: add update to migration model instead of reconstructing...
 			TransitionModel migrationBaseModel = new ConstantTransitionBaseModel(ratesdoubleForm);
 			TransitionModel[] codonModel = new TransitionModel[3];
 			for (int i=0; i<3; i++) {
-				codonModel[i]=new ConstantTransitionBaseModel(mudoubleForm[i],kdoubleForm[i],pisdoubleform[i][0],pisdoubleform[i][1],pisdoubleform[i][2]);
-				//System.err.println(Util.parse(((ConstantTransitionBaseModel) codonModel[i]).Q));
+				codonModel[i]=new ConstantTransitionBaseModel(mudoubleForm[i],kdoubleForm[i],pisdoubleForm[i][0],pisdoubleForm[i][1],pisdoubleForm[i][2]);
 			}
-			//System.err.println();
-			
+
 			LikelihoodTree workingCopy;
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1)
@@ -238,7 +170,7 @@ public class HKY3CPConstSeasonalMigrationModelNoSeasonality extends MigrationMod
 					workingCopy = data.getTrees().get(i).get(0).copy();
 				workingCopy.setMigrationModel(migrationBaseModel);
 				workingCopy.setCodonModel(codonModel);
-				logP+=config.treeWeights[i]*workingCopy.logLikelihood();
+				logP+=config.treeWeights[i]*workingCopy.locLikelihood();
 				trees[i]=workingCopy;
 			}
 

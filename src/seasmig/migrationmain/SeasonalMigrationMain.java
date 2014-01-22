@@ -69,7 +69,7 @@ public class SeasonalMigrationMain
 				case NONE:
 					mcmc.setModelFactory(new MigrationModelFactory(config,data));
 					break;
-				case HKY_3CP:
+				case HKY_3CP: case HKY_3CP_AS_INPUT: 
 					mcmc.setModelFactory(new SequenceAndMigrationModelFactory(config,data));
 					break;
 				}
