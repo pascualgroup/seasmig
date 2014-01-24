@@ -28,6 +28,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	
 	private boolean isTrunk = false;
 	private Sequence noSequence = new Sequence(0);
+	public int postOrderIndex;
 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 

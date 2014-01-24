@@ -143,13 +143,18 @@ public class Config implements Serializable
 	public double veryLongTime = 1000;		
 	
 	// STOCHASTIC MAPPING OUTPUT
+	
+	// trees
 	public boolean asrTrees = true;  
-	public boolean smTrees = true;  // TODO: add alternative with single child branches instead of &map 
+	public boolean smTrees = true;  
+	public boolean smAlternativeTreeOutput = true; // nodes and branches
+	
+	// events
 	public boolean smTransitions = true; 
 	public boolean smTipDwellings = true; 
 	public boolean smLineages = false;
 	public boolean smDescendants = false;
-	public boolean smTrunkStats = false;
+	public boolean smTrunkStats = true;
 	public boolean smMigrationNodeNumTipAndSequenceData = true; // output sequence and node data for each migration event
 	public boolean seqMutationStats = true;
 	public boolean seqMutationsStatsCodonOutput = true;
@@ -181,9 +186,10 @@ public class Config implements Serializable
 
 	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
 
-	public double verificationTolerance = 0.1; // TODO: check why verification fails ?ed? with seq data, and is it just a convergence things.
+	public double verificationTolerance = 3; // TODO: check why verification fails ?ed? with seq data, and is it just a convergence things.
 
 	// For sequence stochastic mapping with input HKY model
+	// TODO: test this... 
 	public double[] HKY_3CP_Input_mu;
 	public double[] HKY_3CP_Input_k;
 	public double[] HKY_3CP_Input_pis0;

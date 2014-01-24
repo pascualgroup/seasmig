@@ -12,6 +12,7 @@ import seasmig.migrationmain.Config.SeqModelType;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.TransitionModel.Transition;
+import seasmig.util.AltTreeOutput;
 import seasmig.util.Util;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
@@ -1497,6 +1498,28 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		returnValue+="}";
 		return returnValue;
+	}
+
+	@Override
+	public AltTreeOutput smAlternativeTreeOutput() {
+		AltTreeOutput altTreeOutput = new AltTreeOutput();
+	
+		int postOrderIndex=0;
+		for (TreeWithLocationsNode node : root) {
+			postOrderIndex++;			
+			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), mapMutationsToSequence(node.seq, node.mutations, node.time));
+			node.postOrderIndex=postOrderIndex;
+		}
+		
+		for (TreeWithLocationsNode node : root) {
+			for (TreeWithLocationsNode child : node.children) {
+				altTreeOutput.addBranch(node.postOrderIndex, child.postOrderIndex);
+			}
+		}
+
+		
+		return altTreeOutput;
+		
 	}
 
 

@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import seasmig.migrationmain.Config;
 import seasmig.treelikelihood.LikelihoodTree;
+import seasmig.util.AltTreeOutput;
 import mc3kit.Model;
 import mc3kit.Variable;
 
@@ -24,6 +25,9 @@ public class TreesLikelihoodVariable extends Variable {
 
 	public class TreesLikelihoodVariableOutputObject implements Serializable {		
 		protected TreesLikelihoodVariableOutputObject() {};
+		
+		
+		
 		String[] probTrees = null;
 		public String[] asrTrees = null;
 		public String[] smTrees = null;
@@ -35,8 +39,10 @@ public class TreesLikelihoodVariable extends Variable {
 		public String[] smSeqMigStats = null;
 		public String[] pis = null;
 		public String[] seqMutationStats = null;
+		public AltTreeOutput[] smAlternativeTreeOutput = null;
 		public Double[] seqLikelihood;
 		public Double[] locLikelihood;
+		
 	}
 	
 
@@ -80,6 +86,7 @@ public class TreesLikelihoodVariable extends Variable {
 			}
 			outputObject.asrTrees=returnValue;
 			
+			// TODO: add alternative tree output to ASR without SM
 			return outputObject;
 		}
 		case STOCHASTIC_MAPPING: {					
@@ -102,6 +109,12 @@ public class TreesLikelihoodVariable extends Variable {
 					returnValue[i]=(header + (trees[i].newickAncestralStateReconstruction()));
 				}				
 				outputObject.asrTrees=returnValue;
+			}
+			if (config.smAlternativeTreeOutput) {
+				outputObject.smAlternativeTreeOutput = new AltTreeOutput[trees.length];
+				for (int i=0;i<trees.length;i++) {
+					outputObject.smAlternativeTreeOutput[i] = trees[i].smAlternativeTreeOutput();					 
+				}									
 			}
 			if (config.smTransitions) {
 				String[] returnValue=new String[trees.length];

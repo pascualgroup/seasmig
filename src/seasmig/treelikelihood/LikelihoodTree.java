@@ -2,6 +2,8 @@ package seasmig.treelikelihood;
 
 import java.io.Serializable;
 
+import seasmig.util.AltTreeOutput;
+
 public interface LikelihoodTree extends Serializable {
 	public void setMigrationModel(Object migrationModel);
 	public void setCodonModel(Object codonModel);
@@ -19,8 +21,10 @@ public interface LikelihoodTree extends Serializable {
 	public String smTipDwellings();
 	public String smLineages();
 	public String smDescendants();
-	String smTrunkStats(double presentDayTipInterval,
-			double timeToDesignateTrunk);
+	public String smTrunkStats(double presentDayTipInterval, double timeToDesignateTrunk);
+	
+	// Alternative tree output nodes and branches following stochastic mapping
+	public AltTreeOutput smAlternativeTreeOutput();
 	
 	// Stochastic Mapping & State Reconstruction of Sequence and Location
 	public String seqMutationStats(int maxBranchRetries) throws Exception;
