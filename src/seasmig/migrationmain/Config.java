@@ -183,6 +183,7 @@ public class Config implements Serializable
 
 	public double verificationTolerance = 0.1; // TODO: check why verification fails ?ed? with seq data, and is it just a convergence things.
 
+	// For sequence stochastic mapping with input HKY model
 	public double[] HKY_3CP_Input_mu;
 	public double[] HKY_3CP_Input_k;
 	public double[] HKY_3CP_Input_pis0;

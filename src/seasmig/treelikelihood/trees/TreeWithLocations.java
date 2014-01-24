@@ -65,7 +65,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private boolean stochasticallyMapped = false;
 
 	private boolean asrDone =false;
-	
+
 	private boolean asrSeqDone =false;
 
 	// for test purpose
@@ -770,11 +770,11 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String smTransitions() {
-		
+
 
 		String returnValue = "{";
 		String[][] transitionTimes = new String[numLocations][numLocations];		
-		
+
 		int postOrderIndex=0;
 		for (TreeWithLocationsNode node : root) {
 			postOrderIndex++;
@@ -1200,20 +1200,16 @@ public class TreeWithLocations implements LikelihoodTree {
 								returnValue+=Sequence.toChar(transition.toTrait)+",";
 								/// codon
 								if (config.seqMutationsStatsCodonOutput) {
-									String cp0 = ""+Sequence.toChar(node.getParent().seq.getNuc(loc*3+0));
-									String cp1 = ""+Sequence.toChar(node.getParent().seq.getNuc(loc*3+1));
-									String cp2 = ""+Sequence.toChar(node.getParent().seq.getNuc(loc*3+2));															
-									returnValue+=(codonPosition==0 ? Sequence.toChar(fromNuc) : cp0);
-									returnValue+=(codonPosition==1 ? Sequence.toChar(fromNuc) : cp1);
-									returnValue+=(codonPosition==2 ? Sequence.toChar(fromNuc) : cp2)+",";
-									returnValue+=(codonPosition==0 ? Sequence.toChar(transition.toTrait) : cp0);
-									returnValue+=(codonPosition==1 ? Sequence.toChar(transition.toTrait) : cp1);
-									returnValue+=(codonPosition==2 ? Sequence.toChar(transition.toTrait) : cp2)+",";
+									String fromCodon=mapMutationsToCodon(node.getParent().seq, loc, node.mutations, transition.time);								
+									returnValue+=fromCodon+",";
+									returnValue+=(codonPosition==0 ? Sequence.toChar(transition.toTrait) : fromCodon.charAt(0));
+									returnValue+=(codonPosition==1 ? Sequence.toChar(transition.toTrait) : fromCodon.charAt(1));
+									returnValue+=(codonPosition==2 ? Sequence.toChar(transition.toTrait) : fromCodon.charAt(2));
 								}
 								// source seq						
 								if (config.seqMutationsStatsSeqOutput) {
-									node.getParent().seq.copy().set(loc*3+codonPosition, fromNuc);									
-									returnValue+=node.getParent().seq.copy().set(loc*3+codonPosition, fromNuc)+",";
+									String fromSeq=mapMutationsToSequence(node.getParent().seq, node.mutations, transition.time);
+									returnValue+=fromSeq+",";
 								}							
 								// location
 								returnValue+=getSequenceTransitionLocation(node,transition.time) + ",";
@@ -1232,6 +1228,43 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		returnValue+="}";
 		System.out.println("done!");
+		return returnValue;
+	}
+
+	private String mapMutationsToSequence(Sequence seq,
+			ArrayList<ArrayList<ArrayList<Transition>>> mutations, double upToTime) {
+		Sequence seqCopy = seq.copy();
+		for (int loc=0; loc<((seqLength-1)/3+1);loc++) {
+			for (int cp = 0; cp<3; cp++) {
+				if ((loc*3+cp) >= seqLength) continue;	
+				for (Transition mutation : mutations.get(cp).get(loc)) {
+					if (mutation.time<upToTime) {
+						seqCopy.set(loc*3+cp, mutation.toTrait);
+					}
+				}
+			}
+		}
+		return seqCopy.toString();
+	}
+
+	private String mapMutationsToCodon(Sequence seq, int loc,
+			ArrayList<ArrayList<ArrayList<Transition>>> mutations, double upToTime) {
+		Sequence seqCopy = seq.copy();
+		for (int cp = 0; cp<3; cp++) {
+			for (Transition mutation : mutations.get(cp).get(loc)) {
+				if (mutation.time<upToTime) {
+					seqCopy.set(loc*3+cp, mutation.toTrait);
+				}
+			}
+		}
+		String returnValue=new String();
+		for (int cp = 0; cp<3; cp++) {
+			try {
+				returnValue+=Sequence.toChar(seqCopy.getNuc(loc*3+cp));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		return returnValue;
 	}
 
@@ -1347,7 +1380,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	private void asrSeq() throws Exception {
-		
+
 		if (asrSeqDone) return;	
 
 		// Add root frequency		
@@ -1388,7 +1421,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				}
 			}
 		}		
-		
+
 		asrSeqDone=true;
 	}
 
