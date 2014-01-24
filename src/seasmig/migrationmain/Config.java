@@ -150,7 +150,7 @@ public class Config implements Serializable
 	public boolean smLineages = false;
 	public boolean smDescendants = false;
 	public boolean smTrunkStats = false;
-	public boolean smMigrationNodeNumAndTipData = true;
+	public boolean smMigrationNodeNumTipAndSequenceData = true; // output sequence and node data for each migration event
 	public boolean seqMutationStats = true;
 	public boolean seqMutationsStatsCodonOutput = true;
 	public boolean seqMutationsStatsSeqOutput = true;

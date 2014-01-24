@@ -527,7 +527,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	public String newickProbs() {	 
-		return newickProbs(root,migrationModel.rootfreq(root.time).toArray()) + "\n";
+		return newickProbs(root,migrationModel.rootfreq(root.time).toArray());
 	}
 
 	private String newickProbs(TreeWithLocationsNode treePart, double[] rootFreq) {
@@ -738,7 +738,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public String newickAncestralStateReconstruction() {
 		// TODO: Check this
 		asr();
-		String returnValue = newickStates(root) + "\n";
+		String returnValue = newickStates(root);
 		return returnValue;
 
 	}
@@ -786,7 +786,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						transitionTimes[fromLocation][transition.toTrait]=new String();
 					}
 					assert(fromLocation!=transition.toTrait);
-					if (config.smMigrationNodeNumAndTipData) { 
+					if (config.smMigrationNodeNumTipAndSequenceData) { 
 						String nodeString = "";
 						// is tip
 						nodeString+="{"+node.isTip()+",";
@@ -1434,10 +1434,69 @@ public class TreeWithLocations implements LikelihoodTree {
 	public Double locLikelihood() {
 		return this.locationLogLike;
 	}
-
+	
 	@Override
-	public Object getRoot() {
-		return root;
+	public String seqMigrationsSeqOutput() throws Exception {
+		String returnValue = "{";
+		String[][] transitionTimes = new String[numLocations][numLocations];		
+
+		int postOrderIndex=0;
+		for (TreeWithLocationsNode node : root) {
+			postOrderIndex++;
+			if (node==root) continue;
+			if (node.migrations!=null) {
+				int fromLocation = node.getParent().getLoc();
+				for (Transition transition : node.migrations) {
+					if (transitionTimes[fromLocation][transition.toTrait]==null) {
+						transitionTimes[fromLocation][transition.toTrait]=new String();
+					}
+					assert(fromLocation!=transition.toTrait);
+					if (config.smMigrationNodeNumTipAndSequenceData) { 
+						String nodeString = "";
+						// is tip
+						nodeString+="{"+node.isTip()+",";
+						// post order node number
+						nodeString+=Integer.toString(postOrderIndex)+",";
+						// migraration time
+						nodeString+=String.format("%.3f",transition.time)+",";
+						// sequence at migration
+						nodeString+=mapMutationsToSequence(node.getParent().seq, node.mutations, transition.time)+"},";
+						// add to list
+						transitionTimes[fromLocation][transition.toTrait]+=nodeString;
+					}
+					else  {
+						transitionTimes[fromLocation][transition.toTrait]+=String.format("%.3f,",transition.time);
+					}
+					fromLocation=transition.toTrait;
+				}				
+			}
+		}
+
+		for (int i=0;i<numLocations;i++) {
+			returnValue+="{";
+			for (int j=0;j<numLocations;j++) {						
+				if (transitionTimes[i][j]!=null) {
+					if (transitionTimes[i][j].length()>=2) { 
+						returnValue+="{"+transitionTimes[i][j].substring(0, transitionTimes[i][j].length()-1)+"}";
+					}
+					else {
+						returnValue+="{}";
+					}
+				}
+				else {
+					returnValue+="{}";
+				}
+				if (j!=(numLocations-1)) {
+					returnValue+=",";
+				}				
+			}
+			returnValue+="}";
+			if (i!=(numLocations-1)) {
+				returnValue+=",";
+			}
+		}
+		returnValue+="}";
+		return returnValue;
 	}
 
 

@@ -24,11 +24,11 @@ public interface LikelihoodTree extends Serializable {
 	
 	// Stochastic Mapping & State Reconstruction of Sequence and Location
 	public String seqMutationStats(int maxBranchRetries) throws Exception;
+	public String seqMigrationsSeqOutput() throws Exception;
 	String pies();
 	public Double seqLikelihood();
 	public Double locLikelihood();
 	
 	// Cleanup after reconstruction
 	public void clearInternalNodes();
-	public Object getRoot(); // TODO: remove this
 }
