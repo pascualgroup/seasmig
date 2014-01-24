@@ -1,6 +1,8 @@
 package seasmig.treelikelihood.trees;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -68,6 +70,14 @@ public class TreeWithLocations implements LikelihoodTree {
 	private boolean asrDone =false;
 
 	private boolean asrSeqDone =false;
+
+	static final Comparator<TreeWithLocationsNode> descendantOrder = new Comparator<TreeWithLocationsNode>() {
+		public int compare(TreeWithLocationsNode v1, TreeWithLocationsNode v2) {
+			Integer descendantsV1 = new Integer(getNumberOfDescendants(v1));
+			Integer descendantsV2 = new Integer(getNumberOfDescendants(v2));
+			return descendantsV1.compareTo(descendantsV2);
+		}
+	};	
 
 	// for test purpose
 	public TreeWithLocations(TreeWithLocationsNode root, int numLocations, int seqLength, Config config) {
@@ -1435,7 +1445,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public Double locLikelihood() {
 		return this.locationLogLike;
 	}
-	
+
 	@Override
 	public String seqMigrationsSeqOutput() throws Exception {
 		String returnValue = "{";
@@ -1502,28 +1512,103 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public AltTreeOutput smAlternativeTreeOutput() {
+		
+		setLayoutByDescendants();
+		
 		AltTreeOutput altTreeOutput = new AltTreeOutput();
-	
+
 		int postOrderIndex=0;
 		for (TreeWithLocationsNode node : root) {
 			postOrderIndex++;			
-			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), mapMutationsToSequence(node.seq, node.mutations, node.time));
+			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(), mapMutationsToSequence(node.seq, node.mutations, node.time));
 			node.postOrderIndex=postOrderIndex;
 		}
-		
+
 		for (TreeWithLocationsNode node : root) {
 			for (TreeWithLocationsNode child : node.children) {
 				altTreeOutput.addBranch(node.postOrderIndex, child.postOrderIndex);
 			}
 		}
 
-		
+
 		return altTreeOutput;
-		
+
+	}
+
+	// sets node layout based on a postorder traversal & number of descendants 
+	public void setLayoutByDescendants() {
+
+		sortChildrenByDescendants();
+
+		Stack<TreeWithLocationsNode> reverseList = new Stack<TreeWithLocationsNode>();
+
+		// set layout of tips based on traversal
+		float y = 0;
+		for (TreeWithLocationsNode s : root) {
+			reverseList.push(s);
+			if (s.isTip()) {
+				s.setLayout(y);
+				y++;
+			}
+		}
+
+		// update layout of internal nodes
+		while (!reverseList.empty()) {
+			TreeWithLocationsNode s = reverseList.pop();
+			if (s.children.size() > 0) {
+				float mean = 0;
+				for (TreeWithLocationsNode child : s.children) {
+					mean += child.getLayout();
+				}
+				mean /= s.children.size();
+				s.setLayout(mean);
+			}
+		}
+
+	}	
+
+
+	// sorts children lists so that first member is child with more descendents than second member
+	public static void sortChildrenByDescendants(TreeWithLocationsNode r) {
+
+		Collections.sort(r.children, descendantOrder);
+
+		Stack<TreeWithLocationsNode> S = new Stack<TreeWithLocationsNode>();
+		TreeWithLocationsNode u;
+
+		S.push(r);
+		while (!S.isEmpty()) {
+			u = S.pop();
+			for (TreeWithLocationsNode s : u.children) {
+				Collections.sort(s.children, descendantOrder);
+				S.push(s);                
+			}
+		}        
+	}	
+
+	public void sortChildrenByDescendants() {
+		sortChildrenByDescendants(root);
 	}
 
 
+	public static int getNumberOfDescendants(TreeWithLocationsNode r) {
 
+		int numberOfDescendants = 0;
+
+		Stack<TreeWithLocationsNode> S = new Stack<TreeWithLocationsNode>();
+		TreeWithLocationsNode u;
+
+		S.push(r);
+		while (!S.isEmpty()) {
+			u = S.pop();
+			for (TreeWithLocationsNode s : u.children) {
+				numberOfDescendants+=1;
+				S.push(s);                
+			}
+		}        
+
+		return numberOfDescendants;
+	}
 
 
 }

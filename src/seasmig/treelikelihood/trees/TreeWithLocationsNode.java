@@ -29,6 +29,7 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	private boolean isTrunk = false;
 	private Sequence noSequence = new Sequence(0);
 	public int postOrderIndex;
+	private float layout;
 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
 
@@ -242,5 +243,13 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 	public void setParent(TreeWithLocationsNode parent) {
 		this.parent = parent;
+	}
+
+	public void setLayout(float y) {
+		this.layout=y;		
+	}
+
+	public float getLayout() {
+		return layout;
 	}
 }
