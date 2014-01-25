@@ -37,9 +37,10 @@ public class TreesLikelihoodVariable extends Variable {
 		public String[] smDescendants = null;
 		public String[] smTrunkStats = null;
 		public String[] smSeqMigStats = null;
-		public String[] pis = null;
+		public String[] pies = null;
 		public String[] seqMutationStats = null;
-		public AltTreeOutput[] smAlternativeTreeOutput = null;
+		public String[] altNodes = null;
+		public String[] altBranches = null;
 		public Double[] seqLikelihood;
 		public Double[] locLikelihood;
 		
@@ -111,9 +112,12 @@ public class TreesLikelihoodVariable extends Variable {
 				outputObject.asrTrees=returnValue;
 			}
 			if (config.smAlternativeTreeOutput) {
-				outputObject.smAlternativeTreeOutput = new AltTreeOutput[trees.length];
+				outputObject.altNodes = new String[trees.length];
+				outputObject.altBranches = new String[trees.length];
 				for (int i=0;i<trees.length;i++) {
-					outputObject.smAlternativeTreeOutput[i] = trees[i].smAlternativeTreeOutput();					 
+					AltTreeOutput smAlternativeTreeOutput = trees[i].smAlternativeTreeOutput();
+					outputObject.altNodes[i] = smAlternativeTreeOutput.getNodes();
+					outputObject.altBranches[i] = smAlternativeTreeOutput.getBranches();  					
 				}									
 			}
 			if (config.smTransitions) {
@@ -248,7 +252,7 @@ public class TreesLikelihoodVariable extends Variable {
 			for (int i=0;i<trees.length;i++) {	 			
 				returnValue[i]=trees[i].pies();
 			}				
-			outputObject.pis=returnValue;											
+			outputObject.pies=returnValue;											
 
 			return outputObject;
 		}

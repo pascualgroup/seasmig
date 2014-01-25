@@ -1216,6 +1216,7 @@ public class TreeWithLocations implements LikelihoodTree {
 									returnValue+=(codonPosition==0 ? Sequence.toChar(transition.toTrait) : fromCodon.charAt(0));
 									returnValue+=(codonPosition==1 ? Sequence.toChar(transition.toTrait) : fromCodon.charAt(1));
 									returnValue+=(codonPosition==2 ? Sequence.toChar(transition.toTrait) : fromCodon.charAt(2));
+									returnValue+=",";
 								}
 								// source seq						
 								if (config.seqMutationsStatsSeqOutput) {

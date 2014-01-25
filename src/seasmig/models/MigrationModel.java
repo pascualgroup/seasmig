@@ -80,20 +80,31 @@ public abstract class MigrationModel extends Model implements Serializable {
 			for (int i=0;i<outputObject.smTrunkStats.length;i++) {
 				flatMap.put("smTrunkStats."+i,String.format("%s",outputObject.smTrunkStats[i]));
 			}
-		}			
+		}	
+
+		///////////////////////////////////////
+		if (outputObject.pies!=null) {
+			for (int i=0;i<outputObject.pies.length;i++) {
+				flatMap.put("pi."+i,String.format("%s",outputObject.pies[i]));
+			}
+		}
+		
 		///////////////////////////////////////
 		if (outputObject.seqMutationStats!=null) {
 			for (int i=0;i<outputObject.seqMutationStats.length;i++) {
 				flatMap.put("seqMutationStats."+i,String.format("%s",outputObject.seqMutationStats[i]));
 			}
 		}
-		if (outputObject.pis!=null) {
-			for (int i=0;i<outputObject.pis.length;i++) {
-				flatMap.put("pi."+i,String.format("%s",outputObject.pis[i]));
+		
+		// Alternative Tree Output
+		if (outputObject.altBranches!=null && outputObject.altNodes!=null) {
+			for (int i=0;i<outputObject.altBranches.length;i++) {
+				flatMap.put("altTreeOutput."+i+"."+"branches",outputObject.altBranches[i]);
+				flatMap.put("altTreeOutput."+i+"."+"nodes",outputObject.altNodes[i]);
 			}
 		}
 		
-		
+			
 		return makeHierarchicalMap(flatMap);
 	}
 

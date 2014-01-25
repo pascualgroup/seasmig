@@ -158,7 +158,7 @@ public class Config implements Serializable
 	public boolean smMigrationNodeNumTipAndSequenceData = true; // output sequence and node data for each migration event
 	public boolean seqMutationStats = true;
 	public boolean seqMutationsStatsCodonOutput = true;
-	public boolean seqMutationsStatsSeqOutput = false;
+	public boolean seqMutationsStatsSeqOutput = true;
 	public double seqStochasticMappingStartTime = 1970; 
 	
 	// MODEL DATA RELATED PARAMETERS
