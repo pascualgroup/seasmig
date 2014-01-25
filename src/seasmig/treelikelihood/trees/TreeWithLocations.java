@@ -1245,18 +1245,23 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	private String mapMutationsToSequence(Sequence seq,
 			ArrayList<ArrayList<ArrayList<Transition>>> mutations, double upToTime) {
-		Sequence seqCopy = seq.copy();
-		for (int loc=0; loc<((seqLength-1)/3+1);loc++) {
-			for (int cp = 0; cp<3; cp++) {
-				if ((loc*3+cp) >= seqLength) continue;	
-				for (Transition mutation : mutations.get(cp).get(loc)) {
-					if (mutation.time<upToTime) {
-						seqCopy.set(loc*3+cp, mutation.toTrait);
+		if (mutations==null) 
+			return seq.toString();
+		else {
+			Sequence seqCopy = seq.copy();		
+			for (int loc=0; loc<((seqLength-1)/3+1);loc++) {
+				for (int cp = 0; cp<3; cp++) {
+					if ((loc*3+cp) >= seqLength) continue;	
+
+					for (Transition mutation : mutations.get(cp).get(loc)) {
+						if (mutation.time<upToTime) {
+							seqCopy.set(loc*3+cp, mutation.toTrait);
+						}
 					}
 				}
-			}
+			}		
+			return seqCopy.toString();
 		}
-		return seqCopy.toString();
 	}
 
 	private String mapMutationsToCodon(Sequence seq, int loc,
@@ -1513,14 +1518,14 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public AltTreeOutput smAlternativeTreeOutput() {
-		
+
 		setLayoutByDescendants();
-		
+
 		AltTreeOutput altTreeOutput = new AltTreeOutput();
 
 		int postOrderIndex=0;
 		for (TreeWithLocationsNode node : root) {
-			postOrderIndex++;			
+			postOrderIndex++;	
 			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(), mapMutationsToSequence(node.seq, node.mutations, node.time));
 			node.postOrderIndex=postOrderIndex;
 		}
