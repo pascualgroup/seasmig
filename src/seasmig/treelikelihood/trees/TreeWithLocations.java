@@ -1544,23 +1544,20 @@ public class TreeWithLocations implements LikelihoodTree {
 	// sets node layout based on a postorder traversal & number of descendants 
 	public void setLayoutByDescendants() {
 
+		// sort children so that the child with the more descendants is left most
 		sortChildrenByDescendants();
 
-		Stack<TreeWithLocationsNode> reverseList = new Stack<TreeWithLocationsNode>();
-
-		// set layout of tips based on traversal
+		// set layout of tips based on post order traversal order of tips 
 		float y = 0;
 		for (TreeWithLocationsNode s : root) {
-			reverseList.push(s);
 			if (s.isTip()) {
 				s.setLayout(y);
 				y++;
 			}
 		}
 
-		// update layout of internal nodes
-		while (!reverseList.empty()) {
-			TreeWithLocationsNode s = reverseList.pop();
+		// update layout of internal nodes based on average of children layout
+		for (TreeWithLocationsNode s : root) {
 			if (s.children.size() > 0) {
 				float mean = 0;
 				for (TreeWithLocationsNode child : s.children) {
