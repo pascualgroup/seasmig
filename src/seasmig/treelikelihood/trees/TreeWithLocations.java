@@ -1519,15 +1519,18 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public AltTreeOutput smAlternativeTreeOutput() {
 
+		int postOrderIndex=0;
+		for (TreeWithLocationsNode node : root) {
+			postOrderIndex++;	
+			node.postOrderIndex=postOrderIndex;
+		}
+		
 		setLayoutByDescendants();
 
 		AltTreeOutput altTreeOutput = new AltTreeOutput();
 
-		int postOrderIndex=0;
 		for (TreeWithLocationsNode node : root) {
-			postOrderIndex++;	
-			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(), mapMutationsToSequence(node.seq, node.mutations, node.time),node.isTip());
-			node.postOrderIndex=postOrderIndex;
+			altTreeOutput.addNode(node.postOrderIndex, node.time, node.getLoc(), node.getLayout(), mapMutationsToSequence(node.seq, node.mutations, node.time),node.isTip());
 		}
 
 		for (TreeWithLocationsNode node : root) {
