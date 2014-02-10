@@ -68,8 +68,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	private boolean stochasticallyMapped = false;
 
 	private boolean asrDone =false;
-
 	private boolean asrSeqDone =false;
+	private boolean sortingDone = false;
 
 	static final Comparator<TreeWithLocationsNode> descendantOrder = new Comparator<TreeWithLocationsNode>() {
 		public int compare(TreeWithLocationsNode v1, TreeWithLocationsNode v2) {
@@ -379,6 +379,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.stochasticallyMapped=false;
 		copyTree.asrDone=false;
 		copyTree.asrSeqDone=false;
+		copyTree.sortingDone=false;
 		treeCopy(this.root, copyTree.root);  
 		return copyTree;			
 	}
@@ -596,6 +597,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String newickStochasticMapping(int maxBranchRetries) {
+		sortChildrenByDescendants();
 		asr(); // Ancestral state reconstruction
 		stochasticMapping(maxBranchRetries);
 
@@ -748,6 +750,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String newickAncestralStateReconstruction() {
 		// TODO: Check this
+		sortChildrenByDescendants();
 		asr();
 		String returnValue = newickStates(root);
 		return returnValue;
@@ -755,6 +758,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	private String newickStates(TreeWithLocationsNode treePart) {
+		sortChildrenByDescendants();
 		String returnValue = new String();
 
 		if (treePart.isTip()) {
@@ -845,6 +849,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String smTipDwellings() {
+		sortChildrenByDescendants();
 		String returnValue = "{";
 		String[] tipDwellings = new String[numLocations];	
 
@@ -896,6 +901,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String smLineages() {
 		// TODO: test this
+		sortChildrenByDescendants();
 		String returnValue = "{";
 		String[] lineages = new String[numLocations];	
 
@@ -948,7 +954,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String smTrunkStats(double presentDayTipInterval, double timeToDesignateTrunk) {
 		// TODO: test this
-
+		sortChildrenByDescendants();
 		List<TreeWithLocationsNode> trunkNodes = markTrunk(presentDayTipInterval, timeToDesignateTrunk);
 
 		String returnValue = "{";
@@ -1021,6 +1027,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String smDescendants() {
 		// TODO: this
+		sortChildrenByDescendants();
 		String returnValue = "{";
 		String[][] decendants = new String[numLocations][numLocations];		
 
@@ -1179,7 +1186,9 @@ public class TreeWithLocations implements LikelihoodTree {
 	public String seqMutationStats(int maxBranchRetries) throws Exception {
 
 		// TODO: check SM time at change in node...
-
+		System.out.print("Sorting children by the number of descendants for consistant node ordering...");	
+		sortChildrenByDescendants();
+		System.out.print("done! ");
 		System.out.println("Stochastically mapping mutations:");
 		System.out.print("Sequence ASR....");
 		asrSeq();
@@ -1346,6 +1355,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	private void stochsticMappingSeq(int maxBranchRetries) throws Exception {
 		// TODO: test
 		// TODO: cite	
+		
+		sortChildrenByDescendants();
 		for (TreeWithLocationsNode node : eachPreorder()) {
 			if (node.getParent()==null) continue;
 			if (node.mutations==null) {
@@ -1454,6 +1465,8 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String seqMigrationsSeqOutput() throws Exception {
+		
+		sortChildrenByDescendants();
 		String returnValue = "{";
 		String[][] transitionTimes = new String[numLocations][numLocations];		
 
@@ -1519,18 +1532,15 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public AltTreeOutput smAlternativeTreeOutput() {
 
-		int postOrderIndex=0;
-		for (TreeWithLocationsNode node : root) {
-			postOrderIndex++;	
-			node.postOrderIndex=postOrderIndex;
-		}
-		
 		setLayoutByDescendants();
 
 		AltTreeOutput altTreeOutput = new AltTreeOutput();
 
+		int postOrderIndex=0;
 		for (TreeWithLocationsNode node : root) {
-			altTreeOutput.addNode(node.postOrderIndex, node.time, node.getLoc(), node.getLayout(), mapMutationsToSequence(node.seq, node.mutations, node.time),node.isTip());
+			postOrderIndex++;	
+			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(), mapMutationsToSequence(node.seq, node.mutations, node.time),node.isTip());
+			node.postOrderIndex=postOrderIndex;
 		}
 
 		for (TreeWithLocationsNode node : root) {
@@ -1592,8 +1602,10 @@ public class TreeWithLocations implements LikelihoodTree {
 		}        
 	}	
 
-	public void sortChildrenByDescendants() {
-		sortChildrenByDescendants(root);
+	public void sortChildrenByDescendants() {		
+		if (!sortingDone) 
+			sortChildrenByDescendants(root);
+		sortingDone=true;
 	}
 
 
