@@ -19,7 +19,8 @@ public class Config implements Serializable
 		TWO_CONSTANT_SEASONS, 
 		SINUSOIDAL, // TODO:
 		N_CONSTANT_SEASONS,  
-		EPOCHAL
+		EPOCHAL,
+		CONSTANT_AS_INPUT
 	}
 	
 	public static enum SeqModelType { 
@@ -195,8 +196,6 @@ public class Config implements Serializable
 	public double[] HKY_3CP_Input_pis0;
 	public double[] HKY_3CP_Input_pis1;
 	public double[] HKY_3CP_Input_pis2;
-
-
 	
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

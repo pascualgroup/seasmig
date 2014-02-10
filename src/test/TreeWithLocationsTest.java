@@ -250,16 +250,16 @@ public class TreeWithLocationsTest {
 					{ 0.333333,0.333333,0.333333,-1}});
 			locTree = new TreeWithLocations(root,equalModel,null);		
 			locTree.logLikelihood();
-			String asrNewick = locTree.newickAncestralStateReconstruction();			
-			System.out.println(asrNewick);
+			String asrNewick = locTree.newickASR();
 			for (int i=0;i<4;i++) {
-				for (int j=0; j<4; j++) {									     
-					if (asrNewick.equals("(-1[&states=0]:1.000,(-1[&states=1]:1.000,-1[&states=0]:1.000)[&states="+Integer.toString(i)+"]:1.000)[&states="+Integer.toString(j)+"]:0.000\n")) {
+				for (int j=0; j<4; j++) {	
+					System.out.println(asrNewick);
+					if (asrNewick.equals("(-1[&states=0]:1.000,(-1[&states=1]:1.000,-1[&states=0]:1.000)[&states="+Integer.toString(i)+"]:1.000)[&states="+Integer.toString(j)+"]:0.000")) {
 						asrOK = true;
 					}					
 				}
 			}			
-			if (asrNewick.equals("(-1[&states=0]:1.000,(-1[&states=1]:1.000,-1[&states=0]:1.000)[&states=0]:1.000)[&states=0]:0.000\n")) {
+			if (asrNewick.equals("(-1[&states=0]:1.000,(-1[&states=1]:1.000,-1[&states=0]:1.000)[&states=0]:1.000)[&states=0]:0.000")) {
 				countParsimonious+=1;
 			}
 			assertEquals(asrOK, true);
@@ -294,8 +294,8 @@ public class TreeWithLocationsTest {
 		TreeWithLocations locTree = new TreeWithLocations(root,equalModel,null);		
 		locTree.logLikelihood();
 		System.out.println(locTree.newickProbs());
-		System.out.println(locTree.newickAncestralStateReconstruction());	
-		System.out.println(locTree.newickStochasticMapping(10000));
+		System.out.println(locTree.newickASR());	
+		System.out.println(locTree.newickSM(10000));
 		assertEquals(false, true);
 	}
 
@@ -334,8 +334,8 @@ public class TreeWithLocationsTest {
 		TreeWithLocations locTree = new TreeWithLocations(root,equalModel,null);		
 		locTree.logLikelihood();
 		System.out.println(locTree.newickProbs());
-		System.out.println(locTree.newickAncestralStateReconstruction());	
-		System.out.println(locTree.newickStochasticMapping(1000));
+		System.out.println(locTree.newickASR());	
+		System.out.println(locTree.newickSM(1000));
 		System.out.println(locTree.smDescendants());
 		assertEquals(false, true);
 	}

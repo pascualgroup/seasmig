@@ -5,18 +5,27 @@ import java.io.Serializable;
 import seasmig.util.AltTreeOutput;
 
 public interface LikelihoodTree extends Serializable {
+	
+	// SET MODELS
 	public void setMigrationModel(Object migrationModel);
 	public void setCodonModel(Object codonModel);
-	public double logLikelihood();
-	String print();
-	public LikelihoodTree copy(); 
+	
+	// GET LIKELIHOODS
+	public double logLikelihood(); // doesn't recalculate likelihood if already calculated after copy
+	public Double seqLikelihood();
+	public Double locLikelihood();
+
+	// MAKE CLEAN WORKING COPY
+	public LikelihoodTree copy();
+
+	// GET OUTPUT
 	public int getNumLocations();
 	public String newickProbs();
-	public double cachedLogLikelihood();
+
 	
 	// Stochastic Mapping & State Reconstruction of Migration
-	public String newickAncestralStateReconstruction();
-	public String newickStochasticMapping(int maxBranchRetries);
+	public String newickASR();
+	public String newickSM(int maxBranchRetries);
 	public String smTransitions();	
 	public String smTipDwellings();
 	public String smLineages();
@@ -30,8 +39,6 @@ public interface LikelihoodTree extends Serializable {
 	public String seqMutationStats(int maxBranchRetries) throws Exception;
 	public String seqMigrationsSeqOutput() throws Exception;
 	String pies();
-	public Double seqLikelihood();
-	public Double locLikelihood();
 	
 	// Cleanup after reconstruction
 	public void clearInternalNodes();

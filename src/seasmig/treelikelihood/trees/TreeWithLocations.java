@@ -53,7 +53,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	HashMap<String, Integer> taxaIndices = new HashMap<String,Integer>();
 
 	double[] ZERO_LOG_PROBS ;	
-	private double logLike = 0;
+	private Double logLike = null;
 
 	// for sequences
 	private int seqLength;
@@ -353,9 +353,9 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public double logLikelihood() {
-		locLogLikelihood();		
-		seqLogLikelihood();		
-		logLike = locationLogLike+seqLogLike;
+		if (logLike==null) {
+			logLike = locLogLikelihood()+seqLogLikelihood();
+		}
 		return logLike;
 	}	
 
@@ -370,6 +370,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.numIdentifiedSeqs=this.numIdentifiedSeqs;
 		copyTree.numLocations=this.numLocations;		
 		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
+		copyTree.logLike=null;
 		if (config.seqModelType==SeqModelType.NONE)
 			copyTree.root = new TreeWithLocationsNode(root.seq, root.getLoc(),root.taxonIndex,root.time,null,false);
 		else
@@ -394,28 +395,6 @@ public class TreeWithLocations implements LikelihoodTree {
 			to.children.add(newChild);			
 			treeCopy(child, newChild);
 		}		
-	}
-
-
-	@Override
-	public String print() {
-		return print(root);
-	}
-
-	public String print(TreeWithLocationsNode treePart) {
-		String returnValue = Integer.toString(treePart.getLoc());
-		if (treePart.children.size()>0) {
-			returnValue+=" (";
-			returnValue+=print(treePart.children.get(0));
-			if (treePart.children.size()>1) {
-				for (int i=1;i<treePart.children.size();i++) {
-					returnValue+=",";
-					returnValue+=treePart.children.get(i);					
-				}				
-			}
-			returnValue+=")";
-		}
-		return returnValue;
 	}
 
 	@Override
@@ -567,11 +546,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		return returnValue;
 	}
 
-	@Override
-	public double cachedLogLikelihood() {		
-		return logLike;
-	}
-
 	public final double logSumExp(double[] alphas) {
 		// TODO: improve this
 		double sumExp = 0;
@@ -596,7 +570,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}
 
 	@Override
-	public String newickStochasticMapping(int maxBranchRetries) {
+	public String newickSM(int maxBranchRetries) {
 		sortChildrenByDescendants();
 		asr(); // Ancestral state reconstruction
 		stochasticMapping(maxBranchRetries);
@@ -748,7 +722,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	}	
 
 	@Override
-	public String newickAncestralStateReconstruction() {
+	public String newickASR() {
 		// TODO: Check this
 		sortChildrenByDescendants();
 		asr();
