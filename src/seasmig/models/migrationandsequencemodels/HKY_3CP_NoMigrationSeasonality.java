@@ -55,7 +55,7 @@ public class HKY_3CP_NoMigrationSeasonality extends MigrationModel {
 	private DoubleVariable rateHyperPrior;
 	private ExponentialDistribution muHyperPriorDist;
 	private DoubleVariable muHyperPrior;
-	private boolean inputSeqModel;
+	private boolean inputCodonModel;
 	private boolean inputMigrationModel;
 	protected HKY_3CP_NoMigrationSeasonality() { }
 
@@ -64,7 +64,7 @@ public class HKY_3CP_NoMigrationSeasonality extends MigrationModel {
 		super(initialChain);
 		this.config = config;
 		this.data = data;		
-		this.inputSeqModel = inputSeqModel;
+		this.inputCodonModel = inputSeqModel;
 		this.inputMigrationModel = inputMigrationModel;
 		numLocations=data.getNumLocations();
 		List<ArrayList<LikelihoodTree>> trees = data.getTrees();		
@@ -172,7 +172,7 @@ public class HKY_3CP_NoMigrationSeasonality extends MigrationModel {
 			}
 
 			// Sequence Model
-			if (!inputSeqModel) {
+			if (!inputCodonModel) {
 				for(int i = 0; i < 3; i++) {
 					for(int j = 0; j < 3; j++) {			
 						m.addEdge(this,forPis[i][j]);
@@ -228,7 +228,7 @@ public class HKY_3CP_NoMigrationSeasonality extends MigrationModel {
 				migrationBaseModel = new ConstantTransitionBaseModel(ratesdoubleForm);
 			}
 
-			if (!inputSeqModel) {
+			if (!inputCodonModel) {
 				double[] mudoubleForm = new double[3];
 				for (int i=0;i<3;i++) {				
 					mudoubleForm[i]=mu[i].getValue();
@@ -272,8 +272,8 @@ public class HKY_3CP_NoMigrationSeasonality extends MigrationModel {
 				else
 					workingCopy = data.getTrees().get(i).get(0).copy();
 				
-				workingCopy.setMigrationModel(migrationBaseModel);
-				workingCopy.setCodonModel(codonModel);
+				if (!inputMigrationModel) workingCopy.setMigrationModel(migrationBaseModel);
+				if (!inputCodonModel) workingCopy.setCodonModel(codonModel);
 				logP+=config.treeWeights[i]*workingCopy.logLikelihood();
 				trees[i]=workingCopy;
 			}
