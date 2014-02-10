@@ -3,17 +3,18 @@ package seasmig.treelikelihood.trees;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import seasmig.treelikelihood.TransitionModel;
+import seasmig.treelikelihood.transitionmodels.ConstantTransitionBaseModel;
+
 @SuppressWarnings("serial")
 public class SimpleAttributeLoader implements AttributeLoader{
-	// TODO: change this to a different and single file type for attributes....
-	// TODO: add grouping of locations together .....
-	
 	HashMap<String, Object> attributes = new HashMap<String,Object>();
 
 	protected SimpleAttributeLoader() {};
@@ -38,13 +39,57 @@ public class SimpleAttributeLoader implements AttributeLoader{
 	}
 
 	
-	private void processCodonModels(String codonModelFilename) {
-		// TODO Auto-generated method stub
+	private void processCodonModels(String filename) throws IOException {
+		FileInputStream codonModelFIStream = new FileInputStream(filename);
+		DataInputStream codonModelDIStream = new DataInputStream(codonModelFIStream);
+		BufferedReader codonModelReader = new BufferedReader(new InputStreamReader(codonModelDIStream));
+
+		HashMap<String, TransitionModel> codonModelMap = new HashMap<String, TransitionModel>();
+	
+		String strLine;
+		//Read File Line By Line
+		int i=0;
+		while ((strLine = codonModelReader.readLine()) != null)   {
+			try {
+				TransitionModel model = new ConstantTransitionBaseModel(codonModelReader.readLine());
+				codonModelMap.put(Integer.toString(i), model);				
+			}
+			catch (NumberFormatException e) {
+				System.err.println("Failed to parse model on line: "+i+" of "+filename);				
+			}
+			i=i+1;					
+		}
 		
+		codonModelReader.close();
+
+		attributes.put("codonModels", codonModelMap);
 	}
 
-	private void processMigrationModels(String migrationModelFilename) {
-		// TODO Auto-generated method stub
+	private void processMigrationModels(String filename) throws IOException {
+
+		FileInputStream migrationModelFIStream = new FileInputStream(filename);
+		DataInputStream migrationModelDIStream = new DataInputStream(migrationModelFIStream);
+		BufferedReader migrationModelReader = new BufferedReader(new InputStreamReader(migrationModelDIStream));
+
+		HashMap<String, TransitionModel> migrationModelMap = new HashMap<String, TransitionModel>();
+	
+		String strLine;
+		//Read File Line By Line
+		int i=0;
+		while ((strLine = migrationModelReader.readLine()) != null)   {
+			try {
+				TransitionModel model = new ConstantTransitionBaseModel(migrationModelReader.readLine());
+				migrationModelMap.put(Integer.toString(i), model);				
+			}
+			catch (NumberFormatException e) {
+				System.err.println("Failed to parse model on line: "+i+" of "+filename);				
+			}
+			i=i+1;					
+		}
+		
+		migrationModelReader.close();
+
+		attributes.put("migrationModels", migrationModelMap);
 		
 	}
 
@@ -87,7 +132,6 @@ public class SimpleAttributeLoader implements AttributeLoader{
 	}
 	
 	void processAlignments(String fileName) throws IOException {
-		// TODO: test this
 		// Read fasta file:
 		// >header1
 		// ACCCCCCAAAGTTAATATATRRYYSSSWWWW

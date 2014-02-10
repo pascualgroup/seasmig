@@ -115,6 +115,10 @@ public class ConstantTransitionBaseModel implements TransitionModel {
 	}
 
 
+	public ConstantTransitionBaseModel(String readLine) {
+		// TODO Auto-generated constructor stub
+	}
+
 	// Methods
 	@Override
 	public double logprobability(int from_location, int to_location, double from_time, double to_time) {
