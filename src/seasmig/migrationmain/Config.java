@@ -119,7 +119,7 @@ public class Config implements Serializable
 	
 	
 	// MIGRATION MODEL RELATED PARAMETERS
-	public MigrationModelType migrationModelType = MigrationModelType.CONSTANT;
+	public MigrationModelType migrationModelType = MigrationModelType.CONSTANT_AS_INPUT;
 	public TwoConstantSeasonsParameterization twoSeasonParameterization = TwoConstantSeasonsParameterization.VARIABLE_SELECTION_DIFF;
 	public TwoConstantSeasonsPhase twoSeasonPhase = TwoConstantSeasonsPhase.FREE_PHASE_FIXED_LENGTH; // FREE LENGTH ONLY IMPLEMENTED FOR VARIABLE SELECTION TWO SEASONS...
 	public double fixedPhase = 0.3;
@@ -163,8 +163,8 @@ public class Config implements Serializable
 	public double seqStochasticMappingStartTime = 1970; 
 	
 	// MODEL DATA RELATED PARAMETERS
-	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\country_map_whoregions.txt"}; // null if locations are loaded from tree
-	public String[] treeFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\VP7human.trees"}; // null for test generated data 
+	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\accession_locid.txt"}; // null if locations are loaded from tree
+	public String[] treeFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\newTrait_tree_with_trait.trees"}; // null for test generated data 
 	public double[] treeWeights = {1.0};
 	public int numTreesFromTail = 25; // at most number of trees to read from tree file's tail
 	public int numLocations = 7; // needs to be specified if locations are loaded from trees....
@@ -183,13 +183,13 @@ public class Config implements Serializable
 	public double timeToDesignateTrunk = 4.0; // time back from present day tip ancestry designated as trunk 
 	public int maxSMBranchRetries = 200000; // maximum number of retries for stochastically mapping a single branch
 
-	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\vp7_partial_epitopes_short.fas"};
+	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\vp7_partial_epitopes_short.fas"};
 
 	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
 
 	public double verificationTolerance = 3; // TODO: check why verification fails ?ed? with seq data, and is it just a convergence things.
 
-	public String[] migrationModelFilenames;
+	public String[] migrationModelFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\migration_models.txt"};
 	public String[] codonModelFilenames;
 
 	// OUTPUT CONFIG TO FILE
