@@ -330,7 +330,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		return seqLogLike;		
 	}
 
-	// Only works for binary trees
 	public Iterable<TreeWithLocationsNode> eachPreorder() {
 		ArrayList<TreeWithLocationsNode> returnValue = new ArrayList<TreeWithLocationsNode>();
 		if(root==null) return returnValue;
@@ -361,7 +360,6 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public LikelihoodTree copy() {
-		// TODO: test this... and or remove ...
 		TreeWithLocations copyTree = new TreeWithLocations();
 		copyTree.migrationModel=this.migrationModel;
 		copyTree.codonLikelihoodModel=this.codonLikelihoodModel;
