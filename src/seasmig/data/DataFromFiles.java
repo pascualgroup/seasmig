@@ -203,7 +203,7 @@ public class DataFromFiles implements Data
 					codonModel = new TransitionModel[3];
 					codonModel[0]=codonModelMap.get(Integer.toString(numid)+"."+"0");
 					codonModel[1]=codonModelMap.get(Integer.toString(numid)+"."+"1");
-					codonModel[2]=codonModelMap.get(Integer.toString(numid)+"."+"2");
+					codonModel[2]=codonModelMap.get(Integer.toString(numid)+"."+"2");					
 				}
 				trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations,config.lastTipTime[h],seqMap,seqLength,config, migrationModel, codonModel));
 				numid++;								

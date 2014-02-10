@@ -164,8 +164,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
 	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime, HashMap<String, Sequence> seqMap_, int seqLength_, Config config, TransitionModel migrationModel, TransitionModel[] codonModel) {
-		this.migrationModel = migrationModel;
-		this.codonModel=codonModel;
+		if (migrationModel!=null) this.migrationModel = migrationModel;
+		if (codonModel!=null) this.codonModel=codonModel;
 		this.config = config;
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
@@ -1151,7 +1151,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public void setCodonModel(Object codonModel) {
-		codonModel = (TransitionModel[]) codonModel;
+		this.codonModel = (TransitionModel[]) codonModel;
 	}
 
 	public double getNumIdentifiedSeqs() {

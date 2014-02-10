@@ -3,7 +3,6 @@ package seasmig.treelikelihood.trees;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -50,19 +49,22 @@ public class SimpleAttributeLoader implements AttributeLoader{
 		//Read File Line By Line
 		int i=0;
 		while ((strLine = codonModelReader.readLine()) != null)   {
-			try {
-				TransitionModel model = new ConstantTransitionBaseModel(codonModelReader.readLine());
-				codonModelMap.put(Integer.toString(i), model);				
+			for (int j=0;j<3;j++) {
+				try {
+					TransitionModel model = new ConstantTransitionBaseModel(strLine);					
+					codonModelMap.put(Integer.toString(i)+"."+Integer.toString(j), model);
+					if (j!=2) strLine = codonModelReader.readLine();
+				}
+				catch (NumberFormatException e) {
+					System.err.println("Failed to parse model on line: "+i*3+j+" of "+filename);				
+				}
+				i=i+1;
 			}
-			catch (NumberFormatException e) {
-				System.err.println("Failed to parse model on line: "+i+" of "+filename);				
-			}
-			i=i+1;					
 		}
 		
 		codonModelReader.close();
 
-		attributes.put("codonModels", codonModelMap);
+		if (i>0) attributes.put("codonModels", codonModelMap);
 	}
 
 	private void processMigrationModels(String filename) throws IOException {
@@ -78,7 +80,7 @@ public class SimpleAttributeLoader implements AttributeLoader{
 		int i=0;
 		while ((strLine = migrationModelReader.readLine()) != null)   {
 			try {
-				TransitionModel model = new ConstantTransitionBaseModel(migrationModelReader.readLine());
+				TransitionModel model = new ConstantTransitionBaseModel(strLine);
 				migrationModelMap.put(Integer.toString(i), model);				
 			}
 			catch (NumberFormatException e) {
@@ -89,7 +91,7 @@ public class SimpleAttributeLoader implements AttributeLoader{
 		
 		migrationModelReader.close();
 
-		attributes.put("migrationModels", migrationModelMap);
+		if (i>0) attributes.put("migrationModels", migrationModelMap);
 		
 	}
 
