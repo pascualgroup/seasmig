@@ -195,11 +195,16 @@ public class DataFromFiles implements Data
 			double numIdentifiedSeqs=0;
 			int numid = 0;
 			for (jebl.evolution.trees.Tree tree : nexusTreeTail) {
-				TransitionModel migrationModel = migrationModelMap.get(Integer.toString(numid));
-				TransitionModel[] codonModel = new TransitionModel[3];
-				codonModel[0]=codonModelMap.get(Integer.toString(numid)+"."+"0");
-				codonModel[1]=codonModelMap.get(Integer.toString(numid)+"."+"1");
-				codonModel[2]=codonModelMap.get(Integer.toString(numid)+"."+"2");
+				TransitionModel migrationModel = null;
+				if (migrationModelMap!=null) 
+					migrationModel = migrationModelMap.get(Integer.toString(numid));
+				TransitionModel[] codonModel = null;
+				if (codonModelMap!=null) {
+					codonModel = new TransitionModel[3];
+					codonModel[0]=codonModelMap.get(Integer.toString(numid)+"."+"0");
+					codonModel[1]=codonModelMap.get(Integer.toString(numid)+"."+"1");
+					codonModel[2]=codonModelMap.get(Integer.toString(numid)+"."+"2");
+				}
 				trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations,config.lastTipTime[h],seqMap,seqLength,config, migrationModel, codonModel));
 				numid++;								
 				if (numid%10==0) System.out.print(".");
