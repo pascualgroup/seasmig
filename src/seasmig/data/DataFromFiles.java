@@ -145,17 +145,21 @@ public class DataFromFiles implements Data
 
 			// Convert trees to internal tree representation
 			String migrationModelFilename = null;
-			if (config.migrationModelFilenames[h]!=null) {
-				if (config.migrationModelFilenames[h].length()>0) {
-					migrationModelFilename = config.migrationModelFilenames[h];
+			if (config.migrationModelFilenames!=null) {
+				if (config.migrationModelFilenames[h]!=null) {
+					if (config.migrationModelFilenames[h].length()>0) {
+						migrationModelFilename = config.migrationModelFilenames[h];
+					}
 				}
 			}
 
 			// Convert trees to internal tree representation
 			String codonModelFilename = null;
-			if (config.codonModelFilenames[h]!=null) {
-				if (config.codonModelFilenames[h].length()>0) {
-					codonModelFilename = config.codonModelFilenames[h];
+			if (config.codonModelFilenames!=null) {
+				if (config.codonModelFilenames[h]!=null) {
+					if (config.codonModelFilenames[h].length()>0) {
+						codonModelFilename = config.codonModelFilenames[h];
+					}
 				}
 			}
 
