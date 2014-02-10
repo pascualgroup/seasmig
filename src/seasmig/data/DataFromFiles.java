@@ -16,6 +16,7 @@ import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.migrationmain.Config;
 import seasmig.data.Data;
 import seasmig.treelikelihood.LikelihoodTree;
+import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.trees.AttributeLoader;
 import seasmig.treelikelihood.trees.Sequence;
 import seasmig.treelikelihood.trees.SimpleAttributeLoader;
@@ -33,12 +34,12 @@ public class DataFromFiles implements Data
 	Config config = null;
 	int numLocations;
 	long iteration = 0;
-	
+
 	protected DataFromFiles() {};
 
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
 		// Data from files isn't serialized it is reloaded...
-		
+
 		// TODO: move report of iteration to somewhere else...
 		iteration += config.checkpointEvery;
 		System.out.print("\riteration: "+iteration);
@@ -107,11 +108,11 @@ public class DataFromFiles implements Data
 			for (int i=0;i<taxa.size();i++) {
 				taxaIndices.put(taxa.get(i).getName(), i);
 			}
-			
+
 			List<jebl.evolution.trees.Tree> nexusTrees = nexusImporter.importTrees();			
 			System.out.println("loaded "+nexusTrees.size()+" trees");
 			//System.err.println(nexusTrees.get(0).getAttribute("posterior"));
-			
+
 			System.out.print("Keeping tail... ");
 			double meanNumTaxa=0;
 			List<jebl.evolution.trees.Tree> nexusTreeTail = new ArrayList<jebl.evolution.trees.Tree>();
@@ -122,7 +123,7 @@ public class DataFromFiles implements Data
 			meanNumTaxa/=nexusTreeTail.size();
 			System.out.println(" keeping last "+nexusTreeTail.size()+ " trees");
 			System.out.println(meanNumTaxa+" taxa on average per tree");
-			
+
 			// Convert trees to internal tree representation
 			String locationFilename = null;
 			if (config.locationFilenames[h]!=null) {
@@ -130,7 +131,7 @@ public class DataFromFiles implements Data
 					locationFilename = config.locationFilenames[h];
 				}
 			}
-			
+
 			String alignmentFilename = null;
 			if (config.alignmentFilenames!=null) {
 				if (config.alignmentFilenames.length>0) {
@@ -141,15 +142,36 @@ public class DataFromFiles implements Data
 					}
 				}
 			}
-			System.out.print("Loading traits & alignments... ");
 
-			AttributeLoader attributeLoader= new SimpleAttributeLoader(locationFilename, null, alignmentFilename);	
+			// Convert trees to internal tree representation
+			String migrationModelFilename = null;
+			if (config.migrationModelFilenames[h]!=null) {
+				if (config.migrationModelFilenames[h].length()>0) {
+					migrationModelFilename = config.migrationModelFilenames[h];
+				}
+			}
+
+			// Convert trees to internal tree representation
+			String codonModelFilename = null;
+			if (config.codonModelFilenames[h]!=null) {
+				if (config.codonModelFilenames[h].length()>0) {
+					codonModelFilename = config.codonModelFilenames[h];
+				}
+			}
+
+			System.out.print("Loading traits, alignments, migration and codon models... ");
+
+			AttributeLoader attributeLoader= new SimpleAttributeLoader(locationFilename, null, alignmentFilename, migrationModelFilename, codonModelFilename);	
 			HashMap<String,Object> attributes = attributeLoader.getAttributes();
 			@SuppressWarnings("unchecked")
 			HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
 			@SuppressWarnings("unchecked")
 			HashMap<String,Sequence> seqMap = (HashMap<String,Sequence>) attributes.get("alignments");
-						
+			@SuppressWarnings("unchecked")
+			HashMap<String,TransitionModel> migrationModelMap = (HashMap<String,TransitionModel>) attributes.get("migrationModels");
+			@SuppressWarnings("unchecked")
+			HashMap<String,TransitionModel> codonModelMap = (HashMap<String,TransitionModel>) attributes.get("codonModels");		
+
 			numLocations = (Integer) attributes.get("numLocations");
 			System.out.println("loaded "+locationMap.size()+" taxon traits"+" from "+locationFilename);	
 			Integer seqLength = (Integer) attributes.get("seqLength");
@@ -157,20 +179,25 @@ public class DataFromFiles implements Data
 				seqLength=0;
 			if (seqMap!=null)
 				System.out.println("loaded "+seqMap.size()+" sequences"+" from "+alignmentFilename);
-			
+
 			System.out.print("Reparsing trees... ");
 
 			if (seqMap!=null) {
 				if (seqMap.size()>0)
 					seqLength=seqMap.get(seqMap.keySet().iterator().next()).length();
 			}
-				
+
 			double numIdentifiedLocations=0;
 			double numIdentifiedSeqs=0;
 			int numid = 0;
-			for (jebl.evolution.trees.Tree tree : nexusTreeTail) {				
-				trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations,config.lastTipTime[h],seqMap,seqLength,config));
-				numid++;
+			for (jebl.evolution.trees.Tree tree : nexusTreeTail) {
+				TransitionModel migrationModel = migrationModelMap.get(Integer.toString(numid));
+				TransitionModel[] codonModel = new TransitionModel[3];
+				codonModel[0]=codonModelMap.get(Integer.toString(numid)+"."+"0");
+				codonModel[1]=codonModelMap.get(Integer.toString(numid)+"."+"1");
+				codonModel[2]=codonModelMap.get(Integer.toString(numid)+"."+"2");
+				trees.get(h).add(new TreeWithLocations((SimpleRootedTree) tree, taxaIndices, locationMap,numLocations,config.lastTipTime[h],seqMap,seqLength,config, migrationModel, codonModel));
+				numid++;								
 				if (numid%10==0) System.out.print(".");
 				numIdentifiedLocations+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedLocations();
 				numIdentifiedSeqs+=((TreeWithLocations)trees.get(h).get(trees.get(h).size()-1)).getNumIdentifiedSeqs();
@@ -180,7 +207,7 @@ public class DataFromFiles implements Data
 			numIdentifiedSeqs=numIdentifiedSeqs/trees.get(h).size();
 			System.out.println("identified "+numIdentifiedLocations+" locations on average per tree");
 			System.out.println("identified "+numIdentifiedSeqs+" sequences on average per tree");
-				
+
 			System.out.println(" reparsed "+trees.get(h).size()+" trees");			
 		}
 

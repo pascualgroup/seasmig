@@ -189,14 +189,9 @@ public class Config implements Serializable
 
 	public double verificationTolerance = 3; // TODO: check why verification fails ?ed? with seq data, and is it just a convergence things.
 
-	// For sequence stochastic mapping with input HKY model
-	// TODO: test this... 
-	public double[] HKY_3CP_Input_mu;
-	public double[] HKY_3CP_Input_k;
-	public double[] HKY_3CP_Input_pis0;
-	public double[] HKY_3CP_Input_pis1;
-	public double[] HKY_3CP_Input_pis2;
-	
+	public String[] migrationModelFilenames;
+	public String[] codonModelFilenames;
+
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {
 		try {

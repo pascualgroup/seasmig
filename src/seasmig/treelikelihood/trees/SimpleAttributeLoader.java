@@ -18,7 +18,7 @@ public class SimpleAttributeLoader implements AttributeLoader{
 
 	protected SimpleAttributeLoader() {};
 	
-	public SimpleAttributeLoader(String locationFilename,String stateFilename, String alignmentFilename) throws NumberFormatException, IOException {
+	public SimpleAttributeLoader(String locationFilename,String stateFilename, String alignmentFilename, String migrationModelFilename, String codonModelFilename) throws NumberFormatException, IOException {
 		if (locationFilename!=null) {
 			processLocations(locationFilename);							
 		}
@@ -28,9 +28,26 @@ public class SimpleAttributeLoader implements AttributeLoader{
 		if (alignmentFilename!=null) {
 			processAlignments(alignmentFilename);
 		}
+		if (migrationModelFilename!=null) {
+			processMigrationModels(migrationModelFilename);
+		}
+		
+		if (codonModelFilename!=null) {
+			processCodonModels(codonModelFilename);
+		}
 	}
 
 	
+	private void processCodonModels(String codonModelFilename) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void processMigrationModels(String migrationModelFilename) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	@Override
 	public HashMap<String, Object> getAttributes() {
 		return attributes;

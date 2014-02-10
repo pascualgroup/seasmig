@@ -22,6 +22,7 @@ import cern.colt.matrix.DoubleMatrix2D;
 
 @SuppressWarnings("serial")
 public class TreeWithLocations implements LikelihoodTree {
+	// TODO: organize this class it is big...
 	// TODO: check -Infinity likelihood source 
 
 	// ENCOUDING FOR UNKNOWN TAXA NUMBER (i.e. internal nodes)
@@ -39,7 +40,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	// Tree & Models
 	TreeWithLocationsNode root = null;		
 	private TransitionModel migrationModel = null;
-	private TransitionModel[] codonLikelihoodModel = new TransitionModel[3]; // CP1, CP2, CP3
+	private TransitionModel[] codonModel = new TransitionModel[3]; // CP1, CP2, CP3
 
 	int numLocations = 0; // number of location categories
 
@@ -79,7 +80,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 	};	
 
-	// for test purpose
+	// FOR TEST PURPOSE
 	public TreeWithLocations(TreeWithLocationsNode root, int numLocations, int seqLength, Config config) {
 		this.config = config;
 		taxaIndices = null;
@@ -97,7 +98,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		this.root = root;
 	}
 
-	// Generate a random tree based on createTreeModel .... 
+	// FOR TEST PURPOSE: Generate a random tree based on createTreeModel ....
 	public TreeWithLocations(TransitionModel createTreeModel, int numNodes, Config config) {
 		this.config = config;
 		numLocations=createTreeModel.getNumLocations();
@@ -113,6 +114,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		makeRandomTree(createTreeModel, root, numNodes);	
 	}
 
+	// FOR TEST PURPOSE: Generate a random tree based on createTreeModel ....
 	// Generate random tree states based on input tree topology and model .... 
 	public TreeWithLocations(TransitionModel createTreeModel, jebl.evolution.trees.SimpleRootedTree tree, Config config) {
 		this.config = config;
@@ -161,7 +163,9 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	// Load a tree from a basic jebl tree
 	// locations are loaded from a hashmap	
-	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime, HashMap<String, Sequence> seqMap_, int seqLength_, Config config) {
+	public TreeWithLocations(jebl.evolution.trees.SimpleRootedTree tree,HashMap<String,Integer> taxaIndices_, HashMap<String, Integer> locationMap, int num_locations_, double lastTipTime, HashMap<String, Sequence> seqMap_, int seqLength_, Config config, TransitionModel migrationModel, TransitionModel[] codonModel) {
+		this.migrationModel = migrationModel;
+		this.codonModel=codonModel;
 		this.config = config;
 		taxaIndices = taxaIndices_;
 		numLocations=num_locations_;
@@ -291,7 +295,7 @@ public class TreeWithLocations implements LikelihoodTree {
 						for (int codonPos = 0; codonPos <3 ; codonPos++) {
 							DoubleMatrix2D p = null;						
 							// TODO: Util.minValue here for numerics issues, check this... 
-							p = codonLikelihoodModel[codonPos].transitionMatrix(node.time, child.time);
+							p = codonModel[codonPos].transitionMatrix(node.time, child.time);
 
 							for (int loc=0;loc<((seqLength-1)/3+1);loc++) {
 								for (int from = 0; from < 4; from++) {													
@@ -312,7 +316,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			DoubleMatrix1D pi[] = new DoubleMatrix1D[3];
 
 			for (int i=0;i<3;i++) {
-				pi[i]=codonLikelihoodModel[i].rootfreq(root.time);
+				pi[i]=codonModel[i].rootfreq(root.time);
 			}
 
 
@@ -362,7 +366,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public LikelihoodTree copy() {
 		TreeWithLocations copyTree = new TreeWithLocations();
 		copyTree.migrationModel=this.migrationModel;
-		copyTree.codonLikelihoodModel=this.codonLikelihoodModel;
+		copyTree.codonModel=this.codonModel;
 		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
 		copyTree.seqLength = this.seqLength;		
 		copyTree.numIdentifiedSeqs=this.numIdentifiedSeqs;
@@ -1147,7 +1151,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public void setCodonModel(Object codonModel) {
-		codonLikelihoodModel = (TransitionModel[]) codonModel;
+		codonModel = (TransitionModel[]) codonModel;
 	}
 
 	public double getNumIdentifiedSeqs() {
@@ -1310,7 +1314,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=0; i<3; i++) {
 			returnValue+=Integer.toString(i)+": {";			
 			for (int j=0; j<3; j++) {
-				returnValue+=Integer.toString(j)+": "+codonLikelihoodModel[i].rootfreq(0).get(j);
+				returnValue+=Integer.toString(j)+": "+codonModel[i].rootfreq(0).get(j);
 				if (j!=2) returnValue+=",";
 				returnValue+=" ";
 			}			
@@ -1353,7 +1357,7 @@ public class TreeWithLocations implements LikelihoodTree {
 					int repeats = 0;
 					do {
 						repeats+=1;
-						event = codonLikelihoodModel[codonPosition].nextEvent(currentTime, currentNuc);						
+						event = codonModel[codonPosition].nextEvent(currentTime, currentNuc);						
 						if (event.time < node.time) {					
 							node.mutations.get(codonPosition).get(loc).add(event);
 							currentNuc = event.toTrait;
@@ -1387,7 +1391,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		DoubleMatrix1D pi[] = new DoubleMatrix1D[3];
 
 		for (int i=0;i<3;i++) {
-			pi[i]=codonLikelihoodModel[i].rootfreq(root.time);
+			pi[i]=codonModel[i].rootfreq(root.time);
 		}
 
 		for (int codonPos = 0; codonPos <3 ; codonPos++) {
@@ -1412,7 +1416,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 					double[] alphas = new double[4];	
 					// TODO: check need for Util.minValue
-					DoubleMatrix1D p = codonLikelihoodModel[codonPosition].probability(parent.seq.getNuc(loc*3+codonPosition), parent.time, node.time+Util.minValue);
+					DoubleMatrix1D p = codonModel[codonPosition].probability(parent.seq.getNuc(loc*3+codonPosition), parent.time, node.time+Util.minValue);
 
 					for (int i=0; i < 4; i++) {								
 						alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbsCP[codonPosition][loc][i];

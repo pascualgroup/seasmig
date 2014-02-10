@@ -26,8 +26,6 @@ public class TreesLikelihoodVariable extends Variable {
 	public class TreesLikelihoodVariableOutputObject implements Serializable {		
 		protected TreesLikelihoodVariableOutputObject() {};
 		
-		
-		
 		String[] probTrees = null;
 		public String[] asrTrees = null;
 		public String[] smTrees = null;
