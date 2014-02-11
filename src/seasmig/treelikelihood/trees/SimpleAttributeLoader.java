@@ -47,7 +47,7 @@ public class SimpleAttributeLoader implements AttributeLoader{
 		DataInputStream codonModelDIStream = new DataInputStream(codonModelFIStream);
 		BufferedReader codonModelReader = new BufferedReader(new InputStreamReader(codonModelDIStream));
 
-		HashMap<String, TransitionModel[]> codonModelMap = new HashMap<String, TransitionModel[]>();
+		HashMap<String, TransitionModel> codonModelMap = new HashMap<String, TransitionModel>();
 	
 		ArrayList<String> matrixLines = new ArrayList<String>(); 
 		
@@ -98,7 +98,9 @@ public class SimpleAttributeLoader implements AttributeLoader{
 			models[0]=new ConstantTransitionBaseModel(mu0, k0, piC0, piA0, piG0);
 			models[1]=new ConstantTransitionBaseModel(mu1, k1, piC1, piA1, piG1);
 			models[2]=new ConstantTransitionBaseModel(mu2, k2, piC2, piA2, piG2);
-			codonModelMap.put(Integer.toString(treeNum), models);
+			codonModelMap.put(Integer.toString(treeNum)+".0", models[0]);
+			codonModelMap.put(Integer.toString(treeNum)+".1", models[1]);
+			codonModelMap.put(Integer.toString(treeNum)+".2", models[2]);
 			treeNum=treeNum+1;
 		}
 
@@ -310,6 +312,11 @@ public class SimpleAttributeLoader implements AttributeLoader{
 			attributes.put("piC2", countC2/(countA2+countC2+countT2+countG2));
 			attributes.put("piT2", countT2/(countA2+countC2+countT2+countG2));
 			attributes.put("piG2", countG2/(countA2+countC2+countT2+countG2));
+			
+			System.out.println("empirical base freq (ACTG)");
+			System.out.println("cp0=("+(Double) attributes.get("piA0")+","+(Double) attributes.get("piC0")+","+(Double) attributes.get("piT0")+","+(Double) attributes.get("piG0")+")");
+			System.out.println("cp1=("+(Double) attributes.get("piA1")+","+(Double) attributes.get("piC1")+","+(Double) attributes.get("piT1")+","+(Double) attributes.get("piG1")+")");
+			System.out.println("cp2=("+(Double) attributes.get("piA2")+","+(Double) attributes.get("piC2")+","+(Double) attributes.get("piT2")+","+(Double) attributes.get("piG2")+")");
 		}
 		else {
 			attributes.put("seqLength",0);

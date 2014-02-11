@@ -184,6 +184,12 @@ public class DataFromFiles implements Data
 			if (seqMap!=null)
 				System.out.println("loaded "+seqMap.size()+" sequences"+" from "+alignmentFilename);
 
+			if (codonModelMap!=null)
+				System.out.println("loaded "+codonModelMap.size()+" codon models"+" from "+codonModelFilename);
+			
+			if (migrationModelMap!=null)
+				System.out.println("loaded "+migrationModelMap.size()+" migration models"+" from "+migrationModelFilename);
+			
 			System.out.print("Reparsing trees... ");
 
 			if (seqMap!=null) {
