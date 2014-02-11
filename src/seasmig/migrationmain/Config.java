@@ -91,12 +91,12 @@ public class Config implements Serializable
 	public Long randomSeed;
 	
 	// IO RELATED PARAMETERS
-	public String sampleFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\samples.jsons";
-	public String swapStatsFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\swap_stats.txt";
+	public String sampleFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\samples.jsons";
+	public String swapStatsFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\swap_stats.txt";
 	public Level logLevel = Level.INFO;
-	public String checkpointFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\checkpoint.bin";
-	public String priorLikelihoodFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\prior_likelihood.txt";
-	public String mlFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_sm_with_sequences\\ml.txt";
+	public String checkpointFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\checkpoint.bin";
+	public String priorLikelihoodFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\prior_likelihood.txt";
+	public String mlFilename = "F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\ml.txt";
 	public long thin = 20;
 	
 	// MCMC RELATED PARAMETERS
@@ -185,12 +185,12 @@ public class Config implements Serializable
 
 	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\vp7_partial_epitopes_short.fas"};
 
-	public SeqModelType seqModelType = SeqModelType.HKY_3CP;
+	public SeqModelType seqModelType = SeqModelType.HKY_3CP_AS_INPUT;
 
 	public double verificationTolerance = 3; // TODO: check why verification fails ?ed? with seq data, and is it just a convergence things.
 
 	public String[] migrationModelFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\migration_models.txt"};
-	public String[] codonModelFilenames;
+	public String[] codonModelFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\codon_models.txt"};
 
 	// OUTPUT CONFIG TO FILE
 	public void outputToFile(String outfilename, Gson gson) {

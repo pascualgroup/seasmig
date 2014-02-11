@@ -272,7 +272,7 @@ public class DataForTests implements Data {
 			// Convert trees to internal tree representation
 			if (config.locationFilenames[0]!=null) {
 				System.out.print("Loading traits... ");
-				AttributeLoader attributeLoader= new SimpleAttributeLoader(config.locationFilenames[0], null,null, null, null);
+				AttributeLoader attributeLoader= new SimpleAttributeLoader(config,config.locationFilenames[0], null,null, null, null);
 				// TODO: think about this...
 				HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributeLoader.getAttributes().get("locations");
 				HashMap<String,Double> stateMap = (HashMap<String,Double>) attributeLoader.getAttributes().get("states");

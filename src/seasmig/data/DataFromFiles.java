@@ -165,11 +165,11 @@ public class DataFromFiles implements Data
 
 			System.out.print("Loading traits, alignments, migration and codon models... ");
 
-			AttributeLoader attributeLoader= new SimpleAttributeLoader(locationFilename, null, alignmentFilename, migrationModelFilename, codonModelFilename);	
+			AttributeLoader attributeLoader= new SimpleAttributeLoader(config, locationFilename, null, alignmentFilename, migrationModelFilename, codonModelFilename);	
 			HashMap<String,Object> attributes = attributeLoader.getAttributes();
 			@SuppressWarnings("unchecked")
 			HashMap<String,Integer> locationMap = (HashMap<String,Integer>) attributes.get("locations");
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") 
 			HashMap<String,Sequence> seqMap = (HashMap<String,Sequence>) attributes.get("alignments");
 			@SuppressWarnings("unchecked")
 			HashMap<String,TransitionModel> migrationModelMap = (HashMap<String,TransitionModel>) attributes.get("migrationModels");
