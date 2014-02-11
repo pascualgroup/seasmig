@@ -31,7 +31,7 @@ public class SequenceAndMigrationModelFactory implements ModelFactory
 			switch (config.seqModelType) {
 			case HKY_3CP: case HKY_3CP_AS_INPUT:
 				boolean inputSeqModel=(config.seqModelType==SeqModelType.HKY_3CP_AS_INPUT);
-				return new HKY_3CP_NoMigrationSeasonality(initialChain, config, data,inputMigrationModel, inputSeqModel);			
+				return new HKY_3CP_ConstantMigrationRates(initialChain, config, data,inputMigrationModel, inputSeqModel);			
 			case NONE:
 				System.err.println("config error... seqModelType==NONE and ???");
 				System.exit(-1);

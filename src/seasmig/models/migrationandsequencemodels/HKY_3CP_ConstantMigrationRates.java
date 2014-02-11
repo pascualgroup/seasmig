@@ -22,7 +22,7 @@ import seasmig.util.Util;
 
 
 @SuppressWarnings("serial")
-public class HKY_3CP_NoMigrationSeasonality extends MigrationModel {
+public class HKY_3CP_ConstantMigrationRates extends MigrationModel {
 
 	// TODO: seperate into two variables for seqence and location likelihood...
 
@@ -57,9 +57,9 @@ public class HKY_3CP_NoMigrationSeasonality extends MigrationModel {
 	private DoubleVariable muHyperPrior;
 	private boolean inputCodonModel = false;
 	private boolean inputMigrationModel = false;
-	protected HKY_3CP_NoMigrationSeasonality() { }
+	protected HKY_3CP_ConstantMigrationRates() { }
 
-	public HKY_3CP_NoMigrationSeasonality(Chain initialChain, Config config, Data data, boolean inputMigrationModel, boolean inputCodonModel) throws MC3KitException
+	public HKY_3CP_ConstantMigrationRates(Chain initialChain, Config config, Data data, boolean inputMigrationModel, boolean inputCodonModel) throws MC3KitException
 	{
 		super(initialChain);
 		this.config = config;
@@ -144,11 +144,7 @@ public class HKY_3CP_NoMigrationSeasonality extends MigrationModel {
 
 	private class LikelihoodVariable extends TreesLikelihoodVariable {
 
-
-		private boolean wasHere;
-		private boolean wasAlsoHere;
-
-		LikelihoodVariable(HKY_3CP_NoMigrationSeasonality m) throws MC3KitException {
+		LikelihoodVariable(HKY_3CP_ConstantMigrationRates m) throws MC3KitException {
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true, nTrees.length,config);
