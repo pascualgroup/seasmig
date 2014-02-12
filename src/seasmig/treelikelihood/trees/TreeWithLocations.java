@@ -710,7 +710,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			}			
 		}
 		System.err.println("Error sampling random location from log probs!");
-		System.exit(-1);
+		//System.exit(-1);
 		return TreeWithLocations.ERR_LOCATION;
 	}
 
@@ -730,9 +730,12 @@ public class TreeWithLocations implements LikelihoodTree {
 			TreeWithLocationsNode parent = node.getParent();					
 			// TODO: check if clause (here for numerics issues)
 			DoubleMatrix1D p = migrationModel.probability(parent.getLoc(), parent.time, node.time);
-			for (int i=0; i < numLocations; i++) {								
+			for (int i=0; i < numLocations; i++) {				
 				alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbsLOC[i];
-			}		
+				if (Double.isNaN(alphas[i])) {
+					alphas[i]=cern.jet.math.Functions.log.apply(p.get(i)*cern.jet.math.Functions.exp.apply(node.logProbsLOC[i]));
+				}
+			}	
 			node.setLoc(normalizeAndGetRandomSampleFromLogProbs(alphas));
 
 		}	

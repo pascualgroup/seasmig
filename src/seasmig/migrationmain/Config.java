@@ -166,7 +166,7 @@ public class Config implements Serializable
 	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\accession_locid.txt"}; // null if locations are loaded from tree
 	public String[] treeFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\newTrait_tree_with_trait.trees"}; // null for test generated data 
 	public double[] treeWeights = {1.0};
-	public int numTreesFromTail = 25; // at most number of trees to read from tree file's tail
+	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
 	public int numLocations = 7; // needs to be specified if locations are loaded from trees....
 	
 	// VARIABLE SELECTION
@@ -183,7 +183,7 @@ public class Config implements Serializable
 	public double timeToDesignateTrunk = 4.0; // time back from present day tip ancestry designated as trunk 
 	public int maxSMBranchRetries = 200000; // maximum number of retries for stochastically mapping a single branch
 
-	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\vp7_partial_epitopes_short.fas"};
+	public String[] alignmentFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\all_epitopes.txt"};
 
 	public SeqModelType seqModelType = SeqModelType.HKY_3CP_AS_INPUT;
 
