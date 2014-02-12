@@ -106,7 +106,7 @@ public class Config implements Serializable
 	public long tuneFor = 200;
 	public long mlthin = 5;	
 	public long initialHistoryCount = 5;
-	public int chainCount = 3;
+	public int chainCount = 1;
 	public double heatPower = 1.0;
 	public long swapInterval = 1;	
 	public double targetAcceptanceRate = 0.25;
