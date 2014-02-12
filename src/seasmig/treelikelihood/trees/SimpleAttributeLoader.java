@@ -195,7 +195,7 @@ public class SimpleAttributeLoader implements AttributeLoader{
 	
 	static String stringTake(String str, int from, int to, int step) {
 		String result=new String();
-		for (int i=0;i<to;i+=step){
+		for (int i=from;i<to;i+=step){
 			result+=str.charAt(i);
 		}
 		return result;
@@ -239,6 +239,31 @@ public class SimpleAttributeLoader implements AttributeLoader{
 					tempT=tempT.replaceAll("a", ""); tempT=tempT.replaceAll("A", ""); tempT=tempT.replaceAll("C", ""); tempT=tempT.replaceAll("c", "");	tempT=tempT.replaceAll("G", "");;	tempT=tempT.replaceAll("g", "");
 					countA+=tempA.length();	countC+=tempC.length();	countT+=tempT.length();	countG+=tempG.length();
 					//System.err.println("seq length: "+seq.length()+" ACTG length: "+(tempA.length()+tempC.length()+tempT.length()+tempG.length()));
+					// for specific codon position 0
+					String cp0 = stringTake(seq,0,seq.length(),3);
+					String tempA0=cp0; String tempC0=cp0; String tempG0=cp0; String tempT0=cp0;
+					tempA0=tempA0.replaceAll("t", ""); tempA0=tempA0.replaceAll("T", ""); tempA0=tempA0.replaceAll("C", ""); tempA0=tempA0.replaceAll("c", "");	tempA0=tempA0.replaceAll("G", "");;	tempA0=tempA0.replaceAll("g", "");
+					tempC0=tempC0.replaceAll("t", ""); tempC0=tempC0.replaceAll("T", ""); tempC0=tempC0.replaceAll("A", ""); tempC0=tempC0.replaceAll("a", "");	tempC0=tempC0.replaceAll("G", "");;	tempC0=tempC0.replaceAll("g", "");
+					tempG0=tempG0.replaceAll("t", ""); tempG0=tempG0.replaceAll("T", ""); tempG0=tempG0.replaceAll("C", ""); tempG0=tempG0.replaceAll("c", "");	tempG0=tempG0.replaceAll("A", "");;	tempG0=tempG0.replaceAll("a", "");
+					tempT0=tempT0.replaceAll("a", ""); tempT0=tempT0.replaceAll("A", ""); tempT0=tempT0.replaceAll("C", ""); tempT0=tempT0.replaceAll("c", "");	tempT0=tempT0.replaceAll("G", "");;	tempT0=tempT0.replaceAll("g", "");
+					countA0+=tempA0.length();	countC0+=tempC0.length();	countT0+=tempT0.length();	countG0+=tempG0.length();
+					//System.err.println("seq length: "+seq.length()+" ACTG length: "+(tempA.length()+tempC.length()+tempT.length()+tempG.length()));
+					// for specific codon position 1
+					String cp1 = stringTake(seq,1,seq.length(),3);
+					String tempA1=cp1; String tempC1=cp1; String tempG1=cp1; String tempT1=cp1;
+					tempA1=tempA1.replaceAll("t", ""); tempA1=tempA1.replaceAll("T", ""); tempA1=tempA1.replaceAll("C", ""); tempA1=tempA1.replaceAll("c", "");	tempA1=tempA1.replaceAll("G", "");;	tempA1=tempA1.replaceAll("g", "");
+					tempC1=tempC1.replaceAll("t", ""); tempC1=tempC1.replaceAll("T", ""); tempC1=tempC1.replaceAll("A", ""); tempC1=tempC1.replaceAll("a", "");	tempC1=tempC1.replaceAll("G", "");;	tempC1=tempC1.replaceAll("g", "");
+					tempG1=tempG1.replaceAll("t", ""); tempG1=tempG1.replaceAll("T", ""); tempG1=tempG1.replaceAll("C", ""); tempG1=tempG1.replaceAll("c", "");	tempG1=tempG1.replaceAll("A", "");;	tempG1=tempG1.replaceAll("a", "");
+					tempT1=tempT1.replaceAll("a", ""); tempT1=tempT1.replaceAll("A", ""); tempT1=tempT1.replaceAll("C", ""); tempT1=tempT1.replaceAll("c", "");	tempT1=tempT1.replaceAll("G", "");;	tempT1=tempT1.replaceAll("g", "");
+					countA1+=tempA1.length();	countC1+=tempC1.length();	countT1+=tempT1.length();	countG1+=tempG1.length();
+					// for specific codon position 2
+					String cp2 = stringTake(seq,2,seq.length(),3);
+					String tempA2=cp2; String tempC2=cp2; String tempG2=cp2; String tempT2=cp2;
+					tempA2=tempA2.replaceAll("t", ""); tempA2=tempA2.replaceAll("T", ""); tempA2=tempA2.replaceAll("C", ""); tempA2=tempA2.replaceAll("c", "");	tempA2=tempA2.replaceAll("G", "");;	tempA2=tempA2.replaceAll("g", "");
+					tempC2=tempC2.replaceAll("t", ""); tempC2=tempC2.replaceAll("T", ""); tempC2=tempC2.replaceAll("A", ""); tempC2=tempC2.replaceAll("a", "");	tempC2=tempC2.replaceAll("G", "");;	tempC2=tempC2.replaceAll("g", "");
+					tempG2=tempG2.replaceAll("t", ""); tempG2=tempG2.replaceAll("T", ""); tempG2=tempG2.replaceAll("C", ""); tempG2=tempG2.replaceAll("c", "");	tempG2=tempG2.replaceAll("A", "");;	tempG2=tempG2.replaceAll("a", "");
+					tempT2=tempT2.replaceAll("a", ""); tempT2=tempT2.replaceAll("A", ""); tempT2=tempT2.replaceAll("C", ""); tempT2=tempT2.replaceAll("c", "");	tempT2=tempT2.replaceAll("G", "");;	tempT2=tempT2.replaceAll("g", "");
+					countA2+=tempA2.length();	countC2+=tempC2.length();	countT2+=tempT2.length();	countG2+=tempG2.length();
 				}				
 				taxa = strLine.substring(1,strLine.length());
 				seq = "";
@@ -285,7 +310,6 @@ public class SimpleAttributeLoader implements AttributeLoader{
 			tempG2=tempG2.replaceAll("t", ""); tempG2=tempG2.replaceAll("T", ""); tempG2=tempG2.replaceAll("C", ""); tempG2=tempG2.replaceAll("c", "");	tempG2=tempG2.replaceAll("A", "");;	tempG2=tempG2.replaceAll("a", "");
 			tempT2=tempT2.replaceAll("a", ""); tempT2=tempT2.replaceAll("A", ""); tempT2=tempT2.replaceAll("C", ""); tempT2=tempT2.replaceAll("c", "");	tempT2=tempT2.replaceAll("G", "");;	tempT2=tempT2.replaceAll("g", "");
 			countA2+=tempA2.length();	countC2+=tempC2.length();	countT2+=tempT2.length();	countG2+=tempG2.length();
-			System.err.println(cp2.length()==countA2+countC2+countT2+countG2);
 		}	
 		
 		seqReader.close();

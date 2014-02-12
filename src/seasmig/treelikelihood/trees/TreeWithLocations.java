@@ -10,6 +10,7 @@ import java.util.Stack;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.migrationmain.Config;
+import seasmig.migrationmain.Config.MigrationModelType;
 import seasmig.migrationmain.Config.SeqModelType;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
@@ -356,8 +357,14 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public double logLikelihood() {
-		if (logLike==null) {
-			logLike = locLogLikelihood()+seqLogLikelihood();
+		if (logLike==null) {			
+			logLike=new Double(0);
+			if (config.migrationModelType!=MigrationModelType.CONSTANT_AS_INPUT) {
+				logLike+=locLogLikelihood();
+			}
+			if (config.seqModelType!=SeqModelType.HKY_3CP_AS_INPUT) {
+				logLike+=seqLogLikelihood();
+			}
 		}
 		return logLike;
 	}	
@@ -519,11 +526,17 @@ public class TreeWithLocations implements LikelihoodTree {
 		migrationModel = (TransitionModel) likelihoodModel_;
 	}
 
-	public String newickProbs() {	 
+	public void fillConditionalLikelihoods() {
+		if (locationLogLike==0) locLogLikelihood();
+		if (seqLogLike==0) seqLogLikelihood();		
+	}
+	
+	public String newickProbs() {		
+		fillConditionalLikelihoods();
 		return newickProbs(root,migrationModel.rootfreq(root.time).toArray());
 	}
-
-	private String newickProbs(TreeWithLocationsNode treePart, double[] rootFreq) {
+	
+	private String newickProbs(TreeWithLocationsNode treePart, double[] rootFreq) {				
 		String returnValue = new String();
 
 		if (treePart.isTip()) {
@@ -573,6 +586,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String newickSM(int maxBranchRetries) {
+		fillConditionalLikelihoods();
 		sortChildrenByDescendants();
 		asr(); // Ancestral state reconstruction
 		stochasticMapping(maxBranchRetries);
@@ -580,7 +594,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		return newickSM(root);
 	}
 
-	private String newickSM(TreeWithLocationsNode treePart) {
+	private String newickSM(TreeWithLocationsNode treePart) {		
 		String returnValue = new String();
 
 		if (treePart.isTip()) {
@@ -608,8 +622,9 @@ public class TreeWithLocations implements LikelihoodTree {
 	private void stochasticMapping(int maxBranchRetries) {
 		// TODO: test
 		// TODO: cite		
-		//System.err.println(" Q="+migrationModel.parse());
+		//System.err.println(" Q="+migrationModel.parse());		
 		if (stochasticallyMapped) return;		
+		fillConditionalLikelihoods();
 		for (TreeWithLocationsNode node : eachPreorder()) { 
 			if (node.getParent()==null) continue;
 			node.migrations=new ArrayList<Transition>();
@@ -703,6 +718,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		if (asrDone) return;		
 		// Calculate root state
 		// TODO: check this
+		fillConditionalLikelihoods();
 		DoubleMatrix1D rootFreq = migrationModel.rootfreq(root.time);
 		double[] alphas = new double[numLocations];	
 		for (int i = 0; i < numLocations; i++) {
@@ -726,6 +742,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	@Override
 	public String newickASR() {
 		// TODO: Check this
+		fillConditionalLikelihoods();
 		sortChildrenByDescendants();
 		asr();
 		String returnValue = newickStates(root);
@@ -733,7 +750,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	}
 
-	private String newickStates(TreeWithLocationsNode treePart) {
+	private String newickStates(TreeWithLocationsNode treePart) {		
 		sortChildrenByDescendants();
 		String returnValue = new String();
 
@@ -761,8 +778,6 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String smTransitions() {
-
-
 		String returnValue = "{";
 		String[][] transitionTimes = new String[numLocations][numLocations];		
 
@@ -1162,6 +1177,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	public String seqMutationStats(int maxBranchRetries) throws Exception {
 
 		// TODO: check SM time at change in node...
+		
+		fillConditionalLikelihoods();
 		System.out.print("Sorting children by the number of descendants for consistant node ordering...");	
 		sortChildrenByDescendants();
 		System.out.print("done! ");
@@ -1386,7 +1403,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private void asrSeq() throws Exception {
 
 		if (asrSeqDone) return;	
-
+		fillConditionalLikelihoods();
 		// Add root frequency		
 		DoubleMatrix1D pi[] = new DoubleMatrix1D[3];
 
@@ -1429,13 +1446,15 @@ public class TreeWithLocations implements LikelihoodTree {
 		asrSeqDone=true;
 	}
 
-	@Override
-	public Double seqLikelihood() {		
+	@Override	
+	public Double seqLikelihood() {
+		fillConditionalLikelihoods();
 		return this.seqLogLike;
 	}
 
 	@Override
 	public Double locLikelihood() {
+		fillConditionalLikelihoods();
 		return this.locationLogLike;
 	}
 
