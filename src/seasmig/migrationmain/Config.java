@@ -166,7 +166,7 @@ public class Config implements Serializable
 	public String[] locationFilenames ={"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\accession_locid.txt"}; // null if locations are loaded from tree
 	public String[] treeFilenames = {"F:\\Daniel\\Dropbox\\SharedFolderBobDanielRV\\who_and_us\\for_testing_seasmig_mapping_without_mcmc\\newTrait_tree_with_trait.trees"}; // null for test generated data 
 	public double[] treeWeights = {1.0};
-	public int numTreesFromTail = 100; // at most number of trees to read from tree file's tail
+	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	public int numLocations = 7; // needs to be specified if locations are loaded from trees....
 	
 	// VARIABLE SELECTION

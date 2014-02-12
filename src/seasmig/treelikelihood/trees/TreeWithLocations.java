@@ -694,7 +694,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (int i=1;i<logProbs.length;i++) {
 			if (Double.isInfinite(min)) 
 				min = logProbs[i];			
-			if (min<logProbs[i] &&  !Double.isInfinite(logProbs[i]))
+			if (min<logProbs[i] &&  !Double.isInfinite(logProbs[i]) && !Double.isNaN(logProbs[i]))
 				min=logProbs[i];
 		}
 		double sum=0;			
@@ -710,6 +710,14 @@ public class TreeWithLocations implements LikelihoodTree {
 			}			
 		}
 		System.err.println("Error sampling random location from log probs!");
+		p=0;	
+		for (int i=0;i<logProbs.length;i++) {
+			p=p+cern.jet.math.Functions.exp.apply(logProbs[i]-min);
+			if (cern.jet.random.Uniform.staticNextDouble()<=(p/sum)) {
+				return i;				
+			}			
+		}
+		System.err.println("Failed Retry!");
 		//System.exit(-1);
 		return TreeWithLocations.ERR_LOCATION;
 	}
