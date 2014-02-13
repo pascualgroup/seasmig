@@ -1546,7 +1546,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		int postOrderIndex=0;
 		for (TreeWithLocationsNode node : root) {
 			postOrderIndex++;	
-			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(), mapMutationsToSequence(node.seq, node.mutations, node.time),node.isTip());
+			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(), mapMutationsToSequence(node.seq, node.mutations, node.time),node.isTip(), node.getTaxonIndex());
 			node.postOrderIndex=postOrderIndex;
 		}
 
