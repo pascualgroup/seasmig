@@ -741,6 +741,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			for (int i=0; i < numLocations; i++) {				
 				alphas[i] = cern.jet.math.Functions.log.apply(p.get(i)) + node.logProbsLOC[i];
 				if (Double.isNaN(alphas[i])) {
+					if (p.get(i)<0) p.set(i, Double.MIN_VALUE);
 					alphas[i]=cern.jet.math.Functions.log.apply(p.get(i)*cern.jet.math.Functions.exp.apply(node.logProbsLOC[i]));
 				}
 			}	
