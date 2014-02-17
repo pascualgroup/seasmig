@@ -96,8 +96,6 @@ public class TreeWithLocations implements LikelihoodTree {
 		Transition event;
 		TransitionType eventType;
 		Integer loci;
-		Sequence seq;
-		Integer location;
 	}
 	
 	static final Comparator<Event> eventOrder = new Comparator<Event>() {
@@ -1711,20 +1709,37 @@ public class TreeWithLocations implements LikelihoodTree {
 			
 			Collections.sort(mutationsAndMigrationsSortedByTime, eventOrder);
 			
-			
+			// Add chain of events as children 
 			Sequence parentSeq = child.seq;
 			int parentLocation = child.getLoc();
+			TreeWithLocationsNode parentNode = to;
 			for (Event event : mutationsAndMigrationsSortedByTime) {
 				// TODO:
-				
+				TreeWithLocationsNode newChild = null;				
+				switch (event.eventType) {
+				case MIGRATION:
+					if (config.seqModelType==SeqModelType.NONE)
+						newChild = new TreeWithLocationsNode(parentSeq, event.event.toTrait, UNKNOWN_TAXA, event.event.time, parentNode,false);
+					else
+						newChild = new TreeWithLocationsNode(parentSeq, event.event.toTrait, UNKNOWN_TAXA, event.event.time, parentNode,true);
+					break;
+				case MUTATION:
+					newChild = new TreeWithLocationsNode(parentSeq.copy().set(event.loci, event.event.toTrait), parentLocation, UNKNOWN_TAXA, event.event.time, parentNode,true);
+					break;
+				}
+				parentNode.children.add(newChild);
+				parentSeq = newChild.seq;
+				parentLocation = newChild.getLoc();								
+				parentNode = newChild;					
 			}
 			
 			TreeWithLocationsNode newChild = null;
 			if (config.seqModelType==SeqModelType.NONE)
-				newChild = new TreeWithLocationsNode(child.seq, child.getLoc(),child.taxonIndex,child.time, to,false);
+				newChild = new TreeWithLocationsNode(child.seq, child.getLoc(),child.taxonIndex,child.time, parentNode,false);
 			else
-				newChild = new TreeWithLocationsNode(child.seq, child.getLoc(),child.taxonIndex,child.time, to,true);
-			to.children.add(newChild);			
+				newChild = new TreeWithLocationsNode(child.seq, child.getLoc(),child.taxonIndex,child.time, parentNode,true);
+			
+			parentNode.children.add(newChild);			
 			copyTree(child, newChild);			
 		}
 		
