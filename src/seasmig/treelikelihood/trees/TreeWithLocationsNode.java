@@ -30,8 +30,12 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 	private Sequence noSequence = new Sequence(0);
 	public int postOrderIndex;
 	private float layout;
+	private NodeType type;
 
 	public static final double minNegative = Double.NEGATIVE_INFINITY;
+	
+	// for output....
+	public enum NodeType {MUTATION, MIGRATION, TIP, BRANCHING};	
 
 	protected TreeWithLocationsNode() {};
 
@@ -40,8 +44,16 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		if (seq==null) {
 			seq = noSequence;
 		} 	
-		if (useSequenceData)
-			if (!seq.isTip()) seq=seq_.copy();		
+		if (useSequenceData) {
+			if (!seq.isTip()) {
+				seq=seq_.copy();
+				type = NodeType.TIP;
+			}
+			else {
+				type = NodeType.BRANCHING;
+			}
+		}
+		
 		setLoc(loc_);
 		time=time_;
 		setParent(parent_);	
@@ -251,5 +263,13 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 
 	public float getLayout() {
 		return layout;
+	}
+
+	public NodeType getType() {				
+		return type;
+	}
+
+	public void setType(NodeType type) {
+		this.type=type;		
 	}
 }

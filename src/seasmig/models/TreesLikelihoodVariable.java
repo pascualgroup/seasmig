@@ -114,8 +114,7 @@ public class TreesLikelihoodVariable extends Variable {
 				outputObject.altBranches = new String[trees.length];
 				for (int i=0;i<trees.length;i++) {
 					AltTreeOutput smAlternativeTreeOutput = trees[i].smAlternativeTreeOutput();
-					outputObject.altNodes[i] = smAlternativeTreeOutput.getNodes();
-					outputObject.altBranches[i] = smAlternativeTreeOutput.getBranches();  					
+					outputObject.altNodes[i] = smAlternativeTreeOutput.getNodes();				
 				}									
 			}
 			if (config.smTransitions) {
@@ -236,12 +235,11 @@ public class TreesLikelihoodVariable extends Variable {
 				outputObject.altBranches = new String[trees.length];
 				for (int i=0;i<trees.length;i++) {
 					AltTreeOutput smAlternativeTreeOutput = trees[i].smAlternativeTreeOutput();
-					outputObject.altNodes[i] = smAlternativeTreeOutput.getNodes();
-					outputObject.altBranches[i] = smAlternativeTreeOutput.getBranches();  					
+					outputObject.altNodes[i] = smAlternativeTreeOutput.getNodes();		
 				}									
-			}
-			
+			}			
 			////////////////////////////////////////
+					
 			String[] returnValue=new String[trees.length];
 			for (int i=0;i<trees.length;i++) {	 			
 				returnValue[i]=trees[i].pies();

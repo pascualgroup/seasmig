@@ -42,4 +42,5 @@ public interface LikelihoodTree extends Serializable {
 	
 	// Cleanup after reconstruction
 	public void clearInternalNodes();
+	
 }

@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import org.javatuples.Pair;
-import org.javatuples.Triplet;
-
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.migrationmain.Config;
@@ -18,6 +15,7 @@ import seasmig.migrationmain.Config.SeqModelType;
 import seasmig.treelikelihood.LikelihoodTree;
 import seasmig.treelikelihood.TransitionModel;
 import seasmig.treelikelihood.TransitionModel.Transition;
+import seasmig.treelikelihood.trees.TreeWithLocationsNode.NodeType;
 import seasmig.util.AltTreeOutput;
 import seasmig.util.Util;
 import cern.colt.matrix.DoubleMatrix1D;
@@ -1569,16 +1567,12 @@ public class TreeWithLocations implements LikelihoodTree {
 		int postOrderIndex=0;
 		for (TreeWithLocationsNode node : root) {
 			postOrderIndex++;	
-			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(), mapMutationsToSequence(node.seq, node.mutations, node.time),node.isTip(), node.getTaxonIndex());
 			node.postOrderIndex=postOrderIndex;
 		}
-
+		
 		for (TreeWithLocationsNode node : root) {
-			for (TreeWithLocationsNode child : node.children) {
-				altTreeOutput.addBranch(node.postOrderIndex, child.postOrderIndex);
-			}
+			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(),node.seq.toString(), node.getType(), node.getTaxonIndex(), node.getParent().postOrderIndex);
 		}
-
 
 		return altTreeOutput;
 
@@ -1722,9 +1716,12 @@ public class TreeWithLocations implements LikelihoodTree {
 						newChild = new TreeWithLocationsNode(parentSeq, event.event.toTrait, UNKNOWN_TAXA, event.event.time, parentNode,false);
 					else
 						newChild = new TreeWithLocationsNode(parentSeq, event.event.toTrait, UNKNOWN_TAXA, event.event.time, parentNode,true);
+					newChild.setType(NodeType.MIGRATION);
 					break;
+					
 				case MUTATION:
 					newChild = new TreeWithLocationsNode(parentSeq.copy().set(event.loci, event.event.toTrait), parentLocation, UNKNOWN_TAXA, event.event.time, parentNode,true);
+					newChild.setType(NodeType.MUTATION);
 					break;
 				}
 				parentNode.children.add(newChild);
