@@ -45,12 +45,8 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 			seq = noSequence;
 		} 	
 		if (useSequenceData) {
-			if (!seq.isTip()) {
+			if (!seq.isTip()) {								
 				seq=seq_.copy();
-				type = NodeType.TIP;
-			}
-			else {
-				type = NodeType.BRANCHING;
 			}
 		}
 		
@@ -58,6 +54,10 @@ public class TreeWithLocationsNode implements Serializable, Iterable<TreeWithLoc
 		time=time_;
 		setParent(parent_);	
 		taxonIndex=taxonIndex_;
+		if (taxonIndex!=-1) 
+			type=NodeType.TIP;
+		else 
+			type=NodeType.BRANCHING;
 	}
 
 	@Override
