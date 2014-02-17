@@ -1571,7 +1571,10 @@ public class TreeWithLocations implements LikelihoodTree {
 		}
 		
 		for (TreeWithLocationsNode node : root) {
-			altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(),node.seq.toString(), node.getType(), node.getTaxonIndex(), node.getParent().postOrderIndex);
+			if (node.getParent()!=null)
+				altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(),node.seq.toString(), node.getType(), node.getTaxonIndex(), node.getParent().postOrderIndex); 
+			else
+				altTreeOutput.addNode(postOrderIndex, node.time, node.getLoc(), node.getLayout(),node.seq.toString(), node.getType(), node.getTaxonIndex(), -1);
 		}
 
 		return altTreeOutput;
