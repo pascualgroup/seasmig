@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+import org.javatuples.Pair;
+import org.javatuples.Triplet;
+
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import seasmig.migrationmain.Config;
@@ -45,6 +48,8 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	int numLocations = 0; // number of location categories
 
+	private Config config = null;
+
 	// For Location Parsing
 	private int numIdentifiedLocations;
 
@@ -65,10 +70,8 @@ public class TreeWithLocations implements LikelihoodTree {
 	private double seqLogLike;
 	private double locationLogLike;
 
-	private Config config = null;
-
+	// FOR OUTPUT
 	private boolean stochasticallyMapped = false;
-
 	private boolean asrDone =false;
 	private boolean asrSeqDone =false;
 	private boolean sortingDone = false;
@@ -78,6 +81,28 @@ public class TreeWithLocations implements LikelihoodTree {
 			Integer descendantsV1 = new Integer(getNumberOfDescendants(v1));
 			Integer descendantsV2 = new Integer(getNumberOfDescendants(v2));
 			return descendantsV1.compareTo(descendantsV2);
+		}
+	};	
+
+	// FOR OUTPUT
+	enum TransitionType {MUTATION, MIGRATION};	
+	class Event {
+		public Event(Transition event, TransitionType eventType, Integer loci) {
+			this.event=event;
+			this.eventType=eventType;
+			this.loci=loci;
+		}		
+		
+		Transition event;
+		TransitionType eventType;
+		Integer loci;
+		Sequence seq;
+		Integer location;
+	}
+	
+	static final Comparator<Event> eventOrder = new Comparator<Event>() {
+		public int compare(Event e1, Event e2) {
+			return Double.compare(e1.event.time,e2.event.time);
 		}
 	};	
 
@@ -390,11 +415,11 @@ public class TreeWithLocations implements LikelihoodTree {
 		copyTree.asrDone=false;
 		copyTree.asrSeqDone=false;
 		copyTree.sortingDone=false;
-		treeCopy(this.root, copyTree.root);  
+		copyTree(this.root, copyTree.root);  
 		return copyTree;			
 	}
 
-	private void treeCopy(TreeWithLocationsNode from, TreeWithLocationsNode to) {
+	private void copyTree(TreeWithLocationsNode from, TreeWithLocationsNode to) {
 		for (TreeWithLocationsNode child : from.children) {
 			TreeWithLocationsNode newChild = null;
 			if (config.seqModelType==SeqModelType.NONE)
@@ -402,7 +427,7 @@ public class TreeWithLocations implements LikelihoodTree {
 			else
 				newChild = new TreeWithLocationsNode(child.seq, child.getLoc(),child.taxonIndex,child.time, to,true);
 			to.children.add(newChild);			
-			treeCopy(child, newChild);
+			copyTree(child, newChild);
 		}		
 	}
 
@@ -530,12 +555,12 @@ public class TreeWithLocations implements LikelihoodTree {
 		if (locationLogLike==0) locLogLikelihood();
 		if (seqLogLike==0) seqLogLikelihood();		
 	}
-	
+
 	public String newickProbs() {		
 		fillConditionalLikelihoods();
 		return newickProbs(root,migrationModel.rootfreq(root.time).toArray());
 	}
-	
+
 	private String newickProbs(TreeWithLocationsNode treePart, double[] rootFreq) {				
 		String returnValue = new String();
 
@@ -1189,7 +1214,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	public String seqMutationStats(int maxBranchRetries) throws Exception {
 
 		// TODO: check SM time at change in node...
-		
+
 		fillConditionalLikelihoods();
 		System.out.print("Sorting children by the number of descendants for consistant node ordering...");	
 		sortChildrenByDescendants();
@@ -1360,7 +1385,7 @@ public class TreeWithLocations implements LikelihoodTree {
 	private void stochsticMappingSeq(int maxBranchRetries) throws Exception {
 		// TODO: test
 		// TODO: cite	
-		
+
 		sortChildrenByDescendants();
 		for (TreeWithLocationsNode node : eachPreorder()) {
 			if (node.getParent()==null) continue;
@@ -1472,7 +1497,7 @@ public class TreeWithLocations implements LikelihoodTree {
 
 	@Override
 	public String seqMigrationsSeqOutput() throws Exception {
-		
+
 		sortChildrenByDescendants();
 		String returnValue = "{";
 		String[][] transitionTimes = new String[numLocations][numLocations];		
@@ -1635,6 +1660,75 @@ public class TreeWithLocations implements LikelihoodTree {
 		return numberOfDescendants;
 	}
 
+	TreeWithLocations copyWithAllEventsMappedOntoBranches() {
+		// TODO: organize this
+		TreeWithLocations copyTree = new TreeWithLocations();
+		copyTree.migrationModel=this.migrationModel;
+		copyTree.codonModel=this.codonModel;
+		copyTree.numIdentifiedLocations=this.numIdentifiedLocations;
+		copyTree.seqLength = this.seqLength;		
+		copyTree.numIdentifiedSeqs=this.numIdentifiedSeqs;
+		copyTree.numLocations=this.numLocations;		
+		copyTree.ZERO_LOG_PROBS=this.ZERO_LOG_PROBS;
+		copyTree.logLike=null;
+		if (config.seqModelType==SeqModelType.NONE)
+			copyTree.root = new TreeWithLocationsNode(root.seq, root.getLoc(),root.taxonIndex,root.time,null,false);
+		else
+			copyTree.root = new TreeWithLocationsNode(root.seq, root.getLoc(),root.taxonIndex,root.time,null,true);
+		copyTree.taxaIndices = taxaIndices;
+		copyTree.config=config;
+		copyTree.stochasticallyMapped=this.stochasticallyMapped;
+		copyTree.asrDone=this.asrDone;
+		copyTree.asrSeqDone=this.asrSeqDone;
+		copyTree.sortingDone=false; // this copy will break node names
+		treeCopyExpandingStocasticMappings(this.root, copyTree.root);  
+		return copyTree;			
+	}
+
+	private void treeCopyExpandingStocasticMappings(TreeWithLocationsNode from, TreeWithLocationsNode to) {
+		// TODO: this...
+
+		to.logProbsCP=from.logProbsCP;
+		to.logProbsLOC=from.logProbsLOC;
+		to.postOrderIndex = 0; // (re-sort after, will break names ...) 
+		to.seq = from.seq;
+		to.taxonIndex = from.taxonIndex;
+		to.time = from.time;
+		// to.addChild(locationTreeNode);
+		for (TreeWithLocationsNode child : from.children) {
+			ArrayList<Event> mutationsAndMigrationsSortedByTime = new ArrayList<Event>();
+			for (int cp=0;cp<3;cp++) {
+				for (int loci=0; loci<child.mutations.get(cp).size();loci++) {
+					for (Transition mutation : child.mutations.get(cp).get(loci)) {
+						mutationsAndMigrationsSortedByTime.add(new Event(mutation, TransitionType.MUTATION, loci*3+cp));
+					}
+				}
+			}
+			
+			for (Transition migration : child.migrations) {
+				mutationsAndMigrationsSortedByTime.add(new Event(migration,TransitionType.MIGRATION,0));																
+			}
+			
+			Collections.sort(mutationsAndMigrationsSortedByTime, eventOrder);
+			
+			
+			Sequence parentSeq = child.seq;
+			int parentLocation = child.getLoc();
+			for (Event event : mutationsAndMigrationsSortedByTime) {
+				// TODO:
+				
+			}
+			
+			TreeWithLocationsNode newChild = null;
+			if (config.seqModelType==SeqModelType.NONE)
+				newChild = new TreeWithLocationsNode(child.seq, child.getLoc(),child.taxonIndex,child.time, to,false);
+			else
+				newChild = new TreeWithLocationsNode(child.seq, child.getLoc(),child.taxonIndex,child.time, to,true);
+			to.children.add(newChild);			
+			copyTree(child, newChild);			
+		}
+		
+	}
 
 }
 
