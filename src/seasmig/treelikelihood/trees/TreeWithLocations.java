@@ -1562,6 +1562,7 @@ public class TreeWithLocations implements LikelihoodTree {
 		
 		TreeWithLocations outputCopy = copyWithAllEventsMappedOntoBranches();
 
+		outputCopy.sortChildrenByDescendants();
 		outputCopy.setLayoutByDescendants();
 
 		AltTreeOutput altTreeOutput = new AltTreeOutput();
