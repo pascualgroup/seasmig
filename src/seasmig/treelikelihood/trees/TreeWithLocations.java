@@ -1743,7 +1743,7 @@ public class TreeWithLocations implements LikelihoodTree {
 				newChild = new TreeWithLocationsNode(child.seq, child.getLoc(),child.taxonIndex,child.time, parentNode,true);
 			
 			parentNode.children.add(newChild);			
-			copyTree(child, newChild);			
+			treeCopyExpandingStocasticMappings(child, newChild);			
 		}
 		
 	}
