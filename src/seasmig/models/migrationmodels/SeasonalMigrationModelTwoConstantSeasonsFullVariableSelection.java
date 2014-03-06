@@ -132,10 +132,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true,nTrees.length,config);
-
-			// TODO: check if this is required
-			m.addEdge(ratePriorDist,rateHyperPrior);
-			
+	
 			// Add dependencies between likelihood variable and parameters
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1) {

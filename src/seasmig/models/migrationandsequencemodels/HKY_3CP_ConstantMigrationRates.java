@@ -149,9 +149,7 @@ public class HKY_3CP_ConstantMigrationRates extends MigrationModel {
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true, nTrees.length,config);
 
-			// TODO: check if you do/don't need to add m.addEdge(m.muHyperPrior,m.muPriorDist); etc... ??
-			m.addEdge(muHyperPriorDist,muHyperPrior);
-			m.addEdge(rateHyperPriorDist,rateHyperPrior);
+			// no need to add between prior and hyperprior!!! this is done automatically.
 
 			// Add dependency between likelihood variable and parameters			
 			
