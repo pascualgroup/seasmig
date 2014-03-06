@@ -82,10 +82,11 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 				treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
 			}
 		}
-		rateHyperPriorDist = new ExponentialDistribution(this, "rateHyperPriorDist", 1.0);		
-		rateHyperPrior = new DoubleVariable(this, "rateHyperPrior", rateHyperPriorDist);
-		ratePriorDist = new ExponentialDistribution(this,"ratePrior");		
-		ratePriorDist.setRate(rateHyperPrior);
+		
+		rateHyperPriorDist = new ExponentialDistribution(this,"rateHyperPriorDist");
+		rateHyperPrior= new DoubleVariable(this, "rateHyperPrior", rateHyperPriorDist);
+		ratePriorDist = new ExponentialDistribution(this,"ratePriorDist");
+		ratePriorDist.setRate(rateHyperPrior);		
 
 		if (fixedPhase && fixedPhaseLength) {
 			seasonStart=config.fixedPhase;			
