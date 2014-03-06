@@ -45,8 +45,10 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 	boolean fixedPhase;
 	boolean fixedPhaseLength;
 	boolean fixRate;
+	private ExponentialDistribution rateHyperPriorDist;
 	private ExponentialDistribution ratePriorDist;
 	private BinaryVariable[][] rateIndicators;
+	private DoubleVariable rateHyperPrior;
 
 	protected SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection() { }
 
@@ -80,7 +82,10 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 				treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
 			}
 		}
-		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
+		rateHyperPriorDist = new ExponentialDistribution(this, "rateHyperPrior", 1.0);		
+		rateHyperPrior = new DoubleVariable(this, "rateHyperPrior", rateHyperPriorDist);
+		ratePriorDist = new ExponentialDistribution(this,"ratePrior");		
+		ratePriorDist.setRate(rateHyperPrior);
 
 		if (fixedPhase && fixedPhaseLength) {
 			seasonStart=config.fixedPhase;			
@@ -99,7 +104,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 
 		DoubleDistribution diffMultiplierPriorDist = new UniformDistribution(this,-1.0,1.0);
 		BinaryDistribution diffIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
-		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, config.rateIndicatorPrior);
+		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
 
 		for (int i=0; i< numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {
@@ -128,6 +133,9 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true,nTrees.length,config);
 
+			// TODO: check if this is required
+			m.addEdge(ratePriorDist,rateHyperPrior);
+			
 			// Add dependencies between likelihood variable and parameters
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1) {

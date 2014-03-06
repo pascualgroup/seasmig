@@ -87,7 +87,7 @@ public class EpochalMigrationModel extends MigrationModel {
 		}		
 
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior",1.0);
-		if (vs) rateIndicatorPriorDist = new BernoulliDistribution(this, "rateIndicatorPrior", config.rateIndicatorPrior);
+		if (vs) rateIndicatorPriorDist = new BernoulliDistribution(this, "rateIndicatorPrior", 0.5);
 
 		for (int i=0; i<nParts; i++) {
 			for (int j=0; j<numLocations; j++) {

@@ -53,7 +53,7 @@ public class MigrationModelNoSeasonalityVarSelect extends MigrationModel {
 			
 		beginConstruction();
 		
-		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, config.rateIndicatorPrior);
+		BinaryDistribution rateIndicatorPriorDist = new BernoulliDistribution(this, 0.5);
 		treeIndices = new IntVariable[trees.size()];
 		for (int i=0;i<trees.size();i++) {
 			if (nTrees[i]>1) {

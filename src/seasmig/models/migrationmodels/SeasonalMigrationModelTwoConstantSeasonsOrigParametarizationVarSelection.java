@@ -74,7 +74,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsOrigParametarizationVarSele
 			seasonalPhaseRealization = config.fixedPhase;
 		
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior");
-		rateIndicatorPriorDist = new BernoulliDistribution(this, "rateIndicatorPriorDist", config.rateIndicatorPrior);
+		rateIndicatorPriorDist = new BernoulliDistribution(this, "rateIndicatorPriorDist", 0.5);
 		
 		for(int i = 0; i < numLocations; i++) {
 			for(int j = 0; j < numLocations; j++) {

@@ -169,9 +169,6 @@ public class Config implements Serializable
 	public int numTreesFromTail = 50; // at most number of trees to read from tree file's tail
 	public int numLocations = 7; // needs to be specified if locations are loaded from trees....
 	
-	// VARIABLE SELECTION
-	public double rateIndicatorPrior = 0.5; // Prior for including any migration between two locations 
-	
 	// ANCESTRAL STATE RECONSTRUCTIOn
 	public StateReconstructionAndTreeOutput stateReconstructionAndTreeOutput = StateReconstructionAndTreeOutput.SEQ_STOCHASTIC_MAPPING ;
 	
