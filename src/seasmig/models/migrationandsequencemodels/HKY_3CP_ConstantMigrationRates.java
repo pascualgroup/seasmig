@@ -150,6 +150,8 @@ public class HKY_3CP_ConstantMigrationRates extends MigrationModel {
 			super(m, "likeVar", true, nTrees.length,config);
 
 			// no need to add between prior and hyperprior!!! this is done automatically.
+			m.addEdge(muHyperPriorDist,muHyperPrior);
+			m.addEdge(rateHyperPriorDist,rateHyperPrior);
 
 			// Add dependency between likelihood variable and parameters			
 			

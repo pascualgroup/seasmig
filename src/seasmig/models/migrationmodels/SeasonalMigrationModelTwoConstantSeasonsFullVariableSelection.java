@@ -82,7 +82,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 				treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
 			}
 		}
-		rateHyperPriorDist = new ExponentialDistribution(this, "rateHyperPrior", 1.0);		
+		rateHyperPriorDist = new ExponentialDistribution(this, "rateHyperPriorDist", 1.0);		
 		rateHyperPrior = new DoubleVariable(this, "rateHyperPrior", rateHyperPriorDist);
 		ratePriorDist = new ExponentialDistribution(this,"ratePrior");		
 		ratePriorDist.setRate(rateHyperPrior);
@@ -132,7 +132,10 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 			// Call superclass constructor specifying that this is an
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true,nTrees.length,config);
-	
+
+			// TODO: check if this is required
+			m.addEdge(ratePriorDist,rateHyperPrior);
+			
 			// Add dependencies between likelihood variable and parameters
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1) {
