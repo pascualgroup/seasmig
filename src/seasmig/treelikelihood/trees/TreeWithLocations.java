@@ -1696,10 +1696,12 @@ public class TreeWithLocations implements LikelihoodTree {
 		for (TreeWithLocationsNode child : from.children) {
 			ArrayList<Event> mutationsAndMigrationsSortedByTime = new ArrayList<Event>();
 			for (int cp=0;cp<3;cp++) {
-				for (int loci=0; loci<child.mutations.get(cp).size();loci++) {
-					for (Transition mutation : child.mutations.get(cp).get(loci)) {
-						mutationsAndMigrationsSortedByTime.add(new Event(mutation, TransitionType.MUTATION, loci*3+cp));
-					}
+				if (child.mutations!=null) {
+					for (int loci=0; loci<child.mutations.get(cp).size();loci++) {
+						for (Transition mutation : child.mutations.get(cp).get(loci)) {
+							mutationsAndMigrationsSortedByTime.add(new Event(mutation, TransitionType.MUTATION, loci*3+cp));
+						}
+					}	
 				}
 			}
 			
