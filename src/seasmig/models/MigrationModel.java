@@ -98,13 +98,11 @@ public abstract class MigrationModel extends Model implements Serializable {
 		
 		// Alternative Tree Output
 		if (outputObject.altBranches!=null && outputObject.altNodes!=null) {
-			for (int i=0;i<outputObject.altBranches.length;i++) {
-				flatMap.put("altTreeOutput."+i+"."+"branches",outputObject.altBranches[i]);
+			for (int i=0;i<outputObject.altBranches.length;i++) {				
 				flatMap.put("altTreeOutput."+i+"."+"nodes",outputObject.altNodes[i]);
 			}
 		}
-		
-			
+				
 		return makeHierarchicalMap(flatMap);
 	}
 

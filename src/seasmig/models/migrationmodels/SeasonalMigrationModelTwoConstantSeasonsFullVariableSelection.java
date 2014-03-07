@@ -45,7 +45,6 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 	boolean fixedPhase;
 	boolean fixedPhaseLength;
 	boolean fixRate;
-	private ExponentialDistribution rateHyperPriorDist;
 	private ExponentialDistribution ratePriorDist;
 	private BinaryVariable[][] rateIndicators;
 	private DoubleVariable rateHyperPrior;
@@ -84,7 +83,7 @@ public class SeasonalMigrationModelTwoConstantSeasonsFullVariableSelection exten
 		}
 		
 		rateHyperPriorDist = new ExponentialDistribution(this,"rateHyperPriorDist");
-		rateHyperPrior= new DoubleVariable(this, "rateHyperPrior", rateHyperPriorDist);
+		rateHyperPrior= new DoubleVariable(this, "rateHyperPrior",  new ExponentialDistribution(this));
 		ratePriorDist = new ExponentialDistribution(this,"ratePriorDist");
 		ratePriorDist.setRate(rateHyperPrior);		
 
