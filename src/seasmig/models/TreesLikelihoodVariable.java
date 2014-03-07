@@ -39,8 +39,8 @@ public class TreesLikelihoodVariable extends Variable {
 		public String[] seqMutationStats = null;
 		public String[] altNodes = null;
 		public String[] altBranches = null;
-		public Double[] seqLikelihood;
-		public Double[] locLikelihood;
+		public Double[] seqLikelihood = null;
+		public Double[] locLikelihood = null;
 		
 	}
 	

@@ -149,7 +149,7 @@ public class HKY_3CP_ConstantMigrationRates extends MigrationModel {
 			// OBSERVED random variable (true for last parameter).
 			super(m, "likeVar", true, nTrees.length,config);
 
-			// no need to add between prior and hyperprior!!! this is done automatically.
+			//do we need to add an edge between prior and hyperprior or is this done automatically???
 			m.addEdge(muHyperPriorDist,muHyperPrior);
 			m.addEdge(rateHyperPriorDist,rateHyperPrior);
 
