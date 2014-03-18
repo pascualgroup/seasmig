@@ -1712,8 +1712,8 @@ public class TreeWithLocations implements LikelihoodTree {
 			Collections.sort(mutationsAndMigrationsSortedByTime, eventOrder);
 			
 			// Add chain of events as children 
-			Sequence parentSeq = child.seq;
-			int parentLocation = child.getLoc();
+			Sequence parentSeq = to.seq;
+			int parentLocation = to.getLoc();
 			TreeWithLocationsNode parentNode = to;
 			for (Event event : mutationsAndMigrationsSortedByTime) {
 				// TODO:
