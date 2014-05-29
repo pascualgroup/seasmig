@@ -77,21 +77,21 @@ public class SimpleAttributeLoader implements AttributeLoader{
 			double mu2=Double.parseDouble(splitString[6]);
 			double piA0; double piA1; double piA2;
 			double piC0; double piC1; double piC2;
-			double piT0; double piT1; double piT2;
+			//double piT0; double piT1; double piT2;
 			double piG0; double piG1; double piG2;
 			piA0=(Double) attributes.get("piA0");
 			piC0=(Double) attributes.get("piC0");
-			piT0=(Double) attributes.get("piT0");
+			//piT0=(Double) attributes.get("piT0");
 			piG0=(Double) attributes.get("piG0");
 			
 			piA1=(Double) attributes.get("piA1");
 			piC1=(Double) attributes.get("piC1");
-			piT1=(Double) attributes.get("piT1");
+			//piT1=(Double) attributes.get("piT1");
 			piG1=(Double) attributes.get("piG1");
 			
 			piA2=(Double) attributes.get("piA2");
 			piC2=(Double) attributes.get("piC2");
-			piT2=(Double) attributes.get("piT2");
+			//piT2=(Double) attributes.get("piT2");
 			piG2=(Double) attributes.get("piG2");
 			
 			TransitionModel[] models = new TransitionModel[3];

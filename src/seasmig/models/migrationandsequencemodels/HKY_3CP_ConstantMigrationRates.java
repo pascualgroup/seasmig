@@ -11,6 +11,7 @@ import mc3kit.distributions.ExponentialDistribution;
 import mc3kit.distributions.NormalDistribution;
 import mc3kit.distributions.UniformDistribution;
 import mc3kit.distributions.UniformIntDistribution;
+import mc3kit.distributions.UniformIntIntegrator;
 import seasmig.data.Data;
 import seasmig.migrationmain.Config;
 import seasmig.models.MigrationModel;
@@ -88,10 +89,20 @@ public class HKY_3CP_ConstantMigrationRates extends MigrationModel {
 		beginConstruction();
 
 		// Trees
-		treeIndices = new IntVariable[trees.size()];
-		for (int i=0;i<trees.size();i++) {
-			if (nTrees[i]>1) {
-				treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
+		if (config.sampleTreesSequentially) {
+			treeIndices = new IntVariable[trees.size()];
+			for (int i=0;i<trees.size();i++) {
+				if (nTrees[i]>1) {
+					treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntIntegrator(this, 0, nTrees[i]-1));
+				}
+			}
+		}
+		else  {
+			treeIndices = new IntVariable[trees.size()];
+			for (int i=0;i<trees.size();i++) {
+				if (nTrees[i]>1) {
+					treeIndices[i] = new IntVariable(this, "treeIndex."+i, new UniformIntDistribution(this, 0, nTrees[i]-1));
+				}
 			}
 		}
 
@@ -154,7 +165,7 @@ public class HKY_3CP_ConstantMigrationRates extends MigrationModel {
 			//m.addEdge(rateHyperPriorDist,rateHyperPrior); // This one throws an error! so no for this one.
 
 			// Add dependency between likelihood variable and parameters			
-			
+
 			// Trees
 			for (int i=0;i<nTrees.length;i++) {
 				if (nTrees[i]>1) {
@@ -209,10 +220,10 @@ public class HKY_3CP_ConstantMigrationRates extends MigrationModel {
 		public boolean update() {
 
 			double logP = 0.0;
-			
+
 			TransitionModel migrationBaseModel = null;
 			TransitionModel[] codonModel = new TransitionModel[3];
-		
+
 			// Migration Model
 			if (!inputMigrationModel) {
 				double[][] ratesdoubleForm = new double[numLocations][numLocations];
@@ -227,7 +238,7 @@ public class HKY_3CP_ConstantMigrationRates extends MigrationModel {
 					ratesdoubleForm[i][i]=rowsum;
 				}
 				migrationBaseModel = new ConstantTransitionBaseModel(ratesdoubleForm);
-				
+
 			}
 
 			if (!inputCodonModel) {
@@ -274,12 +285,12 @@ public class HKY_3CP_ConstantMigrationRates extends MigrationModel {
 					workingCopy = data.getTrees().get(i).get((int)treeIndices[i].getValue()).copy(); 
 				else
 					workingCopy = data.getTrees().get(i).get(0).copy();
-				
+
 				if (!inputMigrationModel) 
 					workingCopy.setMigrationModel(migrationBaseModel);
 				if (!inputCodonModel) 
 					workingCopy.setCodonModel(codonModel);
-				
+
 				logP+=config.treeWeights[i]*workingCopy.logLikelihood();
 				trees[i]=workingCopy;
 			}
